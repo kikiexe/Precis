@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'workspace.context' => ResolveWorkspaceContext::class,
             'role' => EnsureRole::class,
             'pos.device' => DeviceTokenAuth::class,
+            'subscription.status' => \App\Http\Middleware\CheckSubscriptionStatus::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

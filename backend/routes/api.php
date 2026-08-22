@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\CashAdvanceController;
 use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\PayrollController;
 use App\Http\Controllers\Api\PosController;
 use App\Http\Controllers\Api\PosSecurityController;
 use App\Http\Controllers\Api\ShiftController;
+use App\Http\Controllers\Api\SuperadminInvoiceController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -20,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | endpoint API publik, portal user authenticated, multi-tenancy context scoping,
-| presensi karyawan PWA, roster shift, kasbon staf, payroll, dan kasir POS
+| billing SaaS, presensi karyawan PWA, roster shift, kasbon staf, payroll, dan kasir POS
 |
 */
 
@@ -48,8 +50,20 @@ Route::prefix('v1')->group(function (): void {
         });
     });
 
-    // endpoint scoping workspace multi-tenant (sanctum + resolveworkspacecontext)
-    Route::middleware(['auth:sanctum', 'workspace.context'])->group(function (): void {
+    // billing saas user portal
+    Route::middleware('auth:sanctum')->prefix('billing')->group(function (): void {
+        Route::post('/invoices', [BillingController::class, 'createInvoice']);
+        Route::get('/invoices', [BillingController::class, 'myInvoices']);
+        Route::post('/invoices/{id}/proof', [BillingController::class, 'submitProof']);
+    });
+
+    // endpoint superadmin
+    Route::prefix('superadmin')->group(function (): void {
+        Route::post('/invoices/{id}/verify', [SuperadminInvoiceController::class, 'verify']);
+    });
+
+    // endpoint scoping workspace multi-tenant (sanctum + resolveworkspacecontext + checksubscriptionstatus)
+    Route::middleware(['auth:sanctum', 'workspace.context', 'subscription.status'])->group(function (): void {
 
         // rute konteks workspace
         Route::prefix('workspace')->group(function (): void {
