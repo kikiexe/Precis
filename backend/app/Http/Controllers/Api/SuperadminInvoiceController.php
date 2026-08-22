@@ -18,14 +18,14 @@ class SuperadminInvoiceController
     }
 
     /**
-     * Verifikasi transfer pembayaran invoice oleh superadmin.
+     * verifikasi transfer pembayaran invoice oleh superadmin
      */
     public function verify(Request $request, string $id): JsonResponse
     {
         /** @var Superadmin|null $superadmin */
         $superadmin = $request->user();
 
-        // Fallback untuk pengujian superadmin jika guard default
+        // fallback buat pengujian superadmin kalo guard default
         if (! ($superadmin instanceof Superadmin)) {
             $superadmin = Superadmin::firstOrFail();
         }

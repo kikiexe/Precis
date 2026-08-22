@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 class CheckSubscriptionStatus
 {
     /**
-     * Evaluasi status masa berlaku langganan workspace owner.
+     * evaluasi status masa berlaku langganan workspace owner
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -42,7 +42,7 @@ class CheckSubscriptionStatus
 
         $now = Carbon::now();
 
-        // 1. Jika status langsung SUSPENDED
+        // 1. jika status langsung SUSPENDED
         if ($owner->subscription_status === 'SUSPENDED') {
             return new JsonResponse([
                 'message' => 'Layanan workspace ini telah ditangguhkan (SUSPENDED). Silakan lakukan pembayaran perpanjangan langganan.',
@@ -50,14 +50,14 @@ class CheckSubscriptionStatus
             ], Response::HTTP_PAYMENT_REQUIRED);
         }
 
-        // 2. Evaluasi tanggal kedaluwarsa jika ada
+        // 2. evaluasi tanggal kedaluwarsa jika ada
         if ($owner->subscription_expires_at) {
             $expiresAt = Carbon::parse($owner->subscription_expires_at);
 
             if ($now->isAfter($expiresAt)) {
                 $daysPast = $expiresAt->diffInDays($now);
 
-                // Masa tenggang (GRACE_PERIOD) adalah 5 hari
+                // masa tenggang (GRACE_PERIOD) adalah 5 hari
                 if ($daysPast > 5) {
                     $owner->update(['subscription_status' => 'SUSPENDED']);
 
@@ -67,7 +67,7 @@ class CheckSubscriptionStatus
                     ], Response::HTTP_PAYMENT_REQUIRED);
                 }
 
-                // Masih dalam masa tenggang
+                // masih dalam masa tenggang
                 $response = $next($request);
                 $response->headers->set('X-Subscription-Warning', 'GRACE_PERIOD');
 

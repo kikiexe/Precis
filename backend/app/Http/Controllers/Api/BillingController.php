@@ -20,7 +20,7 @@ class BillingController
     }
 
     /**
-     * Buat faktur tagihan invoice paket langganan baru.
+     * buat invoice tagihan paket langganan
      */
     public function createInvoice(CreateInvoiceRequest $request): JsonResponse
     {
@@ -48,7 +48,7 @@ class BillingController
     }
 
     /**
-     * Ambil riwayat faktur tagihan invoice milik user yang login.
+     * riwayat invoice tagihan milik user yang login
      */
     public function myInvoices(Request $request): JsonResponse
     {
@@ -64,7 +64,7 @@ class BillingController
     }
 
     /**
-     * Unggah bukti transfer pembayaran invoice oleh user.
+     * upload bukti transfer pembayaran invoice oleh user
      */
     public function submitProof(SubmitPaymentProofRequest $request, string $id): JsonResponse
     {

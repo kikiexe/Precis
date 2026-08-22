@@ -17,7 +17,7 @@ use Illuminate\Validation\ValidationException;
 class BillingService
 {
     /**
-     * Buat faktur tagihan (invoice) baru dengan tambahan 3-digit kode unik acak.
+     * buat invoice tagihan paket langganan
      */
     public function createInvoice(User $user, string $planId, string $billingCycle = 'MONTHLY'): Invoice
     {
@@ -28,7 +28,7 @@ class BillingService
             ? (float) $plan->annual_price
             : (float) $plan->monthly_price;
 
-        // Generator kode unik 3 digit (100 sampai 999)
+        // generator kode unik 3 digit (100 sampai 999)
         $uniqueCode = random_int(100, 999);
         $totalAmount = $amountBase + $uniqueCode;
 
@@ -47,7 +47,7 @@ class BillingService
     }
 
     /**
-     * Unggah bukti transfer pembayaran oleh pengguna.
+     * upload bukti transfer pembayaran oleh user
      */
     public function submitPaymentProof(
         User $user,
@@ -91,7 +91,7 @@ class BillingService
     }
 
     /**
-     * Verifikasi pembayaran invoice oleh superadmin dan perpanjang masa aktif akun owner.
+     * verifikasi pembayaran invoice oleh superadmin dan perpanjang masa aktif akun owner
      */
     public function verifyInvoicePayment(Superadmin $superadmin, string $invoiceId): Invoice
     {
@@ -110,13 +110,13 @@ class BillingService
 
             $invoice->update(['status' => 'PAID']);
 
-            // Perpanjang masa aktif langganan user
+            // perpanjang masa aktif langganan user
             $user = $invoice->user;
             if ($user) {
                 $currentExpiry = $user->subscription_expires_at;
                 $isCurrentlyActive = $currentExpiry && Carbon::parse($currentExpiry)->isFuture();
 
-                // Tambahkan 30 hari dari tanggal kedaluwarsa saat ini atau dari waktu sekarang
+                // tambahkan 30 hari dari tanggal kedaluwarsa saat ini atau dari waktu sekarang
                 $newExpiry = $isCurrentlyActive
                     ? Carbon::parse($currentExpiry)->addDays(30)
                     : $now->copy()->addDays(30);
@@ -132,7 +132,7 @@ class BillingService
     }
 
     /**
-     * Ambil riwayat faktur tagihan milik user yang sedang login.
+     * ambil riwayat invoice tagihan milik user yang login
      *
      * @return array<int, array<string, mixed>>
      */

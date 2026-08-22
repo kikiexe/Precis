@@ -200,7 +200,7 @@ class SaaSBillingTest extends TestCase
 
     public function test_workspace_access_allowed_with_warning_during_grace_period(): void
     {
-        // Kadaluwarsa 2 hari yang lalu (masih dalam grace period 5 hari)
+        // kadaluwarsa 2 hari yang lalu (masih dalam grace period 5 hari)
         $this->owner->update([
             'subscription_status' => 'ACTIVE',
             'subscription_expires_at' => Carbon::now()->subDays(2),
