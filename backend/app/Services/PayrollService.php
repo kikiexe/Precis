@@ -28,16 +28,23 @@ class PayrollService
     ): array {
         $workspaceId = (string) $member->workspace_id;
         $userId = (string) $member->user_id;
-        $branchId = (string) $member->branch_id;
+        $branchId = $member->branch_id ? (string) $member->branch_id : null;
 
         $baseSalary = (float) $member->base_salary;
 
         // ambil konfigurasi denda telat & tarif lembur cabang
         /** @var BranchSetting|null $setting */
-        $setting = BranchSetting::withoutGlobalScopes()
-            ->where('workspace_id', $workspaceId)
-            ->where('branch_id', $branchId)
-            ->first() ?? $defaultSetting;
+        $setting = null;
+        if ($branchId) {
+            $setting = BranchSetting::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->first();
+        }
+
+        if (! $setting) {
+            $setting = $defaultSetting;
+        }
 
         $latePenaltyPerMinute = (float) ($setting?->late_penalty_per_minute ?? 1000.00);
         $overtimePayPerHour = (float) ($setting?->overtime_pay_per_hour ?? 20000.00);
