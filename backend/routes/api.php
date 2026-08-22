@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CashAdvanceController;
 use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\PosSecurityController;
 use App\Http\Controllers\Api\ShiftController;
@@ -17,7 +18,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | endpoint API publik, portal user authenticated, multi-tenancy context scoping,
-| presensi karyawan PWA, roster shift, dan kasir POS
+| presensi karyawan PWA, roster shift, kasbon staf, dan kasir POS
 |
 */
 
@@ -84,6 +85,12 @@ Route::prefix('v1')->group(function (): void {
             Route::middleware('role:OWNER,ADMIN')->post('/assign', [ShiftController::class, 'assign']);
         });
 
+        // manajemen kasbon staf
+        Route::prefix('cash-advances')->group(function (): void {
+            Route::post('/', [CashAdvanceController::class, 'create']);
+            Route::get('/my', [CashAdvanceController::class, 'my']);
+        });
+
         // endpoint administrasi khusus role OWNER dan ADMIN
         Route::middleware('role:OWNER,ADMIN')->prefix('admin')->group(function (): void {
             Route::get('/attendances/wall-of-faces', [AttendanceController::class, 'wallOfFaces']);
@@ -92,6 +99,12 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('/swap-requests', [ShiftController::class, 'pendingSwapRequests']);
                 Route::post('/swap-requests/{id}/approve', [ShiftController::class, 'approveSwap']);
                 Route::post('/swap-requests/{id}/reject', [ShiftController::class, 'rejectSwap']);
+            });
+
+            Route::prefix('cash-advances')->group(function (): void {
+                Route::get('/', [CashAdvanceController::class, 'adminList']);
+                Route::post('/{id}/approve', [CashAdvanceController::class, 'approve']);
+                Route::post('/{id}/reject', [CashAdvanceController::class, 'reject']);
             });
 
             Route::get('/admin-only', function (Request $request): JsonResponse {
