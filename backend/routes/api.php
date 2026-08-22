@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CashAdvanceController;
 use App\Http\Controllers\Api\MediaController;
+use App\Http\Controllers\Api\PayrollController;
 use App\Http\Controllers\Api\PosController;
 use App\Http\Controllers\Api\PosSecurityController;
 use App\Http\Controllers\Api\ShiftController;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | endpoint API publik, portal user authenticated, multi-tenancy context scoping,
-| presensi karyawan PWA, roster shift, kasbon staf, dan kasir POS
+| presensi karyawan PWA, roster shift, kasbon staf, payroll, dan kasir POS
 |
 */
 
@@ -92,6 +93,9 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/my', [CashAdvanceController::class, 'my']);
         });
 
+        // slip gaji digital staf
+        Route::get('/payroll/my-slip', [PayrollController::class, 'mySlip']);
+
         // endpoint administrasi khusus role OWNER dan ADMIN
         Route::middleware('role:OWNER,ADMIN')->prefix('admin')->group(function (): void {
             Route::get('/attendances/wall-of-faces', [AttendanceController::class, 'wallOfFaces']);
@@ -106,6 +110,12 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('/', [CashAdvanceController::class, 'adminList']);
                 Route::post('/{id}/approve', [CashAdvanceController::class, 'approve']);
                 Route::post('/{id}/reject', [CashAdvanceController::class, 'reject']);
+            });
+
+            Route::prefix('payroll')->group(function (): void {
+                Route::get('/preview', [PayrollController::class, 'preview']);
+                Route::post('/disburse', [PayrollController::class, 'disburse']);
+                Route::get('/export-csv', [PayrollController::class, 'exportCsv']);
             });
 
             Route::get('/admin-only', function (Request $request): JsonResponse {
