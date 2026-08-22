@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: docker.io/library/postgres:16-alpine
+    container_name: precis_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: precis_db
+      POSTGRES_USER: precis_user
+      POSTGRES_PASSWORD: precis_secret_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - precis_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U precis_user -d precis_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: docker.io/library/redis:7-alpine
+    container_name: precis_redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 64mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - precis_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: precis_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      OCTANE_SERVER: frankenphp
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: precis_db
+      DB_USERNAME: precis_user
+      DB_PASSWORD: precis_secret_password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: null
+      MAIL_FROM_ADDRESS: "noreply@precis.com"
+      MAIL_FROM_NAME: "Précis"
+
+  mailpit:
+    image: docker.io/axllent/mailpit:latest
+    container_name: precis_mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025" # SMTP port
+      - "8025:8025" # Web UI port
+
+volumes:
+  precis_pgdata:
+    driver: local
+  precis_redisdata:
+    driver: local

@@ -14,6 +14,7 @@ jobs:
   frontend-check:
     name: Frontend Quality & Build Verification
     runs-on: ubuntu-latest
+    if: hashFiles('package.json') != ''
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
