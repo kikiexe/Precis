@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CashAdvanceController;
 use App\Http\Controllers\Api\MediaController;
+use App\Http\Controllers\Api\PosController;
 use App\Http\Controllers\Api\PosSecurityController;
 use App\Http\Controllers\Api\ShiftController;
 use Illuminate\Http\JsonResponse;
@@ -131,5 +132,11 @@ Route::prefix('v1')->group(function (): void {
                 'branch_name' => $terminal->branch?->name,
             ]);
         });
+
+        // katalog produk offline & manajemen sesi kasir
+        Route::get('/products', [PosController::class, 'products']);
+        Route::post('/sessions/open', [PosController::class, 'openSession']);
+        Route::post('/sessions/close', [PosController::class, 'closeSession']);
+        Route::post('/orders/sync-batch', [PosController::class, 'syncBatch']);
     });
 });
