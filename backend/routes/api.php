@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\PosSecurityController;
+use App\Http\Controllers\Api\ShiftController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 | endpoint API publik, portal user authenticated, multi-tenancy context scoping,
-| presensi karyawan PWA, dan kasir POS
+| presensi karyawan PWA, roster shift, dan kasir POS
 |
 */
 
@@ -76,9 +77,22 @@ Route::prefix('v1')->group(function (): void {
             Route::post('/clock-out', [AttendanceController::class, 'clockOut']);
         });
 
+        // manajemen roster shift & pengajuan tukar shift staf
+        Route::prefix('shifts')->group(function (): void {
+            Route::get('/roster', [ShiftController::class, 'roster']);
+            Route::post('/swap-requests', [ShiftController::class, 'requestSwap']);
+            Route::middleware('role:OWNER,ADMIN')->post('/assign', [ShiftController::class, 'assign']);
+        });
+
         // endpoint administrasi khusus role OWNER dan ADMIN
         Route::middleware('role:OWNER,ADMIN')->prefix('admin')->group(function (): void {
             Route::get('/attendances/wall-of-faces', [AttendanceController::class, 'wallOfFaces']);
+
+            Route::prefix('shifts')->group(function (): void {
+                Route::get('/swap-requests', [ShiftController::class, 'pendingSwapRequests']);
+                Route::post('/swap-requests/{id}/approve', [ShiftController::class, 'approveSwap']);
+                Route::post('/swap-requests/{id}/reject', [ShiftController::class, 'rejectSwap']);
+            });
 
             Route::get('/admin-only', function (Request $request): JsonResponse {
                 return response()->json([
