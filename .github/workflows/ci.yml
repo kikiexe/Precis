@@ -14,23 +14,34 @@ jobs:
   frontend-check:
     name: Frontend Quality & Build Verification
     runs-on: ubuntu-latest
-    if: hashFiles('package.json') != ''
     steps:
       - name: Checkout Source Code
         uses: actions/checkout@v4
 
+      - name: Check if Monorepo Package Exists
+        id: check_pkg
+        run: |
+          if [ -f "package.json" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Setup Node.js Runtime
+        if: steps.check_pkg.outputs.exists == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
       - name: Setup pnpm Package Manager
+        if: steps.check_pkg.outputs.exists == 'true'
         uses: pnpm/action-setup@v4
         with:
           version: 10.30.3
           run_install: false
 
       - name: Restore pnpm Cache
+        if: steps.check_pkg.outputs.exists == 'true'
         uses: actions/cache@v4
         with:
           path: ${{ env.STORE_PATH }}
@@ -41,12 +52,15 @@ jobs:
           STORE_PATH: ~/.local/share/pnpm/store
 
       - name: Install Dependencies
+        if: steps.check_pkg.outputs.exists == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: Static Type Check (Svelte 5 Runes)
+        if: steps.check_pkg.outputs.exists == 'true'
         run: pnpm -r check
 
       - name: Production Build Check
+        if: steps.check_pkg.outputs.exists == 'true'
         run: pnpm -r build
 
   backend-test:
@@ -124,7 +138,7 @@ jobs:
           DB_PASSWORD: secret_test_password
 
       - name: Execute Automated Test Suite (PHPUnit)
-        run: php artisan test --parallel
+        run: php artisan test
         env:
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
