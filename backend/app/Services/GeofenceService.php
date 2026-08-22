@@ -11,7 +11,7 @@ class GeofenceService
     private const EARTH_RADIUS_METERS = 6371000.0;
 
     /**
-     * Hitung jarak fisik dalam meter antara dua koordinat GPS menggunakan formula Haversine.
+     * hitung jarak fisik dalam meter antara dua koordinat GPS menggunakan formula Haversine
      */
     public function calculateDistanceMeters(float $lat1, float $lng1, float $lat2, float $lng2): float
     {
@@ -32,7 +32,7 @@ class GeofenceService
     }
 
     /**
-     * Validasi apakah posisi pengguna berada di dalam batas radius cabang yang diizinkan.
+     * validasi apakah posisi pengguna berada di dalam batas radius cabang yang diizinkan
      *
      * @return array{is_valid: bool, distance_meters: float, allowed_radius_meters: int}
      */

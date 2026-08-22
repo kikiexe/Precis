@@ -33,7 +33,7 @@ class AttendanceClockOutTest extends TestCase
         $workspace = Workspace::where('slug', 'amore-coffee')->first();
         $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
 
-        // Konfigurasi ambang batas lembur 30 menit
+        // konfigurasi ambang batas lembur 30 menit
         BranchSetting::updateOrCreate(
             ['workspace_id' => $workspace->id, 'branch_id' => $branch->id],
             ['min_overtime_threshold_minutes' => 30]
@@ -56,7 +56,7 @@ class AttendanceClockOutTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        // 1. Clock-in jam 07:00
+        // 1. absen jam 07:00
         Carbon::setTestNow(Carbon::today()->setTime(7, 0, 0));
         $this->withHeader('X-Workspace-Id', $workspace->id)
             ->postJson('/api/v1/attendances/clock-in', [
@@ -66,7 +66,7 @@ class AttendanceClockOutTest extends TestCase
                 'photo_url' => 'https://r2.precis.id/staging/' . $workspace->id . '/selfie_in.webp',
             ])->assertStatus(201);
 
-        // 2. Clock-out jam 16:00 (Lembur 60 menit, melebihi threshold 30 menit)
+        // 2. absen jam 16:00 (lembur 60 menit, melebihi 30 menit)
         Carbon::setTestNow(Carbon::today()->setTime(16, 0, 0));
         $response = $this->withHeader('X-Workspace-Id', $workspace->id)
             ->postJson('/api/v1/attendances/clock-out', [
@@ -112,7 +112,7 @@ class AttendanceClockOutTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        // Clock-in valid terlebih dahulu
+        // absen valid terlebih dahulu
         $this->withHeader('X-Workspace-Id', $workspace->id)
             ->postJson('/api/v1/attendances/clock-in', [
                 'branch_id' => $branch->id,
@@ -121,7 +121,7 @@ class AttendanceClockOutTest extends TestCase
                 'photo_url' => 'https://r2.precis.id/staging/' . $workspace->id . '/selfie_in.webp',
             ])->assertStatus(201);
 
-        // Clock-out di luar jangkauan (radius 10km)
+        // absen keluar di luar jangkauan (radius 10km)
         $response = $this->withHeader('X-Workspace-Id', $workspace->id)
             ->postJson('/api/v1/attendances/clock-out', [
                 'branch_id' => $branch->id,
