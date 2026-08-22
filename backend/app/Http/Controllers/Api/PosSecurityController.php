@@ -19,7 +19,7 @@ class PosSecurityController
     }
 
     /**
-     * Verifikasi kata sandi Owner/Admin untuk membuka kunci sementara pengaturan kiosk pada tablet POS.
+     * verifikasi password owner/admin untuk membuka kunci sementara pengaturan pada POS
      */
     public function masterUnlock(PosMasterUnlockRequest $request): JsonResponse
     {

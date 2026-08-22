@@ -13,9 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 class DeviceTokenAuth
 {
     /**
-     * Menangani request masuk untuk rute terminal POS.
+     * handles request masuk buat rute terminal POS.
      *
-     * Memvalidasi header X-Device-Token terhadap hash token pada tabel pos_terminals.
+     * validate header X-Device-Token terhadap hash token di tabel pos_terminals.
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -46,7 +46,7 @@ class DeviceTokenAuth
             ], Response::HTTP_FORBIDDEN);
         }
 
-        // Ikat konteks terminal ke atribut request (aman di FrankenPHP Octane)
+        // ikat konteks ke atribut request (aman di FrankenPHP Octane)
         $request->attributes->set('current_workspace_id', $terminal->workspace_id);
         $request->attributes->set('current_branch_id', $terminal->branch_id);
         $request->attributes->set('current_pos_terminal', $terminal);

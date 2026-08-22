@@ -63,7 +63,7 @@ class AuthController
     }
 
     /**
-     * cabut token akses aktif saat ini (logout)
+     * revoke token akses aktif saat ini (logout)
      */
     public function logout(Request $request): JsonResponse
     {
@@ -77,7 +77,7 @@ class AuthController
     }
 
     /**
-     * Kirimkan tautan pemulihan kata sandi ke email pengguna.
+     * kirim link reset password ke email user
      */
     public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
     {
@@ -91,7 +91,7 @@ class AuthController
     }
 
     /**
-     * Atur ulang kata sandi pengguna menggunakan token yang valid.
+     * reset password user menggunakan token yang valid
      */
     public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {

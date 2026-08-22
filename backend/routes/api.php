@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\PosSecurityController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -10,17 +12,17 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Rute REST API v1 Précis
+| rute REST API
 |--------------------------------------------------------------------------
 |
-| Definisi seluruh endpoint API publik, portal pengguna terautentikasi,
-| multi-tenancy context scoping, dan terminal kasir POS.
+| endpoint API publik, portal user authenticated, multi-tenancy context scoping,
+| presensi karyawan PWA, dan kasir POS
 |
 */
 
 Route::prefix('v1')->group(function (): void {
 
-    // 1. Endpoint Pemeriksaan Kesehatan Sistem (Health Check)
+    // endpoint health check
     Route::get('/health', function (): JsonResponse {
         return response()->json([
             'status' => 'healthy',
@@ -29,41 +31,65 @@ Route::prefix('v1')->group(function (): void {
         ]);
     });
 
-    // 2. Endpoint Otentikasi Pengguna & Portal
+    // endpoint auth portal users
     Route::prefix('auth')->group(function (): void {
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
         Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
-        // Rute portal terotentikasi (Laravel Sanctum)
+        // authenticated portal users
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::get('/me', [AuthController::class, 'me']);
             Route::post('/logout', [AuthController::class, 'logout']);
         });
     });
 
-    // 3. Endpoint Scoping Workspace Multi-Tenant (Sanctum + ResolveWorkspaceContext)
-    Route::middleware(['auth:sanctum', 'workspace.context'])->prefix('workspace')->group(function (): void {
-        Route::get('/context', function (Request $request): JsonResponse {
-            $workspace = $request->attributes->get('current_workspace');
-            $member = $request->attributes->get('current_member');
+    // endpoint scoping workspace multi-tenant (sanctum + resolveworkspacecontext)
+    Route::middleware(['auth:sanctum', 'workspace.context'])->group(function (): void {
 
-            return response()->json([
-                'workspace' => $workspace,
-                'member' => $member,
-            ]);
+        // rute konteks workspace
+        Route::prefix('workspace')->group(function (): void {
+            Route::get('/context', function (Request $request): JsonResponse {
+                $workspace = $request->attributes->get('current_workspace');
+                $member = $request->attributes->get('current_member');
+
+                return response()->json([
+                    'workspace' => $workspace,
+                    'member' => $member,
+                ]);
+            });
+
+            Route::middleware('role:OWNER,ADMIN')->get('/admin-only', function (Request $request): JsonResponse {
+                return response()->json([
+                    'message' => 'Akses halaman admin diizinkan.',
+                    'member_role' => $request->attributes->get('current_member')?->role,
+                ]);
+            });
         });
 
-        // Sub-grup khusus peran OWNER dan ADMIN
-        Route::middleware('role:OWNER,ADMIN')->get('/admin-only', function (Request $request): JsonResponse {
-            return response()->json([
-                'message' => 'Akses halaman admin diizinkan.',
-                'member_role' => $request->attributes->get('current_member')?->role,
-            ]);
+        // media upload presigned URL (object storage)
+        Route::post('/media/presign-upload', [MediaController::class, 'presignUpload']);
+
+        // presensi mobile PWA
+        Route::prefix('attendances')->group(function (): void {
+            Route::post('/clock-in', [AttendanceController::class, 'clockIn']);
+            Route::post('/clock-out', [AttendanceController::class, 'clockOut']);
+        });
+
+        // endpoint administrasi khusus role OWNER dan ADMIN
+        Route::middleware('role:OWNER,ADMIN')->prefix('admin')->group(function (): void {
+            Route::get('/attendances/wall-of-faces', [AttendanceController::class, 'wallOfFaces']);
+
+            Route::get('/admin-only', function (Request $request): JsonResponse {
+                return response()->json([
+                    'message' => 'Akses halaman admin diizinkan.',
+                    'member_role' => $request->attributes->get('current_member')?->role,
+                ]);
+            });
         });
     });
 
-    // 4. Endpoint Kiosk Terminal POS (DeviceTokenAuth)
+    // endpoint POS (devicetokenauth)
     Route::middleware('pos.device')->prefix('pos')->group(function (): void {
         Route::post('/master-unlock', [PosSecurityController::class, 'masterUnlock']);
 

@@ -16,7 +16,7 @@ use Illuminate\Validation\ValidationException;
 class AuthService
 {
     /**
-     * Otentikasi pengguna menggunakan email dan password, lalu terbitkan token Sanctum.
+     * auth user pakai email dan password, lalu terbitkan token Sanctum
      *
      * @return array{token: string, user: User, workspaces: array<int, mixed>}
      */
@@ -59,7 +59,7 @@ class AuthService
     }
 
     /**
-     * Ambil data profil lengkap dan daftar workspace yang dapat diakses oleh pengguna.
+     * ambil data profil lengkap dan daftar workspace yang dapat diakses user
      *
      * @return array<string, mixed>
      */
@@ -94,7 +94,7 @@ class AuthService
     }
 
     /**
-     * Buat token pemulihan kata sandi dan kirimkan email notifikasi.
+     * buat token reset password dan kirimkan email notifikasi
      */
     public function sendPasswordResetLink(string $email): void
     {
@@ -120,7 +120,7 @@ class AuthService
     }
 
     /**
-     * Atur ulang kata sandi pengguna dengan token yang sah.
+     * reset password user dengan token yang sah
      */
     public function resetPassword(string $email, string $token, string $newPassword): bool
     {
@@ -132,7 +132,7 @@ class AuthService
             ]);
         }
 
-        // Batas kedaluwarsa token: 60 menit
+        // batas kedaluwarsa token 60 menit
         $createdAt = Carbon::parse($record->created_at);
         if ($createdAt->addMinutes(60)->isPast()) {
             DB::table('password_reset_tokens')->where('email', $email)->delete();
@@ -159,7 +159,7 @@ class AuthService
             'password' => Hash::make($newPassword),
         ])->save();
 
-        // Hapus token pemulihan dan cabut seluruh sesi lama untuk keamanan
+        // hapus token reset dan cabut seluruh sesi lama buat keamanan
         DB::table('password_reset_tokens')->where('email', $email)->delete();
         $user->tokens()->delete();
 
@@ -167,7 +167,7 @@ class AuthService
     }
 
     /**
-     * Verifikasi kata sandi Owner / Admin untuk master unlock kiosk pada terminal POS.
+     * verifikasi password owner / admin buat master unlock kiosk di POS
      */
     public function verifyPosMasterUnlock(string $workspaceId, string $email, string $password): bool
     {
@@ -177,7 +177,7 @@ class AuthService
             return false;
         }
 
-        // Pastikan pengguna memiliki peran OWNER atau ADMIN pada workspace ini
+        // pastikan user punya role OWNER atau ADMIN di workspace ini
         $member = WorkspaceMember::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
             ->where('user_id', $user->id)

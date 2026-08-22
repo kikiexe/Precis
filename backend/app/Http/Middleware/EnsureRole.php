@@ -13,11 +13,11 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureRole
 {
     /**
-     * Menangani request masuk.
+     * handle request masuk
      *
-     * Memvalidasi bahwa member saat ini memiliki salah satu peran yang diizinkan.
+     * memvalidasi bahwa member saat ini memiliki salah satu peran yang diizinkan
      *
-     * @param string ...$roles Peran yang diizinkan (contoh: OWNER, ADMIN, STAFF)
+     * @param string ...$roles peran yang diizinkan (contoh: owner, admin, staff)
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {

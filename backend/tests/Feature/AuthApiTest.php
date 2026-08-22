@@ -147,7 +147,7 @@ class AuthApiTest extends TestCase
         $updatedUser = User::where('email', 'arief@amorecoffee.id')->first();
         $this->assertTrue(Hash::check('NewSecretPassword2026!', $updatedUser->password));
 
-        // Token harus terhapus setelah reset kata sandi berhasil
+        // token harus dihapus setelah reset password berhasil
         $this->assertDatabaseMissing('password_reset_tokens', [
             'email' => 'arief@amorecoffee.id',
         ]);

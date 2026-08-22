@@ -19,7 +19,7 @@ class ResetPasswordNotification extends Notification
     }
 
     /**
-     * Tentukan saluran pengiriman notifikasi.
+     * cara pengiriman notifikasi
      */
     public function via(object $notifiable): array
     {
@@ -27,7 +27,7 @@ class ResetPasswordNotification extends Notification
     }
 
     /**
-     * Representasi email untuk notifikasi.
+     * email notifikasi
      */
     public function toMail(object $notifiable): MailMessage
     {

@@ -14,10 +14,10 @@ use Symfony\Component\HttpFoundation\Response;
 class ResolveWorkspaceContext
 {
     /**
-     * Menangani request masuk.
+     * handle request masuk
      *
-     * Memvalidasi header X-Workspace-Id dan mengikat konteks workspace serta member
-     * ke dalam atribut request untuk menjamin eksekusi yang aman di Laravel Octane.
+     * memvalidasi header X-Workspace-Id dan mengikat konteks workspace serta member
+     * ke dalam atribut request untuk menjamin eksekusi yang aman di laravel octane
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -55,7 +55,7 @@ class ResolveWorkspaceContext
             ], Response::HTTP_FORBIDDEN);
         }
 
-        // Simpan konteks yang teresolusi di atribut request (bercakup request, aman di FrankenPHP Octane)
+        // simpan konteks yang teresolusi di atribut request (bercakup request, aman di frankenphp octane)
         $request->attributes->set('current_workspace_id', $workspace->id);
         $request->attributes->set('current_workspace', $workspace);
         $request->attributes->set('current_member', $member);

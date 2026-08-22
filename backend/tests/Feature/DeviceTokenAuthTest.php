@@ -21,7 +21,7 @@ class DeviceTokenAuthTest extends TestCase
 
     public function test_valid_device_token_grants_access_and_returns_terminal_info(): void
     {
-        // Token yang di-seed di BranchSeeder: 'pos-device-token-sleman-01'
+        // token yang di-seed di BranchSeeder: 'pos-device-token-sleman-01'
         $response = $this->withHeader('X-Device-Token', 'pos-device-token-sleman-01')
             ->getJson('/api/v1/pos/terminal-info');
 

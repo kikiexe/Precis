@@ -64,7 +64,7 @@ class PosMasterUnlockTest extends TestCase
 
     public function test_staff_role_credentials_cannot_unlock_pos_kiosk(): void
     {
-        // Siti memiliki peran STAFF (tidak diizinkan melakukan master unlock)
+        // sita memiliki peran STAFF ga bisa melakukan master unlock
         $response = $this->withHeader('X-Device-Token', 'pos-device-token-sleman-01')
             ->postJson('/api/v1/pos/master-unlock', [
                 'email' => 'siti.kasir@amorecoffee.id',

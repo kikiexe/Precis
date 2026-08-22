@@ -51,7 +51,7 @@ class MultiTenancyMiddlewareTest extends TestCase
 
     public function test_access_to_unauthorized_workspace_returns_forbidden(): void
     {
-        // Buat workspace independen lain untuk pengujian isolasi
+        // buat workspace independen lain buat pengujian isolasi
         $otherUser = User::create([
             'name' => 'Stranger',
             'email' => 'stranger@othercafe.id',
@@ -67,7 +67,7 @@ class MultiTenancyMiddlewareTest extends TestCase
         $owner = User::where('email', 'arief@amorecoffee.id')->first();
         Sanctum::actingAs($owner);
 
-        // Owner Arief mencoba mengakses workspace milik orang lain
+        // owner arief mencoba mengakses workspace orang lain
         $response = $this->withHeader('X-Workspace-Id', $otherWorkspace->id)
             ->getJson('/api/v1/workspace/context');
 

@@ -49,6 +49,11 @@ class ShiftAssignment extends Model
         return $this->belongsTo(ShiftTemplate::class, 'shift_template_id');
     }
 
+    public function shiftTemplate(): BelongsTo
+    {
+        return $this->belongsTo(ShiftTemplate::class, 'shift_template_id');
+    }
+
     public function assignedUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_user_id');
