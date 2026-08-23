@@ -109,16 +109,16 @@
 </script>
 
 {#if isInitializing}
-  <div class="min-h-screen bg-[#161616] flex items-center justify-center text-white">
+  <div class="min-h-screen bg-[#eeece7]/40 flex items-center justify-center font-sans">
     <div class="text-center space-y-3">
-      <div class="w-10 h-10 border-2 border-[#0f62fe] border-t-transparent animate-spin mx-auto"></div>
-      <p class="text-xs font-mono text-[#8c8c8c]">Memvalidasi sesi Précis Superadmin...</p>
+      <div class="w-8 h-8 border-2 border-[#17171c] border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <p class="text-xs font-mono text-[#75758a]">Memvalidasi sesi Précis Superadmin...</p>
     </div>
   </div>
 {:else if !isAuthenticated}
   <LoginView onLogin={handleLogin} />
 {:else}
-  <div class="min-h-screen bg-[#f4f4f4] flex flex-col">
+  <div class="min-h-screen bg-[#eeece7]/40 flex flex-col font-sans">
     <!-- superadmin top header -->
     <Header
       {activeTab}
@@ -161,7 +161,7 @@
     </main>
 
     <!-- superadmin footer -->
-    <footer class="bg-[#161616] text-[#8c8c8c] border-t border-[#262626] py-3 text-center text-[11px] font-mono">
+    <footer class="bg-[#17171c] text-[#93939f] border-t border-[#262626] py-3.5 text-center text-[11px] font-mono">
       <span>Précis Platform SaaS Engine &bull; Root Console &bull; PostgreSQL 16 &bull; Laravel Octane</span>
     </footer>
   </div>

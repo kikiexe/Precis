@@ -102,32 +102,32 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white border border-[#e0e0e0] max-w-xl w-full p-6 shadow-2xl flex flex-col max-h-[90vh]">
+  <div class="fixed inset-0 z-50 bg-[#17171c]/40 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
+    <div class="bg-white border border-[#d9d9dd] rounded-[22px] max-w-xl w-full p-6 shadow-none flex flex-col max-h-[90vh]">
       <!-- Header -->
-      <div class="flex items-center justify-between border-b border-[#e0e0e0] pb-4 mb-6">
+      <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-4 mb-5">
         <div>
-          <h2 class="text-xl font-bold text-[#161616] font-display">Pilih Metode Pembayaran</h2>
-          <p class="text-xs text-[#525252] font-mono mt-0.5">Kasir: {activeCashier.name} • Total {formatCurrency(finalAmount)}</p>
+          <h2 class="text-xl font-medium text-[#212121] tracking-tight">Pilih Metode Pembayaran</h2>
+          <p class="text-xs text-[#616161] font-mono mt-0.5">Kasir: {activeCashier.name} • Total {formatCurrency(finalAmount)}</p>
         </div>
         <button
           type="button"
           onclick={onClose}
-          class="text-[#8c8c8c] hover:text-[#161616] p-1 cursor-pointer"
+          class="text-[#93939f] hover:text-[#212121] p-1 cursor-pointer"
         >
           <X class="w-5 h-5" />
         </button>
       </div>
 
       <!-- Payment Method Tabs -->
-      <div class="grid grid-cols-3 gap-2 mb-6">
+      <div class="grid grid-cols-3 gap-2.5 mb-5">
         <button
           type="button"
           onclick={() => (selectedMethod = 'CASH')}
-          class={`py-3.5 px-3 border text-center flex flex-col items-center gap-1.5 transition-colors cursor-pointer ${
+          class={`py-3.5 px-3 rounded-[16px] border text-center flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
             selectedMethod === 'CASH'
-              ? 'bg-[#0f62fe] text-white border-[#0f62fe] font-bold shadow-xs'
-              : 'bg-[#f4f4f4] text-[#525252] border-[#e0e0e0] hover:text-[#161616]'
+              ? 'bg-[#17171c] text-white border-[#17171c] font-medium shadow-none'
+              : 'bg-[#eeece7]/40 text-[#616161] border-[#d9d9dd] hover:text-[#212121] hover:bg-[#eeece7]'
           }`}
         >
           <Banknote class="w-5 h-5" />
@@ -137,10 +137,10 @@
         <button
           type="button"
           onclick={() => (selectedMethod = 'QRIS')}
-          class={`py-3.5 px-3 border text-center flex flex-col items-center gap-1.5 transition-colors cursor-pointer ${
+          class={`py-3.5 px-3 rounded-[16px] border text-center flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
             selectedMethod === 'QRIS'
-              ? 'bg-[#0f62fe] text-white border-[#0f62fe] font-bold shadow-xs'
-              : 'bg-[#f4f4f4] text-[#525252] border-[#e0e0e0] hover:text-[#161616]'
+              ? 'bg-[#17171c] text-white border-[#17171c] font-medium shadow-none'
+              : 'bg-[#eeece7]/40 text-[#616161] border-[#d9d9dd] hover:text-[#212121] hover:bg-[#eeece7]'
           }`}
         >
           <QrCode class="w-5 h-5" />
@@ -150,10 +150,10 @@
         <button
           type="button"
           onclick={() => (selectedMethod = 'TRANSFER')}
-          class={`py-3.5 px-3 border text-center flex flex-col items-center gap-1.5 transition-colors cursor-pointer ${
+          class={`py-3.5 px-3 rounded-[16px] border text-center flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
             selectedMethod === 'TRANSFER'
-              ? 'bg-[#0f62fe] text-white border-[#0f62fe] font-bold shadow-xs'
-              : 'bg-[#f4f4f4] text-[#525252] border-[#e0e0e0] hover:text-[#161616]'
+              ? 'bg-[#17171c] text-white border-[#17171c] font-medium shadow-none'
+              : 'bg-[#eeece7]/40 text-[#616161] border-[#d9d9dd] hover:text-[#212121] hover:bg-[#eeece7]'
           }`}
         >
           <ArrowRightLeft class="w-5 h-5" />
@@ -162,16 +162,16 @@
       </div>
 
       <!-- Payment Body Area -->
-      <div class="flex-1 overflow-y-auto mb-6">
+      <div class="flex-1 overflow-y-auto mb-5">
         {#if selectedMethod === 'CASH'}
-          <div class="space-y-4 bg-[#f4f4f4] p-4 border border-[#e0e0e0]">
+          <div class="space-y-4 bg-[#eeece7]/30 p-4 rounded-[16px] border border-[#d9d9dd]">
             <!-- Cash Input -->
             <div>
-              <label for="cash-input" class="block text-xs font-mono text-[#525252] mb-1.5">
+              <label for="cash-input" class="block text-xs font-mono text-[#616161] mb-1.5">
                 Nominal Uang Diterima dari Pelanggan:
               </label>
               <div class="relative">
-                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono text-base font-bold text-[#161616]">
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono text-base font-medium text-[#212121]">
                   Rp
                 </span>
                 <input
@@ -179,21 +179,21 @@
                   type="number"
                   bind:value={cashTendered}
                   step="1000"
-                  class="w-full bg-white border border-[#e0e0e0] pl-12 pr-4 py-3 text-lg font-mono font-bold text-[#161616] focus:border-[#0f62fe] focus:outline-none"
+                  class="w-full bg-white border border-[#d9d9dd] rounded-[12px] pl-12 pr-4 py-3 text-lg font-mono font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
                 />
               </div>
             </div>
 
             <!-- Denomination Shortcuts -->
             <div>
-              <div class="text-[11px] font-mono text-[#8c8c8c] mb-1.5">Pilihan Nominal Cepat:</div>
+              <div class="text-[11px] font-mono text-[#75758a] mb-1.5">Pilihan Nominal Cepat:</div>
               <div class="flex flex-wrap gap-2">
                 {#each cashShortcuts as cut}
                   {@const val = cut.getValue(finalAmount)}
                   <button
                     type="button"
                     onclick={() => handleQuickCash(val)}
-                    class="px-3 py-1.5 bg-white border border-[#e0e0e0] hover:border-[#0f62fe] hover:bg-[#0f62fe]/5 text-xs font-mono font-medium text-[#161616] cursor-pointer transition-colors"
+                    class="px-3.5 py-1.5 bg-white border border-[#d9d9dd] hover:border-[#17171c] rounded-full text-xs font-mono font-medium text-[#212121] cursor-pointer transition-all"
                   >
                     {cut.label}
                   </button>
@@ -202,43 +202,43 @@
             </div>
 
             <!-- Kembalian / Change calculation -->
-            <div class="pt-3 border-t border-[#e0e0e0] flex items-center justify-between">
-              <span class="text-sm font-medium text-[#525252]">Kembalian Pelanggan:</span>
-              <span class={`font-mono text-xl font-bold ${cashTendered >= finalAmount ? 'text-[#24a148]' : 'text-[#da1e28]'}`}>
+            <div class="pt-3 border-t border-[#d9d9dd] flex items-center justify-between">
+              <span class="text-sm font-medium text-[#616161]">Kembalian Pelanggan:</span>
+              <span class={`font-mono text-xl font-medium ${cashTendered >= finalAmount ? 'text-[#003c33]' : 'text-[#b30000]'}`}>
                 {formatCurrency(changeAmount)}
               </span>
             </div>
 
             {#if !isSufficient}
-              <div class="flex items-center gap-2 text-xs text-[#da1e28] font-medium bg-[#da1e28]/10 p-2.5">
+              <div class="flex items-center gap-2 text-xs text-[#b30000] font-medium bg-[#ffad9b]/15 p-3 rounded-[12px]">
                 <AlertTriangle class="w-4 h-4 shrink-0" />
                 <span>Uang yang dimasukkan kurang {formatCurrency(finalAmount - cashTendered)}</span>
               </div>
             {/if}
           </div>
         {:else if selectedMethod === 'QRIS'}
-          <div class="text-center p-6 bg-[#f4f4f4] border border-[#e0e0e0] space-y-3">
-            <div class="w-44 h-44 bg-white p-3 border border-[#e0e0e0] mx-auto shadow-xs flex flex-col items-center justify-center">
+          <div class="text-center p-6 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] space-y-3">
+            <div class="w-44 h-44 bg-white p-3 border border-[#d9d9dd] rounded-[16px] mx-auto shadow-none flex flex-col items-center justify-center">
               <!-- QR Simulator -->
-              <QrCode class="w-32 h-32 text-[#161616]" />
-              <span class="text-[10px] font-mono text-[#8c8c8c] mt-1">QRIS NATIONAL STANDARDS</span>
+              <QrCode class="w-32 h-32 text-[#212121]" />
+              <span class="text-[10px] font-mono text-[#75758a] mt-1">QRIS NATIONAL STANDARDS</span>
             </div>
-            <div class="text-xs text-[#525252] font-mono">
+            <div class="text-xs text-[#616161] font-mono">
               Scan melalui BCA, GoPay, OVO, ShopeePay, atau DANA
             </div>
-            <div class="text-lg font-bold font-mono text-[#0f62fe]">
+            <div class="text-lg font-medium font-mono text-[#17171c]">
               {formatCurrency(finalAmount)}
             </div>
           </div>
         {:else if selectedMethod === 'TRANSFER'}
-          <div class="p-4 bg-[#f4f4f4] border border-[#e0e0e0] space-y-2.5 text-xs font-mono">
-            <div class="text-sm font-bold text-[#161616]">Rekening Outlet:</div>
-            <div class="p-3 bg-white border border-[#e0e0e0] space-y-1">
-              <div class="text-[#525252]">Bank Central Asia (BCA)</div>
-              <div class="text-base font-bold text-[#161616]">8412-9900-1122</div>
-              <div class="text-[#8c8c8c]">a.n. Précis Coffee Sleman</div>
+          <div class="p-4 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] space-y-2.5 text-xs font-mono">
+            <div class="text-sm font-medium text-[#212121]">Rekening Outlet:</div>
+            <div class="p-3 bg-white border border-[#d9d9dd] rounded-[12px] space-y-1">
+              <div class="text-[#75758a]">Bank Central Asia (BCA)</div>
+              <div class="text-base font-medium text-[#212121]">8412-9900-1122</div>
+              <div class="text-[#93939f]">a.n. Précis Coffee Sleman</div>
             </div>
-            <div class="text-[#525252]">
+            <div class="text-[#616161]">
               Pastikan pelanggan menunjukkan bukti transfer sukses sebelum menyelesaikan transaksi.
             </div>
           </div>
@@ -246,11 +246,11 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex gap-3 border-t border-[#e0e0e0] pt-4">
+      <div class="flex gap-3 border-t border-[#d9d9dd] pt-4">
         <button
           type="button"
           onclick={onClose}
-          class="flex-1 py-3 bg-[#f4f4f4] hover:bg-[#e0e0e0] text-[#525252] font-medium text-xs border border-[#e0e0e0] cursor-pointer"
+          class="flex-1 py-3 bg-white hover:bg-[#eeece7]/40 text-[#616161] font-medium text-xs border border-[#d9d9dd] rounded-full cursor-pointer transition-all"
         >
           Kembali
         </button>
@@ -258,10 +258,10 @@
           type="button"
           disabled={!isSufficient || isProcessing}
           onclick={handleProcessPayment}
-          class={`flex-2 py-3 text-white font-medium text-xs flex items-center justify-center gap-2 cursor-pointer shadow-xs ${
+          class={`flex-2 py-3 text-white font-medium text-xs rounded-full flex items-center justify-center gap-2 cursor-pointer transition-all shadow-none ${
             !isSufficient || isProcessing
-              ? 'bg-[#e0e0e0] text-[#8c8c8c] cursor-not-allowed'
-              : 'bg-[#24a148] hover:bg-[#1e8a3d]'
+              ? 'bg-[#eeece7] text-[#93939f] cursor-not-allowed'
+              : 'bg-[#003c33] hover:bg-[#002822]'
           }`}
         >
           {#if isProcessing}

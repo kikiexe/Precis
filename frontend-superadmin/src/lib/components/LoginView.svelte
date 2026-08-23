@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ShieldCheck, Lock, Mail, AlertCircle, RefreshCw } from 'lucide-svelte';
+  import { ShieldCheck, Lock, Mail, AlertCircle, RefreshCw, Eye, EyeOff } from 'lucide-svelte';
 
   interface Props {
     onLogin: (email: string, password: string) => Promise<void>;
@@ -9,6 +9,7 @@
 
   let email = $state('root@precis.com');
   let password = $state('PrecisAdmin2026!');
+  let showPassword = $state(false);
   let isSubmitting = $state(false);
   let errorMessage = $state<string | null>(null);
 
@@ -36,32 +37,32 @@
   }
 </script>
 
-<div class="min-h-screen bg-[#161616] flex items-center justify-center p-4">
-  <div class="w-full max-w-md bg-white border border-[#393939] shadow-2xl p-8">
+<div class="min-h-screen bg-[#eeece7]/40 flex items-center justify-center p-4 font-sans">
+  <div class="w-full max-w-md bg-white border border-[#d9d9dd] rounded-[22px] shadow-none p-8 sm:p-10">
     <!-- Header -->
     <div class="flex items-center space-x-3 mb-6">
-      <div class="w-10 h-10 bg-[#0f62fe] flex items-center justify-center font-bold text-white text-xl tracking-wider">
+      <div class="w-9 h-9 bg-[#17171c] rounded-[10px] flex items-center justify-center font-medium text-white text-base">
         P
       </div>
       <div>
         <div class="flex items-center space-x-2">
-          <span class="font-bold text-xl tracking-tight text-[#161616]">PRÉCIS</span>
-          <span class="text-[10px] px-2 py-0.5 bg-[#da1e28] text-white font-mono uppercase font-bold">Root</span>
+          <span class="font-medium text-lg tracking-tight text-[#212121]">PRÉCIS</span>
+          <span class="text-[10px] px-2 py-0.5 bg-[#17171c] text-white font-mono rounded-full font-medium">Root</span>
         </div>
-        <p class="text-xs text-[#525252]">Platform Superadmin Portal</p>
+        <p class="text-xs text-[#75758a]">Platform Superadmin Portal</p>
       </div>
     </div>
 
     <div class="mb-6">
-      <h1 class="text-base font-bold text-[#161616]">Masuk ke Konsol Superadmin</h1>
-      <p class="text-xs text-[#525252] mt-0.5">
+      <h1 class="text-base font-medium text-[#212121] tracking-tight">Masuk ke Konsol Superadmin</h1>
+      <p class="text-xs text-[#616161] mt-0.5 font-normal">
         Area terbatas untuk verifikasi pembayaran manual, pengawasan tenant, dan kontrol platform root.
       </p>
     </div>
 
     <!-- Error Alert -->
     {#if errorMessage}
-      <div class="mb-5 p-3 bg-[#ffebee] border-l-4 border-[#da1e28] text-[#da1e28] text-xs flex items-start space-x-2">
+      <div class="mb-5 p-3.5 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-[12px] text-[#b30000] text-xs flex items-start space-x-2">
         <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
         <span>{errorMessage}</span>
       </div>
@@ -70,36 +71,49 @@
     <!-- Form -->
     <form onsubmit={handleSubmit} class="space-y-4 text-xs">
       <div>
-        <label for="admin-email" class="block font-semibold uppercase text-[#161616] text-[11px] mb-1">
+        <label for="admin-email" class="block font-medium text-[#212121] text-[11px] mb-1.5">
           Email Superadmin
         </label>
         <div class="relative">
-          <Mail class="w-4 h-4 text-[#8c8c8c] absolute left-3 top-1/2 -translate-y-1/2" />
+          <Mail class="w-4 h-4 text-[#93939f] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             id="admin-email"
             type="email"
             bind:value={email}
             required
             placeholder="root@precis.com"
-            class="w-full pl-9 pr-3 py-2 bg-[#f4f4f4] border border-[#e0e0e0] focus:outline-none focus:border-[#0f62fe] focus:bg-white text-[#161616] font-mono"
+            class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-[#d9d9dd] rounded-[12px] focus:outline-hidden focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 text-[#212121] font-mono transition-all"
           />
         </div>
       </div>
 
       <div>
-        <label for="admin-password" class="block font-semibold uppercase text-[#161616] text-[11px] mb-1">
+        <label for="admin-password" class="block font-medium text-[#212121] text-[11px] mb-1.5">
           Kata Sandi Root
         </label>
         <div class="relative">
-          <Lock class="w-4 h-4 text-[#8c8c8c] absolute left-3 top-1/2 -translate-y-1/2" />
+          <Lock class="w-4 h-4 text-[#93939f] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             id="admin-password"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             bind:value={password}
             required
             placeholder="••••••••••••"
-            class="w-full pl-9 pr-3 py-2 bg-[#f4f4f4] border border-[#e0e0e0] focus:outline-none focus:border-[#0f62fe] focus:bg-white text-[#161616]"
+            class="w-full pl-10 pr-10 py-2.5 bg-white border border-[#d9d9dd] rounded-[12px] focus:outline-hidden focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 text-[#212121] transition-all"
           />
+          <button
+            type="button"
+            tabindex="-1"
+            onclick={() => (showPassword = !showPassword)}
+            class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#93939f] hover:text-[#212121] transition-colors p-1 cursor-pointer flex items-center justify-center"
+            aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+          >
+            {#if showPassword}
+              <EyeOff class="w-4 h-4" />
+            {:else}
+              <Eye class="w-4 h-4" />
+            {/if}
+          </button>
         </div>
       </div>
 
@@ -107,7 +121,7 @@
         <button
           type="submit"
           disabled={isSubmitting}
-          class="w-full py-2.5 bg-[#0f62fe] hover:bg-[#0050e6] text-white font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center space-x-2 disabled:opacity-50"
+          class="w-full py-3 bg-[#17171c] hover:bg-[#000000] text-white font-medium text-xs rounded-full transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-none disabled:opacity-50"
         >
           {#if isSubmitting}
             <RefreshCw class="w-4 h-4 animate-spin" />
@@ -120,8 +134,8 @@
       </div>
     </form>
 
-    <div class="mt-6 pt-4 border-t border-[#f4f4f4] text-center text-[11px] text-[#8c8c8c]">
-      Default Seeder: <code class="bg-[#f4f4f4] px-1.5 py-0.5 text-[#161616]">root@precis.com / PrecisAdmin2026!</code>
+    <div class="mt-6 pt-4 border-t border-[#d9d9dd] text-center text-[11px] text-[#75758a]">
+      Default Seeder: <code class="bg-[#eeece7] px-2 py-0.5 rounded-[4px] text-[#212121] font-mono">root@precis.com / PrecisAdmin2026!</code>
     </div>
   </div>
 </div>

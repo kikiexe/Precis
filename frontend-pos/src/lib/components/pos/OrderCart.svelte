@@ -48,13 +48,13 @@
   );
 </script>
 
-<aside class="w-80 md:w-96 bg-white border-l border-[#e0e0e0] flex flex-col h-full shrink-0 select-none shadow-sm">
+<aside class="w-80 md:w-96 bg-white border-l border-[#d9d9dd] flex flex-col h-full shrink-0 select-none shadow-none font-sans">
   <!-- Header: Cart Title & Cashier Info -->
-  <div class="p-3.5 border-b border-[#e0e0e0] flex items-center justify-between bg-[#f4f4f4]">
+  <div class="p-4 border-b border-[#d9d9dd] flex items-center justify-between bg-[#eeece7]/40">
     <div class="flex items-center gap-2">
-      <ShoppingCart class="w-4 h-4 text-[#0f62fe]" />
-      <span class="font-bold text-sm text-[#161616]">Pesanan Baru</span>
-      <span class="text-xs font-mono bg-[#e0e0e0] text-[#161616] px-1.5 py-0.5 font-semibold">
+      <ShoppingCart class="w-4 h-4 text-[#1863dc]" />
+      <span class="font-medium text-sm text-[#212121]">Pesanan Baru</span>
+      <span class="text-xs font-mono bg-[#eeece7] text-[#212121] px-2 py-0.5 rounded-full font-medium">
         {totalItemCount}
       </span>
     </div>
@@ -63,9 +63,9 @@
       <button
         type="button"
         onclick={onClearCart}
-        class="text-xs font-mono text-[#da1e28] hover:underline flex items-center gap-1 cursor-pointer"
+        class="text-xs font-mono text-[#b30000] hover:underline flex items-center gap-1 cursor-pointer"
       >
-        <Trash2 class="w-3 h-3" />
+        <Trash2 class="w-3.5 h-3.5" />
         <span>Batal</span>
       </button>
     {/if}
@@ -73,15 +73,15 @@
 
   <!-- Cashier Warning Banner if no cashier active -->
   {#if !activeCashier}
-    <div class="p-3 bg-[#da1e28]/10 border-b border-[#da1e28]/20 flex items-center justify-between text-xs">
-      <div class="flex items-center gap-1.5 text-[#da1e28]">
+    <div class="p-3 bg-[#ffad9b]/15 border-b border-[#ffad9b] flex items-center justify-between text-xs">
+      <div class="flex items-center gap-1.5 text-[#b30000]">
         <AlertCircle class="w-4 h-4 shrink-0" />
         <span>Kasir belum login PIN</span>
       </div>
       <button
         type="button"
         onclick={onOpenPinModal}
-        class="bg-[#da1e28] text-white px-2 py-1 font-semibold text-[11px]"
+        class="bg-[#b30000] text-white px-2.5 py-1 rounded-full font-medium text-[11px] cursor-pointer"
       >
         Input PIN
       </button>
@@ -89,27 +89,27 @@
   {/if}
 
   <!-- Order Items List -->
-  <div class="flex-1 overflow-y-auto p-3 space-y-2.5">
+  <div class="flex-1 overflow-y-auto p-3.5 space-y-3">
     {#if items.length === 0}
-      <div class="h-64 flex flex-col items-center justify-center text-center text-[#8c8c8c]">
-        <ShoppingCart class="w-12 h-12 mb-2 opacity-30 text-[#8c8c8c]" />
-        <p class="text-sm font-medium text-[#525252]">Keranjang masih kosong</p>
-        <p class="text-xs text-[#8c8c8c] mt-0.5">Pilih menu dari katalog di sebelah kiri.</p>
+      <div class="h-64 flex flex-col items-center justify-center text-center text-[#93939f]">
+        <ShoppingCart class="w-10 h-10 mb-2 opacity-30 text-[#93939f]" />
+        <p class="text-sm font-medium text-[#212121]">Keranjang masih kosong</p>
+        <p class="text-xs text-[#75758a] mt-0.5">Pilih menu dari katalog di sebelah kiri.</p>
       </div>
     {:else}
       {#each items as item (item.product.id)}
-        <div class="bg-[#f4f4f4] border border-[#e0e0e0] p-2.5 space-y-2">
+        <div class="bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] p-3 space-y-2.5">
           <!-- Title & Subtotal -->
           <div class="flex items-start justify-between gap-2">
             <div class="flex-1">
-              <div class="font-medium text-xs text-[#161616] leading-tight">
+              <div class="font-medium text-xs text-[#212121] leading-tight">
                 {item.product.name}
               </div>
-              <div class="font-mono text-[11px] text-[#525252] mt-0.5">
+              <div class="font-mono text-[11px] text-[#75758a] mt-0.5">
                 {formatCurrency(item.unit_price)}
               </div>
             </div>
-            <div class="font-mono text-xs font-bold text-[#161616]">
+            <div class="font-mono text-xs font-medium text-[#212121]">
               {formatCurrency(item.unit_price * item.quantity)}
             </div>
           </div>
@@ -121,7 +121,7 @@
               value={item.notes}
               placeholder="Catatan (e.g. Less ice, no sugar)..."
               oninput={(e) => onUpdateNotes(item.product.id, (e.target as HTMLInputElement).value)}
-              class="w-full text-[11px] bg-white border border-[#e0e0e0] px-2 py-1 focus:border-[#0f62fe] focus:outline-none"
+              class="w-full text-[11px] bg-white border border-[#d9d9dd] rounded-[8px] px-2.5 py-1 text-[#212121] placeholder-[#93939f] focus:border-[#17171c] focus:outline-hidden"
             />
           </div>
 
@@ -130,7 +130,7 @@
             <button
               type="button"
               onclick={() => onRemoveItem(item.product.id)}
-              class="text-[#da1e28] text-[11px] hover:underline flex items-center gap-1 cursor-pointer"
+              class="text-[#b30000] text-[11px] hover:underline flex items-center gap-1 cursor-pointer"
             >
               <Trash2 class="w-3 h-3" />
               <span>Hapus</span>
@@ -140,17 +140,17 @@
               <button
                 type="button"
                 onclick={() => onUpdateQuantity(item.product.id, -1)}
-                class="w-7 h-7 bg-white border border-[#e0e0e0] hover:bg-[#e0e0e0] text-[#161616] flex items-center justify-center font-bold text-sm cursor-pointer transition-colors active:scale-95"
+                class="w-7 h-7 rounded-full bg-white border border-[#d9d9dd] hover:bg-[#eeece7] text-[#212121] flex items-center justify-center font-medium text-sm cursor-pointer transition-all active:scale-95"
               >
                 <Minus class="w-3 h-3" />
               </button>
-              <span class="font-mono text-xs font-bold w-6 text-center text-[#161616]">
+              <span class="font-mono text-xs font-medium w-6 text-center text-[#212121]">
                 {item.quantity}
               </span>
               <button
                 type="button"
                 onclick={() => onUpdateQuantity(item.product.id, 1)}
-                class="w-7 h-7 bg-[#0f62fe] hover:bg-[#0050e6] text-white flex items-center justify-center font-bold text-sm cursor-pointer transition-colors active:scale-95"
+                class="w-7 h-7 rounded-full bg-[#17171c] hover:bg-[#000000] text-white flex items-center justify-center font-medium text-sm cursor-pointer transition-all active:scale-95"
               >
                 <Plus class="w-3 h-3" />
               </button>
@@ -162,11 +162,11 @@
   </div>
 
   <!-- Bottom Panel: Discounts, Summary & Checkout Button -->
-  <div class="border-t border-[#e0e0e0] bg-[#f4f4f4] p-3.5 space-y-3 shrink-0">
+  <div class="border-t border-[#d9d9dd] bg-[#eeece7]/40 p-4 space-y-3.5 shrink-0">
     <!-- Quick Discount Selector -->
     <div>
-      <div class="text-[11px] font-mono text-[#525252] flex items-center gap-1 mb-1.5">
-        <Tag class="w-3 h-3 text-[#0f62fe]" />
+      <div class="text-[11px] text-[#75758a] flex items-center gap-1.5 mb-1.5 font-medium">
+        <Tag class="w-3 h-3 text-[#1863dc]" />
         <span>Diskon Promo</span>
       </div>
       <div class="grid grid-cols-4 gap-1.5">
@@ -174,10 +174,10 @@
           <button
             type="button"
             onclick={() => onSetDiscountPercent(pct)}
-            class={`py-1 text-[11px] font-mono border transition-colors cursor-pointer ${
+            class={`py-1 text-[11px] font-mono rounded-full border transition-all cursor-pointer ${
               discountPercent === pct && discountNominal === 0
-                ? 'bg-[#0f62fe] text-white border-[#0f62fe] font-bold'
-                : 'bg-white text-[#525252] border-[#e0e0e0] hover:bg-[#e0e0e0]'
+                ? 'bg-[#17171c] text-white border-[#17171c] font-medium shadow-none'
+                : 'bg-white text-[#616161] border-[#d9d9dd] hover:bg-[#eeece7]'
             }`}
           >
             {pct === 0 ? '0%' : `${pct}%`}
@@ -187,20 +187,20 @@
     </div>
 
     <!-- Pricing Breakdown -->
-    <div class="space-y-1 text-xs border-t border-[#e0e0e0] pt-2">
-      <div class="flex justify-between text-[#525252]">
+    <div class="space-y-1.5 text-xs border-t border-[#d9d9dd] pt-2.5">
+      <div class="flex justify-between text-[#616161]">
         <span>Subtotal</span>
         <span class="font-mono">{formatCurrency(subtotal)}</span>
       </div>
       {#if calculatedDiscount > 0}
-        <div class="flex justify-between text-[#da1e28]">
+        <div class="flex justify-between text-[#b30000]">
           <span>Diskon ({discountPercent > 0 ? `${discountPercent}%` : 'Nominal'})</span>
           <span class="font-mono">-{formatCurrency(calculatedDiscount)}</span>
         </div>
       {/if}
-      <div class="flex justify-between text-base font-bold text-[#161616] pt-1.5 border-t border-[#e0e0e0]">
+      <div class="flex justify-between text-base font-medium text-[#212121] pt-2 border-t border-[#d9d9dd]">
         <span>Total Bayar</span>
-        <span class="font-mono text-[#0f62fe]">{formatCurrency(finalTotal)}</span>
+        <span class="font-mono text-[#17171c] font-semibold">{formatCurrency(finalTotal)}</span>
       </div>
     </div>
 
@@ -209,10 +209,10 @@
       type="button"
       disabled={items.length === 0}
       onclick={onOpenPaymentModal}
-      class={`w-full py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs ${
+      class={`w-full py-3.5 text-xs font-medium rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer shadow-none ${
         items.length === 0
-          ? 'bg-[#e0e0e0] text-[#8c8c8c] cursor-not-allowed'
-          : 'bg-[#0f62fe] hover:bg-[#0050e6] text-white active:scale-[0.99]'
+          ? 'bg-[#eeece7] text-[#93939f] cursor-not-allowed'
+          : 'bg-[#17171c] hover:bg-[#000000] text-white active:scale-[0.99]'
       }`}
     >
       <CreditCard class="w-4 h-4" />

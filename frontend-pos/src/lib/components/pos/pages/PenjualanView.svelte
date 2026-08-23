@@ -55,18 +55,18 @@
   }: Props = $props();
 </script>
 
-<div class="flex-1 flex flex-col md:flex-row h-full overflow-hidden">
+<div class="flex-1 flex flex-col md:flex-row h-full overflow-hidden font-sans">
   <!-- Left Side: Catalog + Order Metadata Header -->
   <div class="flex-1 flex flex-col h-full overflow-hidden">
-    <!-- Order Mode & Customer Bar (Flux Style) -->
-    <div class="bg-white border-b border-[#e0e0e0] px-4 py-2 flex flex-wrap items-center justify-between gap-2 shrink-0">
+    <!-- Order Mode & Customer Bar -->
+    <div class="bg-white border-b border-[#d9d9dd] px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0">
       <!-- Order Type Radio Buttons -->
-      <div class="flex items-center gap-1 bg-[#f4f4f4] p-1 border border-[#e0e0e0]">
+      <div class="flex items-center gap-1 bg-[#eeece7]/60 p-1 rounded-full border border-[#d9d9dd]">
         <button
           type="button"
           onclick={() => onSetOrderType('DINE_IN')}
-          class={`px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 cursor-pointer transition-colors ${
-            orderType === 'DINE_IN' ? 'bg-[#0f62fe] text-white font-semibold shadow-xs' : 'text-[#525252] hover:text-[#161616]'
+          class={`px-3.5 py-1.5 text-xs font-medium rounded-full flex items-center gap-1.5 cursor-pointer transition-all ${
+            orderType === 'DINE_IN' ? 'bg-[#17171c] text-white font-medium shadow-none' : 'text-[#616161] hover:text-[#212121]'
           }`}
         >
           <Utensils class="w-3.5 h-3.5" />
@@ -76,8 +76,8 @@
         <button
           type="button"
           onclick={() => onSetOrderType('TAKE_AWAY')}
-          class={`px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 cursor-pointer transition-colors ${
-            orderType === 'TAKE_AWAY' ? 'bg-[#0f62fe] text-white font-semibold shadow-xs' : 'text-[#525252] hover:text-[#161616]'
+          class={`px-3.5 py-1.5 text-xs font-medium rounded-full flex items-center gap-1.5 cursor-pointer transition-all ${
+            orderType === 'TAKE_AWAY' ? 'bg-[#17171c] text-white font-medium shadow-none' : 'text-[#616161] hover:text-[#212121]'
           }`}
         >
           <ShoppingBag class="w-3.5 h-3.5" />
@@ -87,8 +87,8 @@
         <button
           type="button"
           onclick={() => onSetOrderType('DELIVERY')}
-          class={`px-3 py-1.5 text-xs font-medium flex items-center gap-1.5 cursor-pointer transition-colors ${
-            orderType === 'DELIVERY' ? 'bg-[#0f62fe] text-white font-semibold shadow-xs' : 'text-[#525252] hover:text-[#161616]'
+          class={`px-3.5 py-1.5 text-xs font-medium rounded-full flex items-center gap-1.5 cursor-pointer transition-all ${
+            orderType === 'DELIVERY' ? 'bg-[#17171c] text-white font-medium shadow-none' : 'text-[#616161] hover:text-[#212121]'
           }`}
         >
           <Truck class="w-3.5 h-3.5" />
@@ -99,26 +99,26 @@
       <!-- Customer Name & Table Number Inputs -->
       <div class="flex items-center gap-2 text-xs">
         {#if orderType === 'DINE_IN'}
-          <div class="flex items-center gap-1">
-            <span class="font-mono text-[#525252]">Meja:</span>
+          <div class="flex items-center gap-1.5">
+            <span class="text-[#75758a] font-medium">Meja:</span>
             <input
               type="text"
               value={tableNumber}
               oninput={(e) => onSetTableNumber((e.target as HTMLInputElement).value)}
               placeholder="e.g. 04"
-              class="w-16 bg-[#f4f4f4] border border-[#e0e0e0] px-2 py-1 font-mono text-center font-bold focus:border-[#0f62fe] focus:outline-none"
+              class="w-16 bg-[#eeece7]/40 border border-[#d9d9dd] rounded-full px-2.5 py-1 font-mono text-center font-medium text-[#212121] focus:border-[#17171c] focus:outline-hidden"
             />
           </div>
         {/if}
 
-        <div class="flex items-center gap-1">
-          <span class="font-mono text-[#525252]">Pelanggan:</span>
+        <div class="flex items-center gap-1.5">
+          <span class="text-[#75758a] font-medium">Pelanggan:</span>
           <input
             type="text"
             value={customerName}
             oninput={(e) => onSetCustomerName((e.target as HTMLInputElement).value)}
             placeholder="Nama Pemesan (Opsional)"
-            class="w-40 bg-[#f4f4f4] border border-[#e0e0e0] px-2 py-1 focus:border-[#0f62fe] focus:outline-none"
+            class="w-44 bg-[#eeece7]/40 border border-[#d9d9dd] rounded-full px-3 py-1 text-xs text-[#212121] placeholder-[#93939f] focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
       </div>

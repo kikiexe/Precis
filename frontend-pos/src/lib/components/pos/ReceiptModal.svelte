@@ -27,39 +27,39 @@
 </script>
 
 {#if isOpen && order}
-  <div class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white border border-[#e0e0e0] max-w-md w-full p-6 shadow-2xl flex flex-col max-h-[95vh]">
+  <div class="fixed inset-0 z-50 bg-[#17171c]/40 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
+    <div class="bg-white border border-[#d9d9dd] rounded-[22px] max-w-md w-full p-6 shadow-none flex flex-col max-h-[95vh]">
       <!-- Success Header -->
-      <div class="text-center pb-4 border-b border-[#e0e0e0]">
-        <div class="w-12 h-12 bg-[#24a148]/10 text-[#24a148] flex items-center justify-center mx-auto mb-2 rounded-full">
-          <CheckCircle2 class="w-7 h-7" />
+      <div class="text-center pb-4 border-b border-[#d9d9dd]">
+        <div class="w-12 h-12 bg-[#edfce9] text-[#003c33] flex items-center justify-center mx-auto mb-2 rounded-full">
+          <CheckCircle2 class="w-6 h-6" />
         </div>
-        <h2 class="text-lg font-bold text-[#161616] font-display">Transaksi Berhasil!</h2>
-        <p class="text-xs font-mono text-[#525252] mt-0.5">Nomor: {order.order_number}</p>
+        <h2 class="text-lg font-medium text-[#212121] tracking-tight">Transaksi Berhasil!</h2>
+        <p class="text-xs font-mono text-[#75758a] mt-0.5">Nomor: {order.order_number}</p>
       </div>
 
       <!-- Thermal Paper Receipt Preview -->
-      <div class="flex-1 overflow-y-auto my-4 p-4 bg-[#f4f4f4] border border-[#e0e0e0] font-mono text-[11px] leading-relaxed shadow-inner">
-        <div class="bg-white p-4 border border-[#e0e0e0] whitespace-pre font-mono text-xs text-[#161616] shadow-xs">
+      <div class="flex-1 overflow-y-auto my-4 p-3.5 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] font-mono text-[11px] leading-relaxed">
+        <div class="bg-white p-4 rounded-[12px] border border-[#d9d9dd] whitespace-pre font-mono text-xs text-[#212121] shadow-none">
           {receiptText}
         </div>
       </div>
 
       <!-- Actions -->
-      <div class="space-y-2 pt-2 border-t border-[#e0e0e0]">
+      <div class="space-y-2.5 pt-3 border-t border-[#d9d9dd]">
         <button
           type="button"
           disabled={isPrinting}
           onclick={handlePrint}
-          class="w-full py-3 bg-[#161616] hover:bg-[#262626] text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors"
+          class="w-full py-3 bg-[#eeece7]/40 hover:bg-[#eeece7] text-[#212121] border border-[#d9d9dd] rounded-full text-xs font-medium flex items-center justify-center gap-2 cursor-pointer transition-all shadow-none"
         >
           {#if isPrinting}
             <span>Mengirim ke Printer ESC/POS...</span>
           {:else if printSuccess}
-            <Check class="w-4 h-4 text-[#24a148]" />
+            <Check class="w-4 h-4 text-[#003c33]" />
             <span>Struk Berhasil Dicetak</span>
           {:else}
-            <Printer class="w-4 h-4 text-[#0f62fe]" />
+            <Printer class="w-4 h-4 text-[#1863dc]" />
             <span>Cetak Struk Thermal (Bluetooth / USB)</span>
           {/if}
         </button>
@@ -67,7 +67,7 @@
         <button
           type="button"
           onclick={onCloseAndReset}
-          class="w-full py-3 bg-[#0f62fe] hover:bg-[#0050e6] text-white text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-xs"
+          class="w-full py-3 bg-[#17171c] hover:bg-[#000000] text-white rounded-full text-xs font-medium flex items-center justify-center gap-2 cursor-pointer transition-all shadow-none"
         >
           <span>Transaksi Baru</span>
           <ArrowRight class="w-4 h-4" />

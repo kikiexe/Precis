@@ -343,7 +343,7 @@
   <LoginView onLoginSuccess={handleLoginSuccess} />
 {:else}
   <!-- dashboard portal terautentikasi -->
-  <div class="min-h-screen bg-[#f4f4f4] flex flex-row overflow-x-hidden font-sans select-none">
+  <div class="min-h-screen bg-[#eeece7]/40 flex flex-row overflow-x-hidden font-sans select-none">
     <!-- sidebar khusus desktop -->
     <AppSidebar
       {currentUser}

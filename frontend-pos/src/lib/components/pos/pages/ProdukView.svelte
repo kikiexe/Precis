@@ -50,17 +50,17 @@
   }
 </script>
 
-<div class="flex-1 bg-[#f4f4f4] p-6 overflow-y-auto space-y-6">
+<div class="flex-1 bg-[#eeece7]/30 p-4 sm:p-6 md:p-8 overflow-y-auto space-y-6 font-sans">
   <div class="flex items-center justify-between">
     <div>
-      <h2 class="text-xl font-bold text-[#161616] font-display">Manajemen Menu &amp; Stok Produk</h2>
-      <p class="text-xs text-[#525252] font-mono">Daftar item katalog penjualan, harga dasar, dan ketersediaan stok</p>
+      <h2 class="text-xl font-medium text-[#212121] tracking-tight">Manajemen Menu &amp; Stok Produk</h2>
+      <p class="text-xs text-[#616161] font-normal mt-0.5">Daftar item katalog penjualan, harga dasar, dan ketersediaan stok</p>
     </div>
 
     <button
       type="button"
       onclick={() => (isAddModalOpen = true)}
-      class="bg-[#0f62fe] hover:bg-[#0050e6] text-white px-4 py-2.5 text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-xs transition-colors"
+      class="bg-[#17171c] hover:bg-[#000000] text-white px-5 py-2.5 text-xs font-medium rounded-full flex items-center gap-2 cursor-pointer transition-all shadow-none"
     >
       <Plus class="w-4 h-4" />
       <span>Tambah Menu Baru</span>
@@ -68,26 +68,26 @@
   </div>
 
   <!-- Search & Filter Controls -->
-  <div class="bg-white border border-[#e0e0e0] p-4 flex flex-wrap gap-3 items-center justify-between shadow-xs">
+  <div class="bg-white border border-[#d9d9dd] rounded-[20px] p-4 flex flex-wrap gap-3 items-center justify-between shadow-none">
     <div class="relative flex-1 min-w-[240px]">
-      <Search class="w-4 h-4 text-[#8c8c8c] absolute left-3 top-1/2 -translate-y-1/2" />
+      <Search class="w-4 h-4 text-[#93939f] absolute left-3.5 top-1/2 -translate-y-1/2" />
       <input
         type="text"
         bind:value={searchQuery}
         placeholder="Cari nama menu atau deskripsi..."
-        class="w-full bg-[#f4f4f4] pl-9 pr-3 py-2 text-xs border border-[#e0e0e0] focus:border-[#0f62fe] focus:outline-none"
+        class="w-full bg-[#eeece7]/40 pl-10 pr-4 py-2 text-xs rounded-full border border-[#d9d9dd] placeholder-[#93939f] text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden transition-all"
       />
     </div>
 
-    <div class="flex gap-1 overflow-x-auto">
+    <div class="flex gap-1 overflow-x-auto bg-[#eeece7]/60 p-1 rounded-full border border-[#d9d9dd]">
       {#each categories as cat}
         <button
           type="button"
           onclick={() => (selectedCategory = cat.id)}
-          class={`px-3 py-1.5 text-xs font-mono transition-colors border cursor-pointer ${
+          class={`px-3.5 py-1 text-xs font-mono rounded-full transition-all cursor-pointer ${
             selectedCategory === cat.id
-              ? 'bg-[#0f62fe] text-white border-[#0f62fe] font-bold shadow-xs'
-              : 'bg-[#f4f4f4] text-[#525252] border-[#e0e0e0] hover:bg-[#e0e0e0]'
+              ? 'bg-[#17171c] text-white font-medium shadow-none'
+              : 'text-[#616161] hover:text-[#212121]'
           }`}
         >
           {cat.name}
@@ -98,64 +98,64 @@
 
   <!-- Product Table List -->
   {#if filteredProducts.length === 0}
-    <div class="bg-white border border-[#e0e0e0] p-12 text-center space-y-3 shadow-xs">
-      <div class="w-12 h-12 bg-[#f4f4f4] text-[#8c8c8c] flex items-center justify-center mx-auto">
+    <div class="bg-white border border-[#d9d9dd] rounded-[22px] p-12 text-center space-y-3 shadow-none">
+      <div class="w-12 h-12 bg-[#eeece7] text-[#93939f] rounded-full flex items-center justify-center mx-auto">
         <Search class="w-6 h-6" />
       </div>
       <div>
-        <h3 class="text-sm font-bold text-[#161616]">Tidak Ada Menu Produk</h3>
-        <p class="text-xs text-[#8c8c8c] mt-0.5">Belum ada item menu yang terdaftar atau sesuai dengan filter pencarian.</p>
+        <h3 class="text-sm font-medium text-[#212121]">Tidak Ada Menu Produk</h3>
+        <p class="text-xs text-[#75758a] mt-0.5">Belum ada item menu yang terdaftar atau sesuai dengan filter pencarian.</p>
       </div>
       <button
         type="button"
         onclick={() => (isAddModalOpen = true)}
-        class="px-4 py-2 bg-[#0f62fe] text-white text-xs font-semibold hover:bg-[#0050e6] transition-colors inline-flex items-center gap-1.5"
+        class="px-5 py-2.5 bg-[#17171c] text-white text-xs font-medium rounded-full hover:bg-[#000000] transition-all inline-flex items-center gap-1.5 cursor-pointer"
       >
         <Plus class="w-3.5 h-3.5" />
         <span>Tambah Menu Baru</span>
       </button>
     </div>
   {:else}
-    <div class="bg-white border border-[#e0e0e0] overflow-x-auto shadow-xs">
-      <table class="w-full text-xs text-left">
-        <thead class="bg-[#f4f4f4] border-b border-[#e0e0e0] font-mono text-[11px] text-[#525252]">
+    <div class="bg-white border border-[#d9d9dd] rounded-[20px] overflow-hidden shadow-none">
+      <table class="w-full text-xs text-left border-collapse">
+        <thead class="bg-[#eeece7]/50 border-b border-[#d9d9dd] font-mono text-[11px] text-[#616161]">
           <tr>
-            <th class="p-3">Nama Menu</th>
-            <th class="p-3">Kategori</th>
-            <th class="p-3">Harga Jual</th>
-            <th class="p-3">Status Ketersediaan</th>
-            <th class="p-3 text-right">Aksi Cepat</th>
+            <th class="p-3.5 font-medium">Nama Menu</th>
+            <th class="p-3.5 font-medium">Kategori</th>
+            <th class="p-3.5 font-medium">Harga Jual</th>
+            <th class="p-3.5 font-medium">Status Ketersediaan</th>
+            <th class="p-3.5 text-right font-medium">Aksi Cepat</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[#f4f4f4]">
+        <tbody class="divide-y divide-[#d9d9dd]/60">
           {#each filteredProducts as product (product.id)}
             {@const catName = categories.find((c) => c.id === product.category_id)?.name || 'Menu'}
-            <tr class="hover:bg-[#f4f4f4]/60 transition-colors">
-              <td class="p-3">
-                <div class="font-bold text-[#161616] text-sm">{product.name}</div>
+            <tr class="hover:bg-[#eeece7]/20 transition-colors">
+              <td class="p-3.5">
+                <div class="font-medium text-[#212121] text-sm">{product.name}</div>
                 {#if product.description}
-                  <div class="text-[11px] text-[#8c8c8c] line-clamp-1">{product.description}</div>
+                  <div class="text-[11px] text-[#75758a] line-clamp-1 font-normal">{product.description}</div>
                 {/if}
               </td>
-              <td class="p-3 font-mono text-[#525252]">{catName}</td>
-              <td class="p-3 font-mono font-bold text-[#161616]">{formatCurrency(product.base_price)}</td>
-              <td class="p-3">
-                <span class={`text-[10px] font-mono px-2 py-0.5 border ${
+              <td class="p-3.5 font-mono text-[#616161]">{catName}</td>
+              <td class="p-3.5 font-mono font-medium text-[#212121]">{formatCurrency(product.base_price)}</td>
+              <td class="p-3.5">
+                <span class={`text-[10px] font-mono px-2.5 py-0.5 rounded-full font-medium ${
                   product.is_active
-                    ? 'bg-[#24a148]/10 text-[#24a148] border-[#24a148]/30'
-                    : 'bg-[#da1e28]/10 text-[#da1e28] border-[#da1e28]/30'
+                    ? 'bg-[#edfce9] text-[#003c33]'
+                    : 'bg-[#ffad9b]/20 text-[#b30000]'
                 }`}>
                   {product.is_active ? 'Tersedia' : 'Stok Habis'}
                 </span>
               </td>
-              <td class="p-3 text-right">
+              <td class="p-3.5 text-right">
                 <button
                   type="button"
                   onclick={() => onToggleProductActive(product.id)}
-                  class={`px-3 py-1 text-xs font-mono border cursor-pointer transition-colors ${
+                  class={`px-3.5 py-1 text-xs font-mono rounded-full border cursor-pointer transition-all ${
                     product.is_active
-                      ? 'bg-[#f4f4f4] hover:bg-[#da1e28]/10 text-[#da1e28] border-[#e0e0e0]'
-                      : 'bg-[#24a148] text-white hover:bg-[#1e8a3d] border-[#24a148]'
+                      ? 'bg-white hover:bg-[#ffad9b]/15 text-[#b30000] border-[#d9d9dd]'
+                      : 'bg-[#003c33] text-white hover:bg-[#002822] border-[#003c33]'
                   }`}
                 >
                   {product.is_active ? 'Set Habis' : 'Aktifkan'}
@@ -171,33 +171,33 @@
 
 <!-- Modal Tambah Menu -->
 {#if isAddModalOpen}
-  <div class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white border border-[#e0e0e0] max-w-md w-full p-6 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-[#e0e0e0] pb-3">
-        <h3 class="text-sm font-bold text-[#161616]">Tambah Menu Produk Baru</h3>
-        <button type="button" onclick={() => (isAddModalOpen = false)} class="text-[#8c8c8c] hover:text-[#161616] cursor-pointer">
+  <div class="fixed inset-0 z-50 bg-[#17171c]/40 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
+    <div class="bg-white border border-[#d9d9dd] rounded-[22px] max-w-md w-full p-6 shadow-none space-y-4">
+      <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
+        <h3 class="text-sm font-medium text-[#212121]">Tambah Menu Produk Baru</h3>
+        <button type="button" onclick={() => (isAddModalOpen = false)} class="text-[#93939f] hover:text-[#212121] cursor-pointer p-1">
           <X class="w-4 h-4" />
         </button>
       </div>
 
-      <div class="space-y-3 text-xs">
+      <div class="space-y-3.5 text-xs">
         <div>
-          <label for="prod-name" class="block font-mono text-[#525252] mb-1">Nama Menu:</label>
+          <label for="prod-name" class="block text-[#616161] font-medium mb-1.5">Nama Menu:</label>
           <input
             id="prod-name"
             type="text"
             bind:value={newName}
             placeholder="e.g. Hazelnut Latte Double"
-            class="w-full bg-[#f4f4f4] border border-[#e0e0e0] p-2 focus:border-[#0f62fe] focus:outline-none"
+            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 text-[#212121] placeholder-[#93939f] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           />
         </div>
 
         <div>
-          <label for="prod-cat" class="block font-mono text-[#525252] mb-1">Kategori:</label>
+          <label for="prod-cat" class="block text-[#616161] font-medium mb-1.5">Kategori:</label>
           <select
             id="prod-cat"
             bind:value={newCategory}
-            class="w-full bg-[#f4f4f4] border border-[#e0e0e0] p-2 focus:border-[#0f62fe] focus:outline-none"
+            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           >
             {#each categories.filter((c) => c.id !== 'cat-all') as cat}
               <option value={cat.id}>{cat.name}</option>
@@ -206,32 +206,32 @@
         </div>
 
         <div>
-          <label for="prod-price" class="block font-mono text-[#525252] mb-1">Harga Jual (Rp):</label>
+          <label for="prod-price" class="block text-[#616161] font-medium mb-1.5">Harga Jual (Rp):</label>
           <input
             id="prod-price"
             type="number"
             bind:value={newPrice}
             step="1000"
-            class="w-full bg-[#f4f4f4] border border-[#e0e0e0] p-2 font-mono font-bold focus:border-[#0f62fe] focus:outline-none"
+            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 font-mono font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           />
         </div>
 
         <div>
-          <label for="prod-desc" class="block font-mono text-[#525252] mb-1">Deskripsi Singkat:</label>
+          <label for="prod-desc" class="block text-[#616161] font-medium mb-1.5">Deskripsi Singkat:</label>
           <textarea
             id="prod-desc"
             bind:value={newDesc}
             rows="2"
             placeholder="e.g. Espresso, susu segar, hazelnut syrup..."
-            class="w-full bg-[#f4f4f4] border border-[#e0e0e0] p-2 focus:border-[#0f62fe] focus:outline-none"
+            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 text-[#212121] placeholder-[#93939f] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           ></textarea>
         </div>
 
-        <div class="pt-2 flex gap-2">
+        <div class="pt-3 flex gap-2.5 border-t border-[#d9d9dd]">
           <button
             type="button"
             onclick={() => (isAddModalOpen = false)}
-            class="flex-1 py-2 bg-[#f4f4f4] text-[#525252] border border-[#e0e0e0] cursor-pointer"
+            class="flex-1 py-2.5 bg-white text-[#616161] hover:bg-[#eeece7]/40 border border-[#d9d9dd] rounded-full text-xs font-medium cursor-pointer transition-all"
           >
             Batal
           </button>
@@ -239,7 +239,7 @@
             type="button"
             onclick={handleSaveProduct}
             disabled={!newName.trim() || newPrice <= 0}
-            class="flex-2 py-2 bg-[#0f62fe] hover:bg-[#0050e6] text-white font-semibold flex items-center justify-center gap-1.5 cursor-pointer disabled:bg-[#e0e0e0] disabled:text-[#8c8c8c]"
+            class="flex-2 py-2.5 bg-[#17171c] hover:bg-[#000000] text-white font-medium rounded-full flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-none disabled:opacity-50"
           >
             <Check class="w-3.5 h-3.5" />
             <span>Simpan Produk</span>

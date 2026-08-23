@@ -162,79 +162,79 @@
   }
 </script>
 
-<div class="space-y-6 max-w-6xl mx-auto p-4 md:p-8 pb-24 lg:pb-8">
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e0e0e0] pb-4">
+<div class="space-y-6 max-w-6xl mx-auto p-4 sm:p-6 md:p-8 pb-24 lg:pb-8 font-sans">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#d9d9dd] pb-4">
     <div>
-      <h2 class="text-xl font-bold text-[#161616] font-display">Status Langganan &amp; Billing SaaS</h2>
-      <p class="text-xs text-[#525252] font-mono">Manajemen paket langganan, kuota cabang outlet, dan faktur transfer manual</p>
+      <h2 class="text-xl font-medium text-[#212121] tracking-tight">Status Langganan &amp; Billing SaaS</h2>
+      <p class="text-xs text-[#616161] font-normal mt-0.5">Manajemen paket langganan, kuota cabang outlet, dan faktur transfer manual</p>
     </div>
   </div>
 
   {#if actionMessage}
-    <div class="p-3.5 bg-[#24a148]/10 border border-[#24a148]/30 text-[#24a148] text-xs font-mono flex items-center justify-between">
+    <div class="p-3.5 bg-[#edfce9] border border-[#edfce9] text-[#003c33] text-xs font-mono rounded-[12px] flex items-center justify-between">
       <span>{actionMessage}</span>
-      <button type="button" onclick={() => (actionMessage = null)} class="text-[#525252] hover:text-[#161616] cursor-pointer">✕</button>
+      <button type="button" onclick={() => (actionMessage = null)} class="text-[#616161] hover:text-[#212121] cursor-pointer p-1">✕</button>
     </div>
   {/if}
 
   {#if errorMessage}
-    <div class="p-3.5 bg-[#da1e28]/10 border border-[#da1e28]/30 text-[#da1e28] text-xs font-mono flex items-center justify-between">
+    <div class="p-3.5 bg-[#ffad9b]/15 border border-[#ffad9b] text-[#b30000] text-xs font-mono rounded-[12px] flex items-center justify-between">
       <div class="flex items-center gap-2">
         <AlertCircle class="w-4 h-4 shrink-0" />
         <span>{errorMessage}</span>
       </div>
-      <button type="button" onclick={() => (errorMessage = null)} class="text-[#525252] hover:text-[#161616] cursor-pointer">✕</button>
+      <button type="button" onclick={() => (errorMessage = null)} class="text-[#616161] hover:text-[#212121] cursor-pointer p-1">✕</button>
     </div>
   {/if}
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- kartu status paket langganan aktif -->
-    <div class="bg-white border border-[#e0e0e0] p-6 space-y-4 shadow-xs">
-      <div class="flex items-center justify-between border-b border-[#e0e0e0] pb-3">
-        <h3 class="font-bold text-sm text-[#161616] flex items-center gap-2">
-          <CreditCard class="w-4 h-4 text-[#0f62fe]" />
+    <div class="bg-white border border-[#d9d9dd] rounded-[22px] p-6 space-y-4 shadow-none">
+      <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
+        <h3 class="font-medium text-sm text-[#212121] flex items-center gap-2">
+          <CreditCard class="w-4 h-4 text-[#1863dc]" />
           <span>Status Akun Tenant</span>
         </h3>
-        <span class={`text-[10px] font-mono px-2 py-0.5 border font-bold ${
+        <span class={`text-[10px] font-mono px-2.5 py-0.5 rounded-full font-medium ${
           userProfile?.subscription_status === 'ACTIVE'
-            ? 'bg-[#24a148]/10 text-[#24a148] border-[#24a148]/30'
+            ? 'bg-[#edfce9] text-[#003c33]'
             : userProfile?.subscription_status === 'GRACE_PERIOD'
-            ? 'bg-[#f1c21b]/10 text-[#8a6d00] border-[#f1c21b]/30'
+            ? 'bg-[#eeece7] text-[#616161]'
             : userProfile?.subscription_status === 'SUSPENDED'
-            ? 'bg-[#da1e28]/10 text-[#da1e28] border-[#da1e28]/30'
-            : 'bg-[#0f62fe]/10 text-[#0f62fe] border-[#0f62fe]/30'
+            ? 'bg-[#ffad9b]/20 text-[#b30000]'
+            : 'bg-[#f1f5ff] text-[#1863dc]'
         }`}>
           {getStatusLabel(userProfile?.subscription_status || 'TRIAL')}
         </span>
       </div>
 
-      <div class="space-y-2.5 text-xs font-mono">
-        <div class="flex justify-between text-[#525252]">
+      <div class="space-y-2.5 text-xs">
+        <div class="flex justify-between text-[#616161]">
           <span>Nama Pemilik:</span>
-          <span class="font-bold text-[#161616]">{userProfile?.name || 'Owner'}</span>
+          <span class="font-medium text-[#212121]">{userProfile?.name || 'Owner'}</span>
         </div>
-        <div class="flex justify-between text-[#525252]">
+        <div class="flex justify-between text-[#616161]">
           <span>Maksimal Kuota Outlet:</span>
-          <span class="text-[#0f62fe] font-bold">{userProfile?.max_workspaces || 1} Cabang</span>
+          <span class="text-[#1863dc] font-medium font-mono">{userProfile?.max_workspaces || 1} Cabang</span>
         </div>
-        <div class="flex justify-between text-[#525252]">
+        <div class="flex justify-between text-[#616161]">
           <span>Masa Berlaku Hingga:</span>
-          <span class="text-[#161616] font-bold">
+          <span class="text-[#212121] font-medium font-mono">
             {userProfile?.subscription_expires_at ? userProfile.subscription_expires_at.split('T')[0] : 'Aktif (Masa Uji Coba)'}
           </span>
         </div>
       </div>
 
       <!-- formulir penerbitan invoice baru -->
-      <div class="border-t border-[#e0e0e0] pt-4 space-y-3">
-        <div class="font-bold text-xs text-[#161616]">Perpanjang / Upgrade Paket:</div>
+      <div class="border-t border-[#d9d9dd] pt-4 space-y-3">
+        <div class="font-medium text-xs text-[#212121]">Perpanjang / Upgrade Paket:</div>
 
-        <div class="space-y-2">
-          <label for="billing-plan-select" class="block text-[11px] font-mono text-[#525252]">Pilih Paket:</label>
+        <div class="space-y-1.5">
+          <label for="billing-plan-select" class="block text-[11px] text-[#75758a]">Pilih Paket:</label>
           <select
             id="billing-plan-select"
             bind:value={selectedPlanId}
-            class="w-full bg-[#f4f4f4] border border-[#8c8c8c] p-2 text-xs font-mono text-[#161616] focus:border-[#0f62fe] focus:outline-hidden"
+            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 text-xs font-mono text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           >
             {#each plans as plan}
               <option value={plan.id}>
@@ -244,14 +244,14 @@
           </select>
         </div>
 
-        <div class="flex gap-2 text-xs font-mono">
+        <div class="flex gap-2 text-xs font-mono bg-[#eeece7]/40 p-1 rounded-full border border-[#d9d9dd]">
           <button
             type="button"
             onclick={() => (billingCycle = 'MONTHLY')}
-            class={`flex-1 py-1.5 border text-center cursor-pointer transition-colors ${
+            class={`flex-1 py-1.5 rounded-full text-center cursor-pointer transition-all ${
               billingCycle === 'MONTHLY'
-                ? 'bg-[#0f62fe] text-white border-[#0f62fe] font-bold'
-                : 'bg-[#f4f4f4] text-[#525252] border-[#e0e0e0]'
+                ? 'bg-[#17171c] text-white font-medium shadow-none'
+                : 'text-[#616161] hover:text-[#212121]'
             }`}
           >
             Bulanan
@@ -259,10 +259,10 @@
           <button
             type="button"
             onclick={() => (billingCycle = 'ANNUAL')}
-            class={`flex-1 py-1.5 border text-center cursor-pointer transition-colors ${
+            class={`flex-1 py-1.5 rounded-full text-center cursor-pointer transition-all ${
               billingCycle === 'ANNUAL'
-                ? 'bg-[#0f62fe] text-white border-[#0f62fe] font-bold'
-                : 'bg-[#f4f4f4] text-[#525252] border-[#e0e0e0]'
+                ? 'bg-[#17171c] text-white font-medium shadow-none'
+                : 'text-[#616161] hover:text-[#212121]'
             }`}
           >
             Tahunan (Hemat)
@@ -273,7 +273,7 @@
           type="button"
           disabled={isCreatingInvoice || plans.length === 0}
           onclick={handleCreateInvoice}
-          class="w-full py-2.5 bg-[#161616] hover:bg-black text-white font-semibold text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors disabled:opacity-50"
+          class="w-full py-2.5 bg-[#17171c] hover:bg-[#000000] text-white font-medium text-xs rounded-full flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-none disabled:opacity-50"
         >
           <Plus class="w-3.5 h-3.5" />
           <span>{isCreatingInvoice ? 'Menerbitkan...' : 'Terbitkan Faktur Baru'}</span>
@@ -282,25 +282,25 @@
     </div>
 
     <!-- kartu faktur aktif dan instruksi transfer bank -->
-    <div class="bg-white border border-[#e0e0e0] p-6 space-y-4 shadow-xs lg:col-span-2">
+    <div class="bg-white border border-[#d9d9dd] rounded-[22px] p-6 space-y-4 shadow-none lg:col-span-2">
       {#if !activeInvoice}
-        <div class="p-12 text-center space-y-2">
-          <FileText class="w-8 h-8 text-[#8c8c8c] mx-auto opacity-40" />
-          <h3 class="text-sm font-bold text-[#161616]">Tidak Ada Tagihan Aktif</h3>
-          <p class="text-xs text-[#8c8c8c]">Akun Anda dalam status aktif. Terbitkan faktur baru di samping jika ingin memperpanjang masa aktif.</p>
+        <div class="p-12 text-center space-y-2.5">
+          <FileText class="w-8 h-8 text-[#93939f] mx-auto opacity-50" />
+          <h3 class="text-sm font-medium text-[#212121]">Tidak Ada Tagihan Aktif</h3>
+          <p class="text-xs text-[#75758a]">Akun Anda dalam status aktif. Terbitkan faktur baru di samping jika ingin memperpanjang masa aktif.</p>
         </div>
       {:else}
-        <div class="flex items-center justify-between border-b border-[#e0e0e0] pb-3">
+        <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
           <div>
-            <h3 class="font-bold text-sm text-[#161616]">Faktur Tagihan #{activeInvoice.invoice_number}</h3>
-            <p class="text-xs text-[#525252] font-mono">Transfer sesuai nominal dan 3-digit kode unik acak untuk verifikasi otomatis</p>
+            <h3 class="font-medium text-sm text-[#212121]">Faktur Tagihan #{activeInvoice.invoice_number}</h3>
+            <p class="text-xs text-[#616161] mt-0.5">Transfer sesuai nominal dan 3-digit kode unik acak untuk verifikasi otomatis</p>
           </div>
-          <span class={`text-[10px] font-mono px-2 py-0.5 border font-bold ${
+          <span class={`text-[10px] font-mono px-2.5 py-0.5 rounded-full font-medium ${
             activeInvoice.status === 'PAID'
-              ? 'bg-[#24a148]/10 text-[#24a148] border-[#24a148]/30'
+              ? 'bg-[#edfce9] text-[#003c33]'
               : activeInvoice.status === 'PENDING_VERIFICATION'
-              ? 'bg-[#f1c21b]/10 text-[#8a6d00] border-[#f1c21b]/30'
-              : 'bg-[#da1e28]/10 text-[#da1e28] border-[#da1e28]/30'
+              ? 'bg-[#eeece7] text-[#616161]'
+              : 'bg-[#ffad9b]/20 text-[#b30000]'
           }`}>
             {getInvoiceStatusLabel(activeInvoice.status)}
           </span>
@@ -308,49 +308,49 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- rincian tagihan -->
-          <div class="p-4 bg-[#f4f4f4] border border-[#e0e0e0] space-y-2 font-mono text-xs">
-            <div class="flex justify-between text-[#525252]">
+          <div class="p-4 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] space-y-2 font-mono text-xs">
+            <div class="flex justify-between text-[#616161]">
               <span>Nominal Dasar Paket:</span>
-              <span>{formatRp(activeInvoice.amount_base)}</span>
+              <span class="text-[#212121]">{formatRp(activeInvoice.amount_base)}</span>
             </div>
-            <div class="flex justify-between text-[#0f62fe] font-bold">
+            <div class="flex justify-between text-[#1863dc] font-medium">
               <span>Kode Unik Verifikasi:</span>
               <span>+{activeInvoice.unique_code}</span>
             </div>
-            <div class="flex justify-between text-[#525252]">
+            <div class="flex justify-between text-[#616161]">
               <span>Batas Waktu Bayar:</span>
-              <span class="text-[#161616]">{activeInvoice.due_date ? activeInvoice.due_date.split('T')[0] : '3 Hari'}</span>
+              <span class="text-[#212121]">{activeInvoice.due_date ? activeInvoice.due_date.split('T')[0] : '3 Hari'}</span>
             </div>
-            <div class="flex justify-between font-bold text-sm text-[#161616] border-t border-[#e0e0e0] pt-2">
+            <div class="flex justify-between font-medium text-sm text-[#212121] border-t border-[#d9d9dd] pt-2">
               <span>Total Transfer Tepat:</span>
-              <span class="text-[#da1e28] text-base">{formatRp(activeInvoice.total_amount)}</span>
+              <span class="text-[#b30000] text-base">{formatRp(activeInvoice.total_amount)}</span>
             </div>
           </div>
 
           <!-- rekening tujuan dan aksi unggah bukti -->
           <div class="space-y-3">
-            <div class="p-3 bg-[#f4f4f4] border border-[#e0e0e0] text-xs font-mono space-y-1">
-              <div class="text-[#525252]">Rekening Resmi Tujuan:</div>
-              <div class="font-bold text-sm text-[#161616]">BCA: 8412-0099-3311</div>
-              <div class="text-[10px] text-[#8c8c8c]">a.n. PT Precis Ekosistem Digital</div>
+            <div class="p-3.5 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] text-xs font-mono space-y-1">
+              <div class="text-[#75758a]">Rekening Resmi Tujuan:</div>
+              <div class="font-medium text-sm text-[#212121]">BCA: 8412-0099-3311</div>
+              <div class="text-[11px] text-[#93939f]">a.n. PT Precis Ekosistem Digital</div>
             </div>
 
             {#if activeInvoice.status === 'UNPAID'}
               <button
                 type="button"
                 onclick={() => handleOpenProofModal(activeInvoice)}
-                class="w-full py-3 bg-[#0f62fe] hover:bg-[#0050e6] text-white font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-colors"
+                class="w-full py-3 bg-[#17171c] hover:bg-[#000000] text-white font-medium text-xs rounded-full flex items-center justify-center gap-2 cursor-pointer transition-all shadow-none"
               >
                 <Upload class="w-4 h-4" />
                 <span>Unggah Bukti Transfer Bank</span>
               </button>
             {:else if activeInvoice.status === 'PENDING_VERIFICATION'}
-              <div class="p-3 bg-[#f1c21b]/10 border border-[#f1c21b]/30 text-[#8a6d00] text-xs flex items-center gap-2 font-mono">
-                <CheckCircle2 class="w-4 h-4 shrink-0" />
+              <div class="p-3.5 bg-[#eeece7] text-[#616161] rounded-[14px] text-xs flex items-center gap-2.5 font-mono">
+                <CheckCircle2 class="w-4 h-4 shrink-0 text-[#1863dc]" />
                 <span>Bukti transfer telah diterima dan dalam antrean verifikasi Superadmin.</span>
               </div>
             {:else}
-              <div class="p-3 bg-[#24a148]/10 border border-[#24a148]/30 text-[#24a148] text-xs flex items-center gap-2 font-mono">
+              <div class="p-3.5 bg-[#edfce9] text-[#003c33] rounded-[14px] text-xs flex items-center gap-2.5 font-mono">
                 <CheckCircle2 class="w-4 h-4 shrink-0" />
                 <span>Faktur ini telah terverifikasi lunas.</span>
               </div>
@@ -362,56 +362,56 @@
   </div>
 
   <!-- tabel riwayat seluruh faktur tagihan -->
-  <div class="bg-white border border-[#e0e0e0] p-6 space-y-4 shadow-xs">
-    <div class="flex items-center justify-between border-b border-[#e0e0e0] pb-3">
+  <div class="bg-white border border-[#d9d9dd] rounded-[22px] p-6 space-y-4 shadow-none">
+    <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
       <div>
-        <h3 class="font-bold text-sm text-[#161616]">Riwayat Faktur &amp; Pembayaran</h3>
-        <p class="text-xs text-[#525252] font-mono">Daftar seluruh tagihan langganan akun Anda</p>
+        <h3 class="font-medium text-sm text-[#212121]">Riwayat Faktur &amp; Pembayaran</h3>
+        <p class="text-xs text-[#616161] mt-0.5">Daftar seluruh tagihan langganan akun Anda</p>
       </div>
-      <span class="text-xs font-mono text-[#8c8c8c]">Total: {invoices.length} Faktur</span>
+      <span class="text-xs font-mono text-[#75758a]">Total: {invoices.length} Faktur</span>
     </div>
 
     {#if invoices.length === 0}
-      <div class="p-8 text-center text-xs text-[#8c8c8c]">Belum ada riwayat faktur tagihan.</div>
+      <div class="p-8 text-center text-xs text-[#75758a]">Belum ada riwayat faktur tagihan.</div>
     {:else}
-      <div class="overflow-x-auto">
-        <table class="w-full text-xs text-left">
-          <thead class="bg-[#f4f4f4] border-b border-[#e0e0e0] font-mono text-[11px] text-[#525252]">
+      <div class="overflow-x-auto rounded-[16px] border border-[#d9d9dd]">
+        <table class="w-full text-xs text-left border-collapse">
+          <thead class="bg-[#eeece7]/50 border-b border-[#d9d9dd] font-mono text-[11px] text-[#616161]">
             <tr>
-              <th class="p-3">Nomor Faktur</th>
-              <th class="p-3">Nominal Dasar</th>
-              <th class="p-3">Kode Unik</th>
-              <th class="p-3">Total Transfer</th>
-              <th class="p-3">Jatuh Tempo</th>
-              <th class="p-3 text-right">Status</th>
-              <th class="p-3 text-right">Aksi</th>
+              <th class="p-3.5 font-medium">Nomor Faktur</th>
+              <th class="p-3.5 font-medium">Nominal Dasar</th>
+              <th class="p-3.5 font-medium">Kode Unik</th>
+              <th class="p-3.5 font-medium">Total Transfer</th>
+              <th class="p-3.5 font-medium">Jatuh Tempo</th>
+              <th class="p-3.5 text-right font-medium">Status</th>
+              <th class="p-3.5 text-right font-medium">Aksi</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-[#f4f4f4]">
+          <tbody class="divide-y divide-[#d9d9dd]/60">
             {#each invoices as inv (inv.id)}
-              <tr class="hover:bg-[#f4f4f4]/60 transition-colors">
-                <td class="p-3 font-mono font-bold text-[#161616]">{inv.invoice_number}</td>
-                <td class="p-3 font-mono">{formatRp(inv.amount_base)}</td>
-                <td class="p-3 font-mono text-[#0f62fe]">+{inv.unique_code}</td>
-                <td class="p-3 font-mono font-bold text-[#161616]">{formatRp(inv.total_amount)}</td>
-                <td class="p-3 font-mono text-[#8c8c8c]">{inv.due_date ? inv.due_date.split('T')[0] : '-'}</td>
-                <td class="p-3 text-right">
-                  <span class={`text-[10px] font-mono px-2 py-0.5 border ${
+              <tr class="hover:bg-[#eeece7]/20 transition-colors">
+                <td class="p-3.5 font-mono font-medium text-[#212121]">{inv.invoice_number}</td>
+                <td class="p-3.5 font-mono">{formatRp(inv.amount_base)}</td>
+                <td class="p-3.5 font-mono text-[#1863dc]">+{inv.unique_code}</td>
+                <td class="p-3.5 font-mono font-medium text-[#212121]">{formatRp(inv.total_amount)}</td>
+                <td class="p-3.5 font-mono text-[#75758a]">{inv.due_date ? inv.due_date.split('T')[0] : '-'}</td>
+                <td class="p-3.5 text-right">
+                  <span class={`text-[10px] font-mono px-2.5 py-0.5 rounded-full font-medium ${
                     inv.status === 'PAID'
-                      ? 'bg-[#24a148]/10 text-[#24a148] border-[#24a148]/30'
+                      ? 'bg-[#edfce9] text-[#003c33]'
                       : inv.status === 'PENDING_VERIFICATION'
-                      ? 'bg-[#f1c21b]/10 text-[#8a6d00] border-[#f1c21b]/30'
-                      : 'bg-[#da1e28]/10 text-[#da1e28] border-[#da1e28]/30'
+                      ? 'bg-[#eeece7] text-[#616161]'
+                      : 'bg-[#ffad9b]/20 text-[#b30000]'
                   }`}>
                     {getInvoiceStatusLabel(inv.status)}
                   </span>
                 </td>
-                <td class="p-3 text-right">
+                <td class="p-3.5 text-right">
                   {#if inv.status === 'UNPAID'}
                     <button
                       type="button"
                       onclick={() => handleOpenProofModal(inv)}
-                      class="px-2.5 py-1 bg-[#0f62fe] text-white text-[11px] font-semibold cursor-pointer hover:bg-[#0050e6]"
+                      class="px-3.5 py-1 bg-[#17171c] text-white text-[11px] font-medium rounded-full cursor-pointer hover:bg-[#000000] transition-all"
                     >
                       Unggah Bukti
                     </button>
@@ -420,13 +420,13 @@
                       href={inv.confirmation.proof_image_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="text-[#0f62fe] hover:underline text-[11px] font-mono inline-flex items-center gap-1"
+                      class="text-[#1863dc] hover:underline text-[11px] font-mono inline-flex items-center gap-1 font-medium"
                     >
                       <span>Lihat Bukti</span>
                       <ExternalLink class="w-3 h-3" />
                     </a>
                   {:else}
-                    <span class="text-[#8c8c8c] font-mono text-[11px]">-</span>
+                    <span class="text-[#93939f] font-mono text-[11px]">-</span>
                   {/if}
                 </td>
               </tr>
@@ -440,70 +440,70 @@
 
 <!-- modal upload bukti transfer -->
 {#if selectedInvoiceForProof}
-  <div class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-    <div class="bg-white border border-[#e0e0e0] max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
-      <div class="flex items-center justify-between border-b border-[#e0e0e0] pb-3">
-        <h3 class="text-sm font-bold text-[#161616]">Unggah Bukti Transfer Bank</h3>
-        <button type="button" onclick={() => (selectedInvoiceForProof = null)} class="text-[#8c8c8c] hover:text-[#161616] cursor-pointer">✕</button>
+  <div class="fixed inset-0 z-50 bg-[#17171c]/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white border border-[#d9d9dd] rounded-[22px] max-w-md w-full p-6 shadow-none space-y-4 animate-in fade-in zoom-in-95 font-sans">
+      <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
+        <h3 class="text-base font-medium text-[#212121]">Unggah Bukti Transfer Bank</h3>
+        <button type="button" onclick={() => (selectedInvoiceForProof = null)} class="text-[#93939f] hover:text-[#212121] cursor-pointer p-1">✕</button>
       </div>
 
       {#if errorMessage}
-        <div class="p-3 bg-[#da1e28]/10 border border-[#da1e28]/30 text-[#da1e28] text-xs font-mono flex items-start gap-2">
+        <div class="p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-[12px] text-[#b30000] text-xs flex items-start gap-2">
           <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
           <span>{errorMessage}</span>
         </div>
       {/if}
 
-      <div class="space-y-3 text-xs">
-        <div class="p-3 bg-[#f4f4f4] border border-[#e0e0e0] font-mono space-y-1">
-          <div class="flex justify-between text-[#525252]">
+      <div class="space-y-3.5 text-xs">
+        <div class="p-3.5 bg-[#eeece7]/40 border border-[#d9d9dd] rounded-[14px] font-mono space-y-1">
+          <div class="flex justify-between text-[#616161]">
             <span>Nomor Faktur:</span>
-            <span class="font-bold text-[#161616]">{selectedInvoiceForProof.invoice_number}</span>
+            <span class="font-medium text-[#212121]">{selectedInvoiceForProof.invoice_number}</span>
           </div>
-          <div class="flex justify-between text-[#525252]">
+          <div class="flex justify-between text-[#616161]">
             <span>Nominal Tepat Transfer:</span>
-            <span class="font-bold text-[#da1e28]">{formatRp(selectedInvoiceForProof.total_amount)}</span>
+            <span class="font-medium text-[#b30000]">{formatRp(selectedInvoiceForProof.total_amount)}</span>
           </div>
         </div>
 
         <div>
-          <label for="sender-name-input" class="block font-mono text-[#525252] mb-1">Nama Pemilik Rekening Pengirim:</label>
+          <label for="sender-name-input" class="block font-medium text-[#212121] mb-1.5">Nama Pemilik Rekening Pengirim:</label>
           <input
             id="sender-name-input"
             type="text"
             bind:value={senderAccountName}
             placeholder="e.g. Arief Hadinata"
-            class="w-full bg-[#f4f4f4] border border-[#8c8c8c] p-2 text-xs font-mono text-[#161616] focus:border-[#0f62fe] focus:outline-hidden"
+            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 text-xs text-[#212121] placeholder-[#93939f] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           />
         </div>
 
         <div>
-          <label for="transfer-amount-input" class="block font-mono text-[#525252] mb-1">Nominal yang Ditransfer (Rp):</label>
+          <label for="transfer-amount-input" class="block font-medium text-[#212121] mb-1.5">Nominal yang Ditransfer (Rp):</label>
           <input
             id="transfer-amount-input"
             type="number"
             bind:value={transferAmount}
-            class="w-full bg-[#f4f4f4] border border-[#8c8c8c] p-2 text-xs font-mono font-bold text-[#161616] focus:border-[#0f62fe] focus:outline-hidden"
+            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 text-xs font-mono font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           />
         </div>
 
         <div>
-          <label for="proof-file-input" class="block font-mono text-[#525252] mb-1">Foto Struk / Tangkapan Layar M-Banking:</label>
+          <label for="proof-file-input" class="block font-medium text-[#212121] mb-1.5">Foto Struk / Tangkapan Layar M-Banking:</label>
           <input
             id="proof-file-input"
             type="file"
             accept="image/jpeg,image/png,image/webp"
             onchange={handleFileSelected}
-            class="w-full bg-[#f4f4f4] border border-[#8c8c8c] p-2 text-xs font-mono text-[#161616] focus:border-[#0f62fe] focus:outline-hidden"
+            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 text-xs text-[#212121] focus:border-[#17171c] focus:outline-hidden"
           />
-          <p class="text-[10px] text-[#8c8c8c] font-mono mt-1">Format: JPG, PNG, atau WebP. Maksimal 2MB.</p>
+          <p class="text-[11px] text-[#75758a] font-normal mt-1">Format: JPG, PNG, atau WebP. Maksimal 2MB.</p>
         </div>
 
-        <div class="pt-2 flex gap-2">
+        <div class="pt-3 flex gap-2.5 border-t border-[#d9d9dd]">
           <button
             type="button"
             onclick={() => (selectedInvoiceForProof = null)}
-            class="flex-1 py-2.5 bg-[#f4f4f4] text-[#525252] border border-[#e0e0e0] text-xs font-semibold cursor-pointer"
+            class="flex-1 py-2.5 bg-white text-[#616161] hover:bg-[#eeece7]/40 border border-[#d9d9dd] rounded-full text-xs font-medium cursor-pointer transition-all"
           >
             Batal
           </button>
@@ -511,7 +511,7 @@
             type="button"
             onclick={handleSubmitProof}
             disabled={isUploadingProof}
-            class="flex-2 py-2.5 bg-[#0f62fe] hover:bg-[#0050e6] text-white text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+            class="flex-2 py-2.5 bg-[#17171c] hover:bg-[#000000] text-white text-xs font-medium rounded-full flex items-center justify-center gap-1.5 cursor-pointer transition-all disabled:opacity-50"
           >
             <Upload class="w-3.5 h-3.5" />
             <span>{isUploadingProof ? 'Mengunggah...' : 'Kirim Bukti Pembayaran'}</span>

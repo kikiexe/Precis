@@ -122,14 +122,14 @@
         simCanvas.width = 720;
         simCanvas.height = 960;
         const ctx = simCanvas.getContext('2d')!;
-        ctx.fillStyle = '#262626';
+        ctx.fillStyle = '#17171c';
         ctx.fillRect(0, 0, 720, 960);
-        ctx.fillStyle = '#0f62fe';
+        ctx.fillStyle = '#003c33';
         ctx.beginPath();
         ctx.arc(360, 420, 160, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 36px sans-serif';
+        ctx.font = '500 36px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(currentUser.name, 360, 430);
         ctx.font = '24px monospace';
@@ -247,41 +247,41 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 bg-black flex flex-col justify-between select-none max-w-md mx-auto animate-in fade-in">
+  <div class="fixed inset-0 z-50 bg-[#17171c] flex flex-col justify-between select-none max-w-md mx-auto animate-in fade-in font-sans">
     <!-- bilah atas informasi GPS dan tombol tutup -->
-    <div class="p-4 flex items-center justify-between text-white bg-black/70 z-20">
-      <div class="flex items-center gap-2 text-xs font-mono">
-        <MapPin class="w-3.5 h-3.5 text-[#24a148]" />
+    <div class="p-4 flex items-center justify-between text-white bg-[#17171c]/90 backdrop-blur-md z-20 border-b border-white/10">
+      <div class="flex items-center gap-2 text-xs font-mono text-[#edfce9]">
+        <MapPin class="w-3.5 h-3.5 text-[#edfce9]" />
         <span>{gpsStatus}</span>
       </div>
       <button
         type="button"
         onclick={onClose}
         disabled={isProcessing}
-        class="text-white hover:text-[#8c8c8c] p-1 cursor-pointer"
+        class="text-white/80 hover:text-white p-1 cursor-pointer transition-colors"
       >
-        <X class="w-6 h-6" />
+        <X class="w-5 h-5" />
       </button>
     </div>
 
     <!-- banner peringatan jika keluar geofence atau error -->
     {#if geofenceWarning}
-      <div class="mx-4 mt-2 p-3 bg-[#da1e28] text-white text-xs font-mono z-30 flex items-start gap-2 shadow-lg animate-in slide-in-from-top-2">
+      <div class="mx-4 mt-3 p-3.5 bg-[#b30000] text-white text-xs font-mono z-30 flex items-start gap-2.5 rounded-[12px] shadow-none animate-in slide-in-from-top-2">
         <ShieldAlert class="w-4 h-4 shrink-0 mt-0.5" />
         <div>
-          <div class="font-bold">Radius Lokasi Ditolak (Geofence)</div>
+          <div class="font-medium">Radius Lokasi Ditolak (Geofence)</div>
           <div class="text-[11px] mt-0.5 opacity-90">{geofenceWarning}</div>
         </div>
       </div>
     {:else if errorMessage}
-      <div class="mx-4 mt-2 p-3 bg-[#da1e28] text-white text-xs font-mono z-30 flex items-start gap-2 shadow-lg animate-in slide-in-from-top-2">
+      <div class="mx-4 mt-3 p-3.5 bg-[#b30000] text-white text-xs font-mono z-30 flex items-start gap-2.5 rounded-[12px] shadow-none animate-in slide-in-from-top-2">
         <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
         <span>{errorMessage}</span>
       </div>
     {/if}
 
     <!-- area viewport kamera dengan overlay watermark -->
-    <div class="relative flex-1 bg-[#161616] overflow-hidden flex items-center justify-center">
+    <div class="relative flex-1 bg-[#17171c] overflow-hidden flex items-center justify-center">
       {#if isCameraActive}
         <video
           bind:this={videoElement}
@@ -293,46 +293,46 @@
       {:else}
         <!-- tampilan simulator jika webcam tidak terdeteksi -->
         <div class="text-center p-6 space-y-4">
-          <div class="w-32 h-32 rounded-full border-2 border-dashed border-[#0f62fe] mx-auto flex items-center justify-center">
-            <Camera class="w-12 h-12 text-[#0f62fe]" />
+          <div class="w-32 h-32 rounded-full border-2 border-dashed border-[#edfce9]/40 mx-auto flex items-center justify-center">
+            <Camera class="w-12 h-12 text-[#edfce9]" />
           </div>
-          <div class="text-white text-sm font-semibold">{currentUser.name}</div>
-          <div class="text-xs text-[#8c8c8c] font-mono">Posisikan wajah di dalam lingkaran</div>
+          <div class="text-white text-sm font-medium">{currentUser.name}</div>
+          <div class="text-xs text-[#93939f] font-mono">Posisikan wajah di dalam frame kamera</div>
         </div>
       {/if}
 
       <!-- stamp watermark di bagian bawah layar kamera -->
-      <div class="absolute bottom-0 left-0 right-0 p-3 bg-black/80 border-t-2 border-[#0f62fe] text-white font-mono text-xs space-y-1">
-        <div class="font-bold flex items-center justify-between">
+      <div class="absolute bottom-0 left-0 right-0 p-3.5 bg-[#17171c]/90 backdrop-blur-sm border-t border-white/10 text-white font-mono text-xs space-y-1">
+        <div class="font-medium flex items-center justify-between">
           <span>{liveTimestamp} WIB</span>
-          <span class="text-[#24a148] text-[10px] uppercase font-semibold">
+          <span class="text-[#edfce9] text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-white/10">
             {actionType === 'CLOCK_IN' ? 'PRESENSI MASUK' : 'PRESENSI KELUAR'}
           </span>
         </div>
-        <div class="text-[11px] text-[#c6c6c6]">
+        <div class="text-[11px] text-[#d9d9dd]">
           {currentUser.branch_name} • Lat: {latitude.toFixed(6)}, Lng: {longitude.toFixed(6)}
         </div>
       </div>
     </div>
 
     <!-- tombol shutter kamera di bagian bawah -->
-    <div class="p-6 bg-black flex flex-col items-center gap-3 z-20">
+    <div class="p-6 bg-[#17171c] flex flex-col items-center gap-3 z-20 border-t border-white/10">
       <button
         type="button"
         disabled={isProcessing}
         onclick={handleCaptureSelfie}
-        class="w-20 h-20 rounded-full bg-white border-4 border-[#0f62fe] active:scale-95 flex items-center justify-center shadow-lg transition-transform cursor-pointer disabled:opacity-50"
+        class="w-20 h-20 rounded-full bg-white border-4 border-white/30 active:scale-95 flex items-center justify-center transition-all cursor-pointer disabled:opacity-50"
         aria-label="Ambil Foto"
       >
-        <div class={`w-14 h-14 rounded-full bg-[#0f62fe] flex items-center justify-center text-white ${isProcessing ? 'animate-spin' : ''}`}>
+        <div class={`w-14 h-14 rounded-full bg-[#17171c] flex items-center justify-center text-white ${isProcessing ? 'animate-spin' : ''}`}>
           {#if isProcessing}
             <RefreshCw class="w-6 h-6" />
           {:else}
-            <Camera class="w-7 h-7" />
+            <Camera class="w-6 h-6" />
           {/if}
         </div>
       </button>
-      <span class="text-[11px] text-[#8c8c8c] font-mono">
+      <span class="text-[11px] text-[#93939f] font-mono">
         {isProcessing ? 'Mengunggah Foto & Memverifikasi GPS...' : 'Tekan tombol untuk presensi'}
       </span>
     </div>

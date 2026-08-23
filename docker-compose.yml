@@ -46,7 +46,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
+      - ./backend:/app:z
     environment:
       APP_ENV: local
       APP_DEBUG: "true"
