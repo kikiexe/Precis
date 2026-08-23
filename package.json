@@ -1,0 +1,21 @@
+{
+  "name": "precis-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "pnpm --filter @precis/landing dev",
+    "dev:landing": "pnpm --filter @precis/landing dev",
+    "dev:app": "pnpm --filter @precis/app dev",
+    "dev:pos": "pnpm --filter @precis/pos dev",
+    "dev:all": "pnpm -r --parallel dev",
+    "landing": "pnpm --filter @precis/landing dev",
+    "app": "pnpm --filter @precis/app dev",
+    "pos": "pnpm --filter @precis/pos dev",
+    "build": "pnpm -r build",
+    "check": "pnpm -r check"
+  },
+  "onlyBuiltDependencies": [
+    "esbuild",
+    "sharp"
+  ]
+}
