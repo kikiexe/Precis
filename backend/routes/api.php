@@ -52,6 +52,7 @@ Route::prefix('v1')->group(function (): void {
 
     // billing saas user portal
     Route::middleware('auth:sanctum')->prefix('billing')->group(function (): void {
+        Route::get('/plans', [BillingController::class, 'plans']);
         Route::post('/invoices', [BillingController::class, 'createInvoice']);
         Route::get('/invoices', [BillingController::class, 'myInvoices']);
         Route::post('/invoices/{id}/proof', [BillingController::class, 'submitProof']);
@@ -59,7 +60,23 @@ Route::prefix('v1')->group(function (): void {
 
     // endpoint superadmin
     Route::prefix('superadmin')->group(function (): void {
-        Route::post('/invoices/{id}/verify', [SuperadminInvoiceController::class, 'verify']);
+        Route::post('/auth/login', [\App\Http\Controllers\Api\SuperadminController::class, 'login']);
+
+        Route::middleware('auth:sanctum')->group(function (): void {
+            Route::get('/auth/me', [\App\Http\Controllers\Api\SuperadminController::class, 'me']);
+            Route::post('/auth/logout', [\App\Http\Controllers\Api\SuperadminController::class, 'logout']);
+
+            Route::get('/invoices', [\App\Http\Controllers\Api\SuperadminController::class, 'invoices']);
+            Route::post('/invoices/{id}/verify', [\App\Http\Controllers\Api\SuperadminController::class, 'verifyInvoice']);
+
+            Route::get('/metrics', [\App\Http\Controllers\Api\SuperadminController::class, 'metrics']);
+
+            Route::get('/tenants', [\App\Http\Controllers\Api\SuperadminController::class, 'tenants']);
+            Route::post('/tenants/{id}/status', [\App\Http\Controllers\Api\SuperadminController::class, 'updateTenantStatus']);
+            Route::post('/tenants/{id}/extend', [\App\Http\Controllers\Api\SuperadminController::class, 'extendTenantSubscription']);
+
+            Route::get('/plans', [\App\Http\Controllers\Api\SuperadminController::class, 'plans']);
+        });
     });
 
     // endpoint scoping workspace multi-tenant (sanctum + resolveworkspacecontext + checksubscriptionstatus)

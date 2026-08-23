@@ -6,8 +6,10 @@
   import { attendanceService } from './lib/services/attendance-service';
   import { cashAdvanceService } from './lib/services/cash-advance-service';
   import { payrollService } from './lib/services/payroll-service';
+  import { billingService } from './lib/services/billing-service';
   import type {
     User,
+    UserProfile,
     UserWorkspace,
     AttendanceRecord,
     ShiftRosterItem,
@@ -15,6 +17,8 @@
     CashAdvance,
     PayrollSlipData,
     PayrollPreviewData,
+    SubscriptionInvoice,
+    SubscriptionPlanItem,
     LoginResponseData,
   } from './lib/types/app';
   import LoginView from './lib/components/auth/LoginView.svelte';
@@ -34,6 +38,7 @@
   let isCheckingSession = $state(true);
   let userWorkspaces = $state<UserWorkspace[]>([]);
   let activeWorkspaceId = $state<string | null>(null);
+  let userProfile = $state<UserProfile | null>(null);
 
   // profil pengguna aktif
   let currentUser = $state<User>({
@@ -62,6 +67,8 @@
   let adminPendingKasbons = $state<CashAdvance[]>([]);
   let myPayrollSlip = $state<PayrollSlipData | null>(null);
   let adminPayrollPreview = $state<PayrollPreviewData | null>(null);
+  let subscriptionInvoices = $state<SubscriptionInvoice[]>([]);
+  let subscriptionPlans = $state<SubscriptionPlanItem[]>([]);
 
   // ambil permintaan PENDING
   let pendingApprovalsCount = $derived(
@@ -100,6 +107,7 @@
 
     try {
       const profile = await authService.getProfile();
+      userProfile = profile;
       userWorkspaces = profile.workspaces || [];
 
       if (userWorkspaces.length > 0) {
@@ -144,7 +152,7 @@
       const branchId = currentUser.branch_id || undefined;
       const isAdminOrOwner = currentUser.role === 'OWNER' || currentUser.role === 'ADMIN';
 
-      const [rosterData, swapData, wallData, myKasbons, adminKasbons, slipData, previewData] = await Promise.all([
+      const [rosterData, swapData, wallData, myKasbons, adminKasbons, slipData, previewData, invoiceData, planData] = await Promise.all([
         shiftService.getRoster(branchId).catch(() => []),
         isAdminOrOwner
           ? shiftService.getPendingSwapRequests(branchId).catch(() => [])
@@ -160,6 +168,8 @@
         isAdminOrOwner
           ? payrollService.calculatePreview(undefined, undefined, branchId).catch(() => null)
           : Promise.resolve(null),
+        billingService.getInvoices().catch(() => []),
+        billingService.getPlans().catch(() => []),
       ]);
 
       rosterShifts = rosterData;
@@ -168,6 +178,8 @@
       adminPendingKasbons = adminKasbons;
       myPayrollSlip = slipData;
       adminPayrollPreview = previewData;
+      subscriptionInvoices = invoiceData;
+      subscriptionPlans = planData;
 
       if (wallData.length > 0) {
         allAttendances = wallData.map((item) => ({
@@ -306,6 +318,16 @@
   async function handleExportCsv(periodStart: string, periodEnd: string, format: 'BCA' | 'MANDIRI') {
     await payrollService.downloadBankCsv(periodStart, periodEnd, format, currentUser.branch_id || undefined);
   }
+
+  async function handleInvoiceUpdated() {
+    try {
+      const profile = await authService.getProfile();
+      userProfile = profile;
+    } catch {
+      // biarkan silent jika gagal memuat profil terbaru
+    }
+    await loadWorkspaceData();
+  }
 </script>
 
 {#if isCheckingSession}
@@ -386,7 +408,10 @@
           />
         {:else if activeTab === 'billing'}
           <BillingSection
-            onSimulateUpload={() => alert('Bukti transfer terkirim untuk verifikasi Superadmin.')}
+            {userProfile}
+            invoices={subscriptionInvoices}
+            plans={subscriptionPlans}
+            onInvoiceUpdated={handleInvoiceUpdated}
           />
         {/if}
       </main>
@@ -413,7 +438,11 @@
 
     <BillingModal
       isOpen={isBillingModalOpen}
+      {userProfile}
+      activeInvoice={subscriptionInvoices[0] || null}
+      plans={subscriptionPlans}
       onClose={() => (isBillingModalOpen = false)}
+      onInvoiceUpdated={handleInvoiceUpdated}
     />
   </div>
 {/if}

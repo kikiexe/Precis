@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\Billing\CreateInvoiceRequest;
 use App\Http\Requests\Billing\SubmitPaymentProofRequest;
+use App\Models\SubscriptionPlan;
 use App\Models\User;
 use App\Services\BillingService;
 use Illuminate\Http\JsonResponse;
@@ -17,6 +18,19 @@ class BillingController
     public function __construct(
         private readonly BillingService $billingService,
     ) {
+    }
+
+    /**
+     * ambil daftar master paket langganan aktif
+     */
+    public function plans(): JsonResponse
+    {
+        $plans = SubscriptionPlan::where('is_active', true)->orderBy('monthly_price')->get();
+
+        return new JsonResponse([
+            'message' => 'Daftar paket langganan berhasil dimuat.',
+            'data' => $plans,
+        ], Response::HTTP_OK);
     }
 
     /**

@@ -8,10 +8,12 @@
     "dev:landing": "pnpm --filter @precis/landing dev",
     "dev:app": "pnpm --filter @precis/app dev",
     "dev:pos": "pnpm --filter @precis/pos dev",
+    "dev:superadmin": "pnpm --filter @precis/superadmin dev",
     "dev:all": "pnpm -r --parallel dev",
     "landing": "pnpm --filter @precis/landing dev",
     "app": "pnpm --filter @precis/app dev",
     "pos": "pnpm --filter @precis/pos dev",
+    "superadmin": "pnpm --filter @precis/superadmin dev",
     "build": "pnpm -r build",
     "check": "pnpm -r check"
   }

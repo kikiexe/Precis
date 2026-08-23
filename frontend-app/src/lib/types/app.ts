@@ -284,13 +284,34 @@ export interface PayrollSlip {
   disbursement_status: 'PAID' | 'PENDING';
 }
 
+export interface SubscriptionPlanItem {
+  id: string;
+  name: string;
+  max_workspaces: number;
+  monthly_price: number;
+  annual_price: number;
+  is_active: boolean;
+}
+
+export interface InvoicePaymentConfirmation {
+  id?: string;
+  invoice_id?: string;
+  bank_account_name: string;
+  transfer_amount: number;
+  proof_image_url: string;
+  verified_at?: string | null;
+}
+
 export interface SubscriptionInvoice {
+  id: string;
   invoice_number: string;
-  plan_name: string;
-  outlet_quota: number;
   amount_base: number;
   unique_code: number;
   total_amount: number;
+  status: 'UNPAID' | 'PENDING_VERIFICATION' | 'PAID' | 'EXPIRED';
   due_date: string;
-  status: 'UNPAID' | 'PENDING_VERIFICATION' | 'PAID';
+  created_at?: string;
+  plan_name?: string;
+  outlet_quota?: number;
+  confirmation?: InvoicePaymentConfirmation | null;
 }
