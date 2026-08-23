@@ -9,7 +9,7 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Seed the application's baseline database.
      */
     public function run(): void
     {
@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             StaffAndShiftSeeder::class,
             ProductCatalogSeeder::class,
-            SalesHistorySeeder::class,
         ]);
     }
 }

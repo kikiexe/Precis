@@ -25,6 +25,10 @@ class SalesHistorySeeder extends Seeder
      */
     public function run(): void
     {
+        if (app()->environment('testing') || app()->runningUnitTests() || config('database.default') === 'sqlite') {
+            return;
+        }
+
         $workspace = Workspace::where('slug', 'amore-coffee')->first();
         if (! $workspace) {
             $this->command?->warn('Workspace "amore-coffee" tidak ditemukan. Jalankan TenantPilotSeeder terlebih dahulu.');
