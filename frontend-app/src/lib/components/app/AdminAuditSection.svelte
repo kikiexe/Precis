@@ -216,10 +216,10 @@
             {#each pendingKasbons as kasbon}
               <div class="bg-white border border-[#e0e0e0] p-4 text-xs space-y-2.5 shadow-xs">
                 <div class="flex justify-between items-center">
-                  <span class="font-bold text-sm text-[#161616]">{kasbon.user_name}</span>
+                  <span class="font-bold text-sm text-[#161616]">{kasbon.user?.name || kasbon.user_name || 'Staf'}</span>
                   <span class="font-mono text-base font-bold text-[#0f62fe]">{formatRp(kasbon.amount)}</span>
                 </div>
-                <div class="text-[11px] text-[#525252]">Keperluan: "{kasbon.purpose}"</div>
+                <div class="text-[11px] text-[#525252] font-mono">Diajukan: {kasbon.request_date}</div>
                 <div class="flex gap-2 pt-2 border-t border-[#f4f4f4]">
                   <button
                     type="button"

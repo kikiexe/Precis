@@ -178,14 +178,24 @@ export interface WallOfFacesItem {
 
 export interface CashAdvance {
   id: string;
-  user_id: string;
-  user_name: string;
+  user_id?: string;
+  user_name?: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
   amount: number;
-  purpose: string;
+  purpose?: string;
   request_date: string;
   status: 'PENDING' | 'APPROVED' | 'DEDUCTED' | 'REJECTED';
-  approved_by?: string;
-  deducted_at?: string;
+  approved_by?: {
+    id: string;
+    name: string;
+    email: string;
+  } | string | null;
+  deducted_at_payroll_date?: string | null;
+  created_at?: string;
 }
 
 export interface PayrollSlip {

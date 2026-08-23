@@ -4,6 +4,7 @@
   import { authService } from './lib/services/auth-service';
   import { shiftService } from './lib/services/shift-service';
   import { attendanceService } from './lib/services/attendance-service';
+  import { cashAdvanceService } from './lib/services/cash-advance-service';
   import type {
     User,
     UserWorkspace,
@@ -55,12 +56,13 @@
   let allAttendances = $state<AttendanceRecord[]>([]);
   let rosterShifts = $state<ShiftRosterItem[]>([]);
   let pendingSwaps = $state<PendingSwapItem[]>([]);
-  let cashAdvances = $state<CashAdvance[]>([]);
+  let myCashAdvances = $state<CashAdvance[]>([]);
+  let adminPendingKasbons = $state<CashAdvance[]>([]);
   let payrollSlip = $state<PayrollSlip | null>(null);
 
   // ambil permintaan PENDING
   let pendingApprovalsCount = $derived(
-    pendingSwaps.length + cashAdvances.filter((k) => k.status === 'PENDING').length
+    pendingSwaps.length + adminPendingKasbons.length
   );
 
   onMount(() => {
@@ -137,18 +139,26 @@
   async function loadWorkspaceData() {
     try {
       const branchId = currentUser.branch_id || undefined;
-      const [rosterData, swapData, wallData] = await Promise.all([
+      const isAdminOrOwner = currentUser.role === 'OWNER' || currentUser.role === 'ADMIN';
+
+      const [rosterData, swapData, wallData, myKasbons, adminKasbons] = await Promise.all([
         shiftService.getRoster(branchId).catch(() => []),
-        (currentUser.role === 'OWNER' || currentUser.role === 'ADMIN')
+        isAdminOrOwner
           ? shiftService.getPendingSwapRequests(branchId).catch(() => [])
           : Promise.resolve([]),
-        (currentUser.role === 'OWNER' || currentUser.role === 'ADMIN')
+        isAdminOrOwner
           ? attendanceService.getWallOfFaces(branchId).catch(() => [])
+          : Promise.resolve([]),
+        cashAdvanceService.getMyCashAdvances().catch(() => []),
+        isAdminOrOwner
+          ? cashAdvanceService.getAdminCashAdvances('PENDING', branchId).catch(() => [])
           : Promise.resolve([]),
       ]);
 
       rosterShifts = rosterData;
       pendingSwaps = swapData;
+      myCashAdvances = myKasbons;
+      adminPendingKasbons = adminKasbons;
 
       if (wallData.length > 0) {
         allAttendances = wallData.map((item) => ({
@@ -259,29 +269,19 @@
     await loadWorkspaceData();
   }
 
-  function handleCreateKasbon(amount: number, purpose: string) {
-    const newKasbon: CashAdvance = {
-      id: `kasbon-${Date.now()}`,
-      user_id: currentUser.id,
-      user_name: currentUser.name,
-      amount,
-      purpose,
-      request_date: new Date().toISOString().split('T')[0],
-      status: 'PENDING',
-    };
-    cashAdvances = [newKasbon, ...cashAdvances];
+  async function handleCreateKasbon(amount: number) {
+    await cashAdvanceService.requestCashAdvance(amount);
+    await loadWorkspaceData();
   }
 
-  function handleApproveKasbon(kasbonId: string) {
-    cashAdvances = cashAdvances.map((k) =>
-      k.id === kasbonId
-        ? { ...k, status: 'APPROVED' as const, approved_by: currentUser.name }
-        : k
-    );
+  async function handleApproveKasbon(kasbonId: string) {
+    await cashAdvanceService.approveCashAdvance(kasbonId);
+    await loadWorkspaceData();
   }
 
-  function handleRejectKasbon(kasbonId: string) {
-    cashAdvances = cashAdvances.map((k) => (k.id === kasbonId ? { ...k, status: 'REJECTED' as const } : k));
+  async function handleRejectKasbon(kasbonId: string) {
+    await cashAdvanceService.rejectCashAdvance(kasbonId);
+    await loadWorkspaceData();
   }
 </script>
 
@@ -343,7 +343,7 @@
           />
         {:else if activeTab === 'finance'}
           <FinanceSection
-            {cashAdvances}
+            cashAdvances={myCashAdvances}
             {payrollSlip}
             onRequestKasbon={handleCreateKasbon}
           />
@@ -351,7 +351,7 @@
           <AdminAuditSection
             attendances={allAttendances}
             {pendingSwaps}
-            pendingKasbons={cashAdvances.filter((k) => k.status === 'PENDING')}
+            pendingKasbons={adminPendingKasbons}
             payrollList={[]}
             onApproveSwap={handleApproveSwap}
             onRejectSwap={handleRejectSwap}
