@@ -41,6 +41,55 @@ export interface User {
   base_salary: number;
 }
 
+export interface ShiftTemplateItem {
+  id: string;
+  name: string;
+  branch_id: string;
+  branch_name?: string;
+  expected_clock_in: string;
+  expected_clock_out: string;
+}
+
+export interface ShiftRosterItem {
+  id: string;
+  date: string;
+  is_swap: boolean;
+  swap_status: 'NONE' | 'PENDING' | 'APPROVED' | 'REJECTED';
+  template: ShiftTemplateItem | null;
+  assigned_user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  actual_user?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+  swap_approved_by?: {
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+}
+
+export interface PendingSwapItem {
+  id: string;
+  date: string;
+  template: ShiftTemplateItem | null;
+  assigned_user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  actual_user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  created_at?: string;
+}
+
 export interface ShiftAssignment {
   id: string;
   user_id: string;

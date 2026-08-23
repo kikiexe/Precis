@@ -2,13 +2,15 @@
   import { onMount } from 'svelte';
   import { apiClient } from './lib/services/api-client';
   import { authService } from './lib/services/auth-service';
+  import { shiftService } from './lib/services/shift-service';
+  import { attendanceService } from './lib/services/attendance-service';
   import type {
     User,
     UserWorkspace,
     AttendanceRecord,
-    ShiftSwapRequest,
+    ShiftRosterItem,
+    PendingSwapItem,
     CashAdvance,
-    ShiftAssignment,
     PayrollSlip,
     LoginResponseData,
   } from './lib/types/app';
@@ -48,18 +50,17 @@
   let cameraActionType = $state<'CLOCK_IN' | 'CLOCK_OUT'>('CLOCK_IN');
   let isBillingModalOpen = $state(false);
 
-  // membersihkan data collection yang belum memiliki nilai
+  // data dinamis
   let todayAttendance = $state<AttendanceRecord | null>(null);
   let allAttendances = $state<AttendanceRecord[]>([]);
-  let swapRequests = $state<ShiftSwapRequest[]>([]);
+  let rosterShifts = $state<ShiftRosterItem[]>([]);
+  let pendingSwaps = $state<PendingSwapItem[]>([]);
   let cashAdvances = $state<CashAdvance[]>([]);
-  let shifts = $state<ShiftAssignment[]>([]);
   let payrollSlip = $state<PayrollSlip | null>(null);
 
   // ambil permintaan PENDING
   let pendingApprovalsCount = $derived(
-    swapRequests.filter((s) => s.status === 'PENDING').length +
-      cashAdvances.filter((k) => k.status === 'PENDING').length
+    pendingSwaps.length + cashAdvances.filter((k) => k.status === 'PENDING').length
   );
 
   onMount(() => {
@@ -124,6 +125,7 @@
       }
 
       isAuthenticated = true;
+      await loadWorkspaceData();
     } catch {
       authService.logout();
       isAuthenticated = false;
@@ -132,7 +134,47 @@
     }
   }
 
-  function handleLoginSuccess(data: LoginResponseData) {
+  async function loadWorkspaceData() {
+    try {
+      const branchId = currentUser.branch_id || undefined;
+      const [rosterData, swapData, wallData] = await Promise.all([
+        shiftService.getRoster(branchId).catch(() => []),
+        (currentUser.role === 'OWNER' || currentUser.role === 'ADMIN')
+          ? shiftService.getPendingSwapRequests(branchId).catch(() => [])
+          : Promise.resolve([]),
+        (currentUser.role === 'OWNER' || currentUser.role === 'ADMIN')
+          ? attendanceService.getWallOfFaces(branchId).catch(() => [])
+          : Promise.resolve([]),
+      ]);
+
+      rosterShifts = rosterData;
+      pendingSwaps = swapData;
+
+      if (wallData.length > 0) {
+        allAttendances = wallData.map((item) => ({
+          id: item.id,
+          user_id: item.user_id,
+          user_name: item.user_name,
+          avatar_url: item.avatar_url || '',
+          branch_name: item.branch_name,
+          shift_name: item.shift_name || 'Shift Pagi',
+          clock_in_time: item.clock_in_time,
+          clock_out_time: item.clock_out_time,
+          photo_in_url: item.photo_in_url,
+          photo_out_url: item.photo_out_url,
+          lat_in: -7.7829,
+          lng_in: 110.3671,
+          status: item.status,
+          late_minutes: item.late_minutes,
+          created_at: item.date,
+        }));
+      }
+    } catch (e) {
+      console.warn('Gagal memuat data workspace:', e);
+    }
+  }
+
+  async function handleLoginSuccess(data: LoginResponseData) {
     userWorkspaces = data.workspaces || [];
 
     if (userWorkspaces.length > 0) {
@@ -162,9 +204,10 @@
     }
 
     isAuthenticated = true;
+    await loadWorkspaceData();
   }
 
-  function handleSwitchWorkspace(workspace: UserWorkspace) {
+  async function handleSwitchWorkspace(workspace: UserWorkspace) {
     activeWorkspaceId = workspace.workspace_id;
     apiClient.setWorkspaceId(workspace.workspace_id);
 
@@ -174,6 +217,8 @@
       branch_id: workspace.branch_id || 'branch-default',
       branch_name: workspace.branch_name || workspace.workspace_name,
     };
+
+    await loadWorkspaceData();
   }
 
   async function handleLogout() {
@@ -194,22 +239,24 @@
     allAttendances = [record, ...allAttendances.filter((a) => a.id !== record.id)];
   }
 
-  function handleCreateSwap(req: Omit<ShiftSwapRequest, 'id' | 'created_at' | 'status'>) {
-    const newSwap: ShiftSwapRequest = {
-      ...req,
-      id: `swap-${Date.now()}`,
-      status: 'PENDING',
-      created_at: new Date().toISOString(),
-    };
-    swapRequests = [newSwap, ...swapRequests];
+  async function handleCreateSwap(shiftAssignmentId: string, targetUserId: string) {
+    await shiftService.requestSwap(shiftAssignmentId, targetUserId);
+    await loadWorkspaceData();
   }
 
-  function handleApproveSwap(swapId: string) {
-    swapRequests = swapRequests.map((s) => (s.id === swapId ? { ...s, status: 'APPROVED' as const } : s));
+  async function handleAssignShift(shiftTemplateId: string, assignedUserId: string, date: string) {
+    await shiftService.assignShift(shiftTemplateId, assignedUserId, date);
+    await loadWorkspaceData();
   }
 
-  function handleRejectSwap(swapId: string) {
-    swapRequests = swapRequests.map((s) => (s.id === swapId ? { ...s, status: 'REJECTED' as const } : s));
+  async function handleApproveSwap(swapId: string) {
+    await shiftService.approveSwap(swapId);
+    await loadWorkspaceData();
+  }
+
+  async function handleRejectSwap(swapId: string) {
+    await shiftService.rejectSwap(swapId);
+    await loadWorkspaceData();
   }
 
   function handleCreateKasbon(amount: number, purpose: string) {
@@ -290,9 +337,9 @@
           <ShiftSection
             {currentUser}
             allUsers={[]}
-            {shifts}
-            {swapRequests}
+            {rosterShifts}
             onSubmitSwap={handleCreateSwap}
+            onAssignShift={handleAssignShift}
           />
         {:else if activeTab === 'finance'}
           <FinanceSection
@@ -303,7 +350,7 @@
         {:else if activeTab === 'admin'}
           <AdminAuditSection
             attendances={allAttendances}
-            pendingSwaps={swapRequests.filter((s) => s.status === 'PENDING')}
+            {pendingSwaps}
             pendingKasbons={cashAdvances.filter((k) => k.status === 'PENDING')}
             payrollList={[]}
             onApproveSwap={handleApproveSwap}
