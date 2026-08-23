@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             BranchSeeder::class,
             StaffAndShiftSeeder::class,
             ProductCatalogSeeder::class,
+            SalesHistorySeeder::class,
         ]);
     }
 }

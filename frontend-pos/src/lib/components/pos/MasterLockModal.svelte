@@ -11,7 +11,7 @@
 
   let { isOpen = false, onClose, onUnlock }: Props = $props();
 
-  let emailInput = $state('arief.owner@precis.test');
+  let emailInput = $state('');
   let passwordInput = $state('');
   let showPassword = $state(false);
   let isLoading = $state(false);
@@ -122,9 +122,9 @@
               aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
             >
               {#if showPassword}
-                <EyeOff class="w-3.5 h-3.5" />
+                <EyeOff class="w-4 h-4" />
               {:else}
-                <Eye class="w-3.5 h-3.5" />
+                <Eye class="w-4 h-4" />
               {/if}
             </button>
           </div>

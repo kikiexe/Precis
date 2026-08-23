@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Tablet, Key, AlertCircle, ArrowRight, ShieldCheck, Sparkles } from 'lucide-svelte';
+  import { Tablet, Key, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-svelte';
   import { posService } from '../../services/pos-service';
   import type { PosTerminalInfo } from '../../types/pos';
 
@@ -10,7 +10,7 @@
 
   let { isOpen = false, onSuccess }: Props = $props();
 
-  let deviceTokenInput = $state('sleman_pos_token_01');
+  let deviceTokenInput = $state('');
   let isLoading = $state(false);
   let errorMessage = $state<string | null>(null);
 
@@ -36,11 +36,6 @@
     } finally {
       isLoading = false;
     }
-  }
-
-  function setPresetToken(token: string) {
-    deviceTokenInput = token;
-    errorMessage = null;
   }
 </script>
 
@@ -80,7 +75,7 @@
               id="device-token"
               type="text"
               bind:value={deviceTokenInput}
-              placeholder="e.g. sleman_pos_token_01"
+              placeholder="e.g. tok-sleman-a89b"
               required
               disabled={isLoading}
               class="w-full pl-9 pr-3 py-2.5 text-xs font-mono rounded-[12px] border border-[#d9d9dd] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white text-[#212121] transition-all"
@@ -103,25 +98,7 @@
         </button>
       </form>
 
-      <!-- preset token demo -->
-      <div class="mt-6 pt-4 border-t border-[#d9d9dd]">
-        <div class="flex items-center gap-1.5 text-[11px] font-mono text-[#75758a] mb-2">
-          <Sparkles class="w-3.5 h-3.5 text-[#1863dc]" />
-          <span>Token Pilot Seeder:</span>
-        </div>
-        <div class="flex gap-2">
-          <button
-            type="button"
-            onclick={() => setPresetToken('sleman_pos_token_01')}
-            class="flex-1 p-2.5 text-left border border-[#d9d9dd] rounded-[14px] hover:border-[#17171c] bg-[#eeece7]/30 hover:bg-[#eeece7]/60 transition-all cursor-pointer text-xs"
-          >
-            <div class="font-medium text-[11px] text-[#212121]">Outlet Sleman #01</div>
-            <div class="text-[9px] font-mono text-[#75758a]">sleman_pos_token_01</div>
-          </button>
-        </div>
-      </div>
-
-      <div class="mt-5 flex items-center justify-center gap-1.5 text-[10px] text-[#75758a] font-mono">
+      <div class="mt-6 pt-4 border-t border-[#d9d9dd] flex items-center justify-center gap-1.5 text-[10px] text-[#75758a] font-mono">
         <ShieldCheck class="w-3.5 h-3.5 text-[#003c33]" />
         <span>Terenkripsi SHA-256 &amp; Terisolasi Multi-Tenant</span>
       </div>

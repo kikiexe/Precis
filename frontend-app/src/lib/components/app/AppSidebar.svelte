@@ -17,7 +17,7 @@
     currentUser,
     userWorkspaces = [],
     activeWorkspaceId = null,
-    activeTab = 'presensi',
+    activeTab = 'admin',
     pendingApprovalsCount = 0,
     onSelectTab,
     onSwitchWorkspace,
@@ -44,13 +44,31 @@
     userWorkspaces.find((w) => w.workspace_id === activeWorkspaceId)?.workspace_name || currentUser.branch_name
   );
 
-  const navItems = [
-    { id: 'presensi' as const, label: 'Presensi & ESS', icon: Camera, desc: 'Selfie GPS & Hari Ini' },
-    { id: 'shift' as const, label: 'Jadwal & Tukar Shift', icon: Calendar, desc: 'Kalender Kerja Staf' },
-    { id: 'finance' as const, label: 'Kasbon & Payroll', icon: Wallet, desc: 'Pinjaman & Slip Gaji' },
-    { id: 'admin' as const, label: 'Wall of Faces & Audit', icon: ShieldCheck, desc: 'Audit Visual & Approval' },
-    { id: 'billing' as const, label: 'Billing & Langganan', icon: CreditCard, desc: 'Kuota Outlet & Tagihan' },
-  ];
+  let navItems = $derived.by(() => {
+    if (currentUser.role === 'OWNER') {
+      return [
+        { id: 'admin' as const, label: 'Audit & Monitoring', icon: ShieldCheck, desc: 'Wall of Faces & Payroll' },
+        { id: 'shift' as const, label: 'Roster & Jadwal Shift', icon: Calendar, desc: 'Penetapan Shift Karyawan' },
+        { id: 'finance' as const, label: 'Kasbon & Slip Gaji', icon: Wallet, desc: 'Riwayat Pinjaman & Gaji' },
+        { id: 'billing' as const, label: 'Billing & Langganan', icon: CreditCard, desc: 'Kuota Outlet & Tagihan' },
+      ];
+    }
+
+    if (currentUser.role === 'ADMIN') {
+      return [
+        { id: 'admin' as const, label: 'Audit & Approval', icon: ShieldCheck, desc: 'Wall of Faces & Approval' },
+        { id: 'shift' as const, label: 'Jadwal Shift', icon: Calendar, desc: 'Roster Staf Cabang' },
+        { id: 'finance' as const, label: 'Kasbon & Slip Gaji', icon: Wallet, desc: 'Pinjaman & Slip Gaji' },
+        { id: 'presensi' as const, label: 'Presensi Pribadi', icon: Camera, desc: 'Selfie GPS Manager' },
+      ];
+    }
+
+    return [
+      { id: 'presensi' as const, label: 'Presensi & ESS', icon: Camera, desc: 'Selfie GPS Masuk / Pulang' },
+      { id: 'shift' as const, label: 'Jadwal & Tukar Shift', icon: Calendar, desc: 'Roster Saya & Request Swap' },
+      { id: 'finance' as const, label: 'Kasbon & Slip Gaji', icon: Wallet, desc: 'Pengajuan Kasbon & Slip Gaji' },
+    ];
+  });
 </script>
 
 <aside class="hidden lg:flex w-64 bg-white border-r border-[#d9d9dd] flex-col justify-between select-none shrink-0 h-screen sticky top-0 font-sans shadow-none">

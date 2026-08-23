@@ -125,6 +125,7 @@
           branch_name: matchedWs.branch_name || matchedWs.workspace_name,
           base_salary: 3000000,
         };
+        activeTab = matchedWs.role === 'OWNER' || matchedWs.role === 'ADMIN' ? 'admin' : 'presensi';
       } else {
         currentUser = {
           id: profile.id,
@@ -135,6 +136,7 @@
           branch_name: 'Semua Cabang',
           base_salary: 3000000,
         };
+        activeTab = 'presensi';
       }
 
       isAuthenticated = true;
@@ -222,6 +224,7 @@
         branch_name: firstWs.branch_name || firstWs.workspace_name,
         base_salary: 3000000,
       };
+      activeTab = firstWs.role === 'OWNER' || firstWs.role === 'ADMIN' ? 'admin' : 'presensi';
     } else {
       currentUser = {
         id: data.user.id,
@@ -232,6 +235,7 @@
         branch_name: 'Cabang Utama',
         base_salary: 3000000,
       };
+      activeTab = 'presensi';
     }
 
     isAuthenticated = true;
@@ -419,9 +423,10 @@
       <!-- navigasi bawah khusus tampilan mobile -->
       <div class="block lg:hidden">
         <BottomNav
-          activeTab={activeTab === 'billing' ? 'admin' : activeTab}
+          {currentUser}
+          {activeTab}
           {pendingApprovalsCount}
-          onSelectTab={(tab: 'presensi' | 'shift' | 'finance' | 'admin') => (activeTab = tab)}
+          onSelectTab={(tab) => (activeTab = tab)}
         />
       </div>
     </div>

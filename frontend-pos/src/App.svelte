@@ -42,12 +42,7 @@
   let closedSessions = $state<PosSession[]>([]);
 
   // state sesi kasir aktif dan staf
-  let activeCashier = $state<CashierUser | null>({
-    id: 'usr-pilot-01',
-    name: 'Kasir Pilot',
-    role: 'STAFF',
-    pin: '1234',
-  });
+  let activeCashier = $state<CashierUser | null>(null);
   let activeSession = $state<PosSession | null>(null);
 
   // state status jaringan dan sinkronisasi
@@ -347,7 +342,13 @@
             discountPercent = percent;
             discountNominal = 0;
           }}
-          onOpenPaymentModal={() => (isPaymentModalOpen = true)}
+          onOpenPaymentModal={() => {
+            if (!activeCashier) {
+              isPinModalOpen = true;
+            } else {
+              isPaymentModalOpen = true;
+            }
+          }}
           onOpenPinModal={() => (isPinModalOpen = true)}
         />
       {:else if activePage === 'transaksi'}

@@ -7,8 +7,8 @@
 
   let { onLogin }: Props = $props();
 
-  let email = $state('root@precis.com');
-  let password = $state('PrecisAdmin2026!');
+  let email = $state('');
+  let password = $state('');
   let showPassword = $state(false);
   let isSubmitting = $state(false);
   let errorMessage = $state<string | null>(null);
@@ -133,9 +133,5 @@
         </button>
       </div>
     </form>
-
-    <div class="mt-6 pt-4 border-t border-[#d9d9dd] text-center text-[11px] text-[#75758a]">
-      Default Seeder: <code class="bg-[#eeece7] px-2 py-0.5 rounded-[4px] text-[#212121] font-mono">root@precis.com / PrecisAdmin2026!</code>
-    </div>
   </div>
 </div>
