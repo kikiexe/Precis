@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { Plus, Download, Wallet, FileText, AlertCircle } from 'lucide-svelte';
-  import type { CashAdvance, PayrollSlip } from '../../types/app';
+  import { Plus, Wallet, FileText, AlertCircle, Printer } from 'lucide-svelte';
+  import type { CashAdvance, PayrollSlipData } from '../../types/app';
 
   interface Props {
     cashAdvances?: CashAdvance[];
-    payrollSlip?: PayrollSlip | null;
+    payrollSlip?: PayrollSlipData | null;
     onRequestKasbon: (amount: number, purpose?: string) => Promise<void> | void;
   }
 
@@ -40,6 +40,10 @@
     }
   }
 
+  function handlePrintSlip() {
+    window.print();
+  }
+
   let totalActiveKasbon = $derived(
     cashAdvances
       .filter((k) => k.status === 'APPROVED')
@@ -48,6 +52,10 @@
 
   let hasPendingKasbon = $derived(
     cashAdvances.some((k) => k.status === 'PENDING')
+  );
+
+  let isDisbursed = $derived(
+    payrollSlip?.status === 'DISBURSED' || payrollSlip?.disbursement_status === 'PAID'
   );
 </script>
 
@@ -70,9 +78,9 @@
     </button>
   </div>
 
-  <!-- kasbon table, right slip gaji breakdown -->
+  <!-- tabel riwayat kasbon di kiri dan rincian slip gaji -->
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <!-- Left 7 Cols: Kasbon History & Active Status -->
+    <!-- status kasbon aktif dan riwayat permohonan -->
     <div class="lg:col-span-7 space-y-4">
       <div class="bg-white border border-[#e0e0e0] p-5 shadow-xs flex items-center justify-between">
         <div>
@@ -152,10 +160,19 @@
           <div class="border-b border-[#e0e0e0] pb-4 flex items-center justify-between">
             <div>
               <h3 class="text-base font-bold text-[#161616]">Slip Gaji Digital (THP)</h3>
-              <p class="text-xs font-mono text-[#525252]">Periode: {payrollSlip.period}</p>
+              <p class="text-xs font-mono text-[#525252]">Periode: {payrollSlip.period_start} s/d {payrollSlip.period_end}</p>
+              {#if payrollSlip.user_name || payrollSlip.user?.name}
+                <p class="text-[11px] text-[#8c8c8c] font-mono mt-0.5">
+                  {payrollSlip.user_name || payrollSlip.user?.name} {payrollSlip.branch_name ? `• ${payrollSlip.branch_name}` : ''}
+                </p>
+              {/if}
             </div>
-            <span class="px-2.5 py-1 bg-[#24a148]/10 text-[#24a148] text-xs font-mono border border-[#24a148]/30 font-semibold">
-              {payrollSlip.disbursement_status === 'PAID' ? 'Lunas Ditransfer' : 'Menunggu Transfer'}
+            <span class={`px-2.5 py-1 text-xs font-mono border font-semibold ${
+              isDisbursed
+                ? 'bg-[#24a148]/10 text-[#24a148] border-[#24a148]/30'
+                : 'bg-[#0f62fe]/10 text-[#0f62fe] border-[#0f62fe]/30'
+            }`}>
+              {isDisbursed ? 'Lunas Ditransfer' : 'Estimasi Berjalan'}
             </span>
           </div>
 
@@ -166,12 +183,12 @@
             </div>
 
             <div class="flex justify-between text-[#24a148]">
-              <span>Upah Lembur ({payrollSlip.overtime_hours} Jam)</span>
+              <span>Upah Lembur ({payrollSlip.total_overtime_minutes || 0} Menit)</span>
               <span class="font-mono font-semibold">+{formatRp(payrollSlip.overtime_pay)}</span>
             </div>
 
             <div class="flex justify-between text-[#da1e28]">
-              <span>Denda Telat ({payrollSlip.late_minutes} Menit)</span>
+              <span>Denda Telat ({payrollSlip.total_late_minutes || 0} Menit)</span>
               <span class="font-mono font-semibold">-{formatRp(payrollSlip.late_penalty)}</span>
             </div>
 
@@ -193,11 +210,11 @@
 
           <button
             type="button"
-            onclick={() => alert('Slip Gaji format PDF siap diunduh.')}
+            onclick={handlePrintSlip}
             class="w-full py-3 bg-[#f4f4f4] hover:bg-[#e0e0e0] border border-[#e0e0e0] text-xs font-semibold text-[#161616] flex items-center justify-center gap-2 cursor-pointer transition-colors"
           >
-            <Download class="w-4 h-4 text-[#0f62fe]" />
-            <span>Unduh Dokumen Slip Gaji (PDF)</span>
+            <Printer class="w-4 h-4 text-[#0f62fe]" />
+            <span>Cetak / Unduh Slip Gaji</span>
           </button>
         </div>
       {/if}

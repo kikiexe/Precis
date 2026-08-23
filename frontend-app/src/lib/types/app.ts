@@ -198,6 +198,77 @@ export interface CashAdvance {
   created_at?: string;
 }
 
+export interface PayrollMemberItem {
+  workspace_member_id: string;
+  user_id: string;
+  name: string;
+  email?: string;
+  role: Role;
+  branch_id?: string | null;
+  branch_name?: string | null;
+  base_salary: number;
+  total_late_minutes: number;
+  late_penalty: number;
+  total_overtime_minutes: number;
+  overtime_pay: number;
+  cash_advance_deduction: number;
+  net_salary: number;
+}
+
+export interface PayrollPreviewTotals {
+  total_base_salary: number;
+  total_overtime_pay: number;
+  total_late_penalty: number;
+  total_cash_advance_deduction: number;
+  total_net_salary: number;
+}
+
+export interface PayrollPreviewData {
+  period_start: string;
+  period_end: string;
+  items: PayrollMemberItem[];
+  totals?: PayrollPreviewTotals;
+  total_members?: number;
+  total_base_salary?: number;
+  total_overtime_pay?: number;
+  total_late_penalty?: number;
+  total_cash_advance_deduction?: number;
+  total_net_salary?: number;
+}
+
+export interface PayrollSlipData {
+  id?: string | null;
+  user_name?: string;
+  user_email?: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  role?: Role;
+  branch_name?: string | null;
+  period_start: string;
+  period_end: string;
+  base_salary: number;
+  total_late_minutes?: number;
+  late_penalty: number;
+  total_overtime_minutes?: number;
+  overtime_pay: number;
+  cash_advance_deduction: number;
+  net_salary: number;
+  status?: 'DISBURSED' | 'ESTIMATED';
+  disbursement_status?: 'PAID' | 'PENDING';
+  disbursed_at?: string | null;
+}
+
+export interface DisbursePayrollResult {
+  period_start: string;
+  period_end: string;
+  disbursed_count: number;
+  total_amount?: number;
+  total_net_disbursed?: number;
+}
+
 export interface PayrollSlip {
   period: string;
   user_name: string;

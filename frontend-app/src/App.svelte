@@ -5,6 +5,7 @@
   import { shiftService } from './lib/services/shift-service';
   import { attendanceService } from './lib/services/attendance-service';
   import { cashAdvanceService } from './lib/services/cash-advance-service';
+  import { payrollService } from './lib/services/payroll-service';
   import type {
     User,
     UserWorkspace,
@@ -12,7 +13,8 @@
     ShiftRosterItem,
     PendingSwapItem,
     CashAdvance,
-    PayrollSlip,
+    PayrollSlipData,
+    PayrollPreviewData,
     LoginResponseData,
   } from './lib/types/app';
   import LoginView from './lib/components/auth/LoginView.svelte';
@@ -58,7 +60,8 @@
   let pendingSwaps = $state<PendingSwapItem[]>([]);
   let myCashAdvances = $state<CashAdvance[]>([]);
   let adminPendingKasbons = $state<CashAdvance[]>([]);
-  let payrollSlip = $state<PayrollSlip | null>(null);
+  let myPayrollSlip = $state<PayrollSlipData | null>(null);
+  let adminPayrollPreview = $state<PayrollPreviewData | null>(null);
 
   // ambil permintaan PENDING
   let pendingApprovalsCount = $derived(
@@ -141,7 +144,7 @@
       const branchId = currentUser.branch_id || undefined;
       const isAdminOrOwner = currentUser.role === 'OWNER' || currentUser.role === 'ADMIN';
 
-      const [rosterData, swapData, wallData, myKasbons, adminKasbons] = await Promise.all([
+      const [rosterData, swapData, wallData, myKasbons, adminKasbons, slipData, previewData] = await Promise.all([
         shiftService.getRoster(branchId).catch(() => []),
         isAdminOrOwner
           ? shiftService.getPendingSwapRequests(branchId).catch(() => [])
@@ -153,12 +156,18 @@
         isAdminOrOwner
           ? cashAdvanceService.getAdminCashAdvances('PENDING', branchId).catch(() => [])
           : Promise.resolve([]),
+        payrollService.getMySlip().catch(() => null),
+        isAdminOrOwner
+          ? payrollService.calculatePreview(undefined, undefined, branchId).catch(() => null)
+          : Promise.resolve(null),
       ]);
 
       rosterShifts = rosterData;
       pendingSwaps = swapData;
       myCashAdvances = myKasbons;
       adminPendingKasbons = adminKasbons;
+      myPayrollSlip = slipData;
+      adminPayrollPreview = previewData;
 
       if (wallData.length > 0) {
         allAttendances = wallData.map((item) => ({
@@ -283,6 +292,20 @@
     await cashAdvanceService.rejectCashAdvance(kasbonId);
     await loadWorkspaceData();
   }
+
+  async function handleFilterPayrollPeriod(periodStart: string, periodEnd: string) {
+    const preview = await payrollService.calculatePreview(periodStart, periodEnd, currentUser.branch_id || undefined);
+    adminPayrollPreview = preview;
+  }
+
+  async function handleDisbursePayroll(periodStart: string, periodEnd: string) {
+    await payrollService.disbursePayroll(periodStart, periodEnd, currentUser.branch_id || undefined);
+    await loadWorkspaceData();
+  }
+
+  async function handleExportCsv(periodStart: string, periodEnd: string, format: 'BCA' | 'MANDIRI') {
+    await payrollService.downloadBankCsv(periodStart, periodEnd, format, currentUser.branch_id || undefined);
+  }
 </script>
 
 {#if isCheckingSession}
@@ -344,7 +367,7 @@
         {:else if activeTab === 'finance'}
           <FinanceSection
             cashAdvances={myCashAdvances}
-            {payrollSlip}
+            payrollSlip={myPayrollSlip}
             onRequestKasbon={handleCreateKasbon}
           />
         {:else if activeTab === 'admin'}
@@ -352,11 +375,14 @@
             attendances={allAttendances}
             {pendingSwaps}
             pendingKasbons={adminPendingKasbons}
-            payrollList={[]}
+            payrollPreview={adminPayrollPreview}
             onApproveSwap={handleApproveSwap}
             onRejectSwap={handleRejectSwap}
             onApproveKasbon={handleApproveKasbon}
             onRejectKasbon={handleRejectKasbon}
+            onFilterPayrollPeriod={handleFilterPayrollPeriod}
+            onDisbursePayroll={handleDisbursePayroll}
+            onExportCsv={handleExportCsv}
           />
         {:else if activeTab === 'billing'}
           <BillingSection
@@ -375,7 +401,7 @@
       </div>
     </div>
 
-    <!-- shared modal -->
+    <!-- modal bersama -->
     <LiveCameraModal
       isOpen={isCameraModalOpen}
       {currentUser}
