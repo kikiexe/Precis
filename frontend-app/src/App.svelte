@@ -1,23 +1,32 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import type { User, UserWorkspace, AttendanceRecord, ShiftSwapRequest, CashAdvance, PayrollSlip, ShiftAssignment, LoginResponseData } from './lib/types/app';
   import { apiClient } from './lib/services/api-client';
   import { authService } from './lib/services/auth-service';
+  import type {
+    User,
+    UserWorkspace,
+    AttendanceRecord,
+    ShiftSwapRequest,
+    CashAdvance,
+    ShiftAssignment,
+    PayrollSlip,
+    LoginResponseData,
+  } from './lib/types/app';
+  import LoginView from './lib/components/auth/LoginView.svelte';
   import AppHeader from './lib/components/app/AppHeader.svelte';
   import AppSidebar from './lib/components/app/AppSidebar.svelte';
   import BottomNav from './lib/components/app/BottomNav.svelte';
   import StaffPresensiSection from './lib/components/app/StaffPresensiSection.svelte';
-  import LiveCameraModal from './lib/components/app/LiveCameraModal.svelte';
   import ShiftSection from './lib/components/app/ShiftSection.svelte';
   import FinanceSection from './lib/components/app/FinanceSection.svelte';
   import AdminAuditSection from './lib/components/app/AdminAuditSection.svelte';
   import BillingSection from './lib/components/app/BillingSection.svelte';
+  import LiveCameraModal from './lib/components/app/LiveCameraModal.svelte';
   import BillingModal from './lib/components/app/BillingModal.svelte';
-  import LoginView from './lib/components/auth/LoginView.svelte';
 
-  // state autentikasi dan sesi pengguna
-  let isInitializing = $state(true);
+  // manajemen autentikasi & sesi
   let isAuthenticated = $state(false);
+  let isCheckingSession = $state(true);
   let userWorkspaces = $state<UserWorkspace[]>([]);
   let activeWorkspaceId = $state<string | null>(null);
 
@@ -36,6 +45,7 @@
 
   // visibilitas modal
   let isCameraModalOpen = $state(false);
+  let cameraActionType = $state<'CLOCK_IN' | 'CLOCK_OUT'>('CLOCK_IN');
   let isBillingModalOpen = $state(false);
 
   // membersihkan data collection yang belum memiliki nilai
@@ -73,10 +83,12 @@
   });
 
   async function initializeSession() {
+    isCheckingSession = true;
     const token = apiClient.getToken();
+
     if (!token) {
-      isInitializing = false;
       isAuthenticated = false;
+      isCheckingSession = false;
       return;
     }
 
@@ -84,78 +96,69 @@
       const profile = await authService.getProfile();
       userWorkspaces = profile.workspaces || [];
 
-      // ambil workspace tersimpan atau gunakan workspace pertama
-      const savedWorkspaceId = apiClient.getWorkspaceId();
-      const matchedWorkspace = userWorkspaces.find((w) => w.workspace_id === savedWorkspaceId) || userWorkspaces[0];
-
-      if (matchedWorkspace) {
-        activeWorkspaceId = matchedWorkspace.workspace_id;
-        apiClient.setWorkspaceId(matchedWorkspace.workspace_id);
+      if (userWorkspaces.length > 0) {
+        const savedWsId = apiClient.getWorkspaceId();
+        const matchedWs = userWorkspaces.find((w) => w.workspace_id === savedWsId) || userWorkspaces[0];
+        activeWorkspaceId = matchedWs.workspace_id;
+        apiClient.setWorkspaceId(matchedWs.workspace_id);
 
         currentUser = {
           id: profile.id,
           name: profile.name,
+          role: matchedWs.role,
           email: profile.email,
-          role: matchedWorkspace.role,
-          branch_id: matchedWorkspace.branch_id || 'all-branch',
-          branch_name: matchedWorkspace.branch_name || matchedWorkspace.workspace_name,
-          base_salary: 3500000,
+          branch_id: matchedWs.branch_id || 'branch-default',
+          branch_name: matchedWs.branch_name || matchedWs.workspace_name,
+          base_salary: 3000000,
         };
       } else {
         currentUser = {
           id: profile.id,
           name: profile.name,
-          email: profile.email,
           role: 'STAFF',
-          branch_id: 'default',
-          branch_name: 'Outlet',
+          email: profile.email,
+          branch_id: '',
+          branch_name: 'Semua Cabang',
           base_salary: 3000000,
         };
       }
 
       isAuthenticated = true;
     } catch {
-      apiClient.clearSession();
+      authService.logout();
       isAuthenticated = false;
     } finally {
-      isInitializing = false;
+      isCheckingSession = false;
     }
   }
 
-  function handleLoginSuccess(loginData: LoginResponseData) {
-    userWorkspaces = loginData.workspaces || [];
-    const firstWs = userWorkspaces[0];
+  function handleLoginSuccess(data: LoginResponseData) {
+    userWorkspaces = data.workspaces || [];
 
-    if (firstWs) {
+    if (userWorkspaces.length > 0) {
+      const firstWs = userWorkspaces[0];
       activeWorkspaceId = firstWs.workspace_id;
       apiClient.setWorkspaceId(firstWs.workspace_id);
 
       currentUser = {
-        id: loginData.user.id,
-        name: loginData.user.name,
-        email: loginData.user.email,
+        id: data.user.id,
+        name: data.user.name,
         role: firstWs.role,
-        branch_id: firstWs.branch_id || 'all-branch',
+        email: data.user.email,
+        branch_id: firstWs.branch_id || 'branch-default',
         branch_name: firstWs.branch_name || firstWs.workspace_name,
-        base_salary: 3500000,
-      };
-
-      if (firstWs.role === 'OWNER' || firstWs.role === 'ADMIN') {
-        activeTab = 'admin';
-      } else {
-        activeTab = 'presensi';
-      }
-    } else {
-      currentUser = {
-        id: loginData.user.id,
-        name: loginData.user.name,
-        email: loginData.user.email,
-        role: 'STAFF',
-        branch_id: 'default',
-        branch_name: 'Outlet',
         base_salary: 3000000,
       };
-      activeTab = 'presensi';
+    } else {
+      currentUser = {
+        id: data.user.id,
+        name: data.user.name,
+        role: 'STAFF',
+        email: data.user.email,
+        branch_id: '',
+        branch_name: 'Cabang Utama',
+        base_salary: 3000000,
+      };
     }
 
     isAuthenticated = true;
@@ -168,14 +171,9 @@
     currentUser = {
       ...currentUser,
       role: workspace.role,
-      branch_id: workspace.branch_id || 'all-branch',
+      branch_id: workspace.branch_id || 'branch-default',
       branch_name: workspace.branch_name || workspace.workspace_name,
     };
-
-    // sesuaikan tab aktif berdasarkan peran jika diperlukan
-    if (workspace.role === 'STAFF' && (activeTab === 'admin' || activeTab === 'billing')) {
-      activeTab = 'presensi';
-    }
   }
 
   async function handleLogout() {
@@ -186,59 +184,75 @@
     activeTab = 'presensi';
   }
 
-  function handleCaptureSuccess(record: AttendanceRecord) {
-    todayAttendance = record;
-    allAttendances = [record, ...allAttendances];
+  function handleOpenLiveCamera(type: 'CLOCK_IN' | 'CLOCK_OUT') {
+    cameraActionType = type;
+    isCameraModalOpen = true;
   }
 
-  function handleCreateSwap(req: ShiftSwapRequest) {
-    swapRequests = [req, ...swapRequests];
+  function handleCaptureSuccess(record: AttendanceRecord) {
+    todayAttendance = record;
+    allAttendances = [record, ...allAttendances.filter((a) => a.id !== record.id)];
+  }
+
+  function handleCreateSwap(req: Omit<ShiftSwapRequest, 'id' | 'created_at' | 'status'>) {
+    const newSwap: ShiftSwapRequest = {
+      ...req,
+      id: `swap-${Date.now()}`,
+      status: 'PENDING',
+      created_at: new Date().toISOString(),
+    };
+    swapRequests = [newSwap, ...swapRequests];
+  }
+
+  function handleApproveSwap(swapId: string) {
+    swapRequests = swapRequests.map((s) => (s.id === swapId ? { ...s, status: 'APPROVED' as const } : s));
+  }
+
+  function handleRejectSwap(swapId: string) {
+    swapRequests = swapRequests.map((s) => (s.id === swapId ? { ...s, status: 'REJECTED' as const } : s));
   }
 
   function handleCreateKasbon(amount: number, purpose: string) {
     const newKasbon: CashAdvance = {
-      id: `kb-${Date.now()}`,
+      id: `kasbon-${Date.now()}`,
       user_id: currentUser.id,
       user_name: currentUser.name,
       amount,
       purpose,
-      request_date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+      request_date: new Date().toISOString().split('T')[0],
       status: 'PENDING',
     };
     cashAdvances = [newKasbon, ...cashAdvances];
   }
 
-  function handleApproveSwap(swapId: string) {
-    swapRequests = swapRequests.map((s) => (s.id === swapId ? { ...s, status: 'APPROVED' } : s));
-  }
-
-  function handleRejectSwap(swapId: string) {
-    swapRequests = swapRequests.map((s) => (s.id === swapId ? { ...s, status: 'REJECTED' } : s));
-  }
-
   function handleApproveKasbon(kasbonId: string) {
     cashAdvances = cashAdvances.map((k) =>
-      k.id === kasbonId ? { ...k, status: 'APPROVED', approved_by: currentUser.name } : k
+      k.id === kasbonId
+        ? { ...k, status: 'APPROVED' as const, approved_by: currentUser.name }
+        : k
     );
   }
 
   function handleRejectKasbon(kasbonId: string) {
-    cashAdvances = cashAdvances.map((k) => (k.id === kasbonId ? { ...k, status: 'REJECTED' } : k));
+    cashAdvances = cashAdvances.map((k) => (k.id === kasbonId ? { ...k, status: 'REJECTED' as const } : k));
   }
 </script>
 
-{#if isInitializing}
-  <div class="min-h-screen bg-[#f4f4f4] flex flex-col items-center justify-center select-none">
-    <div class="w-10 h-10 bg-[#0f62fe] text-white flex items-center justify-center font-bold text-lg animate-pulse mb-3">
+{#if isCheckingSession}
+  <!-- indikator pemuatan status login awal -->
+  <div class="min-h-screen bg-[#f4f4f4] flex flex-col justify-center items-center p-4 select-none">
+    <div class="w-10 h-10 bg-[#0f62fe] text-white flex items-center justify-center font-bold text-lg font-display animate-pulse mb-3">
       P
     </div>
     <div class="text-xs font-mono text-[#525252]">Memuat sesi akun Précis...</div>
   </div>
 {:else if !isAuthenticated}
+  <!-- tampilan login portal -->
   <LoginView onLoginSuccess={handleLoginSuccess} />
 {:else}
-  <div class="min-h-screen bg-[#f4f4f4] flex flex-row text-[#161616] font-sans antialiased">
-    <!-- 1. navigasi sidebar desktop -->
+  <!-- dashboard portal terautentikasi -->
+  <div class="min-h-screen bg-[#f4f4f4] flex flex-row overflow-x-hidden font-sans select-none">
+    <!-- sidebar khusus desktop -->
     <AppSidebar
       {currentUser}
       {userWorkspaces}
@@ -250,27 +264,25 @@
       onLogout={handleLogout}
     />
 
-    <!-- 2. area konten utama -->
-    <div class="flex-1 flex flex-col min-h-screen bg-[#f4f4f4] overflow-y-auto">
-      <!-- baris header atas khusus tampilan mobile -->
-      <div class="block lg:hidden">
-        <AppHeader
-          {currentUser}
-          {userWorkspaces}
-          {activeWorkspaceId}
-          onSwitchWorkspace={handleSwitchWorkspace}
-          onOpenBilling={() => (isBillingModalOpen = true)}
-          onLogout={handleLogout}
-        />
-      </div>
+    <!-- area konten utama -->
+    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+      <!-- header atas -->
+      <AppHeader
+        {currentUser}
+        {userWorkspaces}
+        {activeWorkspaceId}
+        onSwitchWorkspace={handleSwitchWorkspace}
+        onOpenBilling={() => (isBillingModalOpen = true)}
+        onLogout={handleLogout}
+      />
 
-      <!-- bagian tampilan aktif -->
+      <!-- konten halaman aktif -->
       <main class="flex-1">
         {#if activeTab === 'presensi'}
           <StaffPresensiSection
             {currentUser}
             {todayAttendance}
-            onOpenLiveCamera={() => (isCameraModalOpen = true)}
+            onOpenLiveCamera={handleOpenLiveCamera}
             onOpenSlipModal={() => (activeTab = 'finance')}
             onOpenKasbonTab={() => (activeTab = 'finance')}
           />
@@ -311,7 +323,7 @@
         <BottomNav
           activeTab={activeTab === 'billing' ? 'admin' : activeTab}
           {pendingApprovalsCount}
-          onSelectTab={(tab) => (activeTab = tab)}
+          onSelectTab={(tab: 'presensi' | 'shift' | 'finance' | 'admin') => (activeTab = tab)}
         />
       </div>
     </div>
@@ -320,6 +332,8 @@
     <LiveCameraModal
       isOpen={isCameraModalOpen}
       {currentUser}
+      actionType={cameraActionType}
+      branchId={currentUser.branch_id}
       onClose={() => (isCameraModalOpen = false)}
       onSuccess={handleCaptureSuccess}
     />

@@ -77,11 +77,54 @@ export interface AttendanceRecord {
   clock_in_time: string;
   clock_out_time?: string;
   photo_in_url: string;
+  photo_out_url?: string;
   lat_in: number;
   lng_in: number;
   status: 'ON_TIME' | 'LATE';
   late_minutes: number;
+  overtime_minutes?: number;
   created_at: string;
+}
+
+export interface PresignUploadResponseData {
+  upload_url: string;
+  key: string;
+  public_url: string;
+  expires_in_seconds: number;
+}
+
+export interface ClockInResponseData {
+  id: string;
+  branch_id: string;
+  clock_in_time: string;
+  late_minutes: number;
+  status: 'ON_TIME' | 'LATE';
+  photo_in_url: string;
+}
+
+export interface ClockOutResponseData {
+  id: string;
+  branch_id: string;
+  clock_out_time: string;
+  overtime_minutes: number;
+  photo_out_url: string;
+}
+
+export interface WallOfFacesItem {
+  id: string;
+  user_id: string;
+  user_name: string;
+  avatar_url?: string;
+  branch_id: string;
+  branch_name: string;
+  shift_name?: string;
+  clock_in_time: string;
+  clock_out_time?: string;
+  photo_in_url: string;
+  photo_out_url?: string;
+  status: 'ON_TIME' | 'LATE';
+  late_minutes: number;
+  date: string;
 }
 
 export interface CashAdvance {
