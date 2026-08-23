@@ -3,6 +3,7 @@
   import { db } from './lib/db/pos-db';
   import { posApiClient } from './lib/services/api-client';
   import { posService } from './lib/services/pos-service';
+  import { syncEngine } from './lib/services/sync-engine';
   import type {
     Product,
     Category,
@@ -32,7 +33,7 @@
   let activePage = $state<'penjualan' | 'transaksi' | 'settlement' | 'produk' | 'profil'>('penjualan');
   let isSidebarCollapsed = $state(false);
 
-  // state data terminal, katalog dan master
+  // state data terminal dan master
   let terminalInfo = $state<PosTerminalInfo | null>(null);
   let categories = $state<Category[]>([]);
   let products = $state<Product[]>([]);
@@ -52,6 +53,7 @@
   // state status jaringan dan sinkronisasi
   let selectedCategoryId = $state('cat-all');
   let isOnline = $state(true);
+  let isSyncing = $state(false);
   let pendingSyncCount = $state(0);
 
   // state keranjang dan pesanan
@@ -94,16 +96,33 @@
       isPairingModalOpen = true;
     });
 
+    // inisialisasi listener engine sinkronisasi antrean offline
+    const cleanupAutoSync = syncEngine.initAutoSync();
+    const unsubscribeSync = syncEngine.subscribe((status) => {
+      isSyncing = status.isSyncing;
+      pendingSyncCount = status.pendingCount;
+      if (!status.isSyncing) {
+        loadDbData();
+      }
+    });
+
     initTerminalAndDb();
 
     // baca perubahan status koneksi internet
-    const updateOnline = () => (isOnline = navigator.onLine);
+    const updateOnline = () => {
+      isOnline = navigator.onLine;
+      if (isOnline) {
+        syncEngine.syncPendingOrders();
+      }
+    };
     window.addEventListener('online', updateOnline);
     window.addEventListener('offline', updateOnline);
     isOnline = navigator.onLine;
 
     return () => {
       unsubscribeUnauthorized();
+      cleanupAutoSync();
+      unsubscribeSync();
       window.removeEventListener('online', updateOnline);
       window.removeEventListener('offline', updateOnline);
     };
@@ -142,7 +161,7 @@
 
       closedSessions = await db.sessions.where('status').equals('CLOSED').reverse().toArray();
 
-      const pendingOrders = await db.orders.where('sync_status').equals('PENDING').count();
+      const pendingOrders = await syncEngine.getPendingCount();
       pendingSyncCount = pendingOrders;
     } catch (e) {
       console.warn('Gagal memuat data dari IndexedDB:', e);
@@ -226,37 +245,18 @@
       await db.sessions.put(activeSession);
     }
 
-    pendingSyncCount += 1;
     lastCompletedOrder = order;
     isPaymentModalOpen = false;
     isReceiptModalOpen = true;
 
-    if (isOnline) {
-      triggerBackgroundSync();
-    }
+    // trigger sinkronisasi antrean via sync engine
+    syncEngine.syncPendingOrders();
   }
 
   function handleCloseReceiptAndReset() {
     isReceiptModalOpen = false;
     lastCompletedOrder = null;
     handleClearCart();
-  }
-
-  async function triggerBackgroundSync() {
-    if (!isOnline) return;
-    try {
-      const pendingOrders = await db.orders.where('sync_status').equals('PENDING').toArray();
-      if (pendingOrders.length > 0) {
-        setTimeout(async () => {
-          for (const ord of pendingOrders) {
-            await db.orders.update(ord.client_order_id, { sync_status: 'SYNCED' });
-          }
-          await loadDbData();
-        }, 800);
-      }
-    } catch (e) {
-      console.warn('Sinkronisasi tertunda gagal:', e);
-    }
   }
 
   function handleSessionOpened(session: PosSession) {
@@ -310,13 +310,14 @@
     <PosHeader
       branchName={terminalInfo?.branch_name || terminalInfo?.terminal_name || 'Outlet Sleman #01'}
       {isOnline}
+      {isSyncing}
       {pendingSyncCount}
       {activeCashier}
       {activeSession}
       onOpenPinModal={() => (isPinModalOpen = true)}
       onOpenSessionModal={() => (isSessionModalOpen = true)}
       onOpenMasterLockModal={() => (isMasterLockModalOpen = true)}
-      onSyncNow={triggerBackgroundSync}
+      onSyncNow={() => syncEngine.syncPendingOrders()}
     />
 
     <!-- area tampilan aktif -->

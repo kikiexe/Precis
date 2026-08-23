@@ -2,7 +2,7 @@
   "name": "precis-monorepo",
   "private": true,
   "version": "1.0.0",
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@11.18.0",
   "scripts": {
     "dev": "pnpm --filter @precis/landing dev",
     "dev:landing": "pnpm --filter @precis/landing dev",
