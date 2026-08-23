@@ -14,9 +14,5 @@
     "pos": "pnpm --filter @precis/pos dev",
     "build": "pnpm -r build",
     "check": "pnpm -r check"
-  },
-  "onlyBuiltDependencies": [
-    "esbuild",
-    "sharp"
-  ]
+  }
 }
