@@ -51,11 +51,15 @@ backend/.phpunit.result.cache
 *.phpunit.result.cache
 
 # Framework Specific
+*.sqlite
+backend/database/*.sqlite
 .svelte-kit/
 .vite/
 */.vite/
 .turbo/
 backend/storage/*.key
+backend/storage/logs/*
+!backend/storage/logs/.gitignore
 backend/storage/app/*
 !backend/storage/app/.gitignore
 !backend/storage/app/public/.gitignore
@@ -69,6 +73,7 @@ backend/public/storage
 backend/bootstrap/cache/*
 !backend/bootstrap/cache/.gitignore
 backend/database/seeders/assets/*
+*/public/seeders/*
 
 # Documentation internal (if needed)
 docs/
