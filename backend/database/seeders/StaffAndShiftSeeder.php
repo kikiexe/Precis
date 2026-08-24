@@ -88,7 +88,8 @@ class StaffAndShiftSeeder extends Seeder
             ],
             [
                 'branch_id' => $branchSleman->id,
-                'role' => 'ADMIN',
+                'job_title' => 'Store Manager',
+                'role' => 'MANAGER',
                 'pin' => Hash::make('1234'),
                 'base_salary' => 4500000.00,
                 'is_active' => true,
@@ -112,6 +113,7 @@ class StaffAndShiftSeeder extends Seeder
             ],
             [
                 'branch_id' => $branchSleman->id,
+                'job_title' => 'Barista & Kasir',
                 'role' => 'STAFF',
                 'pin' => Hash::make('1122'),
                 'base_salary' => 2800000.00,
@@ -136,6 +138,7 @@ class StaffAndShiftSeeder extends Seeder
             ],
             [
                 'branch_id' => $branchMalioboro->id,
+                'job_title' => 'Barista & Kasir',
                 'role' => 'STAFF',
                 'pin' => Hash::make('3344'),
                 'base_salary' => 2800000.00,

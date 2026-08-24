@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Mail\PayslipNotificationMailable;
 use App\Models\Attendance;
 use App\Models\BranchSetting;
 use App\Models\CashAdvance;
 use App\Models\Payroll;
 use App\Models\User;
+use App\Models\Workspace;
 use App\Models\WorkspaceMember;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class PayrollService
 {
@@ -86,6 +89,9 @@ class PayrollService
             'role' => $member->role,
             'branch_id' => $branchId,
             'branch_name' => $member->branch?->name,
+            'bank_name' => $member->user?->bank_name,
+            'bank_account_number' => $member->user?->bank_account_number,
+            'bank_account_holder' => $member->user?->bank_account_holder,
             'base_salary' => $baseSalary,
             'total_late_minutes' => $totalLateMinutes,
             'late_penalty' => $latePenalty,
@@ -110,6 +116,7 @@ class PayrollService
         $query = WorkspaceMember::withoutGlobalScopes()
             ->with(['user', 'branch'])
             ->where('workspace_id', $workspaceId)
+            ->where('role', '!=', 'OWNER')
             ->where('is_active', true);
 
         if ($branchId) {
@@ -170,12 +177,14 @@ class PayrollService
     ): array {
         return DB::transaction(function () use ($workspaceId, $periodStart, $periodEnd, $branchId): array {
             $preview = $this->calculatePreview($workspaceId, $periodStart, $periodEnd, $branchId);
+            $workspaceName = Workspace::withoutGlobalScopes()->where('id', $workspaceId)->value('name') ?? 'PRÉCIS Workspace';
             $disbursedCount = 0;
             $now = Carbon::now();
 
             foreach ($preview['items'] as $item) {
                 // simpan atau perbarui record payroll
-                Payroll::withoutGlobalScopes()->updateOrCreate(
+                /** @var Payroll $payroll */
+                $payroll = Payroll::withoutGlobalScopes()->updateOrCreate(
                     [
                         'workspace_id' => $workspaceId,
                         'user_id' => $item['user_id'],
@@ -205,6 +214,23 @@ class PayrollService
                         'status' => 'DEDUCTED',
                         'deducted_at_payroll_date' => $periodEnd,
                     ]);
+
+                // kirim notifikasi email slip gaji jika email staf terisi
+                if (! empty($item['email'])) {
+                    /** @var User|null $employeeUser */
+                    $employeeUser = User::find($item['user_id']);
+                    if ($employeeUser) {
+                        $slipUrl = config('app.url') . '/payroll/slip';
+                        Mail::to($item['email'])->send(new PayslipNotificationMailable(
+                            employee: $employeeUser,
+                            payroll: $payroll,
+                            workspaceName: $workspaceName,
+                            slipUrl: $slipUrl,
+                            overtimeMinutes: (int) $item['total_overtime_minutes'],
+                            lateMinutes: (int) $item['total_late_minutes'],
+                        ));
+                    }
+                }
 
                 $disbursedCount++;
             }
@@ -240,8 +266,8 @@ class PayrollService
             foreach ($preview['items'] as $item) {
                 $lines[] = sprintf(
                     '"%s","%s",%.2f,IDR,"Gaji Periode %s sd %s"',
-                    '0000000000',
-                    str_replace('"', '""', (string) $item['name']),
+                    str_replace('"', '""', (string) ($item['bank_account_number'] ?? '0000000000')),
+                    str_replace('"', '""', (string) ($item['bank_account_holder'] ?? $item['name'])),
                     $item['net_salary'],
                     $periodStart,
                     $periodEnd
@@ -256,8 +282,8 @@ class PayrollService
                 $lines[] = sprintf(
                     '%d,"%s","%s",%.2f,"Payroll %s - %s"',
                     $index++,
-                    str_replace('"', '""', (string) $item['name']),
-                    '0000000000',
+                    str_replace('"', '""', (string) ($item['bank_account_holder'] ?? $item['name'])),
+                    str_replace('"', '""', (string) ($item['bank_account_number'] ?? '0000000000')),
                     $item['net_salary'],
                     $periodStart,
                     $periodEnd

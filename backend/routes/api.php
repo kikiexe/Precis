@@ -6,12 +6,14 @@ use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\Api\CashAdvanceController;
+use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\PayrollController;
 use App\Http\Controllers\Api\PosController;
 use App\Http\Controllers\Api\PosSecurityController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\SuperadminInvoiceController;
+use App\Http\Controllers\Api\WorkspaceController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +41,9 @@ Route::prefix('v1')->group(function (): void {
 
     // endpoint auth portal users
     Route::prefix('auth')->group(function (): void {
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+        Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
         Route::post('/reset-password', [AuthController::class, 'resetPassword']);
@@ -46,8 +51,22 @@ Route::prefix('v1')->group(function (): void {
         // authenticated portal users
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::get('/me', [AuthController::class, 'me']);
+            Route::put('/profile', [AuthController::class, 'updateProfile']);
+            Route::put('/password', [AuthController::class, 'updatePassword']);
+            Route::put('/bank-account', [AuthController::class, 'updateBankAccount']);
             Route::post('/logout', [AuthController::class, 'logout']);
+            Route::post('/workspaces', [WorkspaceController::class, 'store']);
         });
+    });
+
+    // endpoint pembuatan workspace oleh user yang terotentikasi
+    Route::middleware('auth:sanctum')->post('/workspaces', [WorkspaceController::class, 'store']);
+
+    // endpoint publik penerimaan undangan tim workspace
+    Route::prefix('invitations')->group(function (): void {
+        Route::get('/{token}', [InvitationController::class, 'show']);
+        Route::post('/{token}/accept', [InvitationController::class, 'accept']);
+        Route::post('/{token}/reject', [InvitationController::class, 'reject']);
     });
 
     // billing saas user portal
@@ -147,6 +166,20 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('/preview', [PayrollController::class, 'preview']);
                 Route::post('/disburse', [PayrollController::class, 'disburse']);
                 Route::get('/export-csv', [PayrollController::class, 'exportCsv']);
+            });
+
+            Route::prefix('members')->group(function (): void {
+                Route::get('/', [\App\Http\Controllers\Api\MemberController::class, 'index']);
+                Route::post('/', [\App\Http\Controllers\Api\MemberController::class, 'store']);
+                Route::put('/{id}', [\App\Http\Controllers\Api\MemberController::class, 'update']);
+                Route::delete('/{id}', [\App\Http\Controllers\Api\MemberController::class, 'destroy']);
+            });
+
+            Route::prefix('invitations')->group(function (): void {
+                Route::get('/', [InvitationController::class, 'index']);
+                Route::post('/', [InvitationController::class, 'store']);
+                Route::delete('/{id}', [InvitationController::class, 'destroy']);
+                Route::post('/{id}/resend', [InvitationController::class, 'resend']);
             });
 
             Route::get('/admin-only', function (Request $request): JsonResponse {

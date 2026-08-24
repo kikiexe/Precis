@@ -157,7 +157,7 @@ class PayrollEngineTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('message', 'Pencairan penggajian berhasil dieksekusi.')
-            ->assertJsonPath('data.disbursed_count', 4); // 4 staf & admin seeder
+            ->assertJsonPath('data.disbursed_count', 3); // 3 staf (manager & 2 kasir) di seeder
 
         $this->assertDatabaseHas('payrolls', [
             'workspace_id' => $this->workspace->id,

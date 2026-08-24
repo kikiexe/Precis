@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Mail\InvoiceReceiptMailable;
 use App\Models\Invoice;
 use App\Models\PaymentConfirmation;
 use App\Models\SubscriptionPlan;
@@ -11,6 +12,7 @@ use App\Models\Superadmin;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -125,6 +127,9 @@ class BillingService
                     'subscription_status' => 'ACTIVE',
                     'subscription_expires_at' => $newExpiry,
                 ]);
+
+                $billingUrl = config('app.url') . '/settings/billing';
+                Mail::to($user->email)->send(new InvoiceReceiptMailable($user, $invoice, $billingUrl));
             }
 
             return $invoice;

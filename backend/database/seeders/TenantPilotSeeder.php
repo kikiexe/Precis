@@ -48,9 +48,10 @@ class TenantPilotSeeder extends Seeder
             ],
             [
                 'branch_id' => null,
+                'job_title' => 'Pemilik Usaha',
                 'role' => 'OWNER',
                 'pin' => Hash::make('9999'),
-                'base_salary' => 15000000.00,
+                'base_salary' => 0.00,
                 'is_active' => true,
             ]
         );

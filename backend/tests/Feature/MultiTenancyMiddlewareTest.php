@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Models\Workspace;
+use App\Models\WorkspaceMember;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -80,6 +81,12 @@ class MultiTenancyMiddlewareTest extends TestCase
         /** @var User $manager */
         $manager = User::where('email', 'budi.manager@amorecoffee.id')->first();
         $workspace = Workspace::where('slug', 'amore-coffee')->first();
+
+        // tetapkan role ADMIN pada member untuk menguji otorisasi admin
+        WorkspaceMember::withoutGlobalScopes()
+            ->where('workspace_id', $workspace->id)
+            ->where('user_id', $manager->id)
+            ->update(['role' => 'ADMIN']);
 
         Sanctum::actingAs($manager);
 
