@@ -88,4 +88,9 @@ class Workspace extends Model
     {
         return $this->hasMany(Payroll::class, 'workspace_id');
     }
+
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(WorkspaceInvitation::class, 'workspace_id');
+    }
 }

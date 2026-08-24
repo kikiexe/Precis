@@ -4,42 +4,35 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\WorkspaceScope;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[ScopedBy([WorkspaceScope::class])]
-class WorkspaceMember extends Model
+class WorkspaceInvitation extends Model
 {
     use HasFactory, HasUuids;
 
-    protected $table = 'workspace_members';
+    protected $table = 'workspace_invitations';
 
     protected $fillable = [
         'workspace_id',
-        'user_id',
-        'branch_id',
+        'invited_by_user_id',
+        'email',
         'job_title',
         'role',
-        'pin',
         'base_salary',
-        'is_active',
-    ];
-
-    protected $hidden = [
-        'pin',
+        'branch_id',
+        'token',
+        'status',
+        'expires_at',
     ];
 
     protected function casts(): array
     {
         return [
             'base_salary' => 'decimal:2',
-            'is_active' => 'boolean',
-            'pin' => 'hashed',
+            'expires_at' => 'datetime',
         ];
     }
 
@@ -48,9 +41,9 @@ class WorkspaceMember extends Model
         return $this->belongsTo(Workspace::class, 'workspace_id');
     }
 
-    public function user(): BelongsTo
+    public function invitedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'invited_by_user_id');
     }
 
     public function branch(): BelongsTo
@@ -58,8 +51,13 @@ class WorkspaceMember extends Model
         return $this->belongsTo(Branch::class, 'branch_id');
     }
 
-    public function payrolls(): HasMany
+    public function isPending(): bool
     {
-        return $this->hasMany(Payroll::class, 'workspace_member_id');
+        return $this->status === 'PENDING' && ! $this->isExpired();
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->expires_at->isPast();
     }
 }

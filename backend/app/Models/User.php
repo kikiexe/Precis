@@ -21,6 +21,11 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'bank_name',
+        'bank_account_number',
+        'bank_account_holder',
+        'email_verified_at',
+        'email_verification_token',
         'password',
         'plan_id',
         'max_workspaces',
@@ -36,6 +41,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'max_workspaces' => 'integer',
             'subscription_expires_at' => 'datetime',
@@ -85,5 +91,10 @@ class User extends Authenticatable
     public function payrolls(): HasMany
     {
         return $this->hasMany(Payroll::class, 'user_id');
+    }
+
+    public function sentInvitations(): HasMany
+    {
+        return $this->hasMany(WorkspaceInvitation::class, 'invited_by_user_id');
     }
 }

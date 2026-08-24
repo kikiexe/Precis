@@ -15,6 +15,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost:8000'),
 
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:5174'),
+
     'timezone' => env('APP_TIMEZONE', 'Asia/Jakarta'),
 
     'locale' => env('APP_LOCALE', 'id'),
