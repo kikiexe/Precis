@@ -127,3 +127,23 @@ export interface CashierUser {
   pin: string; // 4-digit PIN
   avatar_url?: string;
 }
+
+export type StockAdjustmentReason =
+  | 'STOCK_TAKE'
+  | 'DAMAGED'
+  | 'EXPIRED'
+  | 'RESTOCK'
+  | 'WASTE'
+  | 'OTHER';
+
+export interface RawMaterial {
+  id: string;
+  name: string;
+  category_id: string;
+  category_name?: string;
+  current_stock: number;
+  min_stock_alert: number;
+  unit: string;
+  last_adjusted_at?: string;
+}
+

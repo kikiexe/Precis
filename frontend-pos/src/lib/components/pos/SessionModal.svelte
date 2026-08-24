@@ -112,7 +112,7 @@
       </div>
 
       {#if errorMessage}
-        <div class="mb-4 p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-[12px] text-xs text-[#b30000] flex items-start gap-2">
+        <div class="mb-4 p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-xl text-xs text-[#b30000] flex items-start gap-2">
           <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
           <span>{errorMessage}</span>
         </div>
@@ -135,7 +135,7 @@
               bind:value={openingCashInput}
               step="10000"
               disabled={isLoading}
-              class="w-full bg-white border border-[#d9d9dd] rounded-[12px] px-3.5 py-2.5 font-mono text-base font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+              class="w-full bg-white border border-[#d9d9dd] rounded-xl px-3.5 py-2.5 font-mono text-base font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
             />
           </div>
 
@@ -162,7 +162,7 @@
               bind:value={sessionNotes}
               placeholder="e.g. Shift pagi..."
               disabled={isLoading}
-              class="w-full bg-white border border-[#d9d9dd] rounded-[12px] px-3 py-2 text-xs text-[#212121] placeholder-[#93939f] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+              class="w-full bg-white border border-[#d9d9dd] rounded-xl px-3 py-2 text-xs text-[#212121] placeholder-[#93939f] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
             />
           </div>
 
@@ -194,7 +194,7 @@
         <!-- tampilan tutup kasir dan rekonsiliasi -->
         <div class="space-y-4">
           <!-- metrik sesi aktif -->
-          <div class="p-4 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] space-y-2 text-xs">
+          <div class="p-4 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-2xl space-y-2 text-xs">
             <div class="flex justify-between text-[#616161]">
               <span>ID Sesi Kasir:</span>
               <span class="font-mono text-[#212121] text-[11px] truncate max-w-50">{activeSession.id}</span>
@@ -230,12 +230,12 @@
               bind:value={closingCashInput}
               step="1000"
               disabled={isLoading}
-              class="w-full bg-white border border-[#d9d9dd] rounded-[12px] px-3.5 py-2.5 font-mono text-base font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+              class="w-full bg-white border border-[#d9d9dd] rounded-xl px-3.5 py-2.5 font-mono text-base font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
             />
           </div>
 
           <!-- indikator selisih rekonsiliasi -->
-          <div class={`p-3.5 rounded-[12px] border flex items-center justify-between text-xs font-mono ${
+          <div class={`p-3.5 rounded-xl border flex items-center justify-between text-xs font-mono ${
             discrepancy === 0
               ? 'bg-[#edfce9] border-[#edfce9] text-[#003c33]'
               : discrepancy > 0
@@ -258,7 +258,7 @@
               bind:value={sessionNotes}
               placeholder="e.g. Uang kembalian 2.000 rusak..."
               disabled={isLoading}
-              class="w-full bg-white border border-[#d9d9dd] rounded-[12px] px-3 py-2 text-xs text-[#212121] placeholder-[#93939f] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+              class="w-full bg-white border border-[#d9d9dd] rounded-xl px-3 py-2 text-xs text-[#212121] placeholder-[#93939f] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
             />
           </div>
 

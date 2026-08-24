@@ -8,7 +8,8 @@ export async function burnWatermarkOnCanvas(
   timestampStr: string,
   latitude: number,
   longitude: number,
-  branchName = 'Outlet Sleman #01'
+  branchName = 'Outlet Sleman #01',
+  isFrontCamera = false
 ): Promise<WatermarkResult> {
   const canvas = document.createElement('canvas');
   canvas.width = 720;
@@ -16,8 +17,14 @@ export async function burnWatermarkOnCanvas(
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Failed to get 2D canvas context');
 
-  // 1. Draw raw camera image scaled to 3:4 portrait
+  // 1. Draw camera image (if front camera, mirror horizontally to match live viewfinder WYSIWYG)
+  ctx.save();
+  if (isFrontCamera) {
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+  }
   ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+  ctx.restore();
 
   // 2. Draw black semi-transparent footer banner
   const bannerHeight = 110;
@@ -31,7 +38,7 @@ export async function burnWatermarkOnCanvas(
   // 4. Draw Watermark Timestamp & Store Name
   ctx.fillStyle = '#FFFFFF';
   ctx.font = 'bold 22px "IBM Plex Sans", -apple-system, sans-serif';
-  ctx.fillText(`${timestampStr} WIB • ${branchName}`, 24, canvas.height - 65);
+  ctx.fillText(`${timestampStr} • ${branchName}`, 24, canvas.height - 65);
 
   // 5. Draw GPS coordinates and security seal
   ctx.fillStyle = '#C6C6C6';

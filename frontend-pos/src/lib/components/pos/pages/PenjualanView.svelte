@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Utensils, ShoppingBag, Truck } from 'lucide-svelte';
-  import type { Product, Category, CartItem, CashierUser, OrderType } from '../../../types/pos';
+  import type { Product, Category, CartItem, OrderType } from '../../../types/pos';
   import ProductCatalog from '../ProductCatalog.svelte';
   import OrderCart from '../OrderCart.svelte';
 
@@ -9,7 +9,6 @@
     products: Product[];
     selectedCategoryId: string;
     cartItems: CartItem[];
-    activeCashier: CashierUser | null;
     discountPercent: number;
     discountNominal: number;
     orderType: OrderType;
@@ -26,7 +25,6 @@
     onSetCustomerName: (name: string) => void;
     onSetTableNumber: (table: string) => void;
     onOpenPaymentModal: () => void;
-    onOpenPinModal: () => void;
   }
 
   let {
@@ -34,7 +32,6 @@
     products,
     selectedCategoryId,
     cartItems,
-    activeCashier,
     discountPercent,
     discountNominal,
     orderType = 'DINE_IN',
@@ -51,7 +48,6 @@
     onSetCustomerName,
     onSetTableNumber,
     onOpenPaymentModal,
-    onOpenPinModal,
   }: Props = $props();
 </script>
 
@@ -137,7 +133,6 @@
   <!-- Right Side: Order Cart Panel -->
   <OrderCart
     items={cartItems}
-    {activeCashier}
     {discountPercent}
     {discountNominal}
     {onUpdateQuantity}
@@ -146,6 +141,5 @@
     {onClearCart}
     {onSetDiscountPercent}
     {onOpenPaymentModal}
-    {onOpenPinModal}
   />
 </div>

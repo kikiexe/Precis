@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ChevronDown, Building2, LogOut, Check } from 'lucide-svelte';
+  import { ChevronDown, Building2, LogOut, Check, Plus } from 'lucide-svelte';
   import type { User, Role, UserWorkspace } from '../../types/app';
 
   interface Props {
@@ -7,7 +7,8 @@
     userWorkspaces?: UserWorkspace[];
     activeWorkspaceId?: string | null;
     onSwitchWorkspace?: (workspace: UserWorkspace) => void;
-    onOpenBilling: () => void;
+    onOpenCreateWorkspaceModal?: () => void;
+    onOpenBilling?: () => void;
     onLogout?: () => void;
   }
 
@@ -16,7 +17,7 @@
     userWorkspaces = [],
     activeWorkspaceId = null,
     onSwitchWorkspace,
-    onOpenBilling,
+    onOpenCreateWorkspaceModal,
     onLogout,
   }: Props = $props();
 
@@ -35,39 +36,41 @@
     }
   }
 
-  let badge = $derived(getRoleBadge(currentUser.role));
+  let badge = $derived(
+    userWorkspaces.length === 0
+      ? { label: 'Standalone', bg: 'bg-[#eeece7] text-[#75758a] border border-[#d9d9dd]' }
+      : getRoleBadge(currentUser.role)
+  );
   let currentWorkspaceName = $derived(
-    userWorkspaces.find((w) => w.workspace_id === activeWorkspaceId)?.workspace_name || currentUser.branch_name
+    userWorkspaces.find((w) => w.workspace_id === activeWorkspaceId)?.workspace_name || (userWorkspaces.length === 0 ? 'Tanpa Workspace' : currentUser.branch_name)
   );
 </script>
 
-<header class="bg-white border-b border-[#d9d9dd] px-4 sm:px-6 py-3.5 select-none shrink-0 sticky top-0 z-30 font-sans">
+<header class="block lg:hidden bg-white border-b border-[#d9d9dd] px-4 py-3 select-none shrink-0 sticky top-0 z-30 font-sans">
   <div class="flex items-center justify-between">
     <div class="relative">
       <button
         type="button"
         onclick={() => (isDropdownOpen = !isDropdownOpen)}
-        class="flex items-center gap-3 cursor-pointer text-left group"
+        class="flex items-center gap-2.5 cursor-pointer text-left group"
       >
-        <div class="w-9 h-9 bg-[#17171c] text-white flex items-center justify-center font-medium text-sm rounded-[10px] border border-[#d9d9dd]">
-          P
-        </div>
+        <img src="/logo.png" alt="Précis Logo" class="w-8 h-8 rounded-[10px] object-cover border border-[#d9d9dd]" />
         <div>
           <div class="flex items-center gap-1.5 leading-none">
-            <span class="font-medium text-sm text-[#212121] tracking-tight">{currentUser.name}</span>
+            <span class="font-medium text-xs text-[#212121] tracking-tight">{currentUser.name}</span>
             <ChevronDown class="w-3.5 h-3.5 text-[#93939f] group-hover:text-[#212121] transition-transform" />
           </div>
-          <div class="flex items-center gap-2 mt-1">
-            <span class={`text-[10px] font-mono px-2 py-0.5 rounded-[6px] font-medium ${badge.bg}`}>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <span class={`text-[9px] font-mono px-1.5 py-0.2 rounded-sm font-medium ${badge.bg}`}>
               {badge.label}
             </span>
-            <span class="text-[11px] text-[#75758a] font-normal truncate">• {currentWorkspaceName}</span>
+            <span class="text-[10px] text-[#75758a] font-normal truncate max-w-35">• {currentWorkspaceName}</span>
           </div>
         </div>
       </button>
 
       {#if isDropdownOpen}
-        <div class="absolute left-0 top-14 w-80 bg-white border border-[#d9d9dd] rounded-[16px] p-2 z-50 animate-in fade-in zoom-in-95 font-sans shadow-none">
+        <div class="absolute left-0 top-12 w-72 bg-white border border-[#d9d9dd] rounded-2xl p-2 z-50 animate-in fade-in zoom-in-95 font-sans shadow-none">
           <div class="flex items-center justify-between text-[11px] font-mono text-[#75758a] px-3 py-1.5 border-b border-[#d9d9dd] mb-1">
             <div class="flex items-center gap-1.5">
               <Building2 class="w-3.5 h-3.5 text-[#1863dc]" />
@@ -76,15 +79,15 @@
           </div>
 
           {#if userWorkspaces.length > 0}
-            <div class="max-h-52 overflow-y-auto space-y-1 p-1">
-              {#each userWorkspaces as ws}
+            <div class="space-y-1 max-h-56 overflow-y-auto">
+              {#each userWorkspaces as ws (ws.workspace_id)}
                 <button
                   type="button"
                   onclick={() => {
-                    if (onSwitchWorkspace) onSwitchWorkspace(ws);
                     isDropdownOpen = false;
+                    if (onSwitchWorkspace) onSwitchWorkspace(ws);
                   }}
-                  class={`w-full text-left px-3 py-2.5 rounded-[10px] text-xs flex items-center justify-between transition-all cursor-pointer ${
+                  class={`w-full text-left px-3 py-2 rounded-[10px] text-xs flex items-center justify-between transition-all cursor-pointer ${
                     ws.workspace_id === activeWorkspaceId
                       ? 'bg-[#eeece7] font-medium text-[#212121]'
                       : 'hover:bg-[#eeece7]/50 text-[#616161] hover:text-[#212121]'
@@ -97,7 +100,7 @@
                     </div>
                   </div>
                   <div class="flex items-center gap-2 shrink-0">
-                    <span class={`text-[9px] font-mono px-2 py-0.5 rounded-[4px] ${getRoleBadge(ws.role).bg}`}>
+                    <span class={`text-[9px] font-mono px-2 py-0.5 rounded-sm ${getRoleBadge(ws.role).bg}`}>
                       {ws.role}
                     </span>
                     {#if ws.workspace_id === activeWorkspaceId}
@@ -109,7 +112,23 @@
             </div>
           {:else}
             <div class="px-3 py-2 text-xs text-[#75758a]">
-              {currentUser.branch_name}
+              Belum terhubung ke workspace bisnis.
+            </div>
+          {/if}
+
+          {#if onOpenCreateWorkspaceModal}
+            <div class="border-t border-[#d9d9dd] mt-1 pt-1">
+              <button
+                type="button"
+                onclick={() => {
+                  isDropdownOpen = false;
+                  onOpenCreateWorkspaceModal();
+                }}
+                class="w-full text-left px-3 py-2 rounded-[10px] text-xs text-[#1863dc] hover:bg-[#f1f5ff] flex items-center gap-2 transition-all cursor-pointer font-medium"
+              >
+                <Plus class="w-3.5 h-3.5" />
+                <span>Buat Workspace Bisnis Baru</span>
+              </button>
             </div>
           {/if}
 
@@ -132,14 +151,8 @@
       {/if}
     </div>
 
-    <div class="flex items-center gap-2">
-      <button
-        type="button"
-        onclick={onOpenBilling}
-        class="text-xs font-medium bg-[#edfce9] text-[#003c33] border border-[#edfce9] px-3.5 py-1.5 rounded-full hover:bg-[#edfce9]/80 transition-all cursor-pointer"
-      >
-        Trial 1 Bulan
-      </button>
+    <div class="text-[10px] font-mono text-[#75758a]">
+      PRÉCIS APP
     </div>
   </div>
 </header>

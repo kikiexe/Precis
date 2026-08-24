@@ -17,6 +17,9 @@ export class PosService {
     if (response.data) {
       return response.data;
     }
+    if ((response as unknown as { terminal_id?: string }).terminal_id) {
+      return response as unknown as PosTerminalInfo;
+    }
     throw new Error(response.message || 'Gagal memuat informasi terminal POS.');
   }
 

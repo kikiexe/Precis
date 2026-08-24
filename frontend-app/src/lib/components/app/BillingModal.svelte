@@ -144,20 +144,20 @@
       </div>
 
       {#if actionMessage}
-        <div class="p-3.5 bg-[#edfce9] border border-[#edfce9] text-[#003c33] text-xs font-mono rounded-[12px]">
+        <div class="p-3.5 bg-[#edfce9] border border-[#edfce9] text-[#003c33] text-xs font-mono rounded-xl">
           {actionMessage}
         </div>
       {/if}
 
       {#if errorMessage}
-        <div class="p-3.5 bg-[#ffad9b]/15 border border-[#ffad9b] text-[#b30000] text-xs font-mono rounded-[12px] flex items-start gap-2">
+        <div class="p-3.5 bg-[#ffad9b]/15 border border-[#ffad9b] text-[#b30000] text-xs font-mono rounded-xl flex items-start gap-2">
           <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
           <span>{errorMessage}</span>
         </div>
       {/if}
 
       <!-- status langganan akun saat ini -->
-      <div class="p-4 bg-[#eeece7]/40 border border-[#d9d9dd] rounded-[16px] space-y-2 text-xs font-mono">
+      <div class="p-4 bg-[#eeece7]/40 border border-[#d9d9dd] rounded-2xl space-y-2 text-xs font-mono">
         <div class="flex justify-between items-center">
           <span class="text-[#616161]">Status Akun:</span>
           <span class={`text-[10px] px-2.5 py-0.5 rounded-full font-medium ${
@@ -186,7 +186,7 @@
 
       <!-- kartu faktur tagihan transfer manual -->
       {#if !activeInvoice}
-        <div class="p-6 border border-[#d9d9dd] rounded-[16px] text-center space-y-2.5">
+        <div class="p-6 border border-[#d9d9dd] rounded-2xl text-center space-y-2.5">
           <p class="text-xs text-[#75758a]">Belum ada faktur tagihan yang sedang aktif.</p>
           <button
             type="button"
@@ -199,10 +199,10 @@
           </button>
         </div>
       {:else}
-        <div class="border border-[#d9d9dd] rounded-[16px] p-4 space-y-3 text-xs bg-white shadow-none">
+        <div class="border border-[#d9d9dd] rounded-2xl p-4 space-y-3 text-xs bg-white shadow-none">
           <div class="font-medium text-[#212121] text-xs">Faktur #{activeInvoice.invoice_number}</div>
 
-          <div class="space-y-1.5 bg-[#eeece7]/40 p-3.5 rounded-[12px] font-mono text-[11px]">
+          <div class="space-y-1.5 bg-[#eeece7]/40 p-3.5 rounded-xl font-mono text-[11px]">
             <div class="flex justify-between text-[#616161]">
               <span>Nominal Dasar:</span>
               <span class="text-[#212121]">{formatRp(activeInvoice.amount_base)}</span>
@@ -260,12 +260,12 @@
               </button>
             </div>
           {:else if activeInvoice.status === 'PENDING_VERIFICATION'}
-            <div class="p-3 bg-[#eeece7] text-[#616161] rounded-[12px] text-[11px] flex items-center gap-2 font-mono">
+            <div class="p-3 bg-[#eeece7] text-[#616161] rounded-xl text-[11px] flex items-center gap-2 font-mono">
               <CheckCircle2 class="w-4 h-4 shrink-0 text-[#1863dc]" />
               <span>Bukti terkirim. Menunggu verifikasi tim Superadmin.</span>
             </div>
           {:else}
-            <div class="p-3 bg-[#edfce9] text-[#003c33] rounded-[12px] text-[11px] flex items-center gap-2 font-mono">
+            <div class="p-3 bg-[#edfce9] text-[#003c33] rounded-xl text-[11px] flex items-center gap-2 font-mono">
               <CheckCircle2 class="w-4 h-4 shrink-0" />
               <span>Tagihan telah lunas diverifikasi.</span>
             </div>

@@ -23,6 +23,23 @@ export class PosApiError extends Error {
 
 const STORAGE_KEY_DEVICE_TOKEN = 'precis_pos_device_token';
 
+export function getDefaultPosApiBaseUrl(): string {
+  const envUrl = (import.meta.env.VITE_API_BASE_URL as string) || '';
+  if (typeof window !== 'undefined' && window.location?.hostname) {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+        return envUrl;
+      }
+      return `${protocol}//${hostname}:8000/api/v1`;
+    }
+  }
+
+  return envUrl || 'http://localhost:8000/api/v1';
+}
+
 export class PosApiClient {
   private baseUrl: string;
   private deviceToken: string | null = null;
@@ -31,7 +48,7 @@ export class PosApiClient {
   private subscriptionSuspendedHandlers: Set<SubscriptionSuspendedHandler> = new Set();
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:8000/api/v1';
+    this.baseUrl = baseUrl || getDefaultPosApiBaseUrl();
     this.loadPersistedDeviceToken();
   }
 
@@ -136,8 +153,24 @@ export class PosApiClient {
     if (!response.ok) {
       const status = response.status;
       const errorData = responsePayload as ApiErrorPayload | null;
-      const defaultMessage = `Permintaan POS gagal dengan status ${status}`;
-      const errorMessage = errorData?.message || defaultMessage;
+      let errorMessage = errorData?.message;
+
+      // Extract specific validation message if available
+      if (errorData?.errors && typeof errorData.errors === 'object') {
+        const errorEntries = Object.values(errorData.errors);
+        if (errorEntries.length > 0 && Array.isArray(errorEntries[0]) && errorEntries[0].length > 0) {
+          errorMessage = errorEntries[0][0];
+        }
+      }
+
+      if (!errorMessage) {
+        errorMessage = `Permintaan POS gagal dengan status ${status}`;
+      }
+
+      // Sanitize raw database or SQLSTATE leakages
+      if (errorMessage.includes('SQLSTATE') || errorMessage.includes('syntax error') || errorMessage.includes('Connection refused')) {
+        errorMessage = 'Terjadi kendala pada penyimpanan database server. Silakan coba beberapa saat lagi.';
+      }
 
       if (status === 401 || status === 403) {
         this.deviceUnauthorizedHandlers.forEach((handler) => handler(errorMessage));

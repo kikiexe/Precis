@@ -23,6 +23,23 @@ export class ApiError extends Error {
 
 const STORAGE_KEY_SUPERADMIN_TOKEN = 'precis_superadmin_token';
 
+export function getDefaultSuperadminApiBaseUrl(): string {
+  const envUrl = (import.meta.env.VITE_API_BASE_URL as string) || '';
+  if (typeof window !== 'undefined' && window.location?.hostname) {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+        return envUrl;
+      }
+      return `${protocol}//${hostname}:8000/api/v1`;
+    }
+  }
+
+  return envUrl || 'http://localhost:8000/api/v1';
+}
+
 export class SuperadminApiClient {
   private baseUrl: string;
   private token: string | null = null;
@@ -30,7 +47,7 @@ export class SuperadminApiClient {
   private forbiddenHandlers: Set<ForbiddenHandler> = new Set();
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:8000/api/v1';
+    this.baseUrl = baseUrl || getDefaultSuperadminApiBaseUrl();
     this.loadPersistedToken();
   }
 
@@ -139,8 +156,24 @@ export class SuperadminApiClient {
     if (!response.ok) {
       const status = response.status;
       const errorData = responsePayload as ApiErrorPayload | null;
-      const defaultMessage = `Permintaan Superadmin gagal dengan status ${status}`;
-      const errorMessage = errorData?.message || defaultMessage;
+      let errorMessage = errorData?.message;
+
+      // Extract specific validation message if available
+      if (errorData?.errors && typeof errorData.errors === 'object') {
+        const errorEntries = Object.values(errorData.errors);
+        if (errorEntries.length > 0 && Array.isArray(errorEntries[0]) && errorEntries[0].length > 0) {
+          errorMessage = errorEntries[0][0];
+        }
+      }
+
+      if (!errorMessage) {
+        errorMessage = `Permintaan Superadmin gagal dengan status ${status}`;
+      }
+
+      // Sanitize raw database or SQLSTATE leakages
+      if (errorMessage.includes('SQLSTATE') || errorMessage.includes('syntax error') || errorMessage.includes('Connection refused')) {
+        errorMessage = 'Terjadi kendala pada penyimpanan database server. Silakan coba beberapa saat lagi.';
+      }
 
       if (status === 401) {
         this.unauthorizedHandlers.forEach((handler) => handler());

@@ -9,7 +9,7 @@
     discountAmount: number;
     finalAmount: number;
     items: CartItem[];
-    activeCashier: CashierUser;
+    activeCashier?: CashierUser | null;
     branchId: string;
     workspaceId: string;
     activeSessionId: string;
@@ -23,7 +23,7 @@
     discountAmount = 0,
     finalAmount = 0,
     items = [],
-    activeCashier,
+    activeCashier = null,
     branchId = 'branch-sleman-01',
     workspaceId = 'ws-amore-01',
     activeSessionId = 'sess-active-01',
@@ -73,8 +73,8 @@
       workspace_id: workspaceId,
       branch_id: branchId,
       pos_session_id: activeSessionId,
-      cashier_user_id: activeCashier.id,
-      cashier_name: activeCashier.name,
+      cashier_user_id: activeCashier?.id || 'cashier-outlet',
+      cashier_name: activeCashier?.name || 'Tim Kasir Outlet',
       order_type: 'DINE_IN',
       total_amount: totalAmount,
       discount_amount: discountAmount,
@@ -108,7 +108,7 @@
       <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-4 mb-5">
         <div>
           <h2 class="text-xl font-medium text-[#212121] tracking-tight">Pilih Metode Pembayaran</h2>
-          <p class="text-xs text-[#616161] font-mono mt-0.5">Kasir: {activeCashier.name} • Total {formatCurrency(finalAmount)}</p>
+          <p class="text-xs text-[#616161] font-mono mt-0.5">Kasir: {activeCashier ? activeCashier.name : 'Tim Kasir Outlet'} • Total {formatCurrency(finalAmount)}</p>
         </div>
         <button
           type="button"

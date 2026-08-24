@@ -171,14 +171,14 @@
   </div>
 
   {#if actionMessage}
-    <div class="p-3.5 bg-[#edfce9] border border-[#edfce9] text-[#003c33] text-xs font-mono rounded-[12px] flex items-center justify-between">
+    <div class="p-3.5 bg-[#edfce9] border border-[#edfce9] text-[#003c33] text-xs font-mono rounded-xl flex items-center justify-between">
       <span>{actionMessage}</span>
       <button type="button" onclick={() => (actionMessage = null)} class="text-[#616161] hover:text-[#212121] cursor-pointer p-1">✕</button>
     </div>
   {/if}
 
   {#if errorMessage}
-    <div class="p-3.5 bg-[#ffad9b]/15 border border-[#ffad9b] text-[#b30000] text-xs font-mono rounded-[12px] flex items-center justify-between">
+    <div class="p-3.5 bg-[#ffad9b]/15 border border-[#ffad9b] text-[#b30000] text-xs font-mono rounded-xl flex items-center justify-between">
       <div class="flex items-center gap-2">
         <AlertCircle class="w-4 h-4 shrink-0" />
         <span>{errorMessage}</span>
@@ -234,7 +234,7 @@
           <select
             id="billing-plan-select"
             bind:value={selectedPlanId}
-            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 text-xs font-mono text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+            class="w-full bg-white border border-[#d9d9dd] rounded-xl p-2.5 text-xs font-mono text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           >
             {#each plans as plan}
               <option value={plan.id}>
@@ -308,7 +308,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- rincian tagihan -->
-          <div class="p-4 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] space-y-2 font-mono text-xs">
+          <div class="p-4 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-2xl space-y-2 font-mono text-xs">
             <div class="flex justify-between text-[#616161]">
               <span>Nominal Dasar Paket:</span>
               <span class="text-[#212121]">{formatRp(activeInvoice.amount_base)}</span>
@@ -329,7 +329,7 @@
 
           <!-- rekening tujuan dan aksi unggah bukti -->
           <div class="space-y-3">
-            <div class="p-3.5 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] text-xs font-mono space-y-1">
+            <div class="p-3.5 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-2xl text-xs font-mono space-y-1">
               <div class="text-[#75758a]">Rekening Resmi Tujuan:</div>
               <div class="font-medium text-sm text-[#212121]">BCA: 8412-0099-3311</div>
               <div class="text-[11px] text-[#93939f]">a.n. PT Precis Ekosistem Digital</div>
@@ -374,7 +374,7 @@
     {#if invoices.length === 0}
       <div class="p-8 text-center text-xs text-[#75758a]">Belum ada riwayat faktur tagihan.</div>
     {:else}
-      <div class="overflow-x-auto rounded-[16px] border border-[#d9d9dd]">
+      <div class="overflow-x-auto rounded-2xl border border-[#d9d9dd]">
         <table class="w-full text-xs text-left border-collapse">
           <thead class="bg-[#eeece7]/50 border-b border-[#d9d9dd] font-mono text-[11px] text-[#616161]">
             <tr>
@@ -448,7 +448,7 @@
       </div>
 
       {#if errorMessage}
-        <div class="p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-[12px] text-[#b30000] text-xs flex items-start gap-2">
+        <div class="p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-xl text-[#b30000] text-xs flex items-start gap-2">
           <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
           <span>{errorMessage}</span>
         </div>
@@ -473,7 +473,7 @@
             type="text"
             bind:value={senderAccountName}
             placeholder="e.g. Arief Hadinata"
-            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 text-xs text-[#212121] placeholder-[#93939f] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+            class="w-full bg-white border border-[#d9d9dd] rounded-xl p-2.5 text-xs text-[#212121] placeholder-[#93939f] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           />
         </div>
 
@@ -483,7 +483,7 @@
             id="transfer-amount-input"
             type="number"
             bind:value={transferAmount}
-            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 text-xs font-mono font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+            class="w-full bg-white border border-[#d9d9dd] rounded-xl p-2.5 text-xs font-mono font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           />
         </div>
 
@@ -494,7 +494,7 @@
             type="file"
             accept="image/jpeg,image/png,image/webp"
             onchange={handleFileSelected}
-            class="w-full bg-white border border-[#d9d9dd] rounded-[12px] p-2.5 text-xs text-[#212121] focus:border-[#17171c] focus:outline-hidden"
+            class="w-full bg-white border border-[#d9d9dd] rounded-xl p-2.5 text-xs text-[#212121] focus:border-[#17171c] focus:outline-hidden"
           />
           <p class="text-[11px] text-[#75758a] font-normal mt-1">Format: JPG, PNG, atau WebP. Maksimal 2MB.</p>
         </div>

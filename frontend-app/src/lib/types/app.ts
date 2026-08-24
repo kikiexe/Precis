@@ -13,10 +13,27 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
+  bank_name?: string | null;
+  bank_account_number?: string | null;
+  bank_account_holder?: string | null;
   subscription_status?: string;
   subscription_expires_at?: string;
   max_workspaces?: number;
   workspaces: UserWorkspace[];
+}
+
+export interface TeamMember {
+  id: string;
+  user_id: string;
+  name: string;
+  email: string;
+  job_title: string;
+  role: 'OWNER' | 'ADMIN' | 'MANAGER' | 'STAFF';
+  branch_id: string | null;
+  branch_name: string;
+  base_salary: number;
+  is_active: boolean;
+  created_at?: string;
 }
 
 export interface LoginResponseData {
@@ -25,6 +42,9 @@ export interface LoginResponseData {
     id: string;
     name: string;
     email: string;
+    bank_name?: string | null;
+    bank_account_number?: string | null;
+    bank_account_holder?: string | null;
     subscription_status?: string;
   };
   workspaces: UserWorkspace[];
@@ -36,6 +56,9 @@ export interface User {
   role: Role;
   email: string;
   avatar_url?: string;
+  bank_name?: string | null;
+  bank_account_number?: string | null;
+  bank_account_holder?: string | null;
   branch_id: string;
   branch_name: string;
   base_salary: number;
@@ -315,3 +338,120 @@ export interface SubscriptionInvoice {
   outlet_quota?: number;
   confirmation?: InvoicePaymentConfirmation | null;
 }
+
+export interface ProductMenuItem {
+  id: string;
+  name: string;
+  category_id: string;
+  category_name?: string;
+  price: number;
+  description?: string;
+  image_url?: string;
+  is_available: boolean;
+}
+
+export interface CategoryItem {
+  id: string;
+  name: string;
+  type: 'MENU' | 'RAW_MATERIAL';
+  item_count?: number;
+}
+
+export type RawMaterialUnit = 'pcs' | 'ml' | 'gram' | 'kg' | 'pack' | 'botol' | 'liter';
+
+export interface RawMaterialItem {
+  id: string;
+  name: string;
+  category_id: string;
+  category_name?: string;
+  current_stock: number;
+  min_stock_alert: number;
+  unit: RawMaterialUnit;
+  last_adjusted_at?: string;
+}
+
+export type StockAdjustmentReason =
+  | 'STOCK_TAKE'
+  | 'DAMAGED'
+  | 'EXPIRED'
+  | 'RESTOCK'
+  | 'WASTE'
+  | 'OTHER';
+
+export interface StockAdjustmentLog {
+  id: string;
+  material_id: string;
+  material_name: string;
+  prev_stock: number;
+  adjusted_amount: number;
+  new_stock: number;
+  reason: StockAdjustmentReason;
+  notes?: string;
+  performed_by: string;
+  created_at: string;
+}
+
+export type TimeframePeriod = 'day' | 'week' | 'month' | 'year';
+
+export interface TimeframeSalesPoint {
+  id: string;
+  label: string;
+  subLabel: string;
+  revenue: number;
+  orders_count: number;
+  average_ticket: number;
+}
+
+export interface TimeframeMetricData {
+  period: TimeframePeriod;
+  period_label: string;
+  total_revenue: number;
+  total_orders: number;
+  average_order_value: number;
+  growth_percent: number;
+  growth_label: string;
+  gross_sales: number;
+  total_discount: number;
+  net_revenue: number;
+  breakdown: TimeframeSalesPoint[];
+  top_products: { name: string; quantity: number; total_amount: number; share_percent: number }[];
+  category_breakdown: { name: string; total_amount: number; share_percent: number }[];
+  payment_methods: { method: string; count: number; amount: number; percent: number }[];
+}
+
+export interface DashboardMetrics {
+  today_sales_amount: number;
+  today_orders_count: number;
+  average_order_value: number;
+  low_stock_count: number;
+  seven_day_sales: { date: string; day: string; amount: number }[];
+  top_products: { name: string; quantity: number; total_amount: number; share_percent: number }[];
+}
+
+export interface WorkspaceInvitationItem {
+  id: string;
+  email: string;
+  job_title: string;
+  role: 'ADMIN' | 'MANAGER' | 'STAFF';
+  base_salary: number;
+  branch_id: string | null;
+  branch_name: string;
+  invited_by_name?: string;
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'CANCELLED';
+  expires_at: string;
+  created_at?: string;
+}
+
+export interface PublicInvitationDetails {
+  id: string;
+  workspace_name: string;
+  workspace_slug: string;
+  invited_by_name: string;
+  email: string;
+  job_title: string;
+  role: 'ADMIN' | 'MANAGER' | 'STAFF';
+  branch_name: string;
+  expires_at: string;
+}
+
+

@@ -16,7 +16,6 @@
     CloseSessionResponse,
   } from './lib/types/pos';
   import PosSidebar from './lib/components/pos/PosSidebar.svelte';
-  import PosHeader from './lib/components/pos/PosHeader.svelte';
   import PenjualanView from './lib/components/pos/pages/PenjualanView.svelte';
   import TransaksiView from './lib/components/pos/pages/TransaksiView.svelte';
   import SettlementView from './lib/components/pos/pages/SettlementView.svelte';
@@ -24,7 +23,6 @@
   import ProfilView from './lib/components/pos/pages/ProfilView.svelte';
   import PaymentModal from './lib/components/pos/PaymentModal.svelte';
   import ReceiptModal from './lib/components/pos/ReceiptModal.svelte';
-  import CashierPinModal from './lib/components/pos/CashierPinModal.svelte';
   import SessionModal from './lib/components/pos/SessionModal.svelte';
   import MasterLockModal from './lib/components/pos/MasterLockModal.svelte';
   import DevicePairingModal from './lib/components/pos/DevicePairingModal.svelte';
@@ -41,15 +39,18 @@
   let allOrders = $state<OfflineOrder[]>([]);
   let closedSessions = $state<PosSession[]>([]);
 
-  // state sesi kasir aktif dan staf
-  let activeCashier = $state<CashierUser | null>(null);
+  // state staf / shift operator bersama
+  let activeCashier = $state<CashierUser>({
+    id: 'team-outlet',
+    name: 'Tim Operasional Bar & Kasir',
+    role: 'STAFF',
+    pin: '',
+  });
   let activeSession = $state<PosSession | null>(null);
 
-  // state status jaringan dan sinkronisasi
+  // state status jaringan
   let selectedCategoryId = $state('cat-all');
   let isOnline = $state(true);
-  let isSyncing = $state(false);
-  let pendingSyncCount = $state(0);
 
   // state keranjang dan pesanan
   let cartItems = $state<CartItem[]>([]);
@@ -62,7 +63,6 @@
   // visibilitas modal
   let isPaymentModalOpen = $state(false);
   let isReceiptModalOpen = $state(false);
-  let isPinModalOpen = $state(false);
   let isSessionModalOpen = $state(false);
   let isMasterLockModalOpen = $state(false);
   let isPairingModalOpen = $state(false);
@@ -94,8 +94,6 @@
     // inisialisasi listener engine sinkronisasi antrean offline
     const cleanupAutoSync = syncEngine.initAutoSync();
     const unsubscribeSync = syncEngine.subscribe((status) => {
-      isSyncing = status.isSyncing;
-      pendingSyncCount = status.pendingCount;
       if (!status.isSyncing) {
         loadDbData();
       }
@@ -155,9 +153,6 @@
       }
 
       closedSessions = await db.sessions.where('status').equals('CLOSED').reverse().toArray();
-
-      const pendingOrders = await syncEngine.getPendingCount();
-      pendingSyncCount = pendingOrders;
     } catch (e) {
       console.warn('Gagal memuat data dari IndexedDB:', e);
     }
@@ -229,42 +224,48 @@
     }
 
     if (activeSession) {
+      const updatedSess = { ...activeSession };
+      updatedSess.order_count += 1;
       if (order.payment_method === 'CASH') {
-        activeSession.total_cash_sales = (activeSession.total_cash_sales || 0) + order.final_amount;
+        updatedSess.total_cash_sales += order.final_amount;
       } else if (order.payment_method === 'QRIS') {
-        activeSession.total_qris_sales = (activeSession.total_qris_sales || 0) + order.final_amount;
-      } else {
-        activeSession.total_transfer_sales = (activeSession.total_transfer_sales || 0) + order.final_amount;
+        updatedSess.total_qris_sales += order.final_amount;
+      } else if (order.payment_method === 'TRANSFER') {
+        updatedSess.total_transfer_sales += order.final_amount;
       }
-      activeSession.order_count = (activeSession.order_count || 0) + 1;
-      await db.sessions.put(activeSession);
+      await db.sessions.put(updatedSess);
+      activeSession = updatedSess;
     }
 
     lastCompletedOrder = order;
+    handleClearCart();
     isPaymentModalOpen = false;
     isReceiptModalOpen = true;
 
-    // trigger sinkronisasi antrean via sync engine
-    syncEngine.syncPendingOrders();
+    // Picu sinkronisasi ke server jika terhubung
+    if (navigator.onLine) {
+      syncEngine.syncPendingOrders();
+    }
   }
 
   function handleCloseReceiptAndReset() {
     isReceiptModalOpen = false;
     lastCompletedOrder = null;
-    handleClearCart();
   }
 
+  // fungsi manajemen sesi kasir
   function handleSessionOpened(session: PosSession) {
     activeSession = session;
-    loadDbData();
+    isSessionModalOpen = false;
   }
 
   function handleSessionClosed(_closedData: CloseSessionResponse) {
     activeSession = null;
     loadDbData();
+    isSessionModalOpen = false;
   }
 
-  // fungsi master produk
+  // fungsi produk lokal
   async function handleToggleProductActive(productId: string) {
     const prod = products.find((p) => p.id === productId);
     if (prod) {
@@ -299,22 +300,8 @@
     onToggleCollapse={() => (isSidebarCollapsed = !isSidebarCollapsed)}
   />
 
-  <!-- area workspace -->
+  <!-- area workspace utama -->
   <div class="flex-1 flex flex-col h-full overflow-hidden">
-    <!-- baris header utama -->
-    <PosHeader
-      branchName={terminalInfo?.branch_name || terminalInfo?.terminal_name || 'Outlet Sleman #01'}
-      {isOnline}
-      {isSyncing}
-      {pendingSyncCount}
-      {activeCashier}
-      {activeSession}
-      onOpenPinModal={() => (isPinModalOpen = true)}
-      onOpenSessionModal={() => (isSessionModalOpen = true)}
-      onOpenMasterLockModal={() => (isMasterLockModalOpen = true)}
-      onSyncNow={() => syncEngine.syncPendingOrders()}
-    />
-
     <!-- area tampilan aktif -->
     <main class="flex-1 flex overflow-hidden">
       {#if activePage === 'penjualan'}
@@ -323,7 +310,6 @@
           {products}
           {cartItems}
           {selectedCategoryId}
-          {activeCashier}
           {discountPercent}
           {discountNominal}
           {orderType}
@@ -342,14 +328,7 @@
             discountPercent = percent;
             discountNominal = 0;
           }}
-          onOpenPaymentModal={() => {
-            if (!activeCashier) {
-              isPinModalOpen = true;
-            } else {
-              isPaymentModalOpen = true;
-            }
-          }}
-          onOpenPinModal={() => (isPinModalOpen = true)}
+          onOpenPaymentModal={() => (isPaymentModalOpen = true)}
         />
       {:else if activePage === 'transaksi'}
         <TransaksiView
@@ -376,7 +355,6 @@
           {cashiers}
           totalOrdersCount={allOrders.length}
           totalProductsCount={products.length}
-          onOpenPinModal={() => (isPinModalOpen = true)}
           onOpenMasterLockModal={() => (isMasterLockModalOpen = true)}
           onClearLocalCache={handleClearLocalCache}
         />
@@ -386,14 +364,14 @@
 </div>
 
 <!-- modal pembayaran -->
-{#if isPaymentModalOpen && activeCashier}
+{#if isPaymentModalOpen}
   <PaymentModal
     isOpen={isPaymentModalOpen}
     totalAmount={subtotalAmount}
     discountAmount={calculatedDiscountAmount}
     finalAmount={finalPayableAmount}
     items={cartItems}
-    activeCashier={activeCashier}
+    {activeCashier}
     branchId={terminalInfo?.branch_id || 'branch-sleman-01'}
     workspaceId={terminalInfo?.workspace_id || 'ws-amore-01'}
     activeSessionId={activeSession?.id || 'sess-active-01'}
@@ -409,23 +387,11 @@
   onCloseAndReset={handleCloseReceiptAndReset}
 />
 
-<!-- modal otorisasi pin kasir -->
-<CashierPinModal
-  isOpen={isPinModalOpen}
-  {cashiers}
-  {activeCashier}
-  onClose={() => (isPinModalOpen = false)}
-  onSelectCashier={(cashier: CashierUser) => {
-    activeCashier = cashier;
-    isPinModalOpen = false;
-  }}
-/>
-
 <!-- modal sesi kasir buka / tutup -->
 <SessionModal
   isOpen={isSessionModalOpen}
   {activeSession}
-  cashierUserId={activeCashier?.id || 'usr-pilot-01'}
+  cashierUserId={activeCashier?.id || 'team-outlet'}
   onClose={() => (isSessionModalOpen = false)}
   onSessionOpened={handleSessionOpened}
   onSessionClosed={handleSessionClosed}

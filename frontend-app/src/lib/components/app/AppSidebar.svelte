@@ -1,15 +1,32 @@
 <script lang="ts">
-  import { Camera, Calendar, Wallet, ShieldCheck, CreditCard, ChevronDown, Building2, LogOut, Check } from 'lucide-svelte';
+  import {
+    LayoutDashboard,
+    Package,
+    FolderTree,
+    Layers,
+    Camera,
+    Calendar,
+    Wallet,
+    FileText,
+    Settings,
+    ChevronDown,
+    LogOut,
+    Check,
+    Plus,
+    User as UserIcon
+  } from 'lucide-svelte';
   import type { User, Role, UserWorkspace } from '../../types/app';
 
   interface Props {
     currentUser: User;
     userWorkspaces?: UserWorkspace[];
     activeWorkspaceId?: string | null;
-    activeTab: 'presensi' | 'shift' | 'finance' | 'admin' | 'billing';
+    activeDomain: 'home' | 'dashboard' | 'katalog' | 'tim' | 'finance' | 'settings' | 'presensi' | 'shift';
+    activeSubTab?: string;
     pendingApprovalsCount: number;
-    onSelectTab: (tab: 'presensi' | 'shift' | 'finance' | 'admin' | 'billing') => void;
+    onSelectNav: (domain: 'home' | 'dashboard' | 'katalog' | 'tim' | 'finance' | 'settings' | 'presensi' | 'shift', subTab?: string) => void;
     onSwitchWorkspace?: (workspace: UserWorkspace) => void;
+    onOpenCreateWorkspaceModal?: () => void;
     onLogout?: () => void;
   }
 
@@ -17,10 +34,12 @@
     currentUser,
     userWorkspaces = [],
     activeWorkspaceId = null,
-    activeTab = 'admin',
+    activeDomain = 'dashboard',
+    activeSubTab = '',
     pendingApprovalsCount = 0,
-    onSelectTab,
+    onSelectNav,
     onSwitchWorkspace,
+    onOpenCreateWorkspaceModal,
     onLogout,
   }: Props = $props();
 
@@ -39,173 +58,339 @@
     }
   }
 
-  let badge = $derived(getRoleBadge(currentUser.role));
-  let currentWorkspaceName = $derived(
-    userWorkspaces.find((w) => w.workspace_id === activeWorkspaceId)?.workspace_name || currentUser.branch_name
+  let badge = $derived(
+    userWorkspaces.length === 0
+      ? { label: 'Standalone', bg: 'bg-[#eeece7] text-[#75758a] border border-[#d9d9dd]' }
+      : getRoleBadge(currentUser.role)
   );
-
-  let navItems = $derived.by(() => {
-    if (currentUser.role === 'OWNER') {
-      return [
-        { id: 'admin' as const, label: 'Audit & Monitoring', icon: ShieldCheck, desc: 'Wall of Faces & Payroll' },
-        { id: 'shift' as const, label: 'Roster & Jadwal Shift', icon: Calendar, desc: 'Penetapan Shift Karyawan' },
-        { id: 'finance' as const, label: 'Kasbon & Slip Gaji', icon: Wallet, desc: 'Riwayat Pinjaman & Gaji' },
-        { id: 'billing' as const, label: 'Billing & Langganan', icon: CreditCard, desc: 'Kuota Outlet & Tagihan' },
-      ];
-    }
-
-    if (currentUser.role === 'ADMIN') {
-      return [
-        { id: 'admin' as const, label: 'Audit & Approval', icon: ShieldCheck, desc: 'Wall of Faces & Approval' },
-        { id: 'shift' as const, label: 'Jadwal Shift', icon: Calendar, desc: 'Roster Staf Cabang' },
-        { id: 'finance' as const, label: 'Kasbon & Slip Gaji', icon: Wallet, desc: 'Pinjaman & Slip Gaji' },
-        { id: 'presensi' as const, label: 'Presensi Pribadi', icon: Camera, desc: 'Selfie GPS Manager' },
-      ];
-    }
-
-    return [
-      { id: 'presensi' as const, label: 'Presensi & ESS', icon: Camera, desc: 'Selfie GPS Masuk / Pulang' },
-      { id: 'shift' as const, label: 'Jadwal & Tukar Shift', icon: Calendar, desc: 'Roster Saya & Request Swap' },
-      { id: 'finance' as const, label: 'Kasbon & Slip Gaji', icon: Wallet, desc: 'Pengajuan Kasbon & Slip Gaji' },
-    ];
-  });
+  let currentWorkspaceName = $derived(
+    userWorkspaces.find((w) => w.workspace_id === activeWorkspaceId)?.workspace_name || (userWorkspaces.length === 0 ? 'Tanpa Workspace' : currentUser.branch_name)
+  );
 </script>
 
 <aside class="hidden lg:flex w-64 bg-white border-r border-[#d9d9dd] flex-col justify-between select-none shrink-0 h-screen sticky top-0 font-sans shadow-none">
-  <div>
-    <!-- header merek dan logo -->
-    <div class="h-16 border-b border-[#d9d9dd] px-5 flex items-center gap-3">
-      <div class="w-8 h-8 bg-[#17171c] text-white flex items-center justify-center font-medium text-sm rounded-[10px] border border-[#d9d9dd]">
-        P
-      </div>
+  <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
+    <!-- Header Brand -->
+    <div class="h-16 border-b border-[#d9d9dd] px-5 flex items-center gap-3 shrink-0">
+      <img src="/logo.png" alt="Précis Logo" class="w-8 h-8 rounded-[10px] object-cover border border-[#d9d9dd]" />
       <div>
         <div class="font-medium text-sm text-[#212121] tracking-tight">PRÉCIS PORTAL</div>
-        <div class="text-[10px] font-mono text-[#75758a]">Multi-Tenant Enterprise</div>
+        <div class="text-[10px] font-mono text-[#75758a]">Multi-Tenant F&amp;B</div>
       </div>
     </div>
 
-    <!-- pengalih user aktif dan workspace -->
-    <div class="p-3 border-b border-[#d9d9dd] relative">
+    <!-- User & Workspace Switcher -->
+    <div class="p-3 border-b border-[#d9d9dd] relative shrink-0">
       <button
         type="button"
         onclick={() => (isDropdownOpen = !isDropdownOpen)}
-        class="w-full p-2.5 bg-[#eeece7]/40 hover:bg-[#eeece7] border border-[#d9d9dd] rounded-[12px] text-left transition-all cursor-pointer group flex items-center justify-between"
+        class="w-full p-2.5 bg-[#eeece7]/40 hover:bg-[#eeece7] border border-[#d9d9dd] rounded-xl text-left transition-all cursor-pointer group flex items-center justify-between"
       >
         <div class="min-w-0 flex-1">
           <div class="font-medium text-xs text-[#212121] truncate">{currentUser.name}</div>
           <div class="flex items-center gap-1.5 mt-1">
-            <span class={`text-[9px] font-mono px-1.5 py-0.5 rounded-[4px] font-medium ${badge.bg}`}>
+            <span class={`text-[9px] font-mono px-1.5 py-0.5 rounded-sm font-medium ${badge.bg}`}>
               {badge.label}
             </span>
             <span class="text-[10px] text-[#75758a] font-normal truncate">• {currentWorkspaceName}</span>
           </div>
         </div>
-        <ChevronDown class="w-4 h-4 text-[#93939f] group-hover:text-[#212121] shrink-0 ml-1 transition-transform" />
+        <ChevronDown class="w-4 h-4 text-[#75758a] group-hover:text-[#212121] transition-transform duration-200" />
       </button>
 
       {#if isDropdownOpen}
-        <div class="absolute left-3 right-3 top-20 bg-white border border-[#d9d9dd] rounded-[14px] p-2 z-50 animate-in fade-in shadow-none font-sans">
-          <div class="flex items-center gap-1.5 text-[10px] font-mono text-[#75758a] px-2.5 py-1 border-b border-[#d9d9dd] mb-1">
-            <Building2 class="w-3 h-3 text-[#1863dc]" />
-            <span>Workspace / Cabang:</span>
-          </div>
-
+        <div class="absolute left-3 right-3 top-full mt-1.5 bg-white border border-[#d9d9dd] rounded-xl shadow-lg p-1.5 z-50 space-y-1">
           {#if userWorkspaces.length > 0}
-            <div class="max-h-48 overflow-y-auto space-y-1 p-0.5">
-              {#each userWorkspaces as ws}
-                <button
-                  type="button"
-                  onclick={() => {
-                    if (onSwitchWorkspace) onSwitchWorkspace(ws);
-                    isDropdownOpen = false;
-                  }}
-                  class={`w-full text-left px-2.5 py-2 rounded-[8px] text-xs flex items-center justify-between cursor-pointer transition-all ${
-                    ws.workspace_id === activeWorkspaceId
-                      ? 'bg-[#eeece7] text-[#212121] font-medium'
-                      : 'hover:bg-[#eeece7]/50 text-[#616161] hover:text-[#212121]'
-                  }`}
-                >
-                  <div class="min-w-0 pr-1.5">
-                    <div class="truncate font-medium">{ws.workspace_name}</div>
-                    <div class="text-[9px] font-mono text-[#75758a] truncate mt-0.5">
-                      {ws.branch_name ? `Cabang: ${ws.branch_name}` : 'Semua Cabang'}
-                    </div>
-                  </div>
-                  <div class="flex items-center gap-1.5 shrink-0">
-                    <span class={`text-[8px] font-mono px-1.5 py-0.5 rounded-[4px] ${getRoleBadge(ws.role).bg}`}>
-                      {ws.role}
-                    </span>
-                    {#if ws.workspace_id === activeWorkspaceId}
-                      <Check class="w-3 h-3 text-[#17171c]" />
-                    {/if}
-                  </div>
-                </button>
-              {/each}
+            <div class="text-[9px] font-mono text-[#75758a] px-2 py-1 uppercase tracking-wider">
+              Pilih Workspace
             </div>
+            {#each userWorkspaces as ws}
+              <button
+                type="button"
+                onclick={() => {
+                  isDropdownOpen = false;
+                  onSwitchWorkspace?.(ws);
+                }}
+                class="w-full px-2.5 py-2 rounded-lg text-left text-xs hover:bg-[#eeece7]/50 transition-colors flex items-center justify-between cursor-pointer"
+              >
+                <div class="min-w-0 flex-1">
+                  <div class="font-medium text-[#212121] truncate">{ws.workspace_name}</div>
+                  <div class="text-[10px] text-[#75758a] font-mono">{ws.role}</div>
+                </div>
+                {#if ws.workspace_id === activeWorkspaceId}
+                  <Check class="w-3.5 h-3.5 text-[#17171c]" />
+                {/if}
+              </button>
+            {/each}
           {:else}
-            <div class="px-2.5 py-2 text-xs text-[#75758a]">
-              {currentUser.branch_name}
+            <div class="px-2.5 py-2 text-[11px] text-[#75758a]">
+              Belum terhubung ke workspace bisnis.
+            </div>
+          {/if}
+
+          {#if onOpenCreateWorkspaceModal}
+            <div class="pt-1 border-t border-[#d9d9dd]">
+              <button
+                type="button"
+                onclick={() => {
+                  isDropdownOpen = false;
+                  onOpenCreateWorkspaceModal();
+                }}
+                class="w-full px-2.5 py-2 rounded-lg text-left text-xs text-[#1863dc] hover:bg-[#f1f5ff] transition-colors flex items-center gap-1.5 cursor-pointer font-medium"
+              >
+                <Plus class="w-3.5 h-3.5" />
+                <span>Buat Workspace Bisnis Baru</span>
+              </button>
             </div>
           {/if}
         </div>
       {/if}
     </div>
 
-    <!-- menu navigasi utama -->
-    <nav class="p-3 space-y-1">
-      {#each navItems as item}
-        {@const Icon = item.icon}
-        <button
-          type="button"
-          onclick={() => onSelectTab(item.id)}
-          class={`w-full flex items-center justify-between px-3 py-2.5 rounded-[12px] text-xs transition-all cursor-pointer ${
-            activeTab === item.id
-              ? 'bg-[#eeece7] text-[#212121] font-medium'
-              : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/40'
-          }`}
-        >
-          <div class="flex items-center gap-3">
-            <Icon class={`w-4 h-4 ${activeTab === item.id ? 'text-[#17171c]' : 'text-[#75758a]'}`} />
-            <div class="text-left">
-              <div>{item.label}</div>
-              <div class="text-[10px] text-[#75758a] font-normal">{item.desc}</div>
-            </div>
+    <!-- Navigation Menu Items -->
+    <nav class="p-3 space-y-4 flex-1">
+      {#if currentUser.role === 'OWNER' || currentUser.role === 'ADMIN'}
+        <!-- TOP LEVEL: DASHBOARD -->
+        <div class="space-y-1">
+          <button
+            type="button"
+            onclick={() => onSelectNav('dashboard')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'dashboard'
+                ? 'bg-[#17171c] text-white font-medium shadow-none'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <LayoutDashboard class="w-4 h-4 shrink-0" />
+            <span class="truncate">Dashboard</span>
+          </button>
+        </div>
+
+        <!-- GROUP: KATALOG -->
+        <div class="space-y-1">
+          <div class="text-[10px] font-mono font-medium text-[#75758a] uppercase tracking-wider px-3 py-1">
+            Katalog
           </div>
 
-          {#if item.id === 'admin' && pendingApprovalsCount > 0}
-            <span class="bg-[#ff7759] text-white text-[10px] font-mono font-medium px-2 py-0.5 rounded-full">
-              {pendingApprovalsCount}
-            </span>
-          {/if}
-        </button>
-      {/each}
+          <button
+            type="button"
+            onclick={() => onSelectNav('katalog', 'menu')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'katalog' && (activeSubTab === 'menu' || !activeSubTab)
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <Package class="w-4 h-4 shrink-0" />
+            <span class="truncate">Menu</span>
+          </button>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('katalog', 'kategori')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'katalog' && activeSubTab === 'kategori'
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <FolderTree class="w-4 h-4 shrink-0" />
+            <span class="truncate">Kategori</span>
+          </button>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('katalog', 'bahan')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'katalog' && activeSubTab === 'bahan'
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <Layers class="w-4 h-4 shrink-0" />
+            <span class="truncate">Bahan</span>
+          </button>
+        </div>
+
+        <!-- GROUP: TIM -->
+        <div class="space-y-1">
+          <div class="text-[10px] font-mono font-medium text-[#75758a] uppercase tracking-wider px-3 py-1">
+            Tim
+          </div>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('tim', 'presensi')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'tim' && (activeSubTab === 'presensi' || !activeSubTab)
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <Camera class="w-4 h-4 shrink-0" />
+            <span class="truncate">Presensi</span>
+          </button>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('tim', 'shift')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center justify-between cursor-pointer text-left ${
+              activeDomain === 'tim' && activeSubTab === 'shift'
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <div class="flex items-center gap-2.5 truncate">
+              <Calendar class="w-4 h-4 shrink-0" />
+              <span class="truncate">Shift</span>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('tim', 'kasbon')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center justify-between cursor-pointer text-left ${
+              activeDomain === 'tim' && activeSubTab === 'kasbon'
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <div class="flex items-center gap-2.5 truncate">
+              <Wallet class="w-4 h-4 shrink-0" />
+              <span class="truncate">Kasbon</span>
+            </div>
+            {#if pendingApprovalsCount > 0}
+              <span class="px-1.5 py-0.2 rounded-full bg-[#e5484d] text-white text-[9px] font-mono font-medium">
+                {pendingApprovalsCount}
+              </span>
+            {/if}
+          </button>
+        </div>
+
+        <!-- GROUP: FINANSIAL -->
+        <div class="space-y-1">
+          <div class="text-[10px] font-mono font-medium text-[#75758a] uppercase tracking-wider px-3 py-1">
+            Finansial
+          </div>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('finance', 'payroll')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'finance' && (activeSubTab === 'payroll' || !activeSubTab)
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <Wallet class="w-4 h-4 shrink-0" />
+            <span class="truncate">Payroll</span>
+          </button>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('finance', 'laporan')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'finance' && activeSubTab === 'laporan'
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <FileText class="w-4 h-4 shrink-0" />
+            <span class="truncate">Laporan</span>
+          </button>
+        </div>
+
+        <!-- GROUP: SISTEM -->
+        <div class="space-y-1">
+          <div class="text-[10px] font-mono font-medium text-[#75758a] uppercase tracking-wider px-3 py-1">
+            Sistem
+          </div>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('settings')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'settings'
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <Settings class="w-4 h-4 shrink-0" />
+            <span class="truncate">Pengaturan</span>
+          </button>
+        </div>
+      {:else}
+        <!-- STAFF ESS SIMPLE NAVIGATION -->
+        <div class="space-y-1">
+          <div class="text-[10px] font-mono font-medium text-[#75758a] uppercase tracking-wider px-3 py-1">
+            Menu
+          </div>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('home')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'home'
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <LayoutDashboard class="w-4 h-4 shrink-0" />
+            <span class="truncate">Beranda</span>
+          </button>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('presensi')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'presensi'
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <Camera class="w-4 h-4 shrink-0" />
+            <span class="truncate">Presensi</span>
+          </button>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('shift')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'shift'
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <Calendar class="w-4 h-4 shrink-0" />
+            <span class="truncate">Shift</span>
+          </button>
+
+          <button
+            type="button"
+            onclick={() => onSelectNav('finance')}
+            class={`w-full px-3 py-2 text-xs rounded-[10px] transition-all flex items-center gap-2.5 cursor-pointer text-left ${
+              activeDomain === 'finance'
+                ? 'bg-[#17171c] text-white font-medium'
+                : 'text-[#616161] hover:text-[#212121] hover:bg-[#eeece7]/60'
+            }`}
+          >
+            <UserIcon class="w-4 h-4 shrink-0" />
+            <span class="truncate">Profil</span>
+          </button>
+        </div>
+      {/if}
     </nav>
-  </div>
 
-  <!-- status tenant dan tombol logout di footer -->
-  <div class="border-t border-[#d9d9dd] bg-[#eeece7]/20 p-3 space-y-3">
-    <div class="text-xs space-y-1.5 px-1">
-      <div class="flex items-center justify-between text-[#616161]">
-        <span>Status Paket:</span>
-        <span class="text-[#003c33] font-medium bg-[#edfce9] px-2 py-0.5 rounded-[6px] text-[10px] font-mono">TRIAL 1 BULAN</span>
-      </div>
-      <div class="flex items-center justify-between text-[#75758a] text-[11px]">
-        <span>Kuota Outlet:</span>
-        <span class="text-[#212121] font-medium font-mono">5 Cabang</span>
-      </div>
+    <!-- Logout Footer -->
+    <div class="p-3 border-t border-[#d9d9dd] shrink-0">
+      <button
+        type="button"
+        onclick={onLogout}
+        class="w-full px-3 py-2 text-xs text-[#e5484d] hover:bg-[#ffefef] rounded-[10px] transition-colors flex items-center gap-2 cursor-pointer font-medium"
+      >
+        <LogOut class="w-4 h-4" />
+        <span>Keluar Portal</span>
+      </button>
     </div>
-
-    {#if onLogout}
-      <div>
-        <button
-          type="button"
-          onclick={onLogout}
-          class="w-full py-2 px-3 bg-white border border-[#d9d9dd] hover:bg-[#ffad9b]/15 hover:border-[#ffad9b] text-[#b30000] text-xs font-medium rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer"
-        >
-          <LogOut class="w-3.5 h-3.5" />
-          <span>Keluar Sesi</span>
-        </button>
-      </div>
-    {/if}
   </div>
 </aside>

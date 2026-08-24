@@ -39,7 +39,8 @@
       }`}
     >
       <!-- Logo -->
-      <a href="/" class="flex items-baseline gap-2 group">
+      <a href="/" class="flex items-center gap-2.5 group">
+        <img src="/logo.png" alt="Précis Logo" class="w-7 h-7 rounded-xl object-cover border border-[#e0e0e0]" />
         <span
           class={`font-display tracking-tight font-bold transition-all duration-500 text-[#161616] group-hover:text-[#0f62fe] ${
             isScrolled ? "text-xl" : "text-2xl"

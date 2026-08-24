@@ -105,7 +105,7 @@
       </button>
 
       <div class="mb-5">
-        <div class="w-10 h-10 bg-[#eeece7] text-[#17171c] rounded-[12px] flex items-center justify-center mb-3.5">
+        <div class="w-10 h-10 bg-[#eeece7] text-[#17171c] rounded-xl flex items-center justify-center mb-3.5">
           <KeyRound class="w-5 h-5" />
         </div>
         <h3 class="text-base font-medium text-[#212121] tracking-tight">Atur Ulang Kata Sandi</h3>
@@ -115,14 +115,14 @@
       </div>
 
       {#if errorMessage}
-        <div class="mb-4 p-3.5 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-[12px] text-xs text-[#b30000] flex items-start gap-2.5">
+        <div class="mb-4 p-3.5 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-xl text-xs text-[#b30000] flex items-start gap-2.5">
           <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
           <span>{errorMessage}</span>
         </div>
       {/if}
 
       {#if successMessage}
-        <div class="mb-4 p-3.5 bg-[#edfce9] border border-[#edfce9] rounded-[12px] text-xs text-[#003c33] flex items-start gap-2.5">
+        <div class="mb-4 p-3.5 bg-[#edfce9] border border-[#edfce9] rounded-xl text-xs text-[#003c33] flex items-start gap-2.5">
           <CheckCircle2 class="w-4 h-4 shrink-0 mt-0.5 text-[#003c33]" />
           <div>
             <div class="font-medium">Pembaruan Berhasil</div>
@@ -143,7 +143,7 @@
               bind:value={email}
               required
               disabled={isLoading}
-              class="w-full px-3.5 py-2.5 text-xs text-[#212121] placeholder-[#93939f] border border-[#d9d9dd] rounded-[12px] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white transition-all"
+              class="w-full px-3.5 py-2.5 text-xs text-[#212121] placeholder-[#93939f] border border-[#d9d9dd] rounded-xl focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white transition-all"
             />
           </div>
 
@@ -158,7 +158,7 @@
               placeholder="Tempel token dari email..."
               required
               disabled={isLoading}
-              class="w-full px-3.5 py-2.5 text-xs font-mono text-[#212121] placeholder-[#93939f] border border-[#d9d9dd] rounded-[12px] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white transition-all"
+              class="w-full px-3.5 py-2.5 text-xs font-mono text-[#212121] placeholder-[#93939f] border border-[#d9d9dd] rounded-xl focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white transition-all"
             />
           </div>
 
@@ -173,7 +173,7 @@
                 bind:value={password}
                 required
                 disabled={isLoading}
-                class="w-full pl-9 pr-10 py-2.5 text-xs text-[#212121] placeholder-[#93939f] border border-[#d9d9dd] rounded-[12px] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white transition-all"
+                class="w-full pl-9 pr-10 py-2.5 text-xs text-[#212121] placeholder-[#93939f] border border-[#d9d9dd] rounded-xl focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white transition-all"
               />
               <Lock class="w-4 h-4 text-[#93939f] absolute left-3 top-1/2 -translate-y-1/2" />
               <button
@@ -203,7 +203,7 @@
                 bind:value={passwordConfirmation}
                 required
                 disabled={isLoading}
-                class="w-full pl-9 pr-10 py-2.5 text-xs text-[#212121] placeholder-[#93939f] border border-[#d9d9dd] rounded-[12px] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white transition-all"
+                class="w-full pl-9 pr-10 py-2.5 text-xs text-[#212121] placeholder-[#93939f] border border-[#d9d9dd] rounded-xl focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white transition-all"
               />
               <Lock class="w-4 h-4 text-[#93939f] absolute left-3 top-1/2 -translate-y-1/2" />
               <button

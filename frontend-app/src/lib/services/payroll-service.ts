@@ -1,4 +1,4 @@
-import { apiClient } from './api-client';
+import { apiClient, getDefaultApiBaseUrl } from './api-client';
 import type {
   PayrollSlipData,
   PayrollPreviewData,
@@ -75,7 +75,7 @@ export class PayrollService {
     });
     if (branchId) query.set('branch_id', branchId);
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+    const baseUrl = getDefaultApiBaseUrl();
     const url = `${baseUrl}/admin/payroll/export-csv?${query.toString()}`;
 
     const headers: Record<string, string> = {};

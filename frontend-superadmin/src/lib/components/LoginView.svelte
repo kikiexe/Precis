@@ -41,9 +41,7 @@
   <div class="w-full max-w-md bg-white border border-[#d9d9dd] rounded-[22px] shadow-none p-8 sm:p-10">
     <!-- Header -->
     <div class="flex items-center space-x-3 mb-6">
-      <div class="w-9 h-9 bg-[#17171c] rounded-[10px] flex items-center justify-center font-medium text-white text-base">
-        P
-      </div>
+      <img src="/logo.png" alt="Précis Logo" class="w-9 h-9 rounded-[10px] object-cover border border-[#d9d9dd]" />
       <div>
         <div class="flex items-center space-x-2">
           <span class="font-medium text-lg tracking-tight text-[#212121]">PRÉCIS</span>
@@ -62,7 +60,7 @@
 
     <!-- Error Alert -->
     {#if errorMessage}
-      <div class="mb-5 p-3.5 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-[12px] text-[#b30000] text-xs flex items-start space-x-2">
+      <div class="mb-5 p-3.5 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-xl text-[#b30000] text-xs flex items-start space-x-2">
         <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
         <span>{errorMessage}</span>
       </div>
@@ -81,8 +79,8 @@
             type="email"
             bind:value={email}
             required
-            placeholder="root@precis.com"
-            class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-[#d9d9dd] rounded-[12px] focus:outline-hidden focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 text-[#212121] font-mono transition-all"
+            placeholder="admin@gmail.com"
+            class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-[#d9d9dd] rounded-xl focus:outline-hidden focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 text-[#212121] font-mono transition-all"
           />
         </div>
       </div>
@@ -99,7 +97,7 @@
             bind:value={password}
             required
             placeholder="••••••••••••"
-            class="w-full pl-10 pr-10 py-2.5 bg-white border border-[#d9d9dd] rounded-[12px] focus:outline-hidden focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 text-[#212121] transition-all"
+            class="w-full pl-10 pr-10 py-2.5 bg-white border border-[#d9d9dd] rounded-xl focus:outline-hidden focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 text-[#212121] transition-all"
           />
           <button
             type="button"

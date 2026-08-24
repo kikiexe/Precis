@@ -89,15 +89,15 @@
   }
 </script>
 
-<div class="space-y-6 max-w-6xl mx-auto p-4 sm:p-6 md:p-8 pb-24 lg:pb-8 font-sans">
-  <!-- header atas -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="space-y-3 sm:space-y-4 max-w-4xl mx-auto font-sans pb-6">
+  <!-- Header Bar -->
+  <div class="flex items-center justify-between gap-3 pb-1">
     <div>
-      <h2 class="text-xl font-medium text-[#212121] tracking-tight">Jadwal Shift &amp; Manajemen Pertukaran</h2>
-      <p class="text-xs text-[#616161] font-normal mt-0.5">Kalender roster penugasan kerja mingguan di {currentUser.branch_name}</p>
+      <h2 class="text-sm sm:text-base font-medium text-[#212121]">Roster Jadwal Shift</h2>
+      <p class="text-[11px] text-[#75758a]">Penugasan staf di {currentUser.branch_name || 'Outlet'}</p>
     </div>
 
-    <div class="flex items-center gap-2.5 self-start sm:self-auto">
+    <div class="flex items-center gap-2 shrink-0">
       {#if currentUser.role === 'OWNER' || currentUser.role === 'ADMIN'}
         <button
           type="button"
@@ -105,10 +105,10 @@
             assignErrorMessage = null;
             isAssignModalOpen = true;
           }}
-          class="bg-[#17171c] hover:bg-[#000000] text-white px-4 py-2.5 text-xs font-medium rounded-full flex items-center gap-1.5 cursor-pointer transition-all shadow-none"
+          class="bg-[#17171c] hover:bg-black text-white px-3 py-1.5 text-xs font-medium rounded-full flex items-center gap-1.5 cursor-pointer transition-all"
         >
-          <Plus class="w-4 h-4" />
-          <span>Tetapkan Shift</span>
+          <Plus class="w-3.5 h-3.5" />
+          <span class="hidden sm:inline">Tetapkan</span>
         </button>
       {/if}
 
@@ -118,66 +118,62 @@
           swapErrorMessage = null;
           isSwapModalOpen = true;
         }}
-        class="bg-[#eeece7]/50 hover:bg-[#eeece7] text-[#212121] border border-[#d9d9dd] px-4 py-2.5 text-xs font-medium rounded-full flex items-center gap-1.5 cursor-pointer transition-all"
+        class="bg-[#17171c] hover:bg-black text-white px-3 py-1.5 text-xs font-medium rounded-full flex items-center gap-1.5 cursor-pointer transition-all shadow-none"
       >
-        <RefreshCw class="w-3.5 h-3.5 text-[#1863dc]" />
-        <span>Ajukan Tukar Shift</span>
+        <RefreshCw class="w-3 h-3 text-white" />
+        <span>Tukar Shift</span>
       </button>
     </div>
   </div>
 
-  <!-- kalender roster shift -->
+  <!-- Kalender Roster Shift -->
   {#if rosterShifts.length === 0}
-    <div class="bg-white border border-[#d9d9dd] rounded-[22px] p-12 text-center space-y-2.5 shadow-none">
-      <Calendar class="w-8 h-8 text-[#93939f] mx-auto opacity-50" />
-      <h3 class="text-sm font-medium text-[#212121]">Belum Ada Jadwal Shift Roster</h3>
-      <p class="text-xs text-[#75758a]">Jadwal penugasan shift mingguan belum diterbitkan oleh Store Manager / Owner.</p>
+    <div class="bg-white border border-[#d9d9dd] rounded-2xl p-8 text-center space-y-2 shadow-none">
+      <Calendar class="w-7 h-7 text-[#93939f] mx-auto opacity-50" />
+      <h3 class="text-xs font-medium text-[#212121]">Belum Ada Jadwal Shift Roster</h3>
+      <p class="text-[11px] text-[#75758a]">Jadwal penugasan shift mingguan belum diterbitkan oleh Store Manager / Owner.</p>
     </div>
   {:else}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {#each rosterShifts as shift}
-        <div class="p-5 border bg-white border-[#d9d9dd] rounded-[20px] shadow-none flex flex-col justify-between h-48 text-xs space-y-3">
-          <div>
-            <div class="flex items-center justify-between border-b border-[#d9d9dd]/60 pb-2.5">
-              <span class="font-medium text-[#212121] font-mono text-[11px]">{shift.date}</span>
-              {#if shift.is_swap}
-                <span class={`text-[10px] font-mono px-2.5 py-0.5 rounded-full ${
-                  shift.swap_status === 'APPROVED'
-                    ? 'bg-[#edfce9] text-[#003c33]'
-                    : shift.swap_status === 'PENDING'
-                    ? 'bg-[#eeece7] text-[#616161]'
-                    : 'bg-[#ffad9b]/20 text-[#b30000]'
-                }`}>
-                  Tukar: {shift.swap_status}
-                </span>
-              {:else}
-                <span class="text-[10px] font-mono bg-[#eeece7] text-[#616161] px-2.5 py-0.5 rounded-full">
-                  Reguler
-                </span>
-              {/if}
-            </div>
-
-            <div class="mt-2.5 space-y-1">
-              <div class="font-medium text-sm text-[#212121]">{shift.template?.name || 'Shift Kerja'}</div>
-              <div class="flex items-center gap-1.5 text-xs text-[#75758a] font-mono">
-                <Clock class="w-3.5 h-3.5 text-[#93939f]" />
-                <span>{shift.template?.expected_clock_in || '07:00'} - {shift.template?.expected_clock_out || '15:00'} WIB</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="pt-2.5 border-t border-[#d9d9dd]/60 flex flex-col gap-1">
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="text-[#75758a]">Petugas:</span>
-              <span class="font-medium text-[#212121] truncate max-w-35">{shift.assigned_user.name}</span>
-            </div>
-            {#if shift.is_swap && shift.actual_user}
-              <div class="flex items-center justify-between text-[11px] text-[#1863dc]">
-                <span>Pengganti:</span>
-                <span class="font-medium truncate max-w-35">{shift.actual_user.name}</span>
-              </div>
+        <div class="p-3.5 border bg-white border-[#d9d9dd] hover:border-[#17171c]/40 rounded-2xl transition-all text-xs space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <span class="font-medium text-[#212121] font-mono text-[11px]">{shift.date}</span>
+            {#if shift.is_swap}
+              <span class={`text-[9px] font-mono px-2 py-0.5 rounded-full font-medium ${
+                shift.swap_status === 'APPROVED'
+                  ? 'bg-[#edfce9] text-[#00875a]'
+                  : shift.swap_status === 'PENDING'
+                  ? 'bg-[#eeece7] text-[#616161]'
+                  : 'bg-[#ffefef] text-[#e5484d]'
+              }`}>
+                Tukar: {shift.swap_status}
+              </span>
+            {:else}
+              <span class="text-[9px] font-mono bg-[#eeece7] text-[#616161] px-2 py-0.5 rounded-full">
+                Reguler
+              </span>
             {/if}
           </div>
+
+          <div class="space-y-0.5">
+            <div class="font-medium text-xs sm:text-sm text-[#212121] truncate">{shift.template?.name || 'Shift Pagi'}</div>
+            <div class="flex items-center gap-1.5 text-[11px] text-[#75758a] font-mono">
+              <Clock class="w-3 h-3 text-[#93939f] shrink-0" />
+              <span>{shift.template?.expected_clock_in || '07:00'} - {shift.template?.expected_clock_out || '15:00'} WIB</span>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-[#f2f2f2] flex items-center justify-between text-[11px]">
+            <span class="text-[#75758a]">Petugas:</span>
+            <span class="font-medium text-[#17171c] truncate">{shift.assigned_user.name}</span>
+          </div>
+          {#if shift.is_swap && shift.actual_user}
+            <div class="flex items-center justify-between text-[11px] text-[#1863dc]">
+              <span>Pengganti:</span>
+              <span class="font-medium truncate">{shift.actual_user.name}</span>
+            </div>
+          {/if}
         </div>
       {/each}
     </div>
@@ -203,7 +199,7 @@
       </div>
 
       {#if swapErrorMessage}
-        <div class="p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-[12px] text-[#b30000] text-xs flex items-start gap-2">
+        <div class="p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-xl text-[#b30000] text-xs flex items-start gap-2">
           <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
           <span>{swapErrorMessage}</span>
         </div>
@@ -213,14 +209,14 @@
         <div>
           <label for="swap-shift-select" class="block font-medium text-[#212121] mb-1.5">Pilih Jadwal Shift Anda</label>
           {#if myShifts.length === 0}
-            <div class="p-3 bg-[#eeece7]/40 text-[#75758a] text-xs font-mono rounded-[12px] border border-[#d9d9dd]">
+            <div class="p-3 bg-[#eeece7]/40 text-[#75758a] text-xs font-mono rounded-xl border border-[#d9d9dd]">
               Anda tidak memiliki jadwal shift aktif pada roster saat ini.
             </div>
           {:else}
             <select
               id="swap-shift-select"
               bind:value={selectedShiftAssignmentId}
-              class="w-full border border-[#d9d9dd] rounded-[12px] p-2.5 bg-white text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+              class="w-full border border-[#d9d9dd] rounded-xl p-2.5 bg-white text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
             >
               <option value="">Pilih Shift yang Ingin Ditukar...</option>
               {#each myShifts as s}
@@ -237,7 +233,7 @@
           <select
             id="swap-target-user"
             bind:value={targetUserId}
-            class="w-full border border-[#d9d9dd] rounded-[12px] p-2.5 bg-white text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+            class="w-full border border-[#d9d9dd] rounded-xl p-2.5 bg-white text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           >
             <option value="">Pilih Rekan Kerja Pengganti...</option>
             {#each availableColleagues as col}
@@ -287,7 +283,7 @@
       </div>
 
       {#if assignErrorMessage}
-        <div class="p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-[12px] text-[#b30000] text-xs flex items-start gap-2">
+        <div class="p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-xl text-[#b30000] text-xs flex items-start gap-2">
           <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
           <span>{assignErrorMessage}</span>
         </div>
@@ -299,7 +295,7 @@
           <select
             id="assign-user-select"
             bind:value={assignUserId}
-            class="w-full border border-[#d9d9dd] rounded-[12px] p-2.5 bg-white text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+            class="w-full border border-[#d9d9dd] rounded-xl p-2.5 bg-white text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           >
             <option value="">Pilih Karyawan...</option>
             {#each allUsers as u}
@@ -314,7 +310,7 @@
             id="assign-date-input"
             type="date"
             bind:value={assignDate}
-            class="w-full border border-[#d9d9dd] rounded-[12px] p-2.5 bg-white text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+            class="w-full border border-[#d9d9dd] rounded-xl p-2.5 bg-white text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           />
         </div>
 
@@ -323,7 +319,7 @@
           <select
             id="assign-template-select"
             bind:value={assignTemplateId}
-            class="w-full border border-[#d9d9dd] rounded-[12px] p-2.5 bg-white text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+            class="w-full border border-[#d9d9dd] rounded-xl p-2.5 bg-white text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           >
             <option value="">Pilih Template Shift...</option>
             <option value="template-pagi">Shift Pagi (07:00 - 15:00 WIB)</option>

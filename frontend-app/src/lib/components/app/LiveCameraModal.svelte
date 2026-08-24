@@ -143,7 +143,8 @@
         liveTimestamp,
         latitude,
         longitude,
-        currentUser.branch_name
+        currentUser.branch_name,
+        true
       );
 
       // 2. minta presigned URL dari backend
@@ -266,7 +267,7 @@
 
     <!-- banner peringatan jika keluar geofence atau error -->
     {#if geofenceWarning}
-      <div class="mx-4 mt-3 p-3.5 bg-[#b30000] text-white text-xs font-mono z-30 flex items-start gap-2.5 rounded-[12px] shadow-none animate-in slide-in-from-top-2">
+      <div class="mx-4 mt-3 p-3.5 bg-[#b30000] text-white text-xs font-mono z-30 flex items-start gap-2.5 rounded-xl shadow-none animate-in slide-in-from-top-2">
         <ShieldAlert class="w-4 h-4 shrink-0 mt-0.5" />
         <div>
           <div class="font-medium">Radius Lokasi Ditolak (Geofence)</div>
@@ -274,7 +275,7 @@
         </div>
       </div>
     {:else if errorMessage}
-      <div class="mx-4 mt-3 p-3.5 bg-[#b30000] text-white text-xs font-mono z-30 flex items-start gap-2.5 rounded-[12px] shadow-none animate-in slide-in-from-top-2">
+      <div class="mx-4 mt-3 p-3.5 bg-[#b30000] text-white text-xs font-mono z-30 flex items-start gap-2.5 rounded-xl shadow-none animate-in slide-in-from-top-2">
         <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
         <span>{errorMessage}</span>
       </div>

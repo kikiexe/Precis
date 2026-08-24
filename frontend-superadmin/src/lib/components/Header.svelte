@@ -19,9 +19,7 @@
       <!-- Left: Logo & Portal Title -->
       <div class="flex items-center space-x-4">
         <div class="flex items-center space-x-2.5">
-          <div class="w-8 h-8 bg-white text-[#17171c] rounded-[10px] flex items-center justify-center font-medium tracking-wider">
-            P
-          </div>
+          <img src="/logo.png" alt="Précis Logo" class="w-8 h-8 rounded-[10px] object-cover border border-white/20" />
           <div>
             <div class="flex items-center space-x-2">
               <span class="font-medium text-base tracking-tight text-white">PRÉCIS</span>

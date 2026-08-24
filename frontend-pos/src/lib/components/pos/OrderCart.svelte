@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { Trash2, Plus, Minus, Tag, CreditCard, ShoppingCart, AlertCircle } from 'lucide-svelte';
-  import type { CartItem, CashierUser } from '../../types/pos';
+  import { Trash2, Plus, Minus, Tag, CreditCard, ShoppingCart } from 'lucide-svelte';
+  import type { CartItem } from '../../types/pos';
   import { formatCurrency } from '../../services/printer-service';
 
   interface Props {
     items: CartItem[];
-    activeCashier: CashierUser | null;
     discountPercent: number;
     discountNominal: number;
     onUpdateQuantity: (productId: string, delta: number) => void;
@@ -14,12 +13,10 @@
     onClearCart: () => void;
     onSetDiscountPercent: (percent: number) => void;
     onOpenPaymentModal: () => void;
-    onOpenPinModal: () => void;
   }
 
   let {
     items = [],
-    activeCashier,
     discountPercent = 0,
     discountNominal = 0,
     onUpdateQuantity,
@@ -28,7 +25,6 @@
     onClearCart,
     onSetDiscountPercent,
     onOpenPaymentModal,
-    onOpenPinModal,
   }: Props = $props();
 
   let subtotal = $derived(
@@ -49,7 +45,7 @@
 </script>
 
 <aside class="w-80 md:w-96 bg-white border-l border-[#d9d9dd] flex flex-col h-full shrink-0 select-none shadow-none font-sans">
-  <!-- Header: Cart Title & Cashier Info -->
+  <!-- Header: Cart Title & Items Count -->
   <div class="p-4 border-b border-[#d9d9dd] flex items-center justify-between bg-[#eeece7]/40">
     <div class="flex items-center gap-2">
       <ShoppingCart class="w-4 h-4 text-[#1863dc]" />
@@ -70,23 +66,6 @@
       </button>
     {/if}
   </div>
-
-  <!-- Cashier Warning Banner if no cashier active -->
-  {#if !activeCashier}
-    <div class="p-3 bg-[#ffad9b]/15 border-b border-[#ffad9b] flex items-center justify-between text-xs">
-      <div class="flex items-center gap-1.5 text-[#b30000]">
-        <AlertCircle class="w-4 h-4 shrink-0" />
-        <span>Kasir belum login PIN</span>
-      </div>
-      <button
-        type="button"
-        onclick={onOpenPinModal}
-        class="bg-[#b30000] text-white px-2.5 py-1 rounded-full font-medium text-[11px] cursor-pointer"
-      >
-        Input PIN
-      </button>
-    </div>
-  {/if}
 
   <!-- Order Items List -->
   <div class="flex-1 overflow-y-auto p-3.5 space-y-3">

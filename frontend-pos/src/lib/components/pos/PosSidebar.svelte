@@ -14,7 +14,7 @@
     { id: 'penjualan' as const, label: 'Penjualan', icon: ShoppingBag },
     { id: 'transaksi' as const, label: 'Transaksi', icon: Receipt },
     { id: 'settlement' as const, label: 'Settlement', icon: Calculator },
-    { id: 'produk' as const, label: 'Produk', icon: Package },
+    { id: 'produk' as const, label: 'Stok & Opname', icon: Package },
     { id: 'profil' as const, label: 'Profil & Kiosk', icon: UserCircle },
   ];
 </script>
@@ -27,9 +27,7 @@
   <div>
     <!-- Brand Header -->
     <div class="h-14 border-b border-[#262626] flex items-center px-3.5 gap-3 overflow-hidden">
-      <div class="w-7 h-7 bg-white text-[#17171c] flex items-center justify-center font-medium text-xs rounded-[8px] shrink-0">
-        P
-      </div>
+      <img src="/logo.png" alt="Précis POS Logo" class="w-7 h-7 rounded-[8px] object-cover shrink-0 border border-white/20" />
       {#if !isCollapsed}
         <div class="truncate">
           <div class="font-medium text-xs tracking-tight text-white uppercase">PRÉCIS POS</div>

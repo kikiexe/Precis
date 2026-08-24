@@ -75,7 +75,7 @@
       </p>
 
       {#if errorMessage}
-        <div class="mb-3.5 p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-[12px] text-xs text-[#b30000] flex items-start gap-2">
+        <div class="mb-3.5 p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-xl text-xs text-[#b30000] flex items-start gap-2">
           <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
           <span>{errorMessage}</span>
         </div>
@@ -93,7 +93,7 @@
               bind:value={emailInput}
               required
               disabled={isLoading}
-              class="w-full pl-9 pr-3 py-2 text-xs border border-[#d9d9dd] rounded-[12px] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white text-[#212121] transition-all"
+              class="w-full pl-9 pr-3 py-2 text-xs border border-[#d9d9dd] rounded-xl focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white text-[#212121] transition-all"
             />
             <Mail class="w-3.5 h-3.5 text-[#93939f] absolute left-3 top-2.5" />
           </div>
@@ -111,7 +111,7 @@
               placeholder="••••••••"
               required
               disabled={isLoading}
-              class="w-full pl-9 pr-9 py-2 text-xs border border-[#d9d9dd] rounded-[12px] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white text-[#212121] transition-all"
+              class="w-full pl-9 pr-9 py-2 text-xs border border-[#d9d9dd] rounded-xl focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white text-[#212121] transition-all"
             />
             <Lock class="w-3.5 h-3.5 text-[#93939f] absolute left-3 top-1/2 -translate-y-1/2" />
             <button

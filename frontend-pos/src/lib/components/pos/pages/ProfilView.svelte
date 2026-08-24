@@ -1,23 +1,21 @@
 <script lang="ts">
-  import { UserCircle, Store, Database, Lock, Key } from 'lucide-svelte';
+  import { UserCircle, Store, Database, Lock } from 'lucide-svelte';
   import type { CashierUser } from '../../../types/pos';
 
   interface Props {
-    activeCashier: CashierUser | null;
-    cashiers: CashierUser[];
+    activeCashier?: CashierUser | null;
+    cashiers?: CashierUser[];
     totalOrdersCount: number;
     totalProductsCount: number;
-    onOpenPinModal: () => void;
     onOpenMasterLockModal: () => void;
     onClearLocalCache: () => void;
   }
 
   let {
-    activeCashier,
+    activeCashier = null,
     cashiers = [],
     totalOrdersCount = 0,
     totalProductsCount = 0,
-    onOpenPinModal,
     onOpenMasterLockModal,
     onClearLocalCache,
   }: Props = $props();
@@ -26,7 +24,7 @@
 <div class="flex-1 bg-[#eeece7]/30 p-4 sm:p-6 md:p-8 overflow-y-auto space-y-6 font-sans">
   <div>
     <h2 class="text-xl font-medium text-[#212121] tracking-tight">Profil Kasir &amp; Status Terminal Kiosk</h2>
-    <p class="text-xs text-[#616161] font-normal mt-0.5">Pengaturan otentikasi kasir, identitas outlet, dan penyimpanan IndexedDB lokal</p>
+    <p class="text-xs text-[#616161] font-normal mt-0.5">Identitas outlet, status sinkronisasi, dan penyimpanan IndexedDB lokal</p>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -35,33 +33,22 @@
       <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
         <div class="flex items-center gap-2">
           <UserCircle class="w-4 h-4 text-[#1863dc]" />
-          <h3 class="font-medium text-sm text-[#212121]">Kasir yang Sedang Login</h3>
+          <h3 class="font-medium text-sm text-[#212121]">Operator Terminal Outlet</h3>
         </div>
         <span class="text-[10px] font-mono px-2.5 py-0.5 bg-[#edfce9] text-[#003c33] rounded-full font-medium">
-          Aktif Bertugas
+          Multi-Operator
         </span>
       </div>
 
       <div class="flex items-center gap-4">
         <div class="w-14 h-14 rounded-[16px] bg-[#17171c] text-white flex items-center justify-center font-medium text-xl shadow-none">
-          {activeCashier ? activeCashier.name.charAt(0) : '?'}
+          {activeCashier?.name ? activeCashier.name.charAt(0) : 'T'}
         </div>
         <div>
-          <div class="font-medium text-base text-[#212121]">{activeCashier ? activeCashier.name : 'Belum Login'}</div>
-          <div class="text-xs font-mono text-[#75758a] mt-0.5">Peran: {activeCashier ? activeCashier.role : '-'}</div>
-          <div class="text-[11px] text-[#93939f] font-normal">Otorisasi 4-digit PIN aktif</div>
+          <div class="font-medium text-base text-[#212121]">{activeCashier?.name || 'Tim Operasional Bar & Kasir'}</div>
+          <div class="text-xs font-mono text-[#75758a] mt-0.5">Mode: Multi-Barista Shift</div>
+          <div class="text-[11px] text-[#93939f] font-normal">Terminal kasir siap transaksi bersama</div>
         </div>
-      </div>
-
-      <div class="pt-3 border-t border-[#d9d9dd] flex gap-2">
-        <button
-          type="button"
-          onclick={onOpenPinModal}
-          class="w-full py-2.5 bg-[#17171c] hover:bg-[#000000] text-white text-xs font-medium rounded-full flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-none"
-        >
-          <Key class="w-3.5 h-3.5" />
-          <span>Ganti Kasir (Input PIN)</span>
-        </button>
       </div>
     </div>
 

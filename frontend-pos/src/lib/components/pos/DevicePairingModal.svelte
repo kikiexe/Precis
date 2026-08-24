@@ -43,7 +43,7 @@
   <div class="fixed inset-0 z-50 bg-[#17171c]/60 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-in fade-in font-sans">
     <div class="bg-white border border-[#d9d9dd] rounded-[22px] max-w-md w-full p-6 sm:p-8 shadow-none animate-in zoom-in-95">
       <div class="flex items-center gap-3 mb-5">
-        <div class="w-10 h-10 bg-[#17171c] text-white flex items-center justify-center font-medium rounded-[12px] shadow-none">
+        <div class="w-10 h-10 bg-[#17171c] text-white flex items-center justify-center font-medium rounded-xl shadow-none">
           <Tablet class="w-5 h-5" />
         </div>
         <div>
@@ -59,7 +59,7 @@
       </div>
 
       {#if errorMessage}
-        <div class="mb-4 p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-[12px] text-xs text-[#b30000] flex items-start gap-2">
+        <div class="mb-4 p-3 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-xl text-xs text-[#b30000] flex items-start gap-2">
           <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
           <span>{errorMessage}</span>
         </div>
@@ -78,7 +78,7 @@
               placeholder="e.g. tok-sleman-a89b"
               required
               disabled={isLoading}
-              class="w-full pl-9 pr-3 py-2.5 text-xs font-mono rounded-[12px] border border-[#d9d9dd] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white text-[#212121] transition-all"
+              class="w-full pl-9 pr-3 py-2.5 text-xs font-mono rounded-xl border border-[#d9d9dd] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden bg-white text-[#212121] transition-all"
             />
             <Key class="w-4 h-4 text-[#93939f] absolute left-3 top-3" />
           </div>
