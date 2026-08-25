@@ -13,14 +13,18 @@
     LogOut,
     Check,
     Plus,
+    Building2,
     User as UserIcon
   } from 'lucide-svelte';
-  import type { User, Role, UserWorkspace } from '../../types/app';
+  import type { User, Role, UserWorkspace, BranchItem } from '../../types/app';
 
   interface Props {
     currentUser: User;
     userWorkspaces?: UserWorkspace[];
     activeWorkspaceId?: string | null;
+    branches?: BranchItem[];
+    selectedBranchId?: string;
+    onSelectBranch?: (branchId: string) => void;
     activeDomain: 'home' | 'dashboard' | 'katalog' | 'tim' | 'finance' | 'settings' | 'presensi' | 'shift';
     activeSubTab?: string;
     pendingApprovalsCount: number;
@@ -34,6 +38,9 @@
     currentUser,
     userWorkspaces = [],
     activeWorkspaceId = null,
+    branches = [],
+    selectedBranchId = 'ALL',
+    onSelectBranch,
     activeDomain = 'dashboard',
     activeSubTab = '',
     pendingApprovalsCount = 0,
@@ -50,11 +57,15 @@
       case 'OWNER':
         return { label: 'Owner', bg: 'bg-[#17171c] text-white' };
       case 'ADMIN':
+        return { label: 'Admin', bg: 'bg-[#f1f5ff] text-[#1863dc] border border-[#d9d9dd]' };
+      case 'MANAGER':
         return { label: 'Store Manager', bg: 'bg-[#f1f5ff] text-[#1863dc] border border-[#d9d9dd]' };
       case 'STAFF':
         return { label: 'Staf Outlet', bg: 'bg-[#edfce9] text-[#003c33] border border-[#edfce9]' };
       case 'SUPERADMIN':
         return { label: 'Superadmin', bg: 'bg-[#eeece7] text-[#17171c] border border-[#d9d9dd]' };
+      default:
+        return { label: role, bg: 'bg-[#eeece7] text-[#75758a] border border-[#d9d9dd]' };
     }
   }
 
@@ -65,6 +76,11 @@
   );
   let currentWorkspaceName = $derived(
     userWorkspaces.find((w) => w.workspace_id === activeWorkspaceId)?.workspace_name || (userWorkspaces.length === 0 ? 'Tanpa Workspace' : currentUser.branch_name)
+  );
+  let currentBranchName = $derived(
+    selectedBranchId === 'ALL'
+      ? 'Semua Cabang'
+      : branches.find((b) => b.id === selectedBranchId)?.name || 'Semua Cabang'
   );
 </script>
 
@@ -92,16 +108,16 @@
             <span class={`text-[9px] font-mono px-1.5 py-0.5 rounded-sm font-medium ${badge.bg}`}>
               {badge.label}
             </span>
-            <span class="text-[10px] text-[#75758a] font-normal truncate">• {currentWorkspaceName}</span>
+            <span class="text-[10px] text-[#75758a] font-normal truncate">• {currentWorkspaceName} ({currentBranchName})</span>
           </div>
         </div>
         <ChevronDown class="w-4 h-4 text-[#75758a] group-hover:text-[#212121] transition-transform duration-200" />
       </button>
 
       {#if isDropdownOpen}
-        <div class="absolute left-3 right-3 top-full mt-1.5 bg-white border border-[#d9d9dd] rounded-xl shadow-lg p-1.5 z-50 space-y-1">
+        <div class="absolute left-3 right-3 top-full mt-1.5 bg-white border border-[#d9d9dd] rounded-xl shadow-lg p-1.5 z-50 space-y-1.5">
           {#if userWorkspaces.length > 0}
-            <div class="text-[9px] font-mono text-[#75758a] px-2 py-1 uppercase tracking-wider">
+            <div class="text-[9px] font-mono text-[#75758a] px-2 py-0.5 uppercase tracking-wider">
               Pilih Workspace
             </div>
             {#each userWorkspaces as ws}
@@ -111,7 +127,7 @@
                   isDropdownOpen = false;
                   onSwitchWorkspace?.(ws);
                 }}
-                class="w-full px-2.5 py-2 rounded-lg text-left text-xs hover:bg-[#eeece7]/50 transition-colors flex items-center justify-between cursor-pointer"
+                class="w-full px-2.5 py-1.5 rounded-lg text-left text-xs hover:bg-[#eeece7]/50 transition-colors flex items-center justify-between cursor-pointer"
               >
                 <div class="min-w-0 flex-1">
                   <div class="font-medium text-[#212121] truncate">{ws.workspace_name}</div>
@@ -122,9 +138,46 @@
                 {/if}
               </button>
             {/each}
-          {:else}
-            <div class="px-2.5 py-2 text-[11px] text-[#75758a]">
-              Belum terhubung ke workspace bisnis.
+          {/if}
+
+          {#if branches.length > 0 && (currentUser.role === 'OWNER' || currentUser.role === 'ADMIN')}
+            <div class="pt-1.5 border-t border-[#d9d9dd]">
+              <div class="text-[9px] font-mono text-[#75758a] px-2 py-0.5 uppercase tracking-wider flex items-center gap-1">
+                <Building2 class="w-3 h-3" />
+                <span>Pilih Cabang Outlet</span>
+              </div>
+              <button
+                type="button"
+                onclick={() => {
+                  isDropdownOpen = false;
+                  onSelectBranch?.('ALL');
+                }}
+                class={`w-full px-2.5 py-1.5 rounded-lg text-left text-xs transition-colors flex items-center justify-between cursor-pointer ${
+                  selectedBranchId === 'ALL' ? 'bg-[#eeece7] font-medium' : 'hover:bg-[#eeece7]/50'
+                }`}
+              >
+                <span class="truncate text-[#212121]">Semua Cabang (Konsolidasi)</span>
+                {#if selectedBranchId === 'ALL'}
+                  <Check class="w-3.5 h-3.5 text-[#17171c]" />
+                {/if}
+              </button>
+              {#each branches as b}
+                <button
+                  type="button"
+                  onclick={() => {
+                    isDropdownOpen = false;
+                    onSelectBranch?.(b.id);
+                  }}
+                  class={`w-full px-2.5 py-1.5 rounded-lg text-left text-xs transition-colors flex items-center justify-between cursor-pointer ${
+                    selectedBranchId === b.id ? 'bg-[#eeece7] font-medium' : 'hover:bg-[#eeece7]/50'
+                  }`}
+                >
+                  <span class="truncate text-[#212121]">{b.name}</span>
+                  {#if selectedBranchId === b.id}
+                    <Check class="w-3.5 h-3.5 text-[#17171c]" />
+                  {/if}
+                </button>
+              {/each}
             </div>
           {/if}
 
@@ -136,7 +189,7 @@
                   isDropdownOpen = false;
                   onOpenCreateWorkspaceModal();
                 }}
-                class="w-full px-2.5 py-2 rounded-lg text-left text-xs text-[#1863dc] hover:bg-[#f1f5ff] transition-colors flex items-center gap-1.5 cursor-pointer font-medium"
+                class="w-full px-2.5 py-1.5 rounded-lg text-left text-xs text-[#1863dc] hover:bg-[#f1f5ff] transition-colors flex items-center gap-1.5 cursor-pointer font-medium"
               >
                 <Plus class="w-3.5 h-3.5" />
                 <span>Buat Workspace Bisnis Baru</span>
@@ -300,10 +353,10 @@
           </button>
         </div>
 
-        <!-- GROUP: SISTEM -->
+        <!-- GROUP: PENGATURAN -->
         <div class="space-y-1">
           <div class="text-[10px] font-mono font-medium text-[#75758a] uppercase tracking-wider px-3 py-1">
-            Sistem
+            Pengaturan
           </div>
 
           <button
@@ -316,7 +369,7 @@
             }`}
           >
             <Settings class="w-4 h-4 shrink-0" />
-            <span class="truncate">Pengaturan</span>
+            <span class="truncate">Profil &amp; Cabang</span>
           </button>
         </div>
       {:else}

@@ -237,8 +237,14 @@ export class ApiClient {
     return (responsePayload as ApiResponse<T>) || { message: 'Operasi berhasil.' };
   }
 
-  public get<T = unknown>(endpoint: string, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
-    return this.request<T>(endpoint, { ...options, method: 'GET' });
+  public get<T = unknown>(endpoint: string, optionsOrParams?: RequestOptions['params'] | Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
+    if (optionsOrParams && typeof optionsOrParams === 'object') {
+      if ('params' in optionsOrParams || 'skipAuth' in optionsOrParams || 'skipWorkspace' in optionsOrParams || 'headers' in optionsOrParams) {
+        return this.request<T>(endpoint, { ...(optionsOrParams as Omit<RequestOptions, 'method' | 'body'>), method: 'GET' });
+      }
+      return this.request<T>(endpoint, { params: optionsOrParams as Record<string, string | number | boolean | undefined | null>, method: 'GET' });
+    }
+    return this.request<T>(endpoint, { method: 'GET' });
   }
 
   public post<T = unknown>(endpoint: string, body?: unknown, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {

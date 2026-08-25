@@ -1,5 +1,5 @@
 import { apiClient } from './api-client';
-import type { ShiftRosterItem, PendingSwapItem } from '../types/app';
+import type { ShiftRosterItem, PendingSwapItem, ShiftTemplateItem } from '../types/app';
 
 export class ShiftService {
   public async getRoster(
@@ -103,6 +103,35 @@ export class ShiftService {
     }
 
     throw new Error(response.message || 'Gagal menolak permohonan tukar shift.');
+  }
+
+  public async getTemplates(branchId?: string): Promise<ShiftTemplateItem[]> {
+    const params: Record<string, string> = {};
+    if (branchId) params.branch_id = branchId;
+
+    const response = await apiClient.get<ShiftTemplateItem[]>('/shifts/templates', params);
+    if (response.data && Array.isArray(response.data)) {
+      return response.data;
+    }
+
+    return [];
+  }
+
+  public async createTemplate(payload: {
+    name: string;
+    expected_clock_in: string;
+    expected_clock_out: string;
+    branch_id?: string | null;
+  }): Promise<ShiftTemplateItem> {
+    const response = await apiClient.post<ShiftTemplateItem>('/shifts/templates', payload);
+    if (response.data) {
+      return response.data;
+    }
+    throw new Error(response.message || 'Gagal membuat template shift.');
+  }
+
+  public async deleteTemplate(templateId: string): Promise<void> {
+    await apiClient.delete(`/shifts/templates/${templateId}`);
   }
 }
 

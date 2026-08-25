@@ -1,11 +1,14 @@
 <script lang="ts">
   import { ChevronDown, Building2, LogOut, Check, Plus } from 'lucide-svelte';
-  import type { User, Role, UserWorkspace } from '../../types/app';
+  import type { User, Role, UserWorkspace, BranchItem } from '../../types/app';
 
   interface Props {
     currentUser: User;
     userWorkspaces?: UserWorkspace[];
     activeWorkspaceId?: string | null;
+    branches?: BranchItem[];
+    selectedBranchId?: string;
+    onSelectBranch?: (branchId: string) => void;
     onSwitchWorkspace?: (workspace: UserWorkspace) => void;
     onOpenCreateWorkspaceModal?: () => void;
     onOpenBilling?: () => void;
@@ -16,6 +19,9 @@
     currentUser,
     userWorkspaces = [],
     activeWorkspaceId = null,
+    branches = [],
+    selectedBranchId = 'ALL',
+    onSelectBranch,
     onSwitchWorkspace,
     onOpenCreateWorkspaceModal,
     onLogout,
@@ -28,11 +34,15 @@
       case 'OWNER':
         return { label: 'Owner', bg: 'bg-[#17171c] text-white' };
       case 'ADMIN':
+        return { label: 'Admin', bg: 'bg-[#f1f5ff] text-[#1863dc] border border-[#d9d9dd]' };
+      case 'MANAGER':
         return { label: 'Store Manager', bg: 'bg-[#f1f5ff] text-[#1863dc] border border-[#d9d9dd]' };
       case 'STAFF':
         return { label: 'Staf Outlet', bg: 'bg-[#edfce9] text-[#003c33] border border-[#edfce9]' };
       case 'SUPERADMIN':
         return { label: 'Superadmin', bg: 'bg-[#eeece7] text-[#17171c] border border-[#d9d9dd]' };
+      default:
+        return { label: role, bg: 'bg-[#eeece7] text-[#75758a] border border-[#d9d9dd]' };
     }
   }
 
@@ -70,16 +80,16 @@
       </button>
 
       {#if isDropdownOpen}
-        <div class="absolute left-0 top-12 w-72 bg-white border border-[#d9d9dd] rounded-2xl p-2 z-50 animate-in fade-in zoom-in-95 font-sans shadow-none">
+        <div class="absolute left-0 top-12 w-72 bg-white border border-[#d9d9dd] rounded-2xl p-2 z-50 animate-in fade-in zoom-in-95 font-sans shadow-lg">
           <div class="flex items-center justify-between text-[11px] font-mono text-[#75758a] px-3 py-1.5 border-b border-[#d9d9dd] mb-1">
             <div class="flex items-center gap-1.5">
               <Building2 class="w-3.5 h-3.5 text-[#1863dc]" />
-              <span>Daftar Workspace / Outlet:</span>
+              <span>Daftar Workspace:</span>
             </div>
           </div>
 
           {#if userWorkspaces.length > 0}
-            <div class="space-y-1 max-h-56 overflow-y-auto">
+            <div class="space-y-1 max-h-48 overflow-y-auto">
               {#each userWorkspaces as ws (ws.workspace_id)}
                 <button
                   type="button"
@@ -87,7 +97,7 @@
                     isDropdownOpen = false;
                     if (onSwitchWorkspace) onSwitchWorkspace(ws);
                   }}
-                  class={`w-full text-left px-3 py-2 rounded-[10px] text-xs flex items-center justify-between transition-all cursor-pointer ${
+                  class={`w-full text-left px-3 py-1.5 rounded-[10px] text-xs flex items-center justify-between transition-all cursor-pointer ${
                     ws.workspace_id === activeWorkspaceId
                       ? 'bg-[#eeece7] font-medium text-[#212121]'
                       : 'hover:bg-[#eeece7]/50 text-[#616161] hover:text-[#212121]'
@@ -110,9 +120,45 @@
                 </button>
               {/each}
             </div>
-          {:else}
-            <div class="px-3 py-2 text-xs text-[#75758a]">
-              Belum terhubung ke workspace bisnis.
+          {/if}
+
+          {#if branches.length > 0 && (currentUser.role === 'OWNER' || currentUser.role === 'ADMIN')}
+            <div class="pt-1.5 border-t border-[#d9d9dd] mt-1 space-y-1">
+              <div class="text-[10px] font-mono text-[#75758a] px-3 py-0.5 uppercase tracking-wider">
+                Pilih Cabang Aktif
+              </div>
+              <button
+                type="button"
+                onclick={() => {
+                  isDropdownOpen = false;
+                  onSelectBranch?.('ALL');
+                }}
+                class={`w-full text-left px-3 py-1.5 rounded-[10px] text-xs flex items-center justify-between transition-all cursor-pointer ${
+                  selectedBranchId === 'ALL' ? 'bg-[#eeece7] font-medium text-[#212121]' : 'hover:bg-[#eeece7]/50 text-[#616161]'
+                }`}
+              >
+                <span>Semua Cabang (Konsolidasi)</span>
+                {#if selectedBranchId === 'ALL'}
+                  <Check class="w-3.5 h-3.5 text-[#17171c]" />
+                {/if}
+              </button>
+              {#each branches as b}
+                <button
+                  type="button"
+                  onclick={() => {
+                    isDropdownOpen = false;
+                    onSelectBranch?.(b.id);
+                  }}
+                  class={`w-full text-left px-3 py-1.5 rounded-[10px] text-xs flex items-center justify-between transition-all cursor-pointer ${
+                    selectedBranchId === b.id ? 'bg-[#eeece7] font-medium text-[#212121]' : 'hover:bg-[#eeece7]/50 text-[#616161]'
+                  }`}
+                >
+                  <span>{b.name}</span>
+                  {#if selectedBranchId === b.id}
+                    <Check class="w-3.5 h-3.5 text-[#17171c]" />
+                  {/if}
+                </button>
+              {/each}
             </div>
           {/if}
 

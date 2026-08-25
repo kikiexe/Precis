@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Check, Download, Users, Send, RefreshCw, ShieldCheck } from 'lucide-svelte';
+  import { Check, Download, Users, Send, RefreshCw, ShieldCheck, ChevronDown, MapPin, ExternalLink, Eye, Camera, X } from 'lucide-svelte';
   import type { AttendanceRecord, PendingSwapItem, CashAdvance, PayrollPreviewData } from '../../types/app';
 
   interface Props {
@@ -51,6 +51,7 @@
   // filter tanggal periode payroll
   let filterPeriodStart = $state(getDefaultPeriodStart());
   let filterPeriodEnd = $state(getDefaultPeriodEnd());
+  let selectedAttendanceDetail = $state<AttendanceRecord | null>(null);
 
   $effect(() => {
     if (payrollPreview?.period_start) {
@@ -216,7 +217,11 @@
       {:else}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {#each attendances as att (att.id)}
-            <div class="bg-white border border-[#d9d9dd] rounded-[20px] overflow-hidden shadow-none hover:border-[#17171c] transition-all group">
+            <button
+              type="button"
+              onclick={() => (selectedAttendanceDetail = att)}
+              class="bg-white border border-[#d9d9dd] rounded-[20px] overflow-hidden shadow-none hover:border-[#17171c] hover:shadow-md transition-all group text-left w-full cursor-pointer focus:outline-hidden"
+            >
               <!-- header informasi staf -->
               <div class="p-3.5 border-b border-[#d9d9dd] flex items-center justify-between bg-[#eeece7]/40">
                 <div>
@@ -233,12 +238,20 @@
               </div>
 
               <!-- foto selfie dengan watermark canvas -->
-              <div class="relative bg-[#17171c] aspect-3/4">
+              <div class="relative bg-[#17171c] aspect-3/4 overflow-hidden">
                 <img
                   src={att.photo_in_url}
                   alt={`Selfie ${att.user_name}`}
-                  class="w-full h-full object-cover"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-all"
                 />
+
+                <!-- Hover Inspection Prompt -->
+                <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <span class="px-3 py-1.5 bg-white/90 backdrop-blur-xs text-[#17171c] text-xs font-medium rounded-full shadow-xs flex items-center gap-1.5">
+                    <Eye class="w-3.5 h-3.5" />
+                    <span>Periksa Detail</span>
+                  </span>
+                </div>
               </div>
 
               <!-- footer metadata kartu presensi -->
@@ -252,7 +265,7 @@
                   <span>Lat: {att.lat_in.toFixed(4)}, Lng: {att.lng_in.toFixed(4)}</span>
                 </div>
               </div>
-            </div>
+            </button>
           {/each}
         </div>
       {/if}
@@ -383,13 +396,16 @@
             </button>
           </div>
 
-          <select
-            bind:value={selectedBankFormat}
-            class="border border-[#d9d9dd] rounded-full bg-white px-3.5 py-1.5 text-xs font-mono text-[#212121] focus:border-[#17171c] focus:outline-hidden"
-          >
-            <option value="BCA">Format: BCA Payroll</option>
-            <option value="MANDIRI">Format: Mandiri MCM</option>
-          </select>
+          <div class="relative">
+            <select
+              bind:value={selectedBankFormat}
+              class="appearance-none px-3 pr-7 py-1.5 bg-[#eeece7]/50 hover:bg-[#eeece7] border border-[#d9d9dd] rounded-full text-xs text-[#212121] font-mono focus:outline-hidden cursor-pointer transition-all shadow-2xs"
+            >
+              <option value="BCA">Format: BCA Payroll</option>
+              <option value="MANDIRI">Format: Mandiri MCM</option>
+            </select>
+            <ChevronDown class="w-3.5 h-3.5 text-[#75758a] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
         </div>
       </div>
 
@@ -545,6 +561,129 @@
             <span>{isDisbursing ? 'Memproses...' : 'Konfirmasi & Cairkan'}</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<!-- Modal: Preview & Detail Foto Presensi Selfie + GPS Audit -->
+{#if selectedAttendanceDetail}
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans">
+    <div class="bg-white border border-[#d9d9dd] rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in-95">
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-[#d9d9dd] flex items-center justify-between bg-[#fafafa]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-[#17171c] text-white flex items-center justify-center font-bold text-xs">
+            {selectedAttendanceDetail.user_name?.charAt(0) || 'U'}
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-[#17171c]">{selectedAttendanceDetail.user_name}</h3>
+            <p class="text-[11px] text-[#75758a] font-mono">{selectedAttendanceDetail.branch_name || 'Cabang'}</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onclick={() => (selectedAttendanceDetail = null)}
+          class="p-1.5 rounded-full hover:bg-[#eeece7] text-[#75758a] hover:text-[#17171c] transition-all cursor-pointer"
+        >
+          <X class="w-4 h-4" />
+        </button>
+      </div>
+
+      <!-- Photo & Metadata Body -->
+      <div class="p-4 sm:p-5 space-y-4 max-h-[80vh] overflow-y-auto">
+        <!-- Main High-Res Photo Container -->
+        <div class="aspect-4/3 bg-[#eeece7] rounded-2xl overflow-hidden border border-[#d9d9dd] relative group">
+          {#if selectedAttendanceDetail.photo_in_url || selectedAttendanceDetail.avatar_url}
+            <img
+              src={selectedAttendanceDetail.photo_in_url || selectedAttendanceDetail.avatar_url}
+              alt={`Selfie ${selectedAttendanceDetail.user_name}`}
+              class="w-full h-full object-cover"
+            />
+          {:else}
+            <div class="w-full h-full flex flex-col items-center justify-center text-[#93939f] gap-2">
+              <Camera class="w-10 h-10 opacity-40" />
+              <span class="text-xs font-mono">Foto presensi tidak tersedia</span>
+            </div>
+          {/if}
+
+          <!-- Status Badge Overlay -->
+          <div class="absolute top-3 right-3">
+            {#if !selectedAttendanceDetail.late_minutes || selectedAttendanceDetail.late_minutes === 0}
+              <span class="text-xs font-mono font-medium px-3 py-1 rounded-full bg-[#edfce9] text-[#003c33] border border-[#bbf7d0] shadow-xs">
+                TEPAT WAKTU
+              </span>
+            {:else}
+              <span class="text-xs font-mono font-medium px-3 py-1 rounded-full bg-[#ffefef] text-[#e5484d] border border-[#fecaca] shadow-xs">
+                TELAT {selectedAttendanceDetail.late_minutes} MENIT
+              </span>
+            {/if}
+          </div>
+        </div>
+
+        <!-- Detail Metrics Strip -->
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="p-3 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-xl space-y-0.5">
+            <div class="text-[10px] font-mono uppercase text-[#75758a]">Waktu Masuk (Clock In)</div>
+            <div class="font-mono font-medium text-[#17171c] text-sm">
+              {selectedAttendanceDetail.clock_in_time}
+            </div>
+            <div class="text-[10px] text-[#75758a]">
+              {selectedAttendanceDetail.shift_name ? `Shift: ${selectedAttendanceDetail.shift_name}` : 'Shift Reguler'}
+            </div>
+          </div>
+
+          <div class="p-3 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-xl space-y-0.5">
+            <div class="text-[10px] font-mono uppercase text-[#75758a]">Waktu Keluar (Clock Out)</div>
+            <div class="font-mono font-medium text-[#17171c] text-sm">
+              {selectedAttendanceDetail.clock_out_time ? selectedAttendanceDetail.clock_out_time : 'Sedang Bekerja'}
+            </div>
+            <div class="text-[10px] text-[#75758a]">
+              {selectedAttendanceDetail.clock_out_time ? 'Selesai bertugas' : 'Belum clock out'}
+            </div>
+          </div>
+        </div>
+
+        <!-- Geolocation & GPS Coordinate Verification -->
+        <div class="p-3.5 bg-[#fafafa] border border-[#d9d9dd] rounded-2xl space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 text-xs font-medium text-[#17171c]">
+              <MapPin class="w-3.5 h-3.5 text-[#1863dc]" />
+              <span>Verifikasi Geolocation GPS</span>
+            </div>
+            <span class="text-[10px] font-mono text-[#003c33] bg-[#edfce9] px-2 py-0.5 rounded-full border border-[#bbf7d0]">
+              Radius Valid
+            </span>
+          </div>
+
+          {#if selectedAttendanceDetail.lat_in && selectedAttendanceDetail.lng_in}
+            <div class="flex items-center justify-between text-xs font-mono text-[#616161] pt-1">
+              <span>Koordinat: {Number(selectedAttendanceDetail.lat_in).toFixed(6)}, {Number(selectedAttendanceDetail.lng_in).toFixed(6)}</span>
+              <a
+                href={`https://www.google.com/maps?q=${selectedAttendanceDetail.lat_in},${selectedAttendanceDetail.lng_in}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 text-[#1863dc] hover:underline font-sans text-xs"
+              >
+                <span>Buka Maps</span>
+                <ExternalLink class="w-3 h-3" />
+              </a>
+            </div>
+          {:else}
+            <div class="text-xs text-[#75758a] font-mono">Koordinat GPS tidak terekam</div>
+          {/if}
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-[#d9d9dd] bg-[#fafafa] flex justify-end">
+        <button
+          type="button"
+          onclick={() => (selectedAttendanceDetail = null)}
+          class="px-5 py-2 text-xs font-medium bg-[#17171c] hover:bg-black text-white rounded-full transition-all cursor-pointer"
+        >
+          Tutup
+        </button>
       </div>
     </div>
   </div>

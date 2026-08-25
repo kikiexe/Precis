@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { X, Check, ArrowRight, History } from 'lucide-svelte';
+  import { X, Check, ArrowRight, History, ChevronDown } from 'lucide-svelte';
   import type { RawMaterialItem, StockAdjustmentReason } from '../../types/app';
   import { inventoryService } from '../../services/inventory-service';
 
@@ -220,18 +220,21 @@
           <!-- Reason Standard Dropdown -->
           <div class="space-y-1.5">
             <label for="adj-reason" class="block text-xs font-medium text-[#212121]">Alasan Penyesuaian</label>
-            <select
-              id="adj-reason"
-              bind:value={selectedReason}
-              class="w-full px-3.5 py-2.5 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[12px] text-xs text-[#212121] focus:border-[#17171c] focus:outline-hidden transition-all cursor-pointer"
-            >
-              <option value="STOCK_TAKE">STOCK_TAKE: Opname Fisik / Rekonsiliasi Shift</option>
-              <option value="RESTOCK">RESTOCK: Pembelian / Bahan Masuk Baru</option>
-              <option value="DAMAGED">DAMAGED: Rusak / Pecah di Bar</option>
-              <option value="EXPIRED">EXPIRED: Bahan Kedaluwarsa</option>
-              <option value="WASTE">WASTE: Kalibrasi / Tumpah</option>
-              <option value="OTHER">OTHER: Alasan Lainnya (Wajib Catatan)</option>
-            </select>
+            <div class="relative">
+              <select
+                id="adj-reason"
+                bind:value={selectedReason}
+                class="appearance-none w-full border border-[#d9d9dd] rounded-full px-3.5 pr-8 py-2 bg-[#eeece7]/40 hover:bg-[#eeece7]/60 text-xs text-[#212121] font-mono focus:border-[#17171c] focus:outline-hidden cursor-pointer transition-all shadow-2xs"
+              >
+                <option value="STOCK_TAKE">STOCK_TAKE: Opname Fisik / Rekonsiliasi Shift</option>
+                <option value="RESTOCK">RESTOCK: Pembelian / Bahan Masuk Baru</option>
+                <option value="DAMAGED">DAMAGED: Rusak / Pecah di Bar</option>
+                <option value="EXPIRED">EXPIRED: Bahan Kedaluwarsa</option>
+                <option value="WASTE">WASTE: Kalibrasi / Tumpah</option>
+                <option value="OTHER">OTHER: Alasan Lainnya (Wajib Catatan)</option>
+              </select>
+              <ChevronDown class="w-3.5 h-3.5 text-[#75758a] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
           </div>
 
           <!-- Notes Textarea -->

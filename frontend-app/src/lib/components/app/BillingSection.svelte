@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CreditCard, Upload, CheckCircle2, AlertCircle, Plus, FileText, ExternalLink } from 'lucide-svelte';
+  import { CreditCard, Upload, CheckCircle2, AlertCircle, Plus, FileText, ExternalLink, ChevronDown } from 'lucide-svelte';
   import type { SubscriptionInvoice, SubscriptionPlanItem, UserProfile } from '../../types/app';
   import { billingService } from '../../services/billing-service';
 
@@ -231,17 +231,20 @@
 
         <div class="space-y-1.5">
           <label for="billing-plan-select" class="block text-[11px] text-[#75758a]">Pilih Paket:</label>
-          <select
-            id="billing-plan-select"
-            bind:value={selectedPlanId}
-            class="w-full bg-white border border-[#d9d9dd] rounded-xl p-2.5 text-xs font-mono text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
-          >
-            {#each plans as plan}
-              <option value={plan.id}>
-                {plan.name} ({formatRp(billingCycle === 'ANNUAL' ? plan.annual_price : plan.monthly_price)})
-              </option>
-            {/each}
-          </select>
+          <div class="relative">
+            <select
+              id="billing-plan-select"
+              bind:value={selectedPlanId}
+              class="appearance-none w-full border border-[#d9d9dd] rounded-full px-3.5 pr-8 py-2 bg-[#eeece7]/40 hover:bg-[#eeece7]/60 text-xs text-[#212121] font-mono focus:border-[#17171c] focus:outline-hidden cursor-pointer transition-all shadow-2xs"
+            >
+              {#each plans as plan}
+                <option value={plan.id}>
+                  {plan.name} ({formatRp(billingCycle === 'ANNUAL' ? plan.annual_price : plan.monthly_price)})
+                </option>
+              {/each}
+            </select>
+            <ChevronDown class="w-3.5 h-3.5 text-[#75758a] absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
         </div>
 
         <div class="flex gap-2 text-xs font-mono bg-[#eeece7]/40 p-1 rounded-full border border-[#d9d9dd]">

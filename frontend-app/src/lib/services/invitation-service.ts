@@ -7,7 +7,7 @@ export class InvitationService {
    */
   async getPendingInvitations(): Promise<WorkspaceInvitationItem[]> {
     const res = await apiClient.get<WorkspaceInvitationItem[]>(
-      '/api/v1/admin/invitations'
+      '/admin/invitations'
     );
     return res.data || [];
   }
@@ -23,7 +23,7 @@ export class InvitationService {
     branch_id?: string | null;
   }): Promise<WorkspaceInvitationItem> {
     const res = await apiClient.post<WorkspaceInvitationItem>(
-      '/api/v1/admin/invitations',
+      '/admin/invitations',
       payload
     );
     if (res.data) {
@@ -36,7 +36,7 @@ export class InvitationService {
    * Batalkan undangan yang belum diterima
    */
   async cancelInvitation(invitationId: string): Promise<void> {
-    await apiClient.delete<{ message: string }>(`/api/v1/admin/invitations/${invitationId}`);
+    await apiClient.delete<{ message: string }>(`/admin/invitations/${invitationId}`);
   }
 
   /**
@@ -44,7 +44,7 @@ export class InvitationService {
    */
   async resendInvitation(invitationId: string): Promise<WorkspaceInvitationItem> {
     const res = await apiClient.post<WorkspaceInvitationItem>(
-      `/api/v1/admin/invitations/${invitationId}/resend`
+      `/admin/invitations/${invitationId}/resend`
     );
     if (res.data) {
       return res.data;
@@ -57,7 +57,7 @@ export class InvitationService {
    */
   async getInvitationByToken(token: string): Promise<PublicInvitationDetails> {
     const res = await apiClient.get<PublicInvitationDetails>(
-      `/api/v1/invitations/${token}`,
+      `/invitations/${token}`,
       { skipAuth: true, skipWorkspace: true }
     );
     if (res.data) {
@@ -79,7 +79,7 @@ export class InvitationService {
       user: { id: string; name: string; email: string };
       member: { id: string; role: string; job_title: string };
     }>(
-      `/api/v1/invitations/${token}/accept`,
+      `/invitations/${token}/accept`,
       {
         name: name || undefined,
         password: password || undefined,
@@ -97,7 +97,7 @@ export class InvitationService {
    */
   async rejectInvitation(token: string): Promise<void> {
     await apiClient.post<{ message: string }>(
-      `/api/v1/invitations/${token}/reject`,
+      `/invitations/${token}/reject`,
       {},
       { skipAuth: true, skipWorkspace: true }
     );
@@ -105,3 +105,4 @@ export class InvitationService {
 }
 
 export const invitationService = new InvitationService();
+

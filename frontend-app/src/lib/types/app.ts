@@ -1,4 +1,4 @@
-export type Role = 'STAFF' | 'ADMIN' | 'OWNER' | 'SUPERADMIN';
+export type Role = 'STAFF' | 'ADMIN' | 'OWNER' | 'MANAGER' | 'SUPERADMIN';
 
 export interface UserWorkspace {
   workspace_id: string;
@@ -203,6 +203,8 @@ export interface CashAdvance {
   id: string;
   user_id?: string;
   user_name?: string;
+  branch_id?: string | null;
+  branch_name?: string | null;
   user?: {
     id: string;
     name: string;
@@ -442,16 +444,30 @@ export interface WorkspaceInvitationItem {
   created_at?: string;
 }
 
+export interface BranchItem {
+  id: string;
+  workspace_id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  radius_meters: number;
+  late_penalty_per_minute: number;
+  overtime_pay_per_hour: number;
+  min_overtime_threshold_minutes: number;
+  terminals_count?: number;
+  created_at?: string;
+}
+
 export interface PublicInvitationDetails {
   id: string;
-  workspace_name: string;
-  workspace_slug: string;
-  invited_by_name: string;
   email: string;
+  role: Role;
   job_title: string;
-  role: 'ADMIN' | 'MANAGER' | 'STAFF';
+  workspace_name: string;
   branch_name: string;
+  invited_by_name?: string;
   expires_at: string;
 }
+
 
 
