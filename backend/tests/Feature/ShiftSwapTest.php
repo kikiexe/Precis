@@ -28,11 +28,11 @@ class ShiftSwapTest extends TestCase
     public function test_staff_can_request_shift_swap_to_another_staff(): void
     {
         /** @var User $staff1 */
-        $staff1 = User::where('email', 'siti.kasir@amorecoffee.id')->first();
+        $staff1 = User::where('email', 'ami@gmail.com')->first();
         /** @var User $staff2 */
-        $staff2 = User::where('email', 'dimas.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $staff2 = User::where('email', 'hani@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         $template = ShiftTemplate::create([
             'workspace_id' => $workspace->id,
@@ -76,11 +76,11 @@ class ShiftSwapTest extends TestCase
     public function test_staff_cannot_request_swap_for_another_users_shift(): void
     {
         /** @var User $staff1 */
-        $staff1 = User::where('email', 'siti.kasir@amorecoffee.id')->first();
+        $staff1 = User::where('email', 'ami@gmail.com')->first();
         /** @var User $staff2 */
-        $staff2 = User::where('email', 'dimas.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $staff2 = User::where('email', 'hani@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         $template = ShiftTemplate::create([
             'workspace_id' => $workspace->id,
@@ -116,11 +116,11 @@ class ShiftSwapTest extends TestCase
     public function test_staff_cannot_request_swap_for_past_shift(): void
     {
         /** @var User $staff1 */
-        $staff1 = User::where('email', 'siti.kasir@amorecoffee.id')->first();
+        $staff1 = User::where('email', 'ami@gmail.com')->first();
         /** @var User $staff2 */
-        $staff2 = User::where('email', 'dimas.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $staff2 = User::where('email', 'hani@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         $template = ShiftTemplate::create([
             'workspace_id' => $workspace->id,
@@ -155,13 +155,13 @@ class ShiftSwapTest extends TestCase
     public function test_owner_and_admin_can_view_pending_swap_requests(): void
     {
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         /** @var User $staff1 */
-        $staff1 = User::where('email', 'siti.kasir@amorecoffee.id')->first();
+        $staff1 = User::where('email', 'ami@gmail.com')->first();
         /** @var User $staff2 */
-        $staff2 = User::where('email', 'dimas.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $staff2 = User::where('email', 'hani@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         $template = ShiftTemplate::create([
             'workspace_id' => $workspace->id,
@@ -207,13 +207,13 @@ class ShiftSwapTest extends TestCase
     public function test_owner_and_admin_can_approve_swap_request(): void
     {
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         /** @var User $staff1 */
-        $staff1 = User::where('email', 'siti.kasir@amorecoffee.id')->first();
+        $staff1 = User::where('email', 'ami@gmail.com')->first();
         /** @var User $staff2 */
-        $staff2 = User::where('email', 'dimas.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $staff2 = User::where('email', 'hani@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         $template = ShiftTemplate::create([
             'workspace_id' => $workspace->id,
@@ -253,13 +253,13 @@ class ShiftSwapTest extends TestCase
     public function test_owner_and_admin_can_reject_swap_request(): void
     {
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         /** @var User $staff1 */
-        $staff1 = User::where('email', 'siti.kasir@amorecoffee.id')->first();
+        $staff1 = User::where('email', 'ami@gmail.com')->first();
         /** @var User $staff2 */
-        $staff2 = User::where('email', 'dimas.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $staff2 = User::where('email', 'hani@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         $template = ShiftTemplate::create([
             'workspace_id' => $workspace->id,
@@ -300,11 +300,11 @@ class ShiftSwapTest extends TestCase
     public function test_staff_cannot_approve_or_reject_swap_requests(): void
     {
         /** @var User $staff1 */
-        $staff1 = User::where('email', 'siti.kasir@amorecoffee.id')->first();
+        $staff1 = User::where('email', 'ami@gmail.com')->first();
         /** @var User $staff2 */
-        $staff2 = User::where('email', 'dimas.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $staff2 = User::where('email', 'hani@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         $template = ShiftTemplate::create([
             'workspace_id' => $workspace->id,

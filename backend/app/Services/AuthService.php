@@ -150,6 +150,27 @@ class AuthService
     }
 
     /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function getSerializedUserWorkspaces(string $userId): array
+    {
+        return WorkspaceMember::withoutGlobalScopes()
+            ->with(['workspace', 'branch'])
+            ->where('user_id', $userId)
+            ->where('is_active', true)
+            ->get()
+            ->map(fn (WorkspaceMember $m): array => [
+                'workspace_id' => $m->workspace_id,
+                'workspace_name' => $m->workspace?->name,
+                'workspace_slug' => $m->workspace?->slug,
+                'role' => $m->role,
+                'branch_id' => $m->branch_id,
+                'branch_name' => $m->branch?->name,
+            ])
+            ->toArray();
+    }
+
+    /**
      * auth user pakai email dan password, lalu terbitkan token Sanctum
      *
      * @return array{token: string, user: User, workspaces: array<int, mixed>}
@@ -168,22 +189,7 @@ class AuthService
         $tokenName = $deviceName ?: 'web_portal_' . Str::random(8);
         $token = $user->createToken($tokenName)->plainTextToken;
 
-        $memberships = WorkspaceMember::withoutGlobalScopes()
-            ->with(['workspace', 'branch'])
-            ->where('user_id', $user->id)
-            ->where('is_active', true)
-            ->get();
-
-        $workspaces = $memberships->map(function (WorkspaceMember $membership): array {
-            return [
-                'workspace_id' => $membership->workspace_id,
-                'workspace_name' => $membership->workspace?->name,
-                'workspace_slug' => $membership->workspace?->slug,
-                'role' => $membership->role,
-                'branch_id' => $membership->branch_id,
-                'branch_name' => $membership->branch?->name,
-            ];
-        })->toArray();
+        $workspaces = $this->getSerializedUserWorkspaces((string) $user->id);
 
         return [
             'token' => $token,
@@ -199,22 +205,7 @@ class AuthService
      */
     public function getUserProfile(User $user): array
     {
-        $memberships = WorkspaceMember::withoutGlobalScopes()
-            ->with(['workspace', 'branch'])
-            ->where('user_id', $user->id)
-            ->where('is_active', true)
-            ->get();
-
-        $workspaces = $memberships->map(function (WorkspaceMember $membership): array {
-            return [
-                'workspace_id' => $membership->workspace_id,
-                'workspace_name' => $membership->workspace?->name,
-                'workspace_slug' => $membership->workspace?->slug,
-                'role' => $membership->role,
-                'branch_id' => $membership->branch_id,
-                'branch_name' => $membership->branch?->name,
-            ];
-        })->toArray();
+        $workspaces = $this->getSerializedUserWorkspaces((string) $user->id);
 
         return [
             'id' => $user->id,

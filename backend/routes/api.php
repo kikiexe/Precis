@@ -11,7 +11,9 @@ use App\Http\Controllers\Api\MediaController;
 use App\Http\Controllers\Api\PayrollController;
 use App\Http\Controllers\Api\PosController;
 use App\Http\Controllers\Api\PosSecurityController;
+use App\Http\Controllers\Api\SalesAnalyticsController;
 use App\Http\Controllers\Api\ShiftController;
+use App\Http\Controllers\Api\ShiftTemplateController;
 use App\Http\Controllers\Api\SuperadminInvoiceController;
 use App\Http\Controllers\Api\WorkspaceController;
 use Illuminate\Http\JsonResponse;
@@ -124,17 +126,34 @@ Route::prefix('v1')->group(function (): void {
         // media upload presigned URL (object storage)
         Route::post('/media/presign-upload', [MediaController::class, 'presignUpload']);
 
+        // manajemen cabang outlet
+        Route::get('/branches', [\App\Http\Controllers\Api\BranchController::class, 'index']);
+        Route::middleware('role:OWNER,ADMIN,MANAGER')->put('/branches/{id}', [\App\Http\Controllers\Api\BranchController::class, 'update']);
+
+        // katalog produk & kategori web portal
+        Route::get('/products', [\App\Http\Controllers\Api\ProductCatalogController::class, 'products']);
+        Route::get('/categories', [\App\Http\Controllers\Api\ProductCatalogController::class, 'categories']);
+        Route::middleware('role:OWNER,ADMIN,MANAGER')->post('/products', [\App\Http\Controllers\Api\ProductCatalogController::class, 'storeProduct']);
+        Route::middleware('role:OWNER,ADMIN,MANAGER')->put('/products/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'updateProduct']);
+        Route::middleware('role:OWNER,ADMIN,MANAGER')->delete('/products/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'deleteProduct']);
+        Route::middleware('role:OWNER,ADMIN,MANAGER')->post('/categories', [\App\Http\Controllers\Api\ProductCatalogController::class, 'storeCategory']);
+        Route::middleware('role:OWNER,ADMIN,MANAGER')->delete('/categories/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'deleteCategory']);
+
         // presensi mobile PWA
         Route::prefix('attendances')->group(function (): void {
             Route::post('/clock-in', [AttendanceController::class, 'clockIn']);
             Route::post('/clock-out', [AttendanceController::class, 'clockOut']);
         });
 
-        // manajemen roster shift & pengajuan tukar shift staf
+        // manajemen roster shift, templates & pengajuan tukar shift staf
         Route::prefix('shifts')->group(function (): void {
+            Route::get('/templates', [ShiftTemplateController::class, 'index']);
+            Route::middleware('role:OWNER,ADMIN,MANAGER')->post('/templates', [ShiftTemplateController::class, 'store']);
+            Route::middleware('role:OWNER,ADMIN,MANAGER')->delete('/templates/{id}', [ShiftTemplateController::class, 'destroy']);
+
             Route::get('/roster', [ShiftController::class, 'roster']);
             Route::post('/swap-requests', [ShiftController::class, 'requestSwap']);
-            Route::middleware('role:OWNER,ADMIN')->post('/assign', [ShiftController::class, 'assign']);
+            Route::middleware('role:OWNER,ADMIN,MANAGER')->post('/assign', [ShiftController::class, 'assign']);
         });
 
         // manajemen kasbon staf
@@ -146,9 +165,10 @@ Route::prefix('v1')->group(function (): void {
         // slip gaji digital staf
         Route::get('/payroll/my-slip', [PayrollController::class, 'mySlip']);
 
-        // endpoint administrasi khusus role OWNER dan ADMIN
-        Route::middleware('role:OWNER,ADMIN')->prefix('admin')->group(function (): void {
+        // endpoint administrasi khusus role OWNER dan ADMIN/MANAGER
+        Route::middleware('role:OWNER,ADMIN,MANAGER')->prefix('admin')->group(function (): void {
             Route::get('/attendances/wall-of-faces', [AttendanceController::class, 'wallOfFaces']);
+            Route::get('/analytics/sales', [SalesAnalyticsController::class, 'sales']);
 
             Route::prefix('shifts')->group(function (): void {
                 Route::get('/swap-requests', [ShiftController::class, 'pendingSwapRequests']);

@@ -33,9 +33,9 @@ class PayrollMathematicalPrecisionTest extends TestCase
         $this->seed(DatabaseSeeder::class);
 
         $this->service = new PayrollService();
-        $this->workspace = Workspace::where('slug', 'amore-coffee')->firstOrFail();
+        $this->workspace = Workspace::where('slug', 'norde-coffee')->firstOrFail();
         $this->branch = Branch::withoutGlobalScopes()->where('workspace_id', $this->workspace->id)->firstOrFail();
-        $this->staff = User::where('email', 'siti.kasir@amorecoffee.id')->firstOrFail();
+        $this->staff = User::where('email', 'ami@gmail.com')->firstOrFail();
 
         $this->member = WorkspaceMember::withoutGlobalScopes()
             ->where('workspace_id', $this->workspace->id)

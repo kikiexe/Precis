@@ -25,8 +25,8 @@ class MultiTenancyMiddlewareTest extends TestCase
     public function test_access_with_valid_workspace_header_succeeds(): void
     {
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         Sanctum::actingAs($owner);
 
@@ -41,7 +41,7 @@ class MultiTenancyMiddlewareTest extends TestCase
     public function test_access_without_workspace_header_returns_bad_request(): void
     {
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         Sanctum::actingAs($owner);
 
         $response = $this->getJson('/api/v1/workspace/context');
@@ -65,7 +65,7 @@ class MultiTenancyMiddlewareTest extends TestCase
         ]);
 
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         Sanctum::actingAs($owner);
 
         // owner arief mencoba mengakses workspace orang lain
@@ -79,8 +79,8 @@ class MultiTenancyMiddlewareTest extends TestCase
     public function test_role_middleware_allows_owner_and_admin_for_admin_endpoint(): void
     {
         /** @var User $manager */
-        $manager = User::where('email', 'budi.manager@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $manager = User::where('email', 'paundra@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         // tetapkan role ADMIN pada member untuk menguji otorisasi admin
         WorkspaceMember::withoutGlobalScopes()
@@ -100,8 +100,8 @@ class MultiTenancyMiddlewareTest extends TestCase
     public function test_role_middleware_rejects_staff_for_admin_endpoint(): void
     {
         /** @var User $cashier */
-        $cashier = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $cashier = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         Sanctum::actingAs($cashier);
 

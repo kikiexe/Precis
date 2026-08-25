@@ -27,11 +27,11 @@ class WallOfFacesTest extends TestCase
     public function test_owner_and_admin_can_view_wall_of_faces_feed(): void
     {
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         // buat record presensi hari ini
         Attendance::create([
@@ -73,8 +73,8 @@ class WallOfFacesTest extends TestCase
     public function test_staff_is_forbidden_from_viewing_wall_of_faces_feed(): void
     {
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         Sanctum::actingAs($staff);
 

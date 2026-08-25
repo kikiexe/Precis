@@ -222,13 +222,16 @@ class AttendanceService
      */
     public function getWallOfFaces(string $workspaceId, ?string $branchId = null, ?string $date = null): array
     {
-        $targetDate = $date ? Carbon::parse($date)->toDateString() : Carbon::today()->toDateString();
-
         $query = Attendance::withoutGlobalScopes()
             ->with(['user', 'branch', 'shiftAssignment.shiftTemplate'])
             ->where('workspace_id', $workspaceId)
-            ->whereDate('clock_in_time', $targetDate)
             ->orderByDesc('clock_in_time');
+
+        if ($date) {
+            $query->whereDate('clock_in_time', Carbon::parse($date)->toDateString());
+        } else {
+            $query->limit(100);
+        }
 
         if ($branchId) {
             $query->where('branch_id', $branchId);
@@ -236,9 +239,25 @@ class AttendanceService
 
         return $query->get()->map(function (Attendance $att): array {
             $shift = $att->shiftAssignment?->shiftTemplate;
+            $status = ($att->late_minutes && $att->late_minutes > 0) ? 'LATE' : 'ON_TIME';
 
             return [
                 'id' => $att->id,
+                'user_id' => $att->user_id,
+                'user_name' => $att->user?->name ?? 'Staf',
+                'avatar_url' => $att->photo_in_url ?? '',
+                'branch_id' => $att->branch_id,
+                'branch_name' => $att->branch?->name ?? 'Cabang Utama',
+                'shift_name' => $shift?->name ?? 'Shift Kerja',
+                'clock_in_time' => $att->clock_in_time?->toIso8601String(),
+                'clock_out_time' => $att->clock_out_time?->toIso8601String(),
+                'photo_in_url' => $att->photo_in_url,
+                'photo_out_url' => $att->photo_out_url,
+                'late_minutes' => (int) ($att->late_minutes ?? 0),
+                'overtime_minutes' => (int) ($att->overtime_minutes ?? 0),
+                'status' => $status,
+                'notes' => $att->notes,
+                'created_at' => $att->clock_in_time?->toDateString(),
                 'user' => [
                     'id' => $att->user?->id,
                     'name' => $att->user?->name,
@@ -254,14 +273,6 @@ class AttendanceService
                     'expected_clock_in' => $shift->expected_clock_in,
                     'expected_clock_out' => $shift->expected_clock_out,
                 ] : null,
-                'clock_in_time' => $att->clock_in_time?->toIso8601String(),
-                'clock_out_time' => $att->clock_out_time?->toIso8601String(),
-                'photo_in_url' => $att->photo_in_url,
-                'photo_out_url' => $att->photo_out_url,
-                'late_minutes' => $att->late_minutes,
-                'overtime_minutes' => $att->overtime_minutes,
-                'status' => $att->status,
-                'notes' => $att->notes,
             ];
         })->toArray();
     }

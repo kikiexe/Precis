@@ -29,8 +29,8 @@ class InvitationFlowTest extends TestCase
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
 
-        $this->owner = User::where('email', 'arief@amorecoffee.id')->firstOrFail();
-        $this->workspace = Workspace::where('slug', 'amore-coffee')->firstOrFail();
+        $this->owner = User::where('email', 'kiki@gmail.com')->firstOrFail();
+        $this->workspace = Workspace::where('slug', 'norde-coffee')->firstOrFail();
         $this->branch = Branch::withoutGlobalScopes()->where('workspace_id', $this->workspace->id)->firstOrFail();
     }
 
@@ -72,7 +72,7 @@ class InvitationFlowTest extends TestCase
 
         $response = $this->withHeader('X-Workspace-Id', $this->workspace->id)
             ->postJson('/api/v1/admin/invitations', [
-                'email' => 'siti.kasir@amorecoffee.id',
+                'email' => 'ami@gmail.com',
                 'job_title' => 'Kasir',
                 'role' => 'STAFF',
                 'base_salary' => 2800000.00,

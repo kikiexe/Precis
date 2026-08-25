@@ -27,7 +27,7 @@ class ScheduledTasksTest extends TestCase
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
 
-        $this->owner = User::where('email', 'arief@amorecoffee.id')->firstOrFail();
+        $this->owner = User::where('email', 'kiki@gmail.com')->firstOrFail();
         $this->plan = SubscriptionPlan::where('is_active', true)->firstOrFail();
     }
 

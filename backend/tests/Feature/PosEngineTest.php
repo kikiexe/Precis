@@ -30,8 +30,8 @@ class PosEngineTest extends TestCase
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
 
-        $this->workspace = Workspace::where('slug', 'amore-coffee')->firstOrFail();
-        $this->branch = Branch::withoutGlobalScopes()->where('workspace_id', $this->workspace->id)->where('name', 'like', '%Sleman%')->firstOrFail();
+        $this->workspace = Workspace::where('slug', 'norde-coffee')->firstOrFail();
+        $this->branch = Branch::withoutGlobalScopes()->where('workspace_id', $this->workspace->id)->where('name', 'like', '%Seturan%')->firstOrFail();
 
         $this->terminal = PosTerminal::create([
             'workspace_id' => $this->workspace->id,
@@ -84,7 +84,7 @@ class PosEngineTest extends TestCase
     public function test_cashier_can_open_pos_session(): void
     {
         /** @var User $cashier */
-        $cashier = User::where('email', 'siti.kasir@amorecoffee.id')->firstOrFail();
+        $cashier = User::where('email', 'ami@gmail.com')->firstOrFail();
 
         $response = $this->withHeader('X-Device-Token', $this->deviceToken)
             ->postJson('/api/v1/pos/sessions/open', [
@@ -110,7 +110,7 @@ class PosEngineTest extends TestCase
     public function test_opening_second_session_while_active_is_rejected(): void
     {
         /** @var User $cashier */
-        $cashier = User::where('email', 'siti.kasir@amorecoffee.id')->firstOrFail();
+        $cashier = User::where('email', 'ami@gmail.com')->firstOrFail();
 
         // buka sesi pertama
         $this->withHeader('X-Device-Token', $this->deviceToken)
@@ -133,7 +133,7 @@ class PosEngineTest extends TestCase
     public function test_cashier_can_close_session_and_calculate_cash_reconciliation(): void
     {
         /** @var User $cashier */
-        $cashier = User::where('email', 'siti.kasir@amorecoffee.id')->firstOrFail();
+        $cashier = User::where('email', 'ami@gmail.com')->firstOrFail();
 
         // 1. buka sesi kasir dengan modal 200.000
         $openResponse = $this->withHeader('X-Device-Token', $this->deviceToken)

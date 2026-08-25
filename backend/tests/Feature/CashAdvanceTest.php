@@ -26,8 +26,8 @@ class CashAdvanceTest extends TestCase
     public function test_staff_can_request_cash_advance(): void
     {
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         Sanctum::actingAs($staff);
 
@@ -53,8 +53,8 @@ class CashAdvanceTest extends TestCase
     public function test_staff_cannot_request_cash_advance_with_invalid_amount(): void
     {
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         Sanctum::actingAs($staff);
 
@@ -70,8 +70,8 @@ class CashAdvanceTest extends TestCase
     public function test_staff_cannot_request_cash_advance_while_having_pending_request(): void
     {
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         // buat kasbon yang masih pending
         CashAdvance::create([
@@ -96,8 +96,8 @@ class CashAdvanceTest extends TestCase
     public function test_staff_can_view_own_cash_advance_history(): void
     {
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         CashAdvance::create([
             'workspace_id' => $workspace->id,
@@ -142,10 +142,10 @@ class CashAdvanceTest extends TestCase
     public function test_owner_and_admin_can_view_all_cash_advances(): void
     {
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         CashAdvance::create([
             'workspace_id' => $workspace->id,
@@ -180,10 +180,10 @@ class CashAdvanceTest extends TestCase
     public function test_owner_and_admin_can_approve_cash_advance(): void
     {
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         $advance = CashAdvance::create([
             'workspace_id' => $workspace->id,
@@ -213,10 +213,10 @@ class CashAdvanceTest extends TestCase
     public function test_owner_and_admin_can_reject_cash_advance(): void
     {
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         $advance = CashAdvance::create([
             'workspace_id' => $workspace->id,
@@ -246,8 +246,8 @@ class CashAdvanceTest extends TestCase
     public function test_staff_cannot_approve_or_reject_cash_advance(): void
     {
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         $advance = CashAdvance::create([
             'workspace_id' => $workspace->id,

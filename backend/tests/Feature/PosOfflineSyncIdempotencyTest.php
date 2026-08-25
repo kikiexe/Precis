@@ -27,7 +27,7 @@ class PosOfflineSyncIdempotencyTest extends TestCase
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
 
-        $this->workspace = Workspace::where('slug', 'amore-coffee')->firstOrFail();
+        $this->workspace = Workspace::where('slug', 'norde-coffee')->firstOrFail();
         $this->branch = Branch::withoutGlobalScopes()->where('workspace_id', $this->workspace->id)->firstOrFail();
 
         $this->terminal = PosTerminal::create([

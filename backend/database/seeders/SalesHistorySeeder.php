@@ -21,48 +21,27 @@ use Illuminate\Support\Str;
 class SalesHistorySeeder extends Seeder
 {
     /**
-     * Generate 3-month dynamic sales history backwards from current execution date.
+     * Generate 3-month dynamic sales history for Norde Coffee (Seturan & Kaliurang).
+     * Monthly revenue capped under 20jt/month total with realistic daily variance.
      */
     public function run(): void
     {
-        if (app()->environment('testing') || app()->runningUnitTests() || config('database.default') === 'sqlite') {
+        if (app()->environment('testing') || app()->runningUnitTests()) {
             return;
         }
 
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        if (! $workspace) {
-            $this->command?->warn('Workspace "amore-coffee" tidak ditemukan. Jalankan TenantPilotSeeder terlebih dahulu.');
-            return;
-        }
-
-        $branches = Branch::withoutGlobalScopes()->where('workspace_id', $workspace->id)->get();
+        $branches = Branch::withoutGlobalScopes()->get();
         if ($branches->isEmpty()) {
-            $this->command?->warn('Tidak ada cabang outlet ditemukan. Jalankan BranchSeeder terlebih dahulu.');
             return;
         }
 
-        $products = Product::withoutGlobalScopes()->where('workspace_id', $workspace->id)->where('is_active', true)->get();
-        if ($products->isEmpty()) {
-            $this->command?->warn('Tidak ada produk katalog ditemukan. Jalankan ProductCatalogSeeder terlebih dahulu.');
-            return;
-        }
-
-        // Tanggal patokan: 3 bulan ke belakang dari saat seeder dijalankan
         $now = Carbon::now();
         $startDate = (clone $now)->subMonths(3)->startOfDay();
         $endDate = clone $now;
 
-        $this->command?->info("Membuat histori penjualan 3 bulan: {$startDate->toDateString()} s/d {$endDate->toDateString()}...");
-
-        $customerNames = [
-            'Rian', 'Anisa', 'Fajar', 'Mega', 'Bayu', 'Dina', 'Reza', 'Putri',
-            'Adit', 'Nadia', 'Bagus', 'Tasya', 'Gilang', 'Salsa', 'Kevin',
-            'Dewi', 'Arya', 'Maya', 'Rizky', 'Bella', 'Hendra', 'Wulan', null, null,
-        ];
-
         $paymentMethods = ['QRIS', 'QRIS', 'QRIS', 'CASH', 'CASH', 'TRANSFER'];
 
-        // Ambil mapping kasir & terminal per cabang
+        // Ambil mapping kasir, terminal, dan produk per cabang
         $branchResources = [];
         foreach ($branches as $branch) {
             $terminal = PosTerminal::withoutGlobalScopes()->where('branch_id', $branch->id)->first();
@@ -73,48 +52,66 @@ class SalesHistorySeeder extends Seeder
 
             $cashiers = User::whereIn('id', $cashierMemberships)->get();
             if ($cashiers->isEmpty()) {
-                $cashiers = User::where('email', 'like', '%amorecoffee.id')->get();
+                $cashiers = User::where('email', 'like', '%@gmail.com')->get();
             }
+
+            $products = Product::withoutGlobalScopes()->where('workspace_id', $branch->workspace_id)->where('is_active', true)->get();
+            if ($products->isEmpty()) {
+                $products = Product::withoutGlobalScopes()->where('is_active', true)->get();
+            }
+
+            $isSeturan = str_contains(strtolower($branch->name), 'seturan');
 
             $branchResources[$branch->id] = [
                 'branch' => $branch,
                 'terminal' => $terminal,
                 'cashiers' => $cashiers,
-                'slug_prefix' => str_contains(strtolower($branch->name), 'sleman') ? 'SLM' : 'MLB',
+                'products' => $products,
+                'slug_prefix' => $isSeturan ? 'STR' : 'KLR',
+                'is_seturan' => $isSeturan,
             ];
         }
 
         $currentDate = clone $startDate;
-        $totalOrdersCreated = 0;
-        $totalSessionsCreated = 0;
 
         while ($currentDate->lte($endDate)) {
             $isToday = $currentDate->isSameDay($now);
             $isWeekend = $currentDate->isWeekend();
+
+            // Random daily factor (randomize some slow days, some peak days)
+            // 15% chance of slow day, 65% normal day, 20% peak day
+            $dayProfileRoll = rand(1, 100);
+            $dayMultiplier = 1.0;
+            if ($dayProfileRoll <= 15) {
+                $dayMultiplier = 0.55; // slow rainy day
+            } elseif ($dayProfileRoll > 80 || $isWeekend) {
+                $dayMultiplier = 1.35; // busy day
+            }
 
             foreach ($branches as $branch) {
                 $resource = $branchResources[$branch->id];
                 $terminal = $resource['terminal'];
                 $cashiers = $resource['cashiers'];
                 $slugPrefix = $resource['slug_prefix'];
+                $isSeturan = $resource['is_seturan'];
 
-                // Buat 2 shift per hari: Shift Pagi (07:00-15:00) & Shift Sore (15:00-23:00)
+                // 2 Shift per hari
                 $shifts = [
                     [
                         'name' => 'Pagi',
-                        'open_hour' => 7,
-                        'open_min' => rand(0, 20),
-                        'close_hour' => 15,
-                        'close_min' => rand(0, 15),
-                        'opening_cash' => 300000.00,
+                        'open_hour' => $isSeturan ? 7 : 8,
+                        'open_min' => rand(0, 15),
+                        'close_hour' => $isSeturan ? 15 : 16,
+                        'close_min' => rand(0, 10),
+                        'opening_cash' => 250000.00,
                     ],
                     [
                         'name' => 'Sore',
-                        'open_hour' => 15,
+                        'open_hour' => $isSeturan ? 15 : 16,
                         'open_min' => rand(0, 15),
-                        'close_hour' => 22,
-                        'close_min' => rand(45, 59),
-                        'opening_cash' => 500000.00,
+                        'close_hour' => $isSeturan ? 23 : 23,
+                        'close_min' => rand(30, 59),
+                        'opening_cash' => 350000.00,
                     ],
                 ];
 
@@ -122,7 +119,6 @@ class SalesHistorySeeder extends Seeder
                     $openedAt = (clone $currentDate)->setHour($shiftConfig['open_hour'])->setMinute($shiftConfig['open_min'])->setSecond(0);
                     $closedAt = (clone $currentDate)->setHour($shiftConfig['close_hour'])->setMinute($shiftConfig['close_min'])->setSecond(0);
 
-                    // Jika shift belum tiba waktunya (misal shift sore hari ini saat pagi), skip
                     if ($openedAt->gt($now)) {
                         continue;
                     }
@@ -130,13 +126,14 @@ class SalesHistorySeeder extends Seeder
                     $isOngoingSession = $isToday && $closedAt->gt($now);
                     $sessionStatus = $isOngoingSession ? 'OPEN' : 'CLOSED';
                     $cashierUser = $cashiers[$shiftIndex % max(1, $cashiers->count())] ?? $cashiers->first();
+                    $branchWorkspaceId = $branch->workspace_id;
 
                     $posSession = PosSession::create([
                         'id' => (string) Str::uuid(),
-                        'workspace_id' => $workspace->id,
+                        'workspace_id' => $branchWorkspaceId,
                         'branch_id' => $branch->id,
-                        'opened_by_user_id' => $cashierUser?->id ?: $workspace->owner_user_id,
-                        'closed_by_user_id' => $isOngoingSession ? null : ($cashierUser?->id ?: $workspace->owner_user_id),
+                        'opened_by_user_id' => $cashierUser?->id,
+                        'closed_by_user_id' => $isOngoingSession ? null : $cashierUser?->id,
                         'opening_cash' => $shiftConfig['opening_cash'],
                         'status' => $sessionStatus,
                         'notes' => "Sesi Shift {$shiftConfig['name']} {$currentDate->toDateString()}",
@@ -146,41 +143,38 @@ class SalesHistorySeeder extends Seeder
                         'updated_at' => $isOngoingSession ? $openedAt : $closedAt,
                     ]);
 
-                    $totalSessionsCreated++;
-
-                    // Jumlah order per shift (lebih ramai di weekend)
-                    $orderCount = $isWeekend ? rand(18, 36) : rand(10, 22);
+                    // Target 2 s/d 4 pesanan per shift agar omzet cabang ~100k-250k/shift (Total 2 cabang = ~400k-600k/hari = ~15-19jt/bulan)
+                    $baseOrders = $isSeturan ? rand(2, 4) : rand(2, 3);
+                    $orderCount = max(1, (int) round($baseOrders * $dayMultiplier));
                     if ($isOngoingSession) {
-                        $orderCount = rand(4, 10);
+                        $orderCount = rand(1, 2);
                     }
 
                     $sessionCashSales = 0.00;
-                    $sessionQrisSales = 0.00;
-                    $sessionTransferSales = 0.00;
-
                     $ordersBatch = [];
                     $orderItemsBatch = [];
+                    $products = $resource['products'];
 
                     for ($i = 1; $i <= $orderCount; $i++) {
                         $maxMinutes = max(6, (int) ($closedAt->diffInMinutes($openedAt) - 10));
                         $minuteOffset = rand(5, $maxMinutes);
                         $orderTime = (clone $openedAt)->addMinutes($minuteOffset);
                         if ($orderTime->gt($now)) {
-                            $orderTime = (clone $now)->subMinutes(rand(1, 10));
+                            $orderTime = (clone $now)->subMinutes(rand(1, 5));
                         }
 
                         $orderId = (string) Str::uuid();
                         $clientOrderId = (string) Str::uuid();
                         $orderNumber = sprintf('ORD-%s-%s-%04d', $slugPrefix, $currentDate->format('Ymd'), ($shiftIndex * 50) + $i);
                         $paymentMethod = $paymentMethods[array_rand($paymentMethods)];
-                        $customerName = $customerNames[array_rand($customerNames)];
 
-                        // Pilih 1 hingga 3 produk secara acak
-                        $selectedProducts = $products->random(rand(1, min(3, $products->count())));
+                        // 75% 1 produk, 25% 2 produk
+                        $itemCount = (rand(1, 100) <= 75) ? 1 : 2;
+                        $selectedProducts = $products->random(min($itemCount, $products->count()));
                         $orderTotal = 0.00;
 
                         foreach ($selectedProducts as $prod) {
-                            $qty = rand(1, 2);
+                            $qty = (rand(1, 100) <= 85) ? 1 : 2;
                             $unitPrice = (float) $prod->base_price;
                             $subtotal = $unitPrice * $qty;
                             $orderTotal += $subtotal;
@@ -193,15 +187,15 @@ class SalesHistorySeeder extends Seeder
                                 'unit_price' => $unitPrice,
                                 'quantity' => $qty,
                                 'subtotal' => $subtotal,
-                                'notes' => (rand(1, 5) === 1) ? 'Less ice, normal sugar' : null,
+                                'notes' => (rand(1, 5) === 1) ? 'Less sugar, oatmilk' : null,
                                 'created_at' => $orderTime,
                                 'updated_at' => $orderTime,
                             ];
                         }
 
-                        // Diskon acak (5% atau 10% pada beberapa transaksi)
+                        // Diskon 10% pada beberapa transaksi
                         $discountAmount = 0.00;
-                        if (rand(1, 6) === 1) {
+                        if (rand(1, 8) === 1) {
                             $discountAmount = round($orderTotal * 0.10);
                         }
 
@@ -209,15 +203,11 @@ class SalesHistorySeeder extends Seeder
 
                         if ($paymentMethod === 'CASH') {
                             $sessionCashSales += $finalAmount;
-                        } elseif ($paymentMethod === 'QRIS') {
-                            $sessionQrisSales += $finalAmount;
-                        } else {
-                            $sessionTransferSales += $finalAmount;
                         }
 
                         $ordersBatch[] = [
                             'id' => $orderId,
-                            'workspace_id' => $workspace->id,
+                            'workspace_id' => $branchWorkspaceId,
                             'branch_id' => $branch->id,
                             'pos_session_id' => $posSession->id,
                             'pos_terminal_id' => $terminal?->id,
@@ -232,35 +222,21 @@ class SalesHistorySeeder extends Seeder
                             'created_at' => $orderTime,
                             'updated_at' => $orderTime,
                         ];
-
-                        $totalOrdersCreated++;
                     }
 
                     if (! empty($ordersBatch)) {
-                        Order::insert($ordersBatch);
+                        DB::table('orders')->insert($ordersBatch);
                     }
                     if (! empty($orderItemsBatch)) {
-                        OrderItem::insert($orderItemsBatch);
+                        DB::table('order_items')->insert($orderItemsBatch);
                     }
 
-                    // Rekonsiliasi kas untuk sesi yang ditutup
                     if ($sessionStatus === 'CLOSED') {
                         $expectedCash = $shiftConfig['opening_cash'] + $sessionCashSales;
-                        // Variasi selisih kas fisik laci (95% seimbang, 5% selisih kecil Rp 1.000 - Rp 2.000)
-                        $discrepancy = 0.00;
-                        $randomVariance = rand(1, 20);
-                        if ($randomVariance === 1) {
-                            $discrepancy = (float) (rand(1, 2) * 1000); // lebih
-                        } elseif ($randomVariance === 2) {
-                            $discrepancy = (float) -(rand(1, 2) * 1000); // kurang
-                        }
-
-                        $actualCash = $expectedCash + $discrepancy;
-
                         $posSession->update([
                             'closing_cash_expected' => $expectedCash,
-                            'closing_cash_actual' => $actualCash,
-                            'discrepancy_amount' => $discrepancy,
+                            'closing_cash_actual' => $expectedCash,
+                            'discrepancy_amount' => 0.00,
                         ]);
                     }
                 }
@@ -268,7 +244,5 @@ class SalesHistorySeeder extends Seeder
 
             $currentDate->addDay();
         }
-
-        $this->command?->info("Sukses men-seed {$totalOrdersCreated} pesanan penjualan dan {$totalSessionsCreated} sesi kasir untuk 3 bulan terakhir.");
     }
 }

@@ -29,8 +29,8 @@ class SaaSBillingTest extends TestCase
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
 
-        $this->owner = User::where('email', 'arief@amorecoffee.id')->firstOrFail();
-        $this->workspace = Workspace::where('slug', 'amore-coffee')->firstOrFail();
+        $this->owner = User::where('email', 'kiki@gmail.com')->firstOrFail();
+        $this->workspace = Workspace::where('slug', 'norde-coffee')->firstOrFail();
         $this->plan = SubscriptionPlan::where('is_active', true)->firstOrFail();
         $this->superadmin = Superadmin::firstOrFail();
     }

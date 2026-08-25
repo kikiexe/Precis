@@ -34,10 +34,10 @@ class DatabaseSchemaAndSeedersTest extends TestCase
         $this->assertEquals(3, SubscriptionPlan::count());
 
         // 2. Verify Pilot Tenant & Workspace
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         $this->assertNotNull($owner);
 
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
         $this->assertNotNull($workspace);
         $this->assertEquals($owner->id, $workspace->owner_user_id);
 
@@ -64,12 +64,14 @@ class DatabaseSchemaAndSeedersTest extends TestCase
         }
 
         // 4. Verify Staff & Shifts
-        $this->assertDatabaseHas('users', ['email' => 'budi.manager@amorecoffee.id']);
-        $this->assertDatabaseHas('users', ['email' => 'siti.kasir@amorecoffee.id']);
-        $this->assertDatabaseHas('users', ['email' => 'dimas.kasir@amorecoffee.id']);
+        $this->assertDatabaseHas('users', ['email' => 'paundra@gmail.com']);
+        $this->assertDatabaseHas('users', ['email' => 'ami@gmail.com']);
+        $this->assertDatabaseHas('users', ['email' => 'hani@gmail.com']);
+        $this->assertDatabaseHas('users', ['email' => 'rama@gmail.com']);
+        $this->assertDatabaseHas('users', ['email' => 'kia@gmail.com']);
 
         $totalMembers = WorkspaceMember::withoutGlobalScopes()->where('workspace_id', $workspace->id)->count();
-        $this->assertEquals(4, $totalMembers); // Owner + Manager + 2 Cashiers
+        $this->assertEquals(6, $totalMembers); // Owner + Manager + 4 Cashiers
 
         $templates = ShiftTemplate::withoutGlobalScopes()->where('workspace_id', $workspace->id)->count();
         $this->assertEquals(4, $templates);

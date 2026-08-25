@@ -24,8 +24,8 @@ class MediaPresignUploadTest extends TestCase
     public function test_user_can_request_presigned_upload_url_for_webp_image(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $user = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         Sanctum::actingAs($user);
 
@@ -53,8 +53,8 @@ class MediaPresignUploadTest extends TestCase
     public function test_presign_upload_rejects_unsupported_mime_type(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $user = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         Sanctum::actingAs($user);
 
@@ -72,8 +72,8 @@ class MediaPresignUploadTest extends TestCase
     public function test_presign_upload_rejects_files_larger_than_2mb(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
+        $user = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
 
         Sanctum::actingAs($user);
 

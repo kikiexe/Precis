@@ -27,9 +27,9 @@ class ShiftRosterTest extends TestCase
     public function test_user_can_view_shift_roster_calendar_filtered_by_branch_and_dates(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $user = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         Sanctum::actingAs($user);
 
@@ -60,11 +60,11 @@ class ShiftRosterTest extends TestCase
     public function test_owner_and_admin_can_assign_shift_to_staff(): void
     {
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         $template = ShiftTemplate::create([
             'workspace_id' => $workspace->id,
@@ -102,11 +102,11 @@ class ShiftRosterTest extends TestCase
     public function test_assign_shift_fails_when_duplicate_shift_assigned_on_same_date(): void
     {
         /** @var User $owner */
-        $owner = User::where('email', 'arief@amorecoffee.id')->first();
+        $owner = User::where('email', 'kiki@gmail.com')->first();
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         $template1 = ShiftTemplate::create([
             'workspace_id' => $workspace->id,
@@ -151,9 +151,9 @@ class ShiftRosterTest extends TestCase
     public function test_staff_role_cannot_assign_shifts(): void
     {
         /** @var User $staff */
-        $staff = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         $template = ShiftTemplate::create([
             'workspace_id' => $workspace->id,

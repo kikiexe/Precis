@@ -20,10 +20,10 @@ class PosMasterUnlockTest extends TestCase
 
     public function test_valid_owner_password_unlocks_pos_kiosk(): void
     {
-        $response = $this->withHeader('X-Device-Token', 'pos-device-token-sleman-01')
+        $response = $this->withHeader('X-Device-Token', 'pos-device-token-seturan-01')
             ->postJson('/api/v1/pos/master-unlock', [
-                'email' => 'arief@amorecoffee.id',
-                'password' => 'AmoreOwner2026!',
+                'email' => 'kiki@gmail.com',
+                'password' => '123456',
             ]);
 
         $response->assertOk()
@@ -40,10 +40,10 @@ class PosMasterUnlockTest extends TestCase
 
     public function test_valid_admin_password_unlocks_pos_kiosk(): void
     {
-        $response = $this->withHeader('X-Device-Token', 'pos-device-token-sleman-01')
+        $response = $this->withHeader('X-Device-Token', 'pos-device-token-seturan-01')
             ->postJson('/api/v1/pos/master-unlock', [
-                'email' => 'budi.manager@amorecoffee.id',
-                'password' => 'BudiManager2026!',
+                'email' => 'paundra@gmail.com',
+                'password' => '123456',
             ]);
 
         $response->assertOk()
@@ -52,9 +52,9 @@ class PosMasterUnlockTest extends TestCase
 
     public function test_invalid_password_fails_master_unlock(): void
     {
-        $response = $this->withHeader('X-Device-Token', 'pos-device-token-sleman-01')
+        $response = $this->withHeader('X-Device-Token', 'pos-device-token-seturan-01')
             ->postJson('/api/v1/pos/master-unlock', [
-                'email' => 'arief@amorecoffee.id',
+                'email' => 'kiki@gmail.com',
                 'password' => 'WrongPassword!',
             ]);
 
@@ -65,10 +65,10 @@ class PosMasterUnlockTest extends TestCase
     public function test_staff_role_credentials_cannot_unlock_pos_kiosk(): void
     {
         // sita memiliki peran STAFF ga bisa melakukan master unlock
-        $response = $this->withHeader('X-Device-Token', 'pos-device-token-sleman-01')
+        $response = $this->withHeader('X-Device-Token', 'pos-device-token-seturan-01')
             ->postJson('/api/v1/pos/master-unlock', [
-                'email' => 'siti.kasir@amorecoffee.id',
-                'password' => 'SitiKasir2026!',
+                'email' => 'ami@gmail.com',
+                'password' => '123456',
             ]);
 
         $response->assertStatus(401)

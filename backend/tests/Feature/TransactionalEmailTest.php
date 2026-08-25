@@ -33,8 +33,8 @@ class TransactionalEmailTest extends TestCase
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
 
-        $this->owner = User::where('email', 'arief@amorecoffee.id')->firstOrFail();
-        $this->workspace = Workspace::where('slug', 'amore-coffee')->firstOrFail();
+        $this->owner = User::where('email', 'kiki@gmail.com')->firstOrFail();
+        $this->workspace = Workspace::where('slug', 'norde-coffee')->firstOrFail();
     }
 
     public function test_register_dispatches_verify_email_mailable(): void
@@ -62,13 +62,13 @@ class TransactionalEmailTest extends TestCase
         Mail::fake();
 
         $response = $this->postJson('/api/v1/auth/forgot-password', [
-            'email' => 'arief@amorecoffee.id',
+            'email' => 'kiki@gmail.com',
         ]);
 
         $response->assertOk();
 
         Mail::assertSent(ResetPasswordMailable::class, function (ResetPasswordMailable $mail): bool {
-            return $mail->hasTo('arief@amorecoffee.id')
+            return $mail->hasTo('kiki@gmail.com')
                 && str_contains($mail->envelope()->subject, 'Pemulihan Kata Sandi');
         });
     }
@@ -112,7 +112,7 @@ class TransactionalEmailTest extends TestCase
         $billingService->verifyInvoicePayment($superadmin, $invoice->id);
 
         Mail::assertSent(InvoiceReceiptMailable::class, function (InvoiceReceiptMailable $mail): bool {
-            return $mail->hasTo('arief@amorecoffee.id');
+            return $mail->hasTo('kiki@gmail.com');
         });
     }
 
@@ -142,7 +142,7 @@ class TransactionalEmailTest extends TestCase
 
         $inviteMailable = new WorkspaceInvitationMailable($invitation, 'http://localhost:5174/invite?token=abc');
         $html3 = $inviteMailable->render();
-        $this->assertStringContainsString('Amore Coffee Group', $html3);
+        $this->assertStringContainsString('Norde Coffee', $html3);
         $this->assertStringContainsString('Barista', $html3);
 
         // 4. PayslipNotificationMailable
@@ -155,7 +155,7 @@ class TransactionalEmailTest extends TestCase
             'cash_advance_deduction' => 0,
             'net_salary' => 3080000,
         ]);
-        $payslipMailable = new PayslipNotificationMailable($this->owner, $payroll, 'Amore Coffee', 'http://localhost:5174/slip');
+        $payslipMailable = new PayslipNotificationMailable($this->owner, $payroll, 'Norde Coffee', 'http://localhost:5174/slip');
         $html4 = $payslipMailable->render();
         $this->assertStringContainsString('PEMBERITAHUAN GAJI', $html4);
         $this->assertStringContainsString('3.080.000', $html4);

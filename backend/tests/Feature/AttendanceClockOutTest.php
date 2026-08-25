@@ -29,9 +29,9 @@ class AttendanceClockOutTest extends TestCase
     public function test_user_can_clock_out_and_calculate_overtime_minutes(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $user = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         // konfigurasi ambang batas lembur 30 menit
         BranchSetting::updateOrCreate(
@@ -86,9 +86,9 @@ class AttendanceClockOutTest extends TestCase
     public function test_clock_out_without_active_clock_in_is_rejected(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $user = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         Sanctum::actingAs($user);
 
@@ -106,9 +106,9 @@ class AttendanceClockOutTest extends TestCase
     public function test_clock_out_rejected_when_outside_geofence_radius(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $user = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         Sanctum::actingAs($user);
 

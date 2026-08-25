@@ -27,8 +27,8 @@ class AuthApiTest extends TestCase
     public function test_user_can_login_with_valid_credentials_and_receive_token(): void
     {
         $response = $this->postJson('/api/v1/auth/login', [
-            'email' => 'arief@amorecoffee.id',
-            'password' => 'AmoreOwner2026!',
+            'email' => 'kiki@gmail.com',
+            'password' => '123456',
             'device_name' => 'Chrome MacOS',
         ]);
 
@@ -45,13 +45,13 @@ class AuthApiTest extends TestCase
             ]);
 
         $this->assertNotEmpty($response->json('data.token'));
-        $this->assertEquals('arief@amorecoffee.id', $response->json('data.user.email'));
+        $this->assertEquals('kiki@gmail.com', $response->json('data.user.email'));
     }
 
     public function test_login_fails_with_invalid_password(): void
     {
         $response = $this->postJson('/api/v1/auth/login', [
-            'email' => 'arief@amorecoffee.id',
+            'email' => 'kiki@gmail.com',
             'password' => 'WrongPassword!',
         ]);
 
@@ -70,14 +70,14 @@ class AuthApiTest extends TestCase
     public function test_authenticated_user_can_fetch_profile_and_accessible_workspaces(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'arief@amorecoffee.id')->first();
+        $user = User::where('email', 'kiki@gmail.com')->first();
         Sanctum::actingAs($user);
 
         $response = $this->getJson('/api/v1/auth/me');
 
         $response->assertOk()
-            ->assertJsonPath('data.email', 'arief@amorecoffee.id')
-            ->assertJsonPath('data.workspaces.0.workspace_slug', 'amore-coffee')
+            ->assertJsonPath('data.email', 'kiki@gmail.com')
+            ->assertJsonPath('data.workspaces.0.workspace_slug', 'norde-coffee')
             ->assertJsonPath('data.workspaces.0.role', 'OWNER');
     }
 
@@ -90,7 +90,7 @@ class AuthApiTest extends TestCase
     public function test_user_can_logout_and_revoke_token(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'arief@amorecoffee.id')->first();
+        $user = User::where('email', 'kiki@gmail.com')->first();
         $token = $user->createToken('test_token')->plainTextToken;
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $token)
@@ -110,17 +110,17 @@ class AuthApiTest extends TestCase
         Notification::fake();
 
         $response = $this->postJson('/api/v1/auth/forgot-password', [
-            'email' => 'arief@amorecoffee.id',
+            'email' => 'kiki@gmail.com',
         ]);
 
         $response->assertOk()
             ->assertJson(['message' => 'Tautan pemulihan kata sandi telah dikirim ke alamat email Anda.']);
 
         $this->assertDatabaseHas('password_reset_tokens', [
-            'email' => 'arief@amorecoffee.id',
+            'email' => 'kiki@gmail.com',
         ]);
 
-        $user = User::where('email', 'arief@amorecoffee.id')->first();
+        $user = User::where('email', 'kiki@gmail.com')->first();
         Notification::assertSentTo($user, ResetPasswordNotification::class);
     }
 
@@ -128,13 +128,13 @@ class AuthApiTest extends TestCase
     {
         $plainToken = 'valid-reset-token-1234567890';
         DB::table('password_reset_tokens')->insert([
-            'email' => 'arief@amorecoffee.id',
+            'email' => 'kiki@gmail.com',
             'token' => Hash::make($plainToken),
             'created_at' => now(),
         ]);
 
         $response = $this->postJson('/api/v1/auth/reset-password', [
-            'email' => 'arief@amorecoffee.id',
+            'email' => 'kiki@gmail.com',
             'token' => $plainToken,
             'password' => 'NewSecretPassword2026!',
             'password_confirmation' => 'NewSecretPassword2026!',
@@ -144,25 +144,25 @@ class AuthApiTest extends TestCase
             ->assertJson(['message' => 'Kata sandi berhasil diperbarui. Silakan login kembali.']);
 
         /** @var User $updatedUser */
-        $updatedUser = User::where('email', 'arief@amorecoffee.id')->first();
+        $updatedUser = User::where('email', 'kiki@gmail.com')->first();
         $this->assertTrue(Hash::check('NewSecretPassword2026!', $updatedUser->password));
 
         // token harus dihapus setelah reset password berhasil
         $this->assertDatabaseMissing('password_reset_tokens', [
-            'email' => 'arief@amorecoffee.id',
+            'email' => 'kiki@gmail.com',
         ]);
     }
 
     public function test_reset_password_fails_with_invalid_token(): void
     {
         DB::table('password_reset_tokens')->insert([
-            'email' => 'arief@amorecoffee.id',
+            'email' => 'kiki@gmail.com',
             'token' => Hash::make('real-token'),
             'created_at' => now(),
         ]);
 
         $response = $this->postJson('/api/v1/auth/reset-password', [
-            'email' => 'arief@amorecoffee.id',
+            'email' => 'kiki@gmail.com',
             'token' => 'wrong-token',
             'password' => 'NewSecretPassword2026!',
             'password_confirmation' => 'NewSecretPassword2026!',

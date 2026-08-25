@@ -32,8 +32,8 @@ class SuperadminApiTest extends TestCase
         $this->seed(DatabaseSeeder::class);
 
         $this->superadmin = Superadmin::where('email', 'root@precis.com')->firstOrFail();
-        $this->tenantOwner = User::where('email', 'arief@amorecoffee.id')->firstOrFail();
-        $this->workspace = Workspace::where('slug', 'amore-coffee')->firstOrFail();
+        $this->tenantOwner = User::where('email', 'kiki@gmail.com')->firstOrFail();
+        $this->workspace = Workspace::where('slug', 'norde-coffee')->firstOrFail();
         $this->plan = SubscriptionPlan::where('is_active', true)->firstOrFail();
     }
 

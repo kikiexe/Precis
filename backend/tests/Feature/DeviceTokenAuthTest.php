@@ -21,8 +21,8 @@ class DeviceTokenAuthTest extends TestCase
 
     public function test_valid_device_token_grants_access_and_returns_terminal_info(): void
     {
-        // token yang di-seed di BranchSeeder: 'pos-device-token-sleman-01'
-        $response = $this->withHeader('X-Device-Token', 'pos-device-token-sleman-01')
+        // token yang di-seed di BranchSeeder: 'pos-device-token-seturan-01'
+        $response = $this->withHeader('X-Device-Token', 'pos-device-token-seturan-01')
             ->getJson('/api/v1/pos/terminal-info');
 
         $response->assertOk()
@@ -33,7 +33,7 @@ class DeviceTokenAuthTest extends TestCase
                 'branch_id',
                 'branch_name',
             ])
-            ->assertJsonPath('terminal_name', 'Amore POS Tab Sleman #01');
+            ->assertJsonPath('terminal_name', 'Norde POS Tab Seturan #01');
     }
 
     public function test_missing_device_token_returns_unauthorized(): void
@@ -55,10 +55,10 @@ class DeviceTokenAuthTest extends TestCase
 
     public function test_inactive_terminal_returns_forbidden(): void
     {
-        $terminal = PosTerminal::withoutGlobalScopes()->where('terminal_name', 'like', '%Sleman%')->first();
+        $terminal = PosTerminal::withoutGlobalScopes()->where('terminal_name', 'like', '%Seturan%')->first();
         $terminal->update(['is_active' => false]);
 
-        $response = $this->withHeader('X-Device-Token', 'pos-device-token-sleman-01')
+        $response = $this->withHeader('X-Device-Token', 'pos-device-token-seturan-01')
             ->getJson('/api/v1/pos/terminal-info');
 
         $response->assertStatus(403)

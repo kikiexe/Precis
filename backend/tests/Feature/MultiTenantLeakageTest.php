@@ -38,10 +38,10 @@ class MultiTenantLeakageTest extends TestCase
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
 
-        // tenant A: Amore Coffee
-        $this->workspaceA = Workspace::where('slug', 'amore-coffee')->firstOrFail();
-        $this->ownerA = User::where('email', 'arief@amorecoffee.id')->firstOrFail();
-        $this->staffA = User::where('email', 'siti.kasir@amorecoffee.id')->firstOrFail();
+        // tenant A: Norde Coffee
+        $this->workspaceA = Workspace::where('slug', 'norde-coffee')->firstOrFail();
+        $this->ownerA = User::where('email', 'kiki@gmail.com')->firstOrFail();
+        $this->staffA = User::where('email', 'ami@gmail.com')->firstOrFail();
 
         $branchA = Branch::withoutGlobalScopes()->where('workspace_id', $this->workspaceA->id)->firstOrFail();
         $this->terminalA = PosTerminal::create([

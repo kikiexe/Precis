@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Constants\DomainConstants;
 use App\Mail\PayslipNotificationMailable;
 use App\Models\Attendance;
 use App\Models\BranchSetting;
@@ -13,6 +14,7 @@ use App\Models\User;
 use App\Models\Workspace;
 use App\Models\WorkspaceMember;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
@@ -21,13 +23,18 @@ class PayrollService
     /**
      * hitung kalkulasi komponen penggajian untuk seorang anggota staf pada periode tertentu
      *
+     * @param Collection<int, Attendance>|null $memberAttendances
+     * @param Collection<int, CashAdvance>|null $memberCashAdvances
      * @return array<string, mixed>
      */
     public function calculateMemberPayroll(
         WorkspaceMember $member,
         string $periodStart,
         string $periodEnd,
-        ?BranchSetting $defaultSetting = null
+        ?BranchSetting $defaultSetting = null,
+        ?BranchSetting $branchSetting = null,
+        ?Collection $memberAttendances = null,
+        ?Collection $memberCashAdvances = null
     ): array {
         $workspaceId = (string) $member->workspace_id;
         $userId = (string) $member->user_id;
@@ -37,8 +44,8 @@ class PayrollService
 
         // ambil konfigurasi denda telat & tarif lembur cabang
         /** @var BranchSetting|null $setting */
-        $setting = null;
-        if ($branchId) {
+        $setting = $branchSetting;
+        if (! $setting && $branchId) {
             $setting = BranchSetting::withoutGlobalScopes()
                 ->where('workspace_id', $workspaceId)
                 ->where('branch_id', $branchId)
@@ -49,12 +56,12 @@ class PayrollService
             $setting = $defaultSetting;
         }
 
-        $latePenaltyPerMinute = (float) ($setting?->late_penalty_per_minute ?? 1000.00);
-        $overtimePayPerHour = (float) ($setting?->overtime_pay_per_hour ?? 20000.00);
+        $latePenaltyPerMinute = (float) ($setting?->late_penalty_per_minute ?? DomainConstants::DEFAULT_LATE_PENALTY_PER_MINUTE);
+        $overtimePayPerHour = (float) ($setting?->overtime_pay_per_hour ?? DomainConstants::DEFAULT_OVERTIME_PAY_PER_HOUR);
         $overtimePayPerMinute = $overtimePayPerHour / 60.0;
 
         // akumulasi menit keterlambatan & lembur dari presensi yang disetujui
-        $attendances = Attendance::withoutGlobalScopes()
+        $attendances = $memberAttendances ?? Attendance::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
             ->where('user_id', $userId)
             ->where('status', 'APPROVED')
@@ -68,7 +75,7 @@ class PayrollService
         $overtimePay = round($totalOvertimeMinutes * $overtimePayPerMinute, 2);
 
         // akumulasi kasbon aktif staf yang belum dilunasi
-        $cashAdvances = CashAdvance::withoutGlobalScopes()
+        $cashAdvances = $memberCashAdvances ?? CashAdvance::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
             ->where('user_id', $userId)
             ->where('status', 'APPROVED')
@@ -131,6 +138,33 @@ class PayrollService
             ->whereNull('branch_id')
             ->first();
 
+        $userIds = $members->pluck('user_id')->unique()->toArray();
+        $branchIds = $members->pluck('branch_id')->filter()->unique()->toArray();
+
+        // Batch preloading to eliminate N+1 queries
+        $branchSettings = BranchSetting::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->whereIn('branch_id', $branchIds)
+            ->get()
+            ->keyBy('branch_id');
+
+        $attendancesByUser = Attendance::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->whereIn('user_id', $userIds)
+            ->where('status', 'APPROVED')
+            ->whereBetween('clock_in_time', [$periodStart . ' 00:00:00', $periodEnd . ' 23:59:59'])
+            ->get()
+            ->groupBy('user_id');
+
+        $cashAdvancesByUser = CashAdvance::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->whereIn('user_id', $userIds)
+            ->where('status', 'APPROVED')
+            ->whereNull('deducted_at_payroll_date')
+            ->where('request_date', '<=', $periodEnd)
+            ->get()
+            ->groupBy('user_id');
+
         $items = [];
         $totalBase = 0.0;
         $totalOvertime = 0.0;
@@ -139,7 +173,22 @@ class PayrollService
         $totalNet = 0.0;
 
         foreach ($members as $member) {
-            $calculated = $this->calculateMemberPayroll($member, $periodStart, $periodEnd, $defaultSetting);
+            $uId = (string) $member->user_id;
+            $bId = $member->branch_id ? (string) $member->branch_id : null;
+
+            $bSetting = $bId ? ($branchSettings->get($bId)) : null;
+            $userAttendances = $attendancesByUser->get($uId, collect());
+            $userCashAdvances = $cashAdvancesByUser->get($uId, collect());
+
+            $calculated = $this->calculateMemberPayroll(
+                member: $member,
+                periodStart: $periodStart,
+                periodEnd: $periodEnd,
+                defaultSetting: $defaultSetting,
+                branchSetting: $bSetting,
+                memberAttendances: $userAttendances,
+                memberCashAdvances: $userCashAdvances
+            );
             $items[] = $calculated;
 
             $totalBase += $calculated['base_salary'];

@@ -28,9 +28,9 @@ class AttendanceClockInTest extends TestCase
     public function test_user_can_clock_in_within_branch_geofence_radius(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $user = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         Sanctum::actingAs($user);
 
@@ -59,9 +59,9 @@ class AttendanceClockInTest extends TestCase
     public function test_clock_in_rejected_when_outside_geofence_radius(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $user = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         Sanctum::actingAs($user);
 
@@ -81,9 +81,9 @@ class AttendanceClockInTest extends TestCase
     public function test_clock_in_calculates_late_minutes_accurately_when_past_shift_start(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $user = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         // buat template shift jam 07:00 dan assignment untuk hari ini
         $template = ShiftTemplate::create([
@@ -123,9 +123,9 @@ class AttendanceClockInTest extends TestCase
     public function test_duplicate_active_clock_in_is_rejected(): void
     {
         /** @var User $user */
-        $user = User::where('email', 'siti.kasir@amorecoffee.id')->first();
-        $workspace = Workspace::where('slug', 'amore-coffee')->first();
-        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Sleman%')->first();
+        $user = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
 
         Sanctum::actingAs($user);
 

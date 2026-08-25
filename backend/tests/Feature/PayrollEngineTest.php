@@ -33,10 +33,10 @@ class PayrollEngineTest extends TestCase
         parent::setUp();
         $this->seed(DatabaseSeeder::class);
 
-        $this->owner = User::where('email', 'arief@amorecoffee.id')->firstOrFail();
-        $this->staff = User::where('email', 'siti.kasir@amorecoffee.id')->firstOrFail();
-        $this->workspace = Workspace::where('slug', 'amore-coffee')->firstOrFail();
-        $this->branch = Branch::withoutGlobalScopes()->where('workspace_id', $this->workspace->id)->where('name', 'like', '%Sleman%')->firstOrFail();
+        $this->owner = User::where('email', 'kiki@gmail.com')->firstOrFail();
+        $this->staff = User::where('email', 'ami@gmail.com')->firstOrFail();
+        $this->workspace = Workspace::where('slug', 'norde-coffee')->firstOrFail();
+        $this->branch = Branch::withoutGlobalScopes()->where('workspace_id', $this->workspace->id)->where('name', 'like', '%Seturan%')->firstOrFail();
 
         $this->staffMember = WorkspaceMember::withoutGlobalScopes()
             ->where('workspace_id', $this->workspace->id)
@@ -157,7 +157,7 @@ class PayrollEngineTest extends TestCase
 
         $response->assertOk()
             ->assertJsonPath('message', 'Pencairan penggajian berhasil dieksekusi.')
-            ->assertJsonPath('data.disbursed_count', 3); // 3 staf (manager & 2 kasir) di seeder
+            ->assertJsonPath('data.disbursed_count', 5); // 5 staf (manager & 4 kasir) di seeder
 
         $this->assertDatabaseHas('payrolls', [
             'workspace_id' => $this->workspace->id,

@@ -14,26 +14,26 @@ class BranchSeeder extends Seeder
 {
     public function run(): void
     {
-        $workspace = Workspace::where('slug', 'amore-coffee')->firstOrFail();
+        $workspaceSeturan = Workspace::where('slug', 'norde-coffee')->firstOrFail();
+        $workspaceKaliurang = Workspace::where('slug', 'norde-coffee-kaliurang')->first() ?? $workspaceSeturan;
 
-        // 1. Outlet Sleman #01
-        $branchSleman = Branch::withoutGlobalScopes()->firstOrCreate(
+        // 1. Cabang 1: Norde Coffee - Seturan #01 (pada Workspace 1)
+        $branchSeturan = Branch::withoutGlobalScopes()->firstOrCreate(
             [
-                'workspace_id' => $workspace->id,
-                'name' => 'Amore Outlet Sleman #01',
+                'workspace_id' => $workspaceSeturan->id,
+                'name' => 'Norde Coffee - Seturan #01',
             ],
             [
-                'lat' => -7.71234000,
-                'lng' => 110.35467000,
+                'lat' => -7.76543000,
+                'lng' => 110.40912000,
                 'radius_meters' => 50,
             ]
         );
 
-        // BranchSetting Sleman
         BranchSetting::withoutGlobalScopes()->firstOrCreate(
             [
-                'workspace_id' => $workspace->id,
-                'branch_id' => $branchSleman->id,
+                'workspace_id' => $workspaceSeturan->id,
+                'branch_id' => $branchSeturan->id,
             ],
             [
                 'late_penalty_per_minute' => 1000.00,
@@ -42,37 +42,35 @@ class BranchSeeder extends Seeder
             ]
         );
 
-        // POS Terminal Sleman
         PosTerminal::withoutGlobalScopes()->firstOrCreate(
             [
-                'workspace_id' => $workspace->id,
-                'branch_id' => $branchSleman->id,
-                'terminal_name' => 'Amore POS Tab Sleman #01',
+                'workspace_id' => $workspaceSeturan->id,
+                'branch_id' => $branchSeturan->id,
+                'terminal_name' => 'Norde POS Tab Seturan #01',
             ],
             [
-                'device_token_hash' => hash('sha256', 'pos-device-token-sleman-01'),
+                'device_token_hash' => hash('sha256', 'pos-device-token-seturan-01'),
                 'is_active' => true,
             ]
         );
 
-        // 2. Outlet Malioboro #02
-        $branchMalioboro = Branch::withoutGlobalScopes()->firstOrCreate(
+        // 2. Cabang 2: Norde Coffee - Kaliurang #02 (pada Workspace 1 untuk multi-branch support)
+        $branchKaliurangSeturan = Branch::withoutGlobalScopes()->firstOrCreate(
             [
-                'workspace_id' => $workspace->id,
-                'name' => 'Amore Outlet Malioboro #02',
+                'workspace_id' => $workspaceSeturan->id,
+                'name' => 'Norde Coffee - Kaliurang #02',
             ],
             [
-                'lat' => -7.79256000,
-                'lng' => 110.36589000,
+                'lat' => -7.72145000,
+                'lng' => 110.39567000,
                 'radius_meters' => 60,
             ]
         );
 
-        // BranchSetting Malioboro
         BranchSetting::withoutGlobalScopes()->firstOrCreate(
             [
-                'workspace_id' => $workspace->id,
-                'branch_id' => $branchMalioboro->id,
+                'workspace_id' => $workspaceSeturan->id,
+                'branch_id' => $branchKaliurangSeturan->id,
             ],
             [
                 'late_penalty_per_minute' => 1000.00,
@@ -81,17 +79,55 @@ class BranchSeeder extends Seeder
             ]
         );
 
-        // POS Terminal Malioboro
         PosTerminal::withoutGlobalScopes()->firstOrCreate(
             [
-                'workspace_id' => $workspace->id,
-                'branch_id' => $branchMalioboro->id,
-                'terminal_name' => 'Amore POS Tab Malioboro #01',
+                'workspace_id' => $workspaceSeturan->id,
+                'branch_id' => $branchKaliurangSeturan->id,
+                'terminal_name' => 'Norde POS Tab Kaliurang #01',
             ],
             [
-                'device_token_hash' => hash('sha256', 'pos-device-token-malioboro-01'),
+                'device_token_hash' => hash('sha256', 'pos-device-token-kaliurang-01'),
                 'is_active' => true,
             ]
         );
+
+        // 3. Cabang 2 pada Workspace 2 (jika workspace 2 terpisah)
+        if ($workspaceKaliurang->id !== $workspaceSeturan->id) {
+            $branchKaliurangWS2 = Branch::withoutGlobalScopes()->firstOrCreate(
+                [
+                    'workspace_id' => $workspaceKaliurang->id,
+                    'name' => 'Norde Coffee - Kaliurang #02',
+                ],
+                [
+                    'lat' => -7.72145000,
+                    'lng' => 110.39567000,
+                    'radius_meters' => 60,
+                ]
+            );
+
+            BranchSetting::withoutGlobalScopes()->firstOrCreate(
+                [
+                    'workspace_id' => $workspaceKaliurang->id,
+                    'branch_id' => $branchKaliurangWS2->id,
+                ],
+                [
+                    'late_penalty_per_minute' => 1000.00,
+                    'overtime_pay_per_hour' => 20000.00,
+                    'min_overtime_threshold_minutes' => 30,
+                ]
+            );
+
+            PosTerminal::withoutGlobalScopes()->firstOrCreate(
+                [
+                    'workspace_id' => $workspaceKaliurang->id,
+                    'branch_id' => $branchKaliurangWS2->id,
+                    'terminal_name' => 'Norde POS Tab Kaliurang #02',
+                ],
+                [
+                    'device_token_hash' => hash('sha256', 'pos-device-token-kaliurang-ws2'),
+                    'is_active' => true,
+                ]
+            );
+        }
     }
 }
