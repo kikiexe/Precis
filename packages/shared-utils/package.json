@@ -1,0 +1,19 @@
+{
+  "name": "@precis/shared-utils",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./formatters": "./src/formatters.ts",
+    "./defaults": "./src/defaults.ts"
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

@@ -10,6 +10,9 @@ importers:
 
   frontend-app:
     dependencies:
+      '@precis/shared-utils':
+        specifier: workspace:*
+        version: link:../packages/shared-utils
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -81,6 +84,9 @@ importers:
 
   frontend-pos:
     dependencies:
+      '@precis/shared-utils':
+        specifier: workspace:*
+        version: link:../packages/shared-utils
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -118,6 +124,9 @@ importers:
 
   frontend-superadmin:
     dependencies:
+      '@precis/shared-utils':
+        specifier: workspace:*
+        version: link:../packages/shared-utils
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -149,6 +158,12 @@ importers:
       vite:
         specifier: ^6.1.0
         version: 6.4.3(jiti@2.7.0)(lightningcss@1.32.0)
+
+  packages/shared-utils:
+    devDependencies:
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
 
 packages:
 
