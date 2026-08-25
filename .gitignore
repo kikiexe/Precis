@@ -75,5 +75,14 @@ backend/bootstrap/cache/*
 backend/database/seeders/assets/*
 */public/seeders/*
 
-# Documentation internal (if needed)
+# TypeScript & Linter Caches
+*.tsbuildinfo
+.eslintcache
+*.local
+
+# Documentation
 docs/
+
+# Graphify Caches
+graphify-out/
+.agents/
