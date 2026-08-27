@@ -97,40 +97,69 @@ class ShiftService
         /** @var WorkspaceMember|null $member */
         $member = WorkspaceMember::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
-            ->where('user_id', $assignedUserId)
+            ->where(function ($query) use ($assignedUserId): void {
+                $query->where('user_id', $assignedUserId)
+                    ->orWhere('id', $assignedUserId);
+            })
             ->where('is_active', true)
             ->first();
 
         if (! $member) {
             throw ValidationException::withMessages([
-                'assigned_user_id' => ['Karyawan bukan anggota aktif di workspace ini.'],
+                'assigned_user_id' => ['Karyawan tidak ditemukan atau bukan anggota aktif di workspace ini.'],
             ]);
         }
 
+        $realUserId = (string) $member->user_id;
         $formattedDate = Carbon::parse($date)->toDateString();
 
         // validasi anti-duplikasi: staf tidak boleh memiliki 2 shift di hari yang sama
         $existing = ShiftAssignment::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
-            ->where('assigned_user_id', $assignedUserId)
+            ->where('assigned_user_id', $realUserId)
             ->whereDate('date', $formattedDate)
             ->first();
 
         if ($existing) {
-            throw ValidationException::withMessages([
-                'assigned_user_id' => ['Karyawan ini sudah memiliki penugasan shift pada tanggal tersebut.'],
+            $existing->update([
+                'shift_template_id' => $template->id,
+                'is_swap' => false,
+                'swap_status' => 'NONE',
+                'actual_user_id' => null,
+                'swap_approved_by_user_id' => null,
             ]);
+
+            return $existing;
         }
 
         return ShiftAssignment::create([
             'workspace_id' => $workspaceId,
             'shift_template_id' => $template->id,
-            'assigned_user_id' => $assignedUserId,
+            'assigned_user_id' => $realUserId,
             'date' => $formattedDate,
             'is_swap' => false,
             'swap_status' => 'NONE',
             'created_by_user_id' => $creator->id,
         ]);
+    }
+
+    /**
+     * Hapus / batalkan penugasan shift (menjadikan hari libur / off)
+     */
+    public function deleteAssignment(string $workspaceId, string $assignmentId): void
+    {
+        $assignment = ShiftAssignment::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->where('id', $assignmentId)
+            ->first();
+
+        if (! $assignment) {
+            throw ValidationException::withMessages([
+                'shift_assignment_id' => ['Penugasan shift tidak ditemukan.'],
+            ]);
+        }
+
+        $assignment->delete();
     }
 
     /**
@@ -167,28 +196,33 @@ class ShiftService
             ]);
         }
 
-        if ($targetUserId === $requester->id) {
-            throw ValidationException::withMessages([
-                'target_user_id' => ['Karyawan pengganti tidak boleh sama dengan pemohon.'],
-            ]);
-        }
-
         /** @var WorkspaceMember|null $targetMember */
         $targetMember = WorkspaceMember::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
-            ->where('user_id', $targetUserId)
+            ->where(function ($query) use ($targetUserId): void {
+                $query->where('user_id', $targetUserId)
+                    ->orWhere('id', $targetUserId);
+            })
             ->where('is_active', true)
             ->first();
 
         if (! $targetMember) {
             throw ValidationException::withMessages([
-                'target_user_id' => ['Karyawan pengganti bukan anggota aktif di workspace ini.'],
+                'target_user_id' => ['Karyawan pengganti tidak ditemukan atau bukan anggota aktif di workspace ini.'],
+            ]);
+        }
+
+        $realTargetUserId = (string) $targetMember->user_id;
+
+        if ($realTargetUserId === $requester->id) {
+            throw ValidationException::withMessages([
+                'target_user_id' => ['Karyawan pengganti tidak boleh sama dengan pemohon.'],
             ]);
         }
 
         $assignment->update([
             'is_swap' => true,
-            'actual_user_id' => $targetUserId,
+            'actual_user_id' => $realTargetUserId,
             'swap_status' => 'PENDING',
             'swap_approved_by_user_id' => null,
         ]);

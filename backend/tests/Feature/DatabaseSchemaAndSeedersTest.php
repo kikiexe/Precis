@@ -50,7 +50,7 @@ class DatabaseSchemaAndSeedersTest extends TestCase
 
         // 3. Verify Branches, Settings, and POS Terminals
         $branches = Branch::withoutGlobalScopes()->where('workspace_id', $workspace->id)->get();
-        $this->assertCount(2, $branches);
+        $this->assertCount(1, $branches);
 
         foreach ($branches as $branch) {
             $this->assertDatabaseHas('branch_settings', [
@@ -67,17 +67,18 @@ class DatabaseSchemaAndSeedersTest extends TestCase
         $this->assertDatabaseHas('users', ['email' => 'paundra@gmail.com']);
         $this->assertDatabaseHas('users', ['email' => 'ami@gmail.com']);
         $this->assertDatabaseHas('users', ['email' => 'hani@gmail.com']);
+        $this->assertDatabaseHas('users', ['email' => 'ajril@gmail.com']);
         $this->assertDatabaseHas('users', ['email' => 'rama@gmail.com']);
         $this->assertDatabaseHas('users', ['email' => 'kia@gmail.com']);
 
-        $totalMembers = WorkspaceMember::withoutGlobalScopes()->where('workspace_id', $workspace->id)->count();
-        $this->assertEquals(6, $totalMembers); // Owner + Manager + 4 Cashiers
+        $totalMembersWS1 = WorkspaceMember::withoutGlobalScopes()->where('workspace_id', $workspace->id)->count();
+        $this->assertEquals(4, $totalMembersWS1); // Owner + Manager + 2 Cashiers (Ami & Hani)
 
         $templates = ShiftTemplate::withoutGlobalScopes()->where('workspace_id', $workspace->id)->count();
-        $this->assertEquals(4, $templates);
+        $this->assertEquals(2, $templates); // Pagi & Sore
 
         $assignments = ShiftAssignment::withoutGlobalScopes()->where('workspace_id', $workspace->id)->count();
-        $this->assertEquals(2, $assignments);
+        $this->assertEquals(1, $assignments);
 
         // 5. Verify Categories and Products
         $categories = Category::withoutGlobalScopes()->where('workspace_id', $workspace->id)->count();

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\User;
 use App\Models\WorkspaceMember;
+use App\Models\WorkspaceRole;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,26 +17,32 @@ use Symfony\Component\HttpFoundation\Response;
 class MemberController
 {
     /**
-     * ambil daftar seluruh anggota tim / staf di workspace aktif
+     * ambil daftar seluruh karyawan (member) dalam workspace
      */
     public function index(Request $request): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
 
         $members = WorkspaceMember::withoutGlobalScopes()
-            ->with(['user', 'branch'])
+            ->with(['user', 'branch', 'customRole.permissions'])
             ->where('workspace_id', $workspaceId)
-            ->orderByRaw("CASE WHEN role = 'OWNER' THEN 1 WHEN role = 'ADMIN' THEN 2 WHEN role = 'MANAGER' THEN 3 ELSE 4 END")
+            ->orderByRaw("CASE WHEN role = 'OWNER' THEN 1 ELSE 2 END")
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function (WorkspaceMember $member): array {
+                $isOwner = $member->role === 'OWNER';
+                $roleName = $member->customRole?->name ?? ($isOwner ? 'Pemilik Usaha' : $member->role);
+
                 return [
                     'id' => $member->id,
                     'user_id' => $member->user_id,
                     'name' => $member->user?->name ?? 'Tanpa Nama',
                     'email' => $member->user?->email ?? '-',
-                    'job_title' => $member->job_title ?: ($member->role === 'OWNER' ? 'Pemilik Usaha' : 'Staf'),
+                    'job_title' => $member->job_title ?: ($isOwner ? 'Pemilik Usaha' : 'Staf'),
                     'role' => $member->role,
+                    'role_id' => $member->role_id,
+                    'role_name' => $roleName,
+                    'permissions' => $isOwner ? ['*'] : ($member->customRole ? $member->customRole->permissions->pluck('permission')->toArray() : []),
                     'branch_id' => $member->branch_id,
                     'branch_name' => $member->branch?->name ?? 'Semua Cabang',
                     'base_salary' => (float) $member->base_salary,
@@ -73,7 +80,8 @@ class MemberController
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255'],
             'job_title' => ['required', 'string', 'max:100'],
-            'role' => ['required', 'string', 'in:ADMIN,MANAGER,STAFF'],
+            'role' => ['sometimes', 'string', 'max:50'],
+            'role_id' => ['nullable', 'string', 'uuid'],
             'base_salary' => ['required', 'numeric', 'min:0'],
         ]);
 
@@ -103,17 +111,32 @@ class MemberController
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
+            $roleId = $validated['role_id'] ?? null;
+            $roleName = $validated['role'] ?? 'STAFF';
+
+            if ($roleId) {
+                $roleModel = WorkspaceRole::withoutGlobalScopes()
+                    ->where('workspace_id', $workspaceId)
+                    ->find($roleId);
+                if ($roleModel) {
+                    $roleName = $roleModel->name;
+                } else {
+                    $roleId = null;
+                }
+            }
+
             $member = WorkspaceMember::withoutGlobalScopes()->create([
                 'workspace_id' => $workspaceId,
                 'user_id' => $user->id,
                 'branch_id' => $branchId,
+                'role_id' => $roleId,
                 'job_title' => $validated['job_title'],
-                'role' => $validated['role'],
+                'role' => $roleName,
                 'base_salary' => (float) $validated['base_salary'],
                 'is_active' => true,
             ]);
 
-            $member->load(['user', 'branch']);
+            $member->load(['user', 'branch', 'customRole.permissions']);
 
             return new JsonResponse([
                 'message' => "Karyawan {$user->name} ({$member->job_title}) berhasil ditambahkan. Kata sandi awal: Password123!",
@@ -124,6 +147,8 @@ class MemberController
                     'email' => $member->user?->email,
                     'job_title' => $member->job_title,
                     'role' => $member->role,
+                    'role_id' => $member->role_id,
+                    'role_name' => $member->customRole?->name ?? $member->role,
                     'branch_id' => $member->branch_id,
                     'branch_name' => $member->branch?->name ?? 'Semua Cabang',
                     'base_salary' => (float) $member->base_salary,
@@ -135,7 +160,7 @@ class MemberController
     }
 
     /**
-     * perbarui data karyawan (job_title, role, branch, base_salary)
+     * perbarui data karyawan (job_title, role, role_id, branch, base_salary)
      */
     public function update(Request $request, string $id): JsonResponse
     {
@@ -143,7 +168,8 @@ class MemberController
 
         $validated = $request->validate([
             'job_title' => ['sometimes', 'string', 'max:100'],
-            'role' => ['sometimes', 'string', 'in:ADMIN,MANAGER,STAFF'],
+            'role' => ['sometimes', 'string', 'max:50'],
+            'role_id' => ['nullable', 'string', 'uuid'],
             'base_salary' => ['sometimes', 'numeric', 'min:0'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
@@ -157,8 +183,23 @@ class MemberController
             $member->job_title = $validated['job_title'];
         }
 
-        if ($member->role !== 'OWNER' && isset($validated['role'])) {
-            $member->role = $validated['role'];
+        if ($member->role !== 'OWNER') {
+            if ($request->has('role_id')) {
+                $roleId = $validated['role_id'];
+                if ($roleId) {
+                    $roleModel = WorkspaceRole::withoutGlobalScopes()
+                        ->where('workspace_id', $workspaceId)
+                        ->find($roleId);
+                    if ($roleModel) {
+                        $member->role_id = $roleModel->id;
+                        $member->role = $roleModel->name;
+                    }
+                } else {
+                    $member->role_id = null;
+                }
+            } elseif (isset($validated['role'])) {
+                $member->role = $validated['role'];
+            }
         }
 
         if ($request->has('branch_id')) {
@@ -183,7 +224,7 @@ class MemberController
         }
 
         $member->save();
-        $member->load(['user', 'branch']);
+        $member->load(['user', 'branch', 'customRole.permissions']);
 
         return new JsonResponse([
             'message' => "Data karyawan {$member->user?->name} berhasil diperbarui.",
@@ -192,8 +233,10 @@ class MemberController
                 'user_id' => $member->user_id,
                 'name' => $member->user?->name,
                 'email' => $member->user?->email,
-                'job_title' => $member->job_title ?: ($member->role === 'OWNER' ? 'Pemilik Usaha' : 'Staf'),
+                'job_title' => $member->job_title,
                 'role' => $member->role,
+                'role_id' => $member->role_id,
+                'role_name' => $member->customRole?->name ?? ($member->role === 'OWNER' ? 'Pemilik Usaha' : $member->role),
                 'branch_id' => $member->branch_id,
                 'branch_name' => $member->branch?->name ?? 'Semua Cabang',
                 'base_salary' => (float) $member->base_salary,
@@ -204,7 +247,7 @@ class MemberController
     }
 
     /**
-     * hapus karyawan dari workspace
+     * hapus (nonaktifkan) karyawan dari workspace
      */
     public function destroy(Request $request, string $id): JsonResponse
     {
@@ -217,7 +260,7 @@ class MemberController
 
         if ($member->role === 'OWNER') {
             return new JsonResponse([
-                'message' => 'Pemilik workspace (OWNER) tidak dapat dihapus.',
+                'message' => 'Pemilik bisnis (OWNER) tidak dapat dihapus dari workspace.',
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 

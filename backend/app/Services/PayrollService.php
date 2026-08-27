@@ -71,7 +71,8 @@ class PayrollService
         $totalLateMinutes = (int) $attendances->sum('late_minutes');
         $totalOvertimeMinutes = (int) $attendances->sum('overtime_minutes');
 
-        $latePenalty = round($totalLateMinutes * $latePenaltyPerMinute, 2);
+        $isExemptFromLatePenalty = $member->role === 'OWNER' || $member->hasPermission('attendance.exempt_penalty');
+        $latePenalty = $isExemptFromLatePenalty ? 0.00 : round($totalLateMinutes * $latePenaltyPerMinute, 2);
         $overtimePay = round($totalOvertimeMinutes * $overtimePayPerMinute, 2);
 
         // akumulasi kasbon aktif staf yang belum dilunasi
@@ -165,6 +166,13 @@ class PayrollService
             ->get()
             ->groupBy('user_id');
 
+        $disbursedPayrolls = Payroll::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->where('period_start', $periodStart)
+            ->where('period_end', $periodEnd)
+            ->get()
+            ->keyBy('user_id');
+
         $items = [];
         $totalBase = 0.0;
         $totalOvertime = 0.0;
@@ -189,6 +197,12 @@ class PayrollService
                 memberAttendances: $userAttendances,
                 memberCashAdvances: $userCashAdvances
             );
+
+            /** @var Payroll|null $disbursed */
+            $disbursed = $disbursedPayrolls->get($uId);
+            $calculated['status'] = $disbursed ? 'DISBURSED' : 'ESTIMATED';
+            $calculated['disbursed_at'] = $disbursed?->disbursed_at?->toIso8601String();
+
             $items[] = $calculated;
 
             $totalBase += $calculated['base_salary'];

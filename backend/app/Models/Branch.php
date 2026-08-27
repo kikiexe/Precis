@@ -53,9 +53,19 @@ class Branch extends Model
         return $this->hasOne(BranchSetting::class, 'branch_id');
     }
 
+    public function settings(): HasOne
+    {
+        return $this->setting();
+    }
+
     public function posTerminals(): HasMany
     {
         return $this->hasMany(PosTerminal::class, 'branch_id');
+    }
+
+    public function terminals(): HasMany
+    {
+        return $this->posTerminals();
     }
 
     public function posSessions(): HasMany

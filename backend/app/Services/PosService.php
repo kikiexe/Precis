@@ -84,6 +84,13 @@ class PosService
             ]);
         }
 
+        // Jika member terikat ke branch tertentu, pastikan sesuai dengan branch terminal
+        if ($member->branch_id && $member->branch_id !== $branchId) {
+            throw ValidationException::withMessages([
+                'cashier_user_id' => ['Kasir tidak ditugaskan pada cabang terminal POS ini.'],
+            ]);
+        }
+
         return PosSession::create([
             'workspace_id' => $workspaceId,
             'branch_id' => $branchId,
@@ -110,6 +117,7 @@ class PosService
         if ($posSessionId) {
             $session = PosSession::withoutGlobalScopes()
                 ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
                 ->where('id', $posSessionId)
                 ->where('status', 'OPEN')
                 ->first();
@@ -124,13 +132,14 @@ class PosService
 
         if (! $session) {
             throw ValidationException::withMessages([
-                'pos_session_id' => ['Tidak ditemukan sesi kasir aktif yang sedang terbuka.'],
+                'pos_session_id' => ['Tidak ditemukan sesi kasir aktif yang sedang terbuka pada cabang ini.'],
             ]);
         }
 
         // kalkulasi total penerimaan kas tunai selama sesi ini
         $cashSales = (float) Order::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
+            ->where('branch_id', $branchId)
             ->where('pos_session_id', $session->id)
             ->where('payment_method', 'CASH')
             ->where('payment_status', 'PAID')
@@ -154,7 +163,7 @@ class PosService
     }
 
     /**
-     * sinkronisasi batch transaksi penjualan offline dengan jaminan idempoten
+     * sinkronisasi batch transaksi penjualan offline dengan jaminan idempoten dan verifikasi harga server-side
      *
      * @param  array<int, array<string, mixed>>  $ordersPayload
      * @return array{synced_count: int, order_ids: array<int, string>}
@@ -167,6 +176,25 @@ class PosService
     ): array {
         return DB::transaction(function () use ($workspaceId, $branchId, $posTerminalId, $ordersPayload): array {
             $syncedIds = [];
+
+            // Kumpulkan seluruh product_id dari payload untuk prefetch harga dari database
+            $productIds = [];
+            foreach ($ordersPayload as $orderData) {
+                if (! empty($orderData['items']) && is_array($orderData['items'])) {
+                    foreach ($orderData['items'] as $item) {
+                        if (! empty($item['product_id'])) {
+                            $productIds[] = (string) $item['product_id'];
+                        }
+                    }
+                }
+            }
+
+            /** @var \Illuminate\Support\Collection<string, Product> $products */
+            $products = Product::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->whereIn('id', array_unique($productIds))
+                ->get()
+                ->keyBy('id');
 
             foreach ($ordersPayload as $orderData) {
                 $clientOrderId = (string) $orderData['client_order_id'];
@@ -182,33 +210,77 @@ class PosService
                     continue;
                 }
 
+                // Kalkulasi ulang subtotal dan total harga di sisi server
+                $calculatedTotalAmount = 0.0;
+                $processedItems = [];
+
+                if (! empty($orderData['items']) && is_array($orderData['items'])) {
+                    foreach ($orderData['items'] as $item) {
+                        $productId = isset($item['product_id']) ? (string) $item['product_id'] : null;
+                        $quantity = max(1, (int) ($item['quantity'] ?? 1));
+                        /** @var Product|null $product */
+                        $product = $productId ? $products->get($productId) : null;
+
+                        // Gunakan harga resmi database jika produk terdaftar, fallback ke unit_price client
+                        $unitPrice = $product ? (float) $product->base_price : (float) ($item['unit_price'] ?? 0.0);
+                        $productName = $product ? $product->name : (string) ($item['product_name'] ?? 'Item');
+                        $subtotal = $unitPrice * $quantity;
+                        $calculatedTotalAmount += $subtotal;
+
+                        $processedItems[] = [
+                            'product_id' => $productId,
+                            'product_name' => $productName,
+                            'unit_price' => $unitPrice,
+                            'quantity' => $quantity,
+                            'subtotal' => $subtotal,
+                            'notes' => $item['notes'] ?? null,
+                        ];
+                    }
+                }
+
+                $totalAmount = count($processedItems) > 0 ? $calculatedTotalAmount : (float) $orderData['total_amount'];
+                $discountAmount = max(0.0, min($totalAmount, (float) ($orderData['discount_amount'] ?? 0.00)));
+                $finalAmount = max(0.0, $totalAmount - $discountAmount);
+
+                // Validasi kasir di dalam workspace
+                $cashierUserId = isset($orderData['cashier_user_id']) ? (string) $orderData['cashier_user_id'] : null;
+                if ($cashierUserId) {
+                    $cashierExists = WorkspaceMember::withoutGlobalScopes()
+                        ->where('workspace_id', $workspaceId)
+                        ->where('user_id', $cashierUserId)
+                        ->where('is_active', true)
+                        ->exists();
+
+                    if (! $cashierExists) {
+                        $cashierUserId = null;
+                    }
+                }
+
                 $order = Order::create([
                     'workspace_id' => $workspaceId,
                     'branch_id' => $branchId,
                     'pos_session_id' => $orderData['pos_session_id'] ?? null,
                     'pos_terminal_id' => $posTerminalId,
-                    'cashier_user_id' => $orderData['cashier_user_id'] ?? null,
+                    'cashier_user_id' => $cashierUserId,
                     'client_order_id' => $clientOrderId,
                     'order_number' => (string) $orderData['order_number'],
-                    'total_amount' => (float) $orderData['total_amount'],
-                    'discount_amount' => (float) ($orderData['discount_amount'] ?? 0.00),
-                    'final_amount' => (float) $orderData['final_amount'],
+                    'total_amount' => $totalAmount,
+                    'discount_amount' => $discountAmount,
+                    'final_amount' => $finalAmount,
                     'payment_method' => (string) $orderData['payment_method'],
                     'payment_status' => (string) ($orderData['payment_status'] ?? 'PAID'),
                 ]);
 
-                if (! empty($orderData['items']) && is_array($orderData['items'])) {
-                    foreach ($orderData['items'] as $item) {
-                        OrderItem::create([
-                            'order_id' => $order->id,
-                            'product_id' => $item['product_id'] ?? null,
-                            'product_name' => (string) $item['product_name'],
-                            'unit_price' => (float) $item['unit_price'],
-                            'quantity' => (int) $item['quantity'],
-                            'subtotal' => (float) $item['subtotal'],
-                            'notes' => $item['notes'] ?? null,
-                        ]);
-                    }
+                foreach ($processedItems as $item) {
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $item['product_id'],
+                        'product_name' => $item['product_name'],
+                        'unit_price' => $item['unit_price'],
+                        'quantity' => $item['quantity'],
+                        'subtotal' => $item['subtotal'],
+                        'notes' => $item['notes'],
+                    ]);
                 }
 
                 $syncedIds[] = $order->id;

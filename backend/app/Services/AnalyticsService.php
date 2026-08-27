@@ -16,7 +16,7 @@ class AnalyticsService
     public function getSalesAnalytics(string $workspaceId, string $period = 'day', ?string $branchId = null): array
     {
         $now = Carbon::now();
-        $dateRanges = $this->resolveDateRanges($period, $now);
+        $dateRanges = $this->resolveDateRanges($period, $now, $workspaceId);
 
         $start = $dateRanges['start'];
         $end = $dateRanges['end'];
@@ -91,7 +91,7 @@ class AnalyticsService
     /**
      * @return array{period: string, start: Carbon, end: Carbon, prevStart: Carbon, prevEnd: Carbon, periodLabel: string, growthLabel: string}
      */
-    private function resolveDateRanges(string $period, Carbon $now): array
+    private function resolveDateRanges(string $period, Carbon $now, string $workspaceId): array
     {
         switch ($period) {
             case 'week':
@@ -115,13 +115,53 @@ class AnalyticsService
                 break;
 
             case 'year':
-                $start = $now->copy()->startOfYear();
-                $end = $now->copy()->endOfYear();
-                $prevStart = $start->copy()->subYear();
-                $prevEnd = $end->copy()->subYear();
-                $periodLabel = 'Tahun Ini';
-                $growthLabel = 'vs tahun lalu';
+                $wsCreatedRaw = DB::table('workspaces')->where('id', $workspaceId)->value('created_at');
+                $earliestOrderRaw = DB::table('orders')->where('workspace_id', $workspaceId)->min('created_at');
+
+                $wsCreatedAt = $wsCreatedRaw ? Carbon::parse((string) $wsCreatedRaw) : $now->copy()->startOfYear();
+                if ($earliestOrderRaw) {
+                    $earliestOrderDate = Carbon::parse((string) $earliestOrderRaw);
+                    if ($earliestOrderDate->isBefore($wsCreatedAt)) {
+                        $wsCreatedAt = $earliestOrderDate;
+                    }
+                }
+
+                // Mulai dari bulan pembukaan workspace / transaksi pertama, berakhir di hari saat ini
+                $earliestAllowed = $now->copy()->subYears(2)->startOfMonth();
+                $start = $wsCreatedAt->isAfter($earliestAllowed) ? $wsCreatedAt->copy()->startOfMonth() : $now->copy()->startOfYear();
+                $end = $now->copy()->endOfDay();
+
+                $durationDays = $start->diffInDays($end) ?: 1;
+                $prevEnd = $start->copy()->subDay()->endOfDay();
+                $prevStart = $prevEnd->copy()->subDays((int) $durationDays)->startOfDay();
+
+                $periodLabel = 'Tahun Berjalan';
+                $growthLabel = 'vs periode lalu';
                 $normalizedPeriod = 'year';
+                break;
+
+            case 'all':
+                $earliestOrderRaw = DB::table('orders')->where('workspace_id', $workspaceId)->min('created_at');
+                $wsCreatedRaw = DB::table('workspaces')->where('id', $workspaceId)->value('created_at');
+
+                $wsCreatedAt = $wsCreatedRaw ? Carbon::parse((string) $wsCreatedRaw) : $now->copy()->subYears(2)->startOfMonth();
+                if ($earliestOrderRaw) {
+                    $earliestOrderDate = Carbon::parse((string) $earliestOrderRaw);
+                    if ($earliestOrderDate->isBefore($wsCreatedAt)) {
+                        $wsCreatedAt = $earliestOrderDate;
+                    }
+                }
+
+                $start = $wsCreatedAt->copy()->startOfMonth();
+                $end = $now->copy()->endOfDay();
+
+                $durationDays = $start->diffInDays($end) ?: 1;
+                $prevEnd = $start->copy()->subDay()->endOfDay();
+                $prevStart = $prevEnd->copy()->subDays((int) $durationDays)->startOfDay();
+
+                $periodLabel = 'Sepanjang Waktu';
+                $growthLabel = 'akumulasi total';
+                $normalizedPeriod = 'all';
                 break;
 
             case 'day':
@@ -237,22 +277,28 @@ class AnalyticsService
                 ];
             }
         } else {
-            for ($m = 1; $m <= 12; $m++) {
-                $mStart = $start->copy()->month($m)->startOfMonth();
-                $mEnd = $mStart->copy()->endOfMonth();
+            // Periode Tahunan & Sepanjang Waktu: Dari bulan pembuatan workspace hingga bulan saat ini
+            $cursor = $start->copy()->startOfMonth();
+            $currentMonth = $end->copy()->startOfMonth();
+
+            while ($cursor->lte($currentMonth)) {
+                $mStart = $cursor->copy()->startOfMonth();
+                $mEnd = $cursor->isSameMonth($end) ? $end->copy() : $cursor->copy()->endOfMonth();
 
                 $matching = $mappedOrders->filter(fn ($o) => $o['timestamp']->betweenIncluded($mStart, $mEnd));
                 $count = $matching->count();
                 $rev = (float) $matching->sum('amount');
 
                 $breakdown[] = [
-                    'id' => 'y-m' . $m,
-                    'label' => $mStart->format('M'),
-                    'subLabel' => $mStart->format('Y'),
+                    'id' => ($period === 'all' ? 'all-' : 'y-') . $cursor->format('Y-m'),
+                    'label' => $cursor->format('M Y'),
+                    'subLabel' => $cursor->format('Y'),
                     'revenue' => (int) $rev,
                     'orders_count' => $count,
                     'average_ticket' => $count > 0 ? (int) round($rev / $count) : 0,
                 ];
+
+                $cursor->addMonth();
             }
         }
 

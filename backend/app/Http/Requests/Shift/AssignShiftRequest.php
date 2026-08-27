@@ -17,7 +17,7 @@ class AssignShiftRequest extends FormRequest
     {
         return [
             'shift_template_id' => ['required', 'string', 'uuid', 'exists:shift_templates,id'],
-            'assigned_user_id' => ['required', 'string', 'uuid', 'exists:users,id'],
+            'assigned_user_id' => ['required', 'string', 'uuid'],
             'date' => ['required', 'date_format:Y-m-d'],
         ];
     }

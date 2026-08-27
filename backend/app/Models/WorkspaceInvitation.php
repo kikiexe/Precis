@@ -21,6 +21,7 @@ class WorkspaceInvitation extends Model
         'email',
         'job_title',
         'role',
+        'role_id',
         'base_salary',
         'branch_id',
         'token',
@@ -49,6 +50,11 @@ class WorkspaceInvitation extends Model
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class, 'branch_id');
+    }
+
+    public function customRole(): BelongsTo
+    {
+        return $this->belongsTo(WorkspaceRole::class, 'role_id');
     }
 
     public function isPending(): bool

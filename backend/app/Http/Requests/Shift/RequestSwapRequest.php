@@ -17,7 +17,7 @@ class RequestSwapRequest extends FormRequest
     {
         return [
             'shift_assignment_id' => ['required', 'string', 'uuid', 'exists:shift_assignments,id'],
-            'target_user_id' => ['required', 'string', 'uuid', 'exists:users,id'],
+            'target_user_id' => ['required', 'string', 'uuid'],
         ];
     }
 

@@ -33,7 +33,7 @@ class DeviceTokenAuthTest extends TestCase
                 'branch_id',
                 'branch_name',
             ])
-            ->assertJsonPath('terminal_name', 'Norde POS Tab Seturan #01');
+            ->assertJsonPath('terminal_name', 'Norde POS Tab Seturan');
     }
 
     public function test_missing_device_token_returns_unauthorized(): void

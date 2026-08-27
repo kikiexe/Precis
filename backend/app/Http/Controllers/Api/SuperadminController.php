@@ -58,8 +58,14 @@ class SuperadminController
 
     public function me(Request $request): JsonResponse
     {
-        /** @var Superadmin|null $superadmin */
-        $superadmin = $request->user() instanceof Superadmin ? $request->user() : Superadmin::firstOrFail();
+        /** @var Superadmin $superadmin */
+        $superadmin = $request->user();
+
+        if (! ($superadmin instanceof Superadmin)) {
+            return new JsonResponse([
+                'message' => 'Akses ditolak. Endpoint ini memerlukan otorisasi Superadmin.',
+            ], Response::HTTP_FORBIDDEN);
+        }
 
         return new JsonResponse([
             'message' => 'Profil Superadmin berhasil dimuat.',
@@ -96,7 +102,13 @@ class SuperadminController
     public function verifyInvoice(Request $request, string $id): JsonResponse
     {
         /** @var Superadmin $superadmin */
-        $superadmin = $request->user() instanceof Superadmin ? $request->user() : Superadmin::firstOrFail();
+        $superadmin = $request->user();
+
+        if (! ($superadmin instanceof Superadmin)) {
+            return new JsonResponse([
+                'message' => 'Akses ditolak. Endpoint ini memerlukan otorisasi Superadmin.',
+            ], Response::HTTP_FORBIDDEN);
+        }
 
         $invoice = $this->billingService->verifyInvoicePayment(
             superadmin: $superadmin,

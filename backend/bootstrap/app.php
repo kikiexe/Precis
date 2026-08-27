@@ -22,8 +22,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'workspace.context' => ResolveWorkspaceContext::class,
             'role' => EnsureRole::class,
+            'permission' => \App\Http\Middleware\EnsurePermission::class,
             'pos.device' => DeviceTokenAuth::class,
             'subscription.status' => \App\Http\Middleware\CheckSubscriptionStatus::class,
+            'superadmin' => \App\Http\Middleware\EnsureSuperadmin::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

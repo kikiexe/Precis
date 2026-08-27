@@ -20,7 +20,7 @@ use Illuminate\Validation\ValidationException;
 
 class InvitationService
 {
-    private const int INVITATION_EXPIRATION_DAYS = 7;
+    private const INVITATION_EXPIRATION_DAYS = 30;
 
     /**
      * buat undangan tim baru ke alamat email calon staf dan kirimkan email undangan
@@ -57,7 +57,22 @@ class InvitationService
             }
         }
 
-        return DB::transaction(function () use ($inviter, $workspace, $workspaceId, $email, $data, $branchId): WorkspaceInvitation {
+        $roleId = $data['role_id'] ?? null;
+        $roleName = $data['role'] ?? 'STAFF';
+
+        if ($roleId) {
+            $roleModel = \App\Models\WorkspaceRole::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->find($roleId);
+            if ($roleModel) {
+                $roleName = $roleModel->name;
+                $roleId = $roleModel->id;
+            } else {
+                $roleId = null;
+            }
+        }
+
+        return DB::transaction(function () use ($inviter, $workspace, $workspaceId, $email, $data, $branchId, $roleId, $roleName): WorkspaceInvitation {
             // batalkan undangan pending sebelumnya untuk email yang sama di workspace ini
             WorkspaceInvitation::where('workspace_id', $workspaceId)
                 ->where('email', $email)
@@ -73,7 +88,8 @@ class InvitationService
                 'invited_by_user_id' => $inviter->id,
                 'email' => $email,
                 'job_title' => trim($data['job_title']),
-                'role' => $data['role'],
+                'role' => $roleName,
+                'role_id' => $roleId,
                 'base_salary' => (float) $data['base_salary'],
                 'branch_id' => $branchId,
                 'token' => $token,
@@ -81,7 +97,7 @@ class InvitationService
                 'expires_at' => $expiresAt,
             ]);
 
-            $invitation->load(['workspace', 'invitedBy', 'branch']);
+            $invitation->load(['workspace', 'invitedBy', 'branch', 'customRole']);
 
             $inviteUrl = rtrim((string) config('app.frontend_url', 'http://localhost:5174'), '/') . '/invite?token=' . $token;
 
@@ -98,48 +114,61 @@ class InvitationService
      */
     public function getPendingInvitations(string $workspaceId): Collection
     {
-        return WorkspaceInvitation::with(['invitedBy', 'branch'])
+        return WorkspaceInvitation::with(['branch', 'customRole'])
             ->where('workspace_id', $workspaceId)
             ->where('status', 'PENDING')
-            ->orderByDesc('created_at')
+            ->where('expires_at', '>', Carbon::now())
+            ->orderBy('created_at', 'desc')
             ->get();
     }
 
     /**
-     * batalkan undangan tim yang belum diterima
+     * batalkan undangan yang masih pending
      */
-    public function cancelInvitation(string $workspaceId, string $invitationId): bool
+    public function cancelInvitation(string $workspaceId, string $invitationId): WorkspaceInvitation
     {
-        /** @var WorkspaceInvitation $invitation */
+        /** @var WorkspaceInvitation|null $invitation */
         $invitation = WorkspaceInvitation::where('workspace_id', $workspaceId)
             ->where('id', $invitationId)
-            ->firstOrFail();
+            ->first();
+
+        if (! $invitation) {
+            throw ValidationException::withMessages([
+                'invitation_id' => ['Undangan tidak ditemukan.'],
+            ]);
+        }
 
         if ($invitation->status !== 'PENDING') {
             throw ValidationException::withMessages([
-                'invitation' => ['Hanya undangan dengan status PENDING yang dapat dibatalkan.'],
+                'invitation_id' => ['Hanya undangan berstatus PENDING yang dapat dibatalkan.'],
             ]);
         }
 
         $invitation->update(['status' => 'CANCELLED']);
 
-        return true;
+        return $invitation;
     }
 
     /**
-     * kirim ulang email undangan dengan memperbarui token dan masa berlaku
+     * kirim ulang email undangan
      */
     public function resendInvitation(string $workspaceId, string $invitationId): WorkspaceInvitation
     {
-        /** @var WorkspaceInvitation $invitation */
-        $invitation = WorkspaceInvitation::with(['workspace', 'invitedBy', 'branch'])
+        /** @var WorkspaceInvitation|null $invitation */
+        $invitation = WorkspaceInvitation::with(['workspace', 'invitedBy', 'branch', 'customRole'])
             ->where('workspace_id', $workspaceId)
             ->where('id', $invitationId)
-            ->firstOrFail();
+            ->first();
+
+        if (! $invitation) {
+            throw ValidationException::withMessages([
+                'invitation_id' => ['Undangan tidak ditemukan.'],
+            ]);
+        }
 
         if ($invitation->status !== 'PENDING') {
             throw ValidationException::withMessages([
-                'invitation' => ['Hanya undangan dengan status PENDING yang dapat dikirim ulang.'],
+                'invitation_id' => ['Hanya undangan berstatus PENDING yang dapat dikirim ulang.'],
             ]);
         }
 
@@ -164,7 +193,7 @@ class InvitationService
     public function getInvitationByToken(string $token): WorkspaceInvitation
     {
         /** @var WorkspaceInvitation|null $invitation */
-        $invitation = WorkspaceInvitation::with(['workspace', 'invitedBy', 'branch'])
+        $invitation = WorkspaceInvitation::with(['workspace', 'invitedBy', 'branch', 'customRole'])
             ->where('token', $token)
             ->first();
 
@@ -236,6 +265,7 @@ class InvitationService
                 ],
                 [
                     'branch_id' => $invitation->branch_id,
+                    'role_id' => $invitation->role_id,
                     'job_title' => $invitation->job_title,
                     'role' => $invitation->role,
                     'base_salary' => $invitation->base_salary,

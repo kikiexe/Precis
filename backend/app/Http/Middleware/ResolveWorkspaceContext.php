@@ -44,6 +44,7 @@ class ResolveWorkspaceContext
         }
 
         $member = WorkspaceMember::withoutGlobalScopes()
+            ->with(['customRole.permissions', 'branch'])
             ->where('workspace_id', $workspace->id)
             ->where('user_id', $user->id)
             ->where('is_active', true)

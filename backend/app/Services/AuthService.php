@@ -155,18 +155,42 @@ class AuthService
     private function getSerializedUserWorkspaces(string $userId): array
     {
         return WorkspaceMember::withoutGlobalScopes()
-            ->with(['workspace', 'branch'])
+            ->with(['workspace', 'branch', 'customRole.permissions'])
             ->where('user_id', $userId)
             ->where('is_active', true)
             ->get()
-            ->map(fn (WorkspaceMember $m): array => [
-                'workspace_id' => $m->workspace_id,
-                'workspace_name' => $m->workspace?->name,
-                'workspace_slug' => $m->workspace?->slug,
-                'role' => $m->role,
-                'branch_id' => $m->branch_id,
-                'branch_name' => $m->branch?->name,
-            ])
+            ->map(function (WorkspaceMember $m): array {
+                $isOwner = $m->role === 'OWNER';
+                $permissions = $isOwner ? ['*'] : ($m->customRole ? $m->customRole->permissions->pluck('permission')->toArray() : []);
+                if (! $isOwner && empty($permissions) && $m->role === 'MANAGER') {
+                    $permissions = [
+                        'catalog.view',
+                        'catalog.manage',
+                        'inventory.view',
+                        'inventory.adjust',
+                        'attendance.view_all',
+                        'shifts.manage',
+                        'shifts.approve_swap',
+                        'sales.view_analytics',
+                        'cash_advance.approve',
+                        'members.view',
+                        'pos.manage_terminals',
+                        'pos.void_order',
+                        'pos.apply_discount',
+                    ];
+                }
+
+                return [
+                    'workspace_id' => $m->workspace_id,
+                    'workspace_name' => $m->workspace?->name,
+                    'workspace_slug' => $m->workspace?->slug,
+                    'role' => $m->role,
+                    'job_title' => $m->job_title,
+                    'permissions' => $permissions,
+                    'branch_id' => $m->branch_id,
+                    'branch_name' => $m->branch?->name,
+                ];
+            })
             ->toArray();
     }
 
@@ -351,14 +375,23 @@ class AuthService
             return false;
         }
 
-        // pastikan user punya role OWNER, ADMIN, atau MANAGER di workspace ini
-        $member = WorkspaceMember::withoutGlobalScopes()
+        // pastikan user punya role OWNER, ADMIN, MANAGER, atau permission pos.manage_terminals / pos.void_order
+        $members = WorkspaceMember::withoutGlobalScopes()
+            ->with('customRole.permissions')
             ->where('workspace_id', $workspaceId)
             ->where('user_id', $user->id)
             ->where('is_active', true)
-            ->whereIn('role', ['OWNER', 'ADMIN', 'MANAGER'])
-            ->first();
+            ->get();
 
-        return $member !== null;
+        foreach ($members as $member) {
+            if (
+                in_array($member->role, ['OWNER', 'ADMIN', 'MANAGER'], true)
+                || $member->hasPermission(['pos.manage_terminals', 'pos.void_order'])
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

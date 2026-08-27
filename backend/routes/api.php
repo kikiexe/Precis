@@ -43,12 +43,14 @@ Route::prefix('v1')->group(function (): void {
 
     // endpoint auth portal users
     Route::prefix('auth')->group(function (): void {
-        Route::post('/register', [AuthController::class, 'register']);
-        Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
-        Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
-        Route::post('/login', [AuthController::class, 'login']);
-        Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-        Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+        Route::middleware('throttle:10,1')->group(function (): void {
+            Route::post('/register', [AuthController::class, 'register']);
+            Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+            Route::post('/resend-verification', [AuthController::class, 'resendVerification']);
+            Route::post('/login', [AuthController::class, 'login']);
+            Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+            Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+        });
 
         // authenticated portal users
         Route::middleware('auth:sanctum')->group(function (): void {
@@ -81,9 +83,9 @@ Route::prefix('v1')->group(function (): void {
 
     // endpoint superadmin
     Route::prefix('superadmin')->group(function (): void {
-        Route::post('/auth/login', [\App\Http\Controllers\Api\SuperadminController::class, 'login']);
+        Route::middleware('throttle:5,1')->post('/auth/login', [\App\Http\Controllers\Api\SuperadminController::class, 'login']);
 
-        Route::middleware('auth:sanctum')->group(function (): void {
+        Route::middleware(['auth:sanctum', 'superadmin'])->group(function (): void {
             Route::get('/auth/me', [\App\Http\Controllers\Api\SuperadminController::class, 'me']);
             Route::post('/auth/logout', [\App\Http\Controllers\Api\SuperadminController::class, 'logout']);
 
@@ -126,18 +128,25 @@ Route::prefix('v1')->group(function (): void {
         // media upload presigned URL (object storage)
         Route::post('/media/presign-upload', [MediaController::class, 'presignUpload']);
 
-        // manajemen cabang outlet
+        // manajemen cabang outlet & terminal POS
         Route::get('/branches', [\App\Http\Controllers\Api\BranchController::class, 'index']);
-        Route::middleware('role:OWNER,ADMIN,MANAGER')->put('/branches/{id}', [\App\Http\Controllers\Api\BranchController::class, 'update']);
+        Route::middleware('permission:catalog.manage,roles.manage,members.manage,pos.manage_terminals')->group(function (): void {
+            Route::put('/branches/{id}', [\App\Http\Controllers\Api\BranchController::class, 'update']);
+            Route::post('/branches/{id}/terminals', [\App\Http\Controllers\Api\BranchController::class, 'createTerminal']);
+            Route::post('/branches/{id}/terminals/{terminalId}/regenerate-token', [\App\Http\Controllers\Api\BranchController::class, 'regenerateTerminalToken']);
+            Route::delete('/branches/{id}/terminals/{terminalId}', [\App\Http\Controllers\Api\BranchController::class, 'deleteTerminal']);
+        });
 
         // katalog produk & kategori web portal
         Route::get('/products', [\App\Http\Controllers\Api\ProductCatalogController::class, 'products']);
         Route::get('/categories', [\App\Http\Controllers\Api\ProductCatalogController::class, 'categories']);
-        Route::middleware('role:OWNER,ADMIN,MANAGER')->post('/products', [\App\Http\Controllers\Api\ProductCatalogController::class, 'storeProduct']);
-        Route::middleware('role:OWNER,ADMIN,MANAGER')->put('/products/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'updateProduct']);
-        Route::middleware('role:OWNER,ADMIN,MANAGER')->delete('/products/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'deleteProduct']);
-        Route::middleware('role:OWNER,ADMIN,MANAGER')->post('/categories', [\App\Http\Controllers\Api\ProductCatalogController::class, 'storeCategory']);
-        Route::middleware('role:OWNER,ADMIN,MANAGER')->delete('/categories/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'deleteCategory']);
+        Route::middleware('permission:catalog.manage')->group(function (): void {
+            Route::post('/products', [\App\Http\Controllers\Api\ProductCatalogController::class, 'storeProduct']);
+            Route::put('/products/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'updateProduct']);
+            Route::delete('/products/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'deleteProduct']);
+            Route::post('/categories', [\App\Http\Controllers\Api\ProductCatalogController::class, 'storeCategory']);
+            Route::delete('/categories/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'deleteCategory']);
+        });
 
         // presensi mobile PWA
         Route::prefix('attendances')->group(function (): void {
@@ -148,12 +157,13 @@ Route::prefix('v1')->group(function (): void {
         // manajemen roster shift, templates & pengajuan tukar shift staf
         Route::prefix('shifts')->group(function (): void {
             Route::get('/templates', [ShiftTemplateController::class, 'index']);
-            Route::middleware('role:OWNER,ADMIN,MANAGER')->post('/templates', [ShiftTemplateController::class, 'store']);
-            Route::middleware('role:OWNER,ADMIN,MANAGER')->delete('/templates/{id}', [ShiftTemplateController::class, 'destroy']);
+            Route::middleware('permission:shifts.manage')->post('/templates', [ShiftTemplateController::class, 'store']);
+            Route::middleware('permission:shifts.manage')->delete('/templates/{id}', [ShiftTemplateController::class, 'destroy']);
 
             Route::get('/roster', [ShiftController::class, 'roster']);
             Route::post('/swap-requests', [ShiftController::class, 'requestSwap']);
-            Route::middleware('role:OWNER,ADMIN,MANAGER')->post('/assign', [ShiftController::class, 'assign']);
+            Route::middleware('permission:shifts.manage')->post('/assign', [ShiftController::class, 'assign']);
+            Route::middleware('permission:shifts.manage')->delete('/assignments/{id}', [ShiftController::class, 'deleteAssignment']);
         });
 
         // manajemen kasbon staf
@@ -165,44 +175,54 @@ Route::prefix('v1')->group(function (): void {
         // slip gaji digital staf
         Route::get('/payroll/my-slip', [PayrollController::class, 'mySlip']);
 
-        // endpoint administrasi khusus role OWNER dan ADMIN/MANAGER
-        Route::middleware('role:OWNER,ADMIN,MANAGER')->prefix('admin')->group(function (): void {
-            Route::get('/attendances/wall-of-faces', [AttendanceController::class, 'wallOfFaces']);
-            Route::get('/analytics/sales', [SalesAnalyticsController::class, 'sales']);
+        // manajemen peran & hak akses (custom roles & permissions)
+        Route::prefix('roles')->group(function (): void {
+            Route::get('/permissions-catalog', [\App\Http\Controllers\Api\RoleController::class, 'catalog']);
+            Route::get('/', [\App\Http\Controllers\Api\RoleController::class, 'index']);
+            Route::middleware('permission:roles.manage')->post('/', [\App\Http\Controllers\Api\RoleController::class, 'store']);
+            Route::middleware('permission:roles.manage')->get('/{id}', [\App\Http\Controllers\Api\RoleController::class, 'show']);
+            Route::middleware('permission:roles.manage')->put('/{id}', [\App\Http\Controllers\Api\RoleController::class, 'update']);
+            Route::middleware('permission:roles.manage')->delete('/{id}', [\App\Http\Controllers\Api\RoleController::class, 'destroy']);
+        });
+
+        // endpoint administrasi khusus hak akses relevan
+        Route::prefix('admin')->group(function (): void {
+            Route::middleware('permission:attendance.view_all')->get('/attendances/wall-of-faces', [AttendanceController::class, 'wallOfFaces']);
+            Route::middleware('permission:sales.view_analytics')->get('/analytics/sales', [SalesAnalyticsController::class, 'sales']);
 
             Route::prefix('shifts')->group(function (): void {
-                Route::get('/swap-requests', [ShiftController::class, 'pendingSwapRequests']);
-                Route::post('/swap-requests/{id}/approve', [ShiftController::class, 'approveSwap']);
-                Route::post('/swap-requests/{id}/reject', [ShiftController::class, 'rejectSwap']);
+                Route::middleware('permission:shifts.approve_swap,shifts.manage')->get('/swap-requests', [ShiftController::class, 'pendingSwapRequests']);
+                Route::middleware('permission:shifts.approve_swap,shifts.manage')->post('/swap-requests/{id}/approve', [ShiftController::class, 'approveSwap']);
+                Route::middleware('permission:shifts.approve_swap,shifts.manage')->post('/swap-requests/{id}/reject', [ShiftController::class, 'rejectSwap']);
             });
 
             Route::prefix('cash-advances')->group(function (): void {
-                Route::get('/', [CashAdvanceController::class, 'adminList']);
-                Route::post('/{id}/approve', [CashAdvanceController::class, 'approve']);
-                Route::post('/{id}/reject', [CashAdvanceController::class, 'reject']);
+                Route::middleware('permission:cash_advance.approve')->get('/', [CashAdvanceController::class, 'adminList']);
+                Route::middleware('permission:cash_advance.approve')->post('/{id}/approve', [CashAdvanceController::class, 'approve']);
+                Route::middleware('permission:cash_advance.approve')->post('/{id}/reject', [CashAdvanceController::class, 'reject']);
             });
 
             Route::prefix('payroll')->group(function (): void {
-                Route::get('/preview', [PayrollController::class, 'preview']);
-                Route::post('/disburse', [PayrollController::class, 'disburse']);
-                Route::get('/export-csv', [PayrollController::class, 'exportCsv']);
+                Route::middleware('permission:payroll.view,payroll.disburse')->get('/preview', [PayrollController::class, 'preview']);
+                Route::middleware('permission:payroll.disburse')->post('/disburse', [PayrollController::class, 'disburse']);
+                Route::middleware('permission:payroll.disburse')->get('/export-csv', [PayrollController::class, 'exportCsv']);
             });
 
             Route::prefix('members')->group(function (): void {
-                Route::get('/', [\App\Http\Controllers\Api\MemberController::class, 'index']);
-                Route::post('/', [\App\Http\Controllers\Api\MemberController::class, 'store']);
-                Route::put('/{id}', [\App\Http\Controllers\Api\MemberController::class, 'update']);
-                Route::delete('/{id}', [\App\Http\Controllers\Api\MemberController::class, 'destroy']);
+                Route::middleware('permission:members.view,members.manage')->get('/', [\App\Http\Controllers\Api\MemberController::class, 'index']);
+                Route::middleware('permission:members.manage')->post('/', [\App\Http\Controllers\Api\MemberController::class, 'store']);
+                Route::middleware('permission:members.manage')->put('/{id}', [\App\Http\Controllers\Api\MemberController::class, 'update']);
+                Route::middleware('permission:members.manage')->delete('/{id}', [\App\Http\Controllers\Api\MemberController::class, 'destroy']);
             });
 
             Route::prefix('invitations')->group(function (): void {
-                Route::get('/', [InvitationController::class, 'index']);
-                Route::post('/', [InvitationController::class, 'store']);
-                Route::delete('/{id}', [InvitationController::class, 'destroy']);
-                Route::post('/{id}/resend', [InvitationController::class, 'resend']);
+                Route::middleware('permission:members.view,members.manage')->get('/', [InvitationController::class, 'index']);
+                Route::middleware('permission:members.manage')->post('/', [InvitationController::class, 'store']);
+                Route::middleware('permission:members.manage')->delete('/{id}', [InvitationController::class, 'destroy']);
+                Route::middleware('permission:members.manage')->post('/{id}/resend', [InvitationController::class, 'resend']);
             });
 
-            Route::get('/admin-only', function (Request $request): JsonResponse {
+            Route::middleware('role:OWNER,ADMIN,MANAGER')->get('/admin-only', function (Request $request): JsonResponse {
                 return response()->json([
                     'message' => 'Akses halaman admin diizinkan.',
                     'member_role' => $request->attributes->get('current_member')?->role,
@@ -213,10 +233,31 @@ Route::prefix('v1')->group(function (): void {
 
     // endpoint POS (devicetokenauth)
     Route::middleware('pos.device')->prefix('pos')->group(function (): void {
-        Route::post('/master-unlock', [PosSecurityController::class, 'masterUnlock']);
+        Route::middleware('throttle:5,1')->post('/master-unlock', [PosSecurityController::class, 'masterUnlock']);
 
         Route::get('/terminal-info', function (Request $request): JsonResponse {
+            /** @var \App\Models\PosTerminal $terminal */
             $terminal = $request->attributes->get('current_pos_terminal');
+
+            $cashiers = \App\Models\WorkspaceMember::withoutGlobalScopes()
+                ->with('user')
+                ->where('workspace_id', $terminal->workspace_id)
+                ->where('is_active', true)
+                ->where(function ($q) use ($terminal): void {
+                    $q->where('branch_id', $terminal->branch_id)
+                        ->orWhereNull('branch_id');
+                })
+                ->get()
+                ->map(function (\App\Models\WorkspaceMember $m): array {
+                    return [
+                        'id' => (string) $m->user_id,
+                        'name' => (string) ($m->user?->name ?? 'Kasir'),
+                        'role' => (string) $m->role,
+                        'pin' => '',
+                    ];
+                })
+                ->values()
+                ->toArray();
 
             return response()->json([
                 'terminal_id' => $terminal->id,
@@ -224,6 +265,7 @@ Route::prefix('v1')->group(function (): void {
                 'workspace_id' => $terminal->workspace_id,
                 'branch_id' => $terminal->branch_id,
                 'branch_name' => $terminal->branch?->name,
+                'cashiers' => $cashiers,
             ]);
         });
 

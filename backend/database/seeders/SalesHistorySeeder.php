@@ -5,13 +5,9 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Branch;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\PosSession;
 use App\Models\PosTerminal;
 use App\Models\Product;
 use App\Models\User;
-use App\Models\Workspace;
 use App\Models\WorkspaceMember;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -21,8 +17,13 @@ use Illuminate\Support\Str;
 class SalesHistorySeeder extends Seeder
 {
     /**
-     * Generate 3-month dynamic sales history for Norde Coffee (Seturan & Kaliurang).
-     * Monthly revenue capped under 20jt/month total with realistic daily variance.
+     * Generate 5-year realistic dynamic sales history for Norde Coffee (Seturan & Kaliurang).
+     * Features:
+     * - Yearly macro growth progression over 5 years.
+     * - Seasonal peak months and trough months.
+     * - Promotional festival weeks and bad weather slowdowns.
+     * - Annual Store Anniversary mega peak days and rare blackout days.
+     * - Streamed batch database insertion with single transaction for maximum speed and minimal memory footprint.
      */
     public function run(): void
     {
@@ -36,7 +37,7 @@ class SalesHistorySeeder extends Seeder
         }
 
         $now = Carbon::now();
-        $startDate = (clone $now)->subMonths(3)->startOfDay();
+        $startDate = (clone $now)->subYears(5)->startOfMonth();
         $endDate = clone $now;
 
         $paymentMethods = ['QRIS', 'QRIS', 'QRIS', 'CASH', 'CASH', 'TRANSFER'];
@@ -73,176 +74,222 @@ class SalesHistorySeeder extends Seeder
         }
 
         $currentDate = clone $startDate;
+        $orderCounter = 1;
 
-        while ($currentDate->lte($endDate)) {
-            $isToday = $currentDate->isSameDay($now);
-            $isWeekend = $currentDate->isWeekend();
+        $posSessionRows = [];
+        $orderRows = [];
+        $orderItemRows = [];
 
-            // Random daily factor (randomize some slow days, some peak days)
-            // 15% chance of slow day, 65% normal day, 20% peak day
-            $dayProfileRoll = rand(1, 100);
-            $dayMultiplier = 1.0;
-            if ($dayProfileRoll <= 15) {
-                $dayMultiplier = 0.55; // slow rainy day
-            } elseif ($dayProfileRoll > 80 || $isWeekend) {
-                $dayMultiplier = 1.35; // busy day
+        // Hapus data transaksi lama jika ada untuk idempotency
+        DB::table('order_items')->delete();
+        DB::table('orders')->delete();
+        DB::table('pos_sessions')->delete();
+
+        $flushBatch = function () use (&$posSessionRows, &$orderRows, &$orderItemRows): void {
+            if (! empty($posSessionRows)) {
+                DB::table('pos_sessions')->insert($posSessionRows);
+                $posSessionRows = [];
             }
+            if (! empty($orderRows)) {
+                DB::table('orders')->insert($orderRows);
+                $orderRows = [];
+            }
+            if (! empty($orderItemRows)) {
+                DB::table('order_items')->insert($orderItemRows);
+                $orderItemRows = [];
+            }
+        };
 
-            foreach ($branches as $branch) {
-                $resource = $branchResources[$branch->id];
-                $terminal = $resource['terminal'];
-                $cashiers = $resource['cashiers'];
-                $slugPrefix = $resource['slug_prefix'];
-                $isSeturan = $resource['is_seturan'];
+        DB::beginTransaction();
 
-                // 2 Shift per hari
-                $shifts = [
-                    [
-                        'name' => 'Pagi',
-                        'open_hour' => $isSeturan ? 7 : 8,
-                        'open_min' => rand(0, 15),
-                        'close_hour' => $isSeturan ? 15 : 16,
-                        'close_min' => rand(0, 10),
-                        'opening_cash' => 250000.00,
-                    ],
-                    [
-                        'name' => 'Sore',
-                        'open_hour' => $isSeturan ? 15 : 16,
-                        'open_min' => rand(0, 15),
-                        'close_hour' => $isSeturan ? 23 : 23,
-                        'close_min' => rand(30, 59),
-                        'opening_cash' => 350000.00,
-                    ],
-                ];
+        try {
+            while ($currentDate->lte($endDate)) {
+                $dateStr = $currentDate->toDateString();
+                $monthNum = (int) $currentDate->format('n');
+                $yearDiff = (int) $now->diffInYears($currentDate); // 5 down to 0
+                $isToday = $currentDate->isSameDay($now);
+                $isWeekend = $currentDate->isWeekend();
 
-                foreach ($shifts as $shiftIndex => $shiftConfig) {
-                    $openedAt = (clone $currentDate)->setHour($shiftConfig['open_hour'])->setMinute($shiftConfig['open_min'])->setSecond(0);
-                    $closedAt = (clone $currentDate)->setHour($shiftConfig['close_hour'])->setMinute($shiftConfig['close_min'])->setSecond(0);
+                // 1. Macro Yearly Growth Multiplier
+                $yearlyMultiplier = match (min(5, max(0, $yearDiff))) {
+                    5 => 0.65,
+                    4 => 0.78,
+                    3 => 0.90,
+                    2 => 1.05,
+                    1, 0 => 1.20,
+                };
 
-                    if ($openedAt->gt($now)) {
+                // 2. Monthly Seasonality
+                $monthlyMultiplier = match ($monthNum) {
+                    12 => 1.70, // Liburan Akhir Tahun / Natal
+                    7 => 1.45,  // Liburan Sekolah / Musim Panas
+                    2 => 0.60,  // Pasca Liburan / Musim Hujan
+                    9 => 0.75,  // Low Season
+                    default => 0.90 + (rand(0, 20) / 100.0),
+                };
+
+                // 3. Daily Events & Shocks
+                $isAnniversaryDay = ($currentDate->format('m-d') === '10-15');
+                $isBlackoutDay = ($currentDate->format('m-d') === '02-20');
+
+                $dailyMultiplier = 1.0;
+                if ($isAnniversaryDay) {
+                    $dailyMultiplier = 3.20;
+                } elseif ($isBlackoutDay) {
+                    $dailyMultiplier = 0.20;
+                } else {
+                    $randomNoise = rand(85, 115) / 100.0;
+                    $dailyMultiplier = ($isWeekend ? 1.30 : 0.95) * $randomNoise;
+                }
+
+                $combinedMultiplier = $yearlyMultiplier * $monthlyMultiplier * $dailyMultiplier;
+
+                foreach ($branches as $branch) {
+                    $resource = $branchResources[$branch->id];
+                    $terminal = $resource['terminal'];
+                    $cashiers = $resource['cashiers'];
+                    $products = $resource['products'];
+                    $slugPrefix = $resource['slug_prefix'];
+                    $isSeturan = $resource['is_seturan'];
+
+                    if ($products->isEmpty()) {
                         continue;
                     }
 
-                    $isOngoingSession = $isToday && $closedAt->gt($now);
-                    $sessionStatus = $isOngoingSession ? 'OPEN' : 'CLOSED';
-                    $cashierUser = $cashiers[$shiftIndex % max(1, $cashiers->count())] ?? $cashiers->first();
-                    $branchWorkspaceId = $branch->workspace_id;
+                    // 2 Shift per hari
+                    $shifts = [
+                        [
+                            'name' => 'Pagi',
+                            'open_hour' => $isSeturan ? 7 : 8,
+                            'open_min' => rand(0, 15),
+                            'close_hour' => $isSeturan ? 15 : 16,
+                            'close_min' => rand(0, 10),
+                            'opening_cash' => 250000.00,
+                        ],
+                        [
+                            'name' => 'Sore',
+                            'open_hour' => $isSeturan ? 15 : 16,
+                            'open_min' => rand(0, 15),
+                            'close_hour' => 23,
+                            'close_min' => rand(30, 59),
+                            'opening_cash' => 350000.00,
+                        ],
+                    ];
 
-                    $posSession = PosSession::create([
-                        'id' => (string) Str::uuid(),
-                        'workspace_id' => $branchWorkspaceId,
-                        'branch_id' => $branch->id,
-                        'opened_by_user_id' => $cashierUser?->id,
-                        'closed_by_user_id' => $isOngoingSession ? null : $cashierUser?->id,
-                        'opening_cash' => $shiftConfig['opening_cash'],
-                        'status' => $sessionStatus,
-                        'notes' => "Sesi Shift {$shiftConfig['name']} {$currentDate->toDateString()}",
-                        'opened_at' => $openedAt,
-                        'closed_at' => $isOngoingSession ? null : $closedAt,
-                        'created_at' => $openedAt,
-                        'updated_at' => $isOngoingSession ? $openedAt : $closedAt,
-                    ]);
+                    foreach ($shifts as $shiftIndex => $shiftConfig) {
+                        $openedAt = (clone $currentDate)->setHour($shiftConfig['open_hour'])->setMinute($shiftConfig['open_min'])->setSecond(0);
+                        $closedAt = (clone $currentDate)->setHour($shiftConfig['close_hour'])->setMinute($shiftConfig['close_min'])->setSecond(0);
 
-                    // Target 2 s/d 4 pesanan per shift agar omzet cabang ~100k-250k/shift (Total 2 cabang = ~400k-600k/hari = ~15-19jt/bulan)
-                    $baseOrders = $isSeturan ? rand(2, 4) : rand(2, 3);
-                    $orderCount = max(1, (int) round($baseOrders * $dayMultiplier));
-                    if ($isOngoingSession) {
-                        $orderCount = rand(1, 2);
-                    }
-
-                    $sessionCashSales = 0.00;
-                    $ordersBatch = [];
-                    $orderItemsBatch = [];
-                    $products = $resource['products'];
-
-                    for ($i = 1; $i <= $orderCount; $i++) {
-                        $maxMinutes = max(6, (int) ($closedAt->diffInMinutes($openedAt) - 10));
-                        $minuteOffset = rand(5, $maxMinutes);
-                        $orderTime = (clone $openedAt)->addMinutes($minuteOffset);
-                        if ($orderTime->gt($now)) {
-                            $orderTime = (clone $now)->subMinutes(rand(1, 5));
+                        if ($openedAt->gt($now)) {
+                            continue;
                         }
 
-                        $orderId = (string) Str::uuid();
-                        $clientOrderId = (string) Str::uuid();
-                        $orderNumber = sprintf('ORD-%s-%s-%04d', $slugPrefix, $currentDate->format('Ymd'), ($shiftIndex * 50) + $i);
-                        $paymentMethod = $paymentMethods[array_rand($paymentMethods)];
+                        $isOngoingSession = $isToday && $closedAt->gt($now);
+                        $sessionStatus = $isOngoingSession ? 'OPEN' : 'CLOSED';
+                        $cashierUser = $cashiers[$shiftIndex % max(1, $cashiers->count())] ?? $cashiers->first();
+                        $branchWorkspaceId = $branch->workspace_id;
 
-                        // 75% 1 produk, 25% 2 produk
-                        $itemCount = (rand(1, 100) <= 75) ? 1 : 2;
-                        $selectedProducts = $products->random(min($itemCount, $products->count()));
-                        $orderTotal = 0.00;
+                        $sessionId = (string) Str::uuid();
 
-                        foreach ($selectedProducts as $prod) {
-                            $qty = (rand(1, 100) <= 85) ? 1 : 2;
-                            $unitPrice = (float) $prod->base_price;
-                            $subtotal = $unitPrice * $qty;
-                            $orderTotal += $subtotal;
-
-                            $orderItemsBatch[] = [
-                                'id' => (string) Str::uuid(),
-                                'order_id' => $orderId,
-                                'product_id' => $prod->id,
-                                'product_name' => $prod->name,
-                                'unit_price' => $unitPrice,
-                                'quantity' => $qty,
-                                'subtotal' => $subtotal,
-                                'notes' => (rand(1, 5) === 1) ? 'Less sugar, oatmilk' : null,
-                                'created_at' => $orderTime,
-                                'updated_at' => $orderTime,
-                            ];
-                        }
-
-                        // Diskon 10% pada beberapa transaksi
-                        $discountAmount = 0.00;
-                        if (rand(1, 8) === 1) {
-                            $discountAmount = round($orderTotal * 0.10);
-                        }
-
-                        $finalAmount = max(0.00, $orderTotal - $discountAmount);
-
-                        if ($paymentMethod === 'CASH') {
-                            $sessionCashSales += $finalAmount;
-                        }
-
-                        $ordersBatch[] = [
-                            'id' => $orderId,
+                        $posSessionRows[] = [
+                            'id' => $sessionId,
                             'workspace_id' => $branchWorkspaceId,
                             'branch_id' => $branch->id,
-                            'pos_session_id' => $posSession->id,
-                            'pos_terminal_id' => $terminal?->id,
-                            'cashier_user_id' => $cashierUser?->id,
-                            'client_order_id' => $clientOrderId,
-                            'order_number' => $orderNumber,
-                            'total_amount' => $orderTotal,
-                            'discount_amount' => $discountAmount,
-                            'final_amount' => $finalAmount,
-                            'payment_method' => $paymentMethod,
-                            'payment_status' => 'PAID',
-                            'created_at' => $orderTime,
-                            'updated_at' => $orderTime,
+                            'opened_by_user_id' => $cashierUser?->id,
+                            'closed_by_user_id' => $isOngoingSession ? null : $cashierUser?->id,
+                            'opening_cash' => $shiftConfig['opening_cash'],
+                            'status' => $sessionStatus,
+                            'notes' => "Sesi Shift {$shiftConfig['name']} {$currentDate->toDateString()}",
+                            'opened_at' => $openedAt->toDateTimeString(),
+                            'closed_at' => $isOngoingSession ? null : $closedAt->toDateTimeString(),
+                            'created_at' => $openedAt->toDateTimeString(),
+                            'updated_at' => ($isOngoingSession ? $openedAt : $closedAt)->toDateTimeString(),
                         ];
-                    }
 
-                    if (! empty($ordersBatch)) {
-                        DB::table('orders')->insert($ordersBatch);
-                    }
-                    if (! empty($orderItemsBatch)) {
-                        DB::table('order_items')->insert($orderItemsBatch);
-                    }
+                        $baseOrders = $isSeturan ? 3 : 2;
+                        $orderCount = max(1, (int) round($baseOrders * $combinedMultiplier));
 
-                    if ($sessionStatus === 'CLOSED') {
-                        $expectedCash = $shiftConfig['opening_cash'] + $sessionCashSales;
-                        $posSession->update([
-                            'closing_cash_expected' => $expectedCash,
-                            'closing_cash_actual' => $expectedCash,
-                            'discrepancy_amount' => 0.00,
-                        ]);
+                        if ($isOngoingSession) {
+                            $orderCount = min(2, $orderCount);
+                        }
+
+                        for ($o = 0; $o < $orderCount; $o++) {
+                            $orderId = (string) Str::uuid();
+                            $minuteOffset = rand(15, 420);
+                            $orderTime = (clone $openedAt)->addMinutes($minuteOffset);
+                            if ($orderTime->gt($now)) {
+                                $orderTime = (clone $now)->subMinutes(rand(1, 10));
+                            }
+
+                            $clientOrderId = (string) Str::uuid();
+                            $orderNumber = sprintf('ORD/%s/%s/%05d', $slugPrefix, $currentDate->format('ymd'), $orderCounter++);
+                            $paymentMethod = $paymentMethods[array_rand($paymentMethods)];
+
+                            $itemCount = rand(1, 3);
+                            $selectedProducts = $products->random(min($itemCount, $products->count()));
+
+                            $subtotal = 0.00;
+
+                            foreach ($selectedProducts as $prod) {
+                                $qty = rand(1, 2);
+                                $unitPrice = (float) ($prod->base_price ?? $prod->price ?? 25000.00);
+                                $itemSubtotal = $unitPrice * $qty;
+                                $subtotal += $itemSubtotal;
+
+                                $orderItemRows[] = [
+                                    'id' => (string) Str::uuid(),
+                                    'order_id' => $orderId,
+                                    'product_id' => $prod->id,
+                                    'product_name' => $prod->name,
+                                    'unit_price' => $unitPrice,
+                                    'quantity' => $qty,
+                                    'subtotal' => $itemSubtotal,
+                                    'notes' => null,
+                                    'created_at' => $orderTime->toDateTimeString(),
+                                    'updated_at' => $orderTime->toDateTimeString(),
+                                ];
+                            }
+
+                            $discountAmount = 0.00;
+                            $totalAmount = $subtotal;
+                            $finalAmount = $totalAmount - $discountAmount;
+
+                            $orderRows[] = [
+                                'id' => $orderId,
+                                'workspace_id' => $branchWorkspaceId,
+                                'branch_id' => $branch->id,
+                                'pos_session_id' => $sessionId,
+                                'pos_terminal_id' => $terminal?->id,
+                                'cashier_user_id' => $cashierUser?->id,
+                                'client_order_id' => $clientOrderId,
+                                'order_number' => $orderNumber,
+                                'total_amount' => $totalAmount,
+                                'discount_amount' => $discountAmount,
+                                'final_amount' => $finalAmount,
+                                'payment_method' => $paymentMethod,
+                                'payment_status' => 'PAID',
+                                'created_at' => $orderTime->toDateTimeString(),
+                                'updated_at' => $orderTime->toDateTimeString(),
+                            ];
+                        }
                     }
                 }
+
+                // Flush ke DB setiap 500 item untuk menjaga konsumsi RAM < 10MB
+                if (count($orderItemRows) >= 500) {
+                    $flushBatch();
+                }
+
+                $currentDate->addDay();
             }
 
-            $currentDate->addDay();
+            // Flush sisa baris terakhir
+            $flushBatch();
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
         }
     }
 }

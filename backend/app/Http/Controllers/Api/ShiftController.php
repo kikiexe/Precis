@@ -73,6 +73,23 @@ class ShiftController
     }
 
     /**
+     * Hapus / batalkan penugasan shift (menjadikan libur / off)
+     */
+    public function deleteAssignment(Request $request, string $id): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+
+        $this->shiftService->deleteAssignment(
+            workspaceId: $workspaceId,
+            assignmentId: $id,
+        );
+
+        return new JsonResponse([
+            'message' => 'Penugasan shift berhasil dibatalkan.',
+        ], Response::HTTP_OK);
+    }
+
+    /**
      * ajukan permohonan pertukaran shift oleh staf
      */
     public function requestSwap(RequestSwapRequest $request): JsonResponse

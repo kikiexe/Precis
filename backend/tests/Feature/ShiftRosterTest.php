@@ -99,7 +99,7 @@ class ShiftRosterTest extends TestCase
         ]);
     }
 
-    public function test_assign_shift_fails_when_duplicate_shift_assigned_on_same_date(): void
+    public function test_assign_shift_updates_existing_shift_assigned_on_same_date(): void
     {
         /** @var User $owner */
         $owner = User::where('email', 'kiki@gmail.com')->first();
@@ -129,23 +129,72 @@ class ShiftRosterTest extends TestCase
         Sanctum::actingAs($owner);
 
         // penugasan pertama berhasil
-        $this->withHeader('X-Workspace-Id', $workspace->id)
+        $firstRes = $this->withHeader('X-Workspace-Id', $workspace->id)
             ->postJson('/api/v1/shifts/assign', [
                 'shift_template_id' => $template1->id,
                 'assigned_user_id' => $staff->id,
                 'date' => $targetDate,
             ])->assertStatus(201);
 
-        // penugasan kedua untuk staf yang sama di hari yang sama harus ditolak
-        $response = $this->withHeader('X-Workspace-Id', $workspace->id)
+        $assignmentId = $firstRes->json('data.id');
+
+        // penugasan kedua untuk staf yang sama di hari yang sama memperbarui template shift yang ada
+        $secondRes = $this->withHeader('X-Workspace-Id', $workspace->id)
             ->postJson('/api/v1/shifts/assign', [
                 'shift_template_id' => $template2->id,
                 'assigned_user_id' => $staff->id,
                 'date' => $targetDate,
             ]);
 
-        $response->assertStatus(422)
-            ->assertJsonValidationErrors(['assigned_user_id']);
+        $secondRes->assertStatus(201)
+            ->assertJsonPath('data.id', $assignmentId)
+            ->assertJsonPath('data.shift_template_id', $template2->id);
+
+        $this->assertDatabaseHas('shift_assignments', [
+            'id' => $assignmentId,
+            'shift_template_id' => $template2->id,
+        ]);
+    }
+
+    public function test_owner_and_admin_can_delete_shift_assignment(): void
+    {
+        /** @var User $owner */
+        $owner = User::where('email', 'kiki@gmail.com')->first();
+        /** @var User $staff */
+        $staff = User::where('email', 'ami@gmail.com')->first();
+        $workspace = Workspace::where('slug', 'norde-coffee')->first();
+        $branch = Branch::where('workspace_id', $workspace->id)->where('name', 'like', '%Seturan%')->first();
+
+        $template = ShiftTemplate::create([
+            'workspace_id' => $workspace->id,
+            'branch_id' => $branch->id,
+            'name' => 'Shift Pagi',
+            'expected_clock_in' => '07:00:00',
+            'expected_clock_out' => '15:00:00',
+        ]);
+
+        $targetDate = Carbon::today()->addDays(5)->toDateString();
+
+        Sanctum::actingAs($owner);
+
+        $createRes = $this->withHeader('X-Workspace-Id', $workspace->id)
+            ->postJson('/api/v1/shifts/assign', [
+                'shift_template_id' => $template->id,
+                'assigned_user_id' => $staff->id,
+                'date' => $targetDate,
+            ])->assertStatus(201);
+
+        $assignmentId = $createRes->json('data.id');
+
+        $deleteRes = $this->withHeader('X-Workspace-Id', $workspace->id)
+            ->deleteJson("/api/v1/shifts/assignments/{$assignmentId}");
+
+        $deleteRes->assertOk()
+            ->assertJsonPath('message', 'Penugasan shift berhasil dibatalkan.');
+
+        $this->assertDatabaseMissing('shift_assignments', [
+            'id' => $assignmentId,
+        ]);
     }
 
     public function test_staff_role_cannot_assign_shifts(): void

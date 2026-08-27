@@ -8,11 +8,15 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Workspace;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class ProductCatalogSeeder extends Seeder
 {
     public function run(): void
     {
+        $now = Carbon::now();
+        $pilotCreationDate = (clone $now)->subYears(5)->startOfMonth();
+
         $workspaces = Workspace::all();
 
         $catalog = [
@@ -47,6 +51,10 @@ class ProductCatalogSeeder extends Seeder
                     [
                         'workspace_id' => $workspace->id,
                         'name' => $categoryName,
+                    ],
+                    [
+                        'created_at' => $pilotCreationDate,
+                        'updated_at' => $pilotCreationDate,
                     ]
                 );
 
@@ -60,6 +68,8 @@ class ProductCatalogSeeder extends Seeder
                         [
                             'base_price' => $item['price'],
                             'is_active' => true,
+                            'created_at' => $pilotCreationDate,
+                            'updated_at' => $pilotCreationDate,
                         ]
                     );
                 }

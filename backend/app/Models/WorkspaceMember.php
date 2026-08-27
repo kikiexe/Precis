@@ -23,6 +23,7 @@ class WorkspaceMember extends Model
         'workspace_id',
         'user_id',
         'branch_id',
+        'role_id',
         'job_title',
         'role',
         'pin',
@@ -58,8 +59,76 @@ class WorkspaceMember extends Model
         return $this->belongsTo(Branch::class, 'branch_id');
     }
 
+    public function customRole(): BelongsTo
+    {
+        return $this->belongsTo(WorkspaceRole::class, 'role_id');
+    }
+
     public function payrolls(): HasMany
     {
         return $this->hasMany(Payroll::class, 'workspace_member_id');
+    }
+
+    /**
+     * Memeriksa apakah member memiliki izin akses (permission) tertentu.
+     * Owner selalu memiliki bypass izin penuh (wildcard).
+     *
+     * @param string|array<int, string> $permission
+     */
+    public function hasPermission(string|array $permission): bool
+    {
+        // 1. Owner selalu memiliki hak akses penuh ke seluruh modul
+        if ($this->role === 'OWNER') {
+            return true;
+        }
+
+        // 2. Jika role kustom terhubung, periksa permission mapping
+        $customRole = null;
+        if ($this->relationLoaded('customRole')) {
+            $customRole = $this->customRole;
+        } elseif ($this->role_id) {
+            $customRole = WorkspaceRole::withoutGlobalScopes()->with('permissions')->find($this->role_id);
+        }
+
+        if ($customRole) {
+            $perms = (array) $permission;
+            foreach ($perms as $p) {
+                if ($customRole->hasPermission($p)) {
+                    return true;
+                }
+            }
+        }
+
+        // 3. Fallback compatibility untuk legacy static role (ADMIN / MANAGER / STAFF)
+        if ($this->role === 'ADMIN') {
+            return true;
+        }
+
+        if ($this->role === 'MANAGER') {
+            $managerDefaultAllowed = [
+                'catalog.view',
+                'catalog.manage',
+                'inventory.view',
+                'inventory.adjust',
+                'attendance.view_all',
+                'shifts.manage',
+                'shifts.approve_swap',
+                'sales.view_analytics',
+                'cash_advance.approve',
+                'members.view',
+                'pos.manage_terminals',
+                'pos.reprint_receipt',
+                'pos.void_order',
+                'pos.apply_discount',
+            ];
+            $perms = (array) $permission;
+            foreach ($perms as $p) {
+                if (in_array($p, $managerDefaultAllowed, true)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
