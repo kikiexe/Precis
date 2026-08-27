@@ -1,27 +1,24 @@
 <script lang="ts">
   import {
-    ArrowUpRight,
-    ArrowDownRight,
     CreditCard,
     QrCode,
     Banknote,
     Package,
     ShieldCheck,
-    BarChart3,
     PieChart,
     ChevronRight,
-    ChevronDown,
     Sparkles,
-    Percent
+    Percent,
   } from 'lucide-svelte';
-  import type { TimeframePeriod, TimeframeSalesPoint, User, BranchItem } from '../../types/app';
+  import type { TimeframePeriod, User, BranchItem } from '../../types/app';
   import { inventoryService } from '../../services/inventory-service';
+  import { formatRupiah } from '@precis/shared-utils';
+  import SalesLineChart from './dashboard/SalesLineChart.svelte';
 
   interface Props {
     currentUser: User;
     branches?: BranchItem[];
     selectedBranchId?: string;
-    onSelectBranch?: (branchId: string) => void;
     onNavigate: (domain: 'dashboard' | 'katalog' | 'tim' | 'finance' | 'settings', subTab?: string) => void;
   }
 
@@ -29,15 +26,12 @@
     currentUser,
     branches = [],
     selectedBranchId = 'ALL',
-    onSelectBranch,
     onNavigate,
   }: Props = $props();
 
   let selectedTimeframe = $state<TimeframePeriod>('month');
-  let selectedPointId = $state<string | null>(null);
   let activeInsightTab = $state<'mix' | 'payments' | 'discount'>('mix');
   let activeMixSubTab = $state<'menu' | 'kategori'>('menu');
-  let chartMode = $state<'net' | 'gross_comparison'>('net');
 
   let timeframeData = $state(inventoryService.getTimeframeMetrics('month'));
   let isLoading = $state(false);
@@ -52,42 +46,6 @@
     });
   });
 
-  let activePoint = $derived.by<TimeframeSalesPoint | null>(() => {
-    if (!timeframeData.breakdown || timeframeData.breakdown.length === 0) return null;
-    if (selectedPointId) {
-      const found = timeframeData.breakdown.find((p: TimeframeSalesPoint) => p.id === selectedPointId);
-      if (found) return found;
-    }
-    return timeframeData.breakdown[timeframeData.breakdown.length - 1] || null;
-  });
-
-  let highestRevenuePoint = $derived.by(() => {
-    if (!timeframeData.breakdown || timeframeData.breakdown.length === 0) return 1;
-    return Math.max(...timeframeData.breakdown.map((p: TimeframeSalesPoint) => p.revenue), 1);
-  });
-
-  let pointCount = $derived(timeframeData.breakdown.length);
-  let candleWidthClass = $derived(
-    pointCount > 8
-      ? 'max-w-[14px] sm:max-w-[18px]'
-      : pointCount > 4
-      ? 'max-w-[28px] sm:max-w-[36px]'
-      : 'max-w-[48px] sm:max-w-[56px]'
-  );
-  let candleGapClass = $derived(
-    pointCount > 8
-      ? 'gap-1 sm:gap-1.5'
-      : pointCount > 4
-      ? 'gap-2 sm:gap-3'
-      : 'gap-4 sm:gap-6'
-  );
-  let labelTextClass = $derived(
-    pointCount > 8
-      ? 'text-[9px] sm:text-[10px]'
-      : 'text-[10px] sm:text-[11px]'
-  );
-
-  // Human Readable Business Insight Generator
   let businessInsights = $derived.by(() => {
     const growth = timeframeData.growth_percent;
     const topProd = timeframeData.top_products[0]?.name || 'Menu Utama';
@@ -99,285 +57,113 @@
       return {
         isPositive: true,
         title: `Penjualan ${timeframeData.period_label} Naik +${growth}% (${timeframeData.growth_label})`,
-        summary: `Pendapatan bersih tercatat ${formatCurrency(timeframeData.total_revenue)} dari ${timeframeData.total_orders.toLocaleString('id-ID')} transaksi pesanan.`,
+        summary: `Pendapatan bersih tercatat ${formatRupiah(timeframeData.total_revenue)} dari ${timeframeData.total_orders.toLocaleString('id-ID')} transaksi pesanan.`,
         recommendations: [
-          `Rata-rata nilai belanja per pelanggan berada di angka ${formatCurrency(timeframeData.average_order_value)} per transaksi.`,
+          `Rata-rata nilai belanja per pelanggan berada di angka ${formatRupiah(timeframeData.average_order_value)} per transaksi.`,
           `Menu "${topProd}" menyumbang kontribusi terbesar (${topProdShare}% total volume pesanan).`,
-          `Total potongan diskon & promosi terhitung sebesar ${formatCurrency(timeframeData.total_discount)} (${discountRatio}% dari nilai kotor).`
-        ]
+          `Total potongan diskon & promosi terhitung sebesar ${formatRupiah(timeframeData.total_discount)} (${discountRatio}% dari nilai kotor).`,
+        ],
       };
     } else {
       return {
         isPositive: false,
-        title: `Penjualan ${timeframeData.period_label} Tercatat ${formatCurrency(timeframeData.total_revenue)} (${growth}% ${timeframeData.growth_label})`,
-        summary: `Total ${timeframeData.total_orders.toLocaleString('id-ID')} pesanan berhasil diproses dengan rata-rata tiket ${formatCurrency(timeframeData.average_order_value)}.`,
+        title: `Penjualan ${timeframeData.period_label} Tercatat ${formatRupiah(timeframeData.total_revenue)} (${growth}% ${timeframeData.growth_label})`,
+        summary: `Total ${timeframeData.total_orders.toLocaleString('id-ID')} pesanan berhasil diproses dengan rata-rata tiket ${formatRupiah(timeframeData.average_order_value)}.`,
         recommendations: [
           `Volume transaksi di jam-jam tertentu mengalami penurunan dibanding periode lalu.`,
           `Menu "${topProd}" tetap stabil sebagai produk terfavorit pelanggan (${topProdShare}% porsi).`,
-          `Saran: Tingkatkan penjualan dengan paket bundling menu atau diskon khusus di jam sepi.`
-        ]
+          `Saran: Tingkatkan penjualan dengan paket bundling menu atau diskon khusus di jam sepi.`,
+        ],
       };
     }
   });
 
-  function formatCurrency(amount: number) {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  }
+  const focusRing =
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#17171c]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 </script>
 
-<div class="space-y-4 sm:space-y-6 font-sans pb-4">
+<div class="space-y-6 font-sans pb-8">
   <!-- Top Operational Banner -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white border border-[#d9d9dd] rounded-[24px] p-4 sm:p-6">
-    <div>
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xs">
+    <div class="min-w-0 space-y-1">
       <div class="flex items-center gap-2">
-        <span class="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[#eeece7] text-[#17171c] font-medium">
+        <span class="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[#f4f4f6] text-[#17171c] font-semibold shrink-0">
           Operasional
         </span>
-        {#if branches.length > 0}
-          <div class="relative inline-block">
-            <select
-              value={selectedBranchId}
-              onchange={(e) => onSelectBranch?.((e.target as HTMLSelectElement).value)}
-              class="appearance-none px-3 pr-7 py-1 bg-[#eeece7]/50 hover:bg-[#eeece7] border border-[#d9d9dd] rounded-full text-xs text-[#212121] font-mono focus:outline-hidden cursor-pointer transition-all shadow-2xs"
-            >
-              <option value="ALL">Semua Cabang (Konsolidasi)</option>
-              {#each branches as b}
-                <option value={b.id}>{b.name}</option>
-              {/each}
-            </select>
-            <ChevronDown class="w-3.5 h-3.5 text-[#75758a] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
-        {:else}
-          <span class="text-xs text-[#75758a]">{currentUser.branch_name || 'Norde Coffee'}</span>
-        {/if}
+        <span class="text-xs text-[#8e8e93] font-medium truncate">
+          {currentUser.branch_name || (branches.length > 0 ? branches[0].name : 'Outlet Utama')}
+        </span>
       </div>
-      <h1 class="text-xl sm:text-2xl font-medium text-[#212121] tracking-tight mt-1">
-        Ringkasan Penjualan &amp; Bisnis
-      </h1>
-      <div class="flex items-center gap-2 text-xs text-[#616161] font-normal mt-0.5">
-        <span class="w-2 h-2 rounded-full bg-[#16a34a] animate-pulse shrink-0"></span>
-        <span>Data Terhubung Realtime &bull; Sinkronisasi Kasir Aktif</span>
+      <div class="flex items-center gap-2 mt-1">
+        <h1 class="text-lg sm:text-2xl font-bold text-[#17171c] tracking-tight truncate">
+          Ringkasan Penjualan &amp; Bisnis
+        </h1>
+        <span class="w-2 h-2 rounded-full bg-[#10b981] motion-safe:animate-pulse shrink-0"></span>
       </div>
     </div>
 
-    <div class="flex items-center gap-2 self-stretch sm:self-center">
+    <div class="flex items-center gap-2 shrink-0">
       <button
         type="button"
         onclick={() => onNavigate('katalog', 'menu')}
-        class="flex-1 sm:flex-initial px-3.5 py-2 text-xs font-medium bg-[#17171c] hover:bg-black text-white rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5"
+        class="px-4 py-2 text-xs font-semibold bg-[#17171c] hover:bg-black text-white rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs {focusRing}"
       >
-        <Package class="w-3.5 h-3.5" />
+        <Package class="w-4 h-4" />
         <span>Menu</span>
       </button>
 
       <button
         type="button"
         onclick={() => onNavigate('tim', 'presensi')}
-        class="flex-1 sm:flex-initial px-3.5 py-2 text-xs font-medium bg-white hover:bg-[#eeece7] border border-[#d9d9dd] text-[#212121] rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5"
+        class="px-4 py-2 text-xs font-semibold bg-white hover:bg-[#f8f8fa] border border-[#e5e5ea] text-[#17171c] rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs {focusRing}"
       >
-        <ShieldCheck class="w-3.5 h-3.5" />
+        <ShieldCheck class="w-4 h-4" />
         <span>Presensi</span>
       </button>
     </div>
   </div>
 
-  <!-- Unified Revenue Headline & Chart Hub -->
-  <div class="bg-white border border-[#d9d9dd] rounded-[24px] p-4 sm:p-6 space-y-5">
-    <!-- Top Row: Timeframe Dropdown & Main Revenue Headline -->
-    <div class="space-y-3">
-      <div class="flex items-start justify-between gap-2 pb-3 border-b border-[#f2f2f2]">
+  <!-- Unified Liveline Sales Trend -->
+  <SalesLineChart
+    breakdown={timeframeData.breakdown}
+    totalRevenue={timeframeData.total_revenue}
+    totalDiscount={timeframeData.total_discount}
+    totalOrders={timeframeData.total_orders}
+    averageOrderValue={timeframeData.average_order_value}
+    growthPercent={timeframeData.growth_percent}
+    growthLabel={timeframeData.growth_label}
+    periodLabel={timeframeData.period_label}
+    {selectedTimeframe}
+    onSelectTimeframe={(tf) => (selectedTimeframe = tf)}
+    {isLoading}
+  />
+
+  <!-- Analisis & Rekomendasi Bisnis -->
+  <div class="bg-[#17171c] text-white border border-[#27272a] rounded-2xl sm:rounded-3xl p-5 sm:p-7 space-y-4 shadow-sm">
+    <div class="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-8 h-8 rounded-xl bg-white/10 text-white flex items-center justify-center shrink-0">
+          <Sparkles class="w-4 h-4 text-[#34d399]" />
+        </div>
         <div class="min-w-0">
-          <div class="text-[10px] sm:text-[11px] font-mono text-[#75758a] uppercase tracking-wider truncate">
-            Total Kas Bersih ({timeframeData.period_label})
-          </div>
-          <div class="text-xl sm:text-3xl font-medium font-mono text-[#17171c] tracking-tight mt-0.5 truncate">
-            {formatCurrency(timeframeData.total_revenue)}
-          </div>
-        </div>
-
-        <div class="flex flex-col items-end gap-1 shrink-0">
-          <!-- Timeframe Dropdown Selector -->
-          <div class="relative">
-            <select
-              bind:value={selectedTimeframe}
-              onchange={() => (selectedPointId = null)}
-              class="appearance-none px-3 pr-7 py-1.5 bg-[#eeece7]/50 hover:bg-[#eeece7] border border-[#d9d9dd] rounded-full text-xs text-[#212121] font-mono focus:outline-hidden cursor-pointer transition-all shadow-2xs"
-            >
-              <option value="day">Harian (Per Jam)</option>
-              <option value="week">Pekan Ini</option>
-              <option value="month">Bulan Ini</option>
-              <option value="year">Tahun Ini</option>
-            </select>
-            <ChevronDown class="w-3.5 h-3.5 text-[#75758a] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          </div>
-
-          <div class={`flex items-center gap-1 text-[10px] sm:text-[11px] font-mono font-medium ${
-            timeframeData.growth_percent >= 0 ? 'text-[#00875a]' : 'text-[#e5484d]'
-          }`}>
-            {#if timeframeData.growth_percent >= 0}
-              <ArrowUpRight class="w-3 h-3" />
-              <span>+{timeframeData.growth_percent}% {timeframeData.growth_label}</span>
-            {:else}
-              <ArrowDownRight class="w-3 h-3" />
-              <span>{timeframeData.growth_percent}% {timeframeData.growth_label}</span>
-            {/if}
-          </div>
+          <h3 class="text-sm sm:text-base font-bold text-white truncate">Analisis &amp; Rekomendasi Penjualan</h3>
+          <p class="text-xs text-[#a1a1aa] truncate">Insight performa bisnis &amp; tren transaksi</p>
         </div>
       </div>
 
-      <!-- 4 Key Metric Badges in 1 Row: Gross Sales, Order Count, AOV, Discount -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-        <div class="bg-[#fbfbfb] border border-[#d9d9dd]/60 rounded-xl p-2.5 text-center">
-          <div class="text-[9px] sm:text-[10px] text-[#75758a] uppercase font-mono truncate">Pesanan Kotor (Gross)</div>
-          <div class="text-xs sm:text-sm font-medium font-mono text-[#17171c] mt-0.5 truncate">
-            {formatCurrency(timeframeData.total_revenue + timeframeData.total_discount)}
-          </div>
-        </div>
-
-        <div class="bg-[#fbfbfb] border border-[#d9d9dd]/60 rounded-xl p-2.5 text-center">
-          <div class="text-[9px] sm:text-[10px] text-[#75758a] uppercase font-mono truncate">Volume Pesanan</div>
-          <div class="text-xs sm:text-sm font-medium font-mono text-[#17171c] mt-0.5 truncate">
-            {timeframeData.total_orders.toLocaleString('id-ID')}
-          </div>
-        </div>
-
-        <div class="bg-[#fbfbfb] border border-[#d9d9dd]/60 rounded-xl p-2.5 text-center">
-          <div class="text-[9px] sm:text-[10px] text-[#75758a] uppercase font-mono truncate">Rata-rata Belanja (AOV)</div>
-          <div class="text-xs sm:text-sm font-medium font-mono text-[#17171c] mt-0.5 truncate">
-            {formatCurrency(timeframeData.average_order_value)}
-          </div>
-        </div>
-
-        <div class="bg-[#fbfbfb] border border-[#d9d9dd]/60 rounded-xl p-2.5 text-center">
-          <div class="text-[9px] sm:text-[10px] text-[#75758a] uppercase font-mono truncate">Potongan Diskon</div>
-          <div class="text-xs sm:text-sm font-medium font-mono text-[#e5484d] mt-0.5 truncate">
-            -{formatCurrency(timeframeData.total_discount)}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Chart Section: Multi-series Gross vs Net & Dynamic Track -->
-    <div class="pt-2 space-y-3">
-      <div class="flex items-center justify-between text-xs text-[#75758a]">
-        <div class="flex items-center gap-2">
-          <span class="flex items-center gap-1.5 font-medium text-[#212121]">
-            <BarChart3 class="w-3.5 h-3.5 text-[#17171c]" />
-            <span>Grafik Tren Penjualan</span>
-          </span>
-          <div class="flex items-center gap-1 bg-[#eeece7]/60 p-0.5 rounded-full text-[10px] font-mono">
-            <button
-              type="button"
-              onclick={() => (chartMode = 'net')}
-              class={`px-2 py-0.5 rounded-full transition-all cursor-pointer ${
-                chartMode === 'net' ? 'bg-[#17171c] text-white' : 'text-[#616161]'
-              }`}
-            >
-              Net Sales
-            </button>
-            <button
-              type="button"
-              onclick={() => (chartMode = 'gross_comparison')}
-              class={`px-2 py-0.5 rounded-full transition-all cursor-pointer ${
-                chartMode === 'gross_comparison' ? 'bg-[#17171c] text-white' : 'text-[#616161]'
-              }`}
-            >
-              Gross vs Net
-            </button>
-          </div>
-        </div>
-
-        {#if activePoint}
-          <div class="font-mono text-xs text-[#17171c] font-medium hidden sm:block">
-            {activePoint.label}: {formatCurrency(activePoint.revenue)} ({activePoint.orders_count} pesanan)
-          </div>
-        {/if}
-      </div>
-
-      <!-- Chart Visual Container -->
-      <div class="h-44 sm:h-52 w-full pt-4 flex items-end justify-between {candleGapClass} border-b border-[#eeece7] pb-2 relative select-none">
-        {#if timeframeData.breakdown.length === 0}
-          <div class="w-full h-full flex items-center justify-center text-xs text-[#75758a] font-mono">
-            {isLoading ? 'Memuat data analitik...' : 'Belum ada transaksi di periode ini.'}
-          </div>
-        {:else}
-          {#each timeframeData.breakdown as point}
-            {@const isSelected = activePoint?.id === point.id}
-            {@const heightPercent = Math.max(8, Math.round((point.revenue / highestRevenuePoint) * 100))}
-
-            <button
-              type="button"
-              onclick={() => (selectedPointId = point.id)}
-              class="h-full flex-1 flex flex-col justify-end items-center group cursor-pointer relative focus:outline-hidden"
-            >
-              <!-- Bar Column -->
-              <div class="w-full {candleWidthClass} flex flex-col justify-end items-center h-full">
-                {#if chartMode === 'gross_comparison'}
-                  <!-- Multi-layer bar: Net (solid) & Discount portion -->
-                  <div
-                    style="height: {heightPercent}%"
-                    class={`w-full rounded-t-sm transition-all duration-300 ${
-                      isSelected
-                        ? 'bg-[#17171c]'
-                        : 'bg-[#17171c]/70 group-hover:bg-[#17171c]'
-                    }`}
-                  ></div>
-                {:else}
-                  <!-- Single Net Sales Bar -->
-                  <div
-                    style="height: {heightPercent}%"
-                    class={`w-full rounded-t-sm transition-all duration-300 ${
-                      isSelected
-                        ? 'bg-[#17171c]'
-                        : 'bg-[#1863dc]/60 group-hover:bg-[#1863dc]'
-                    }`}
-                  ></div>
-                {/if}
-              </div>
-
-              <!-- Time Point Label -->
-              <span class="mt-2 font-mono {labelTextClass} transition-colors truncate max-w-full text-center {
-                isSelected ? 'font-bold text-[#17171c]' : 'text-[#75758a] group-hover:text-[#212121]'
-              }">
-                {point.label}
-              </span>
-            </button>
-          {/each}
-        {/if}
-      </div>
-    </div>
-  </div>
-
-  <!-- Analisis & Rekomendasi Bisnis (Human Readable) -->
-  <div class="bg-[#17171c] text-white border border-[#17171c] rounded-[24px] p-4 sm:p-6 space-y-3">
-    <div class="flex items-center justify-between border-b border-white/10 pb-3">
-      <div class="flex items-center gap-2.5">
-        <div class="w-7 h-7 rounded-lg bg-white/10 text-white flex items-center justify-center shrink-0">
-          <Sparkles class="w-4 h-4 text-[#00875a]" />
-        </div>
-        <div>
-          <h3 class="text-xs sm:text-sm font-medium text-white">Analisis &amp; Rekomendasi Penjualan</h3>
-          <p class="text-[10px] font-mono text-[#93939f]">Insight performa bisnis &amp; perilaku belanja pelanggan</p>
-        </div>
-      </div>
-
-      <span class="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-white/10 text-[#00875a] font-medium">
+      <span class="text-[10px] font-mono px-3 py-1 rounded-full bg-white/10 text-[#34d399] font-semibold shrink-0">
         Insight Pintar
       </span>
     </div>
 
-    <div class="space-y-2 text-xs">
-      <div class="font-medium text-white/95 text-xs sm:text-sm">
+    <div class="space-y-2.5 text-xs">
+      <div class="font-bold text-white text-sm">
         {businessInsights.title}
       </div>
-      <p class="text-white/80 text-[11px] leading-relaxed">
+      <p class="text-white/80 text-xs leading-relaxed">
         {businessInsights.summary}
       </p>
-      <ul class="space-y-1.5 text-white/70 text-[11px] list-disc list-inside leading-relaxed pt-1 border-t border-white/10">
+      <ul class="space-y-1.5 text-white/70 text-xs list-disc list-inside leading-relaxed pt-2 border-t border-white/10">
         {#each businessInsights.recommendations as item}
           <li>{item}</li>
         {/each}
@@ -385,21 +171,22 @@
     </div>
   </div>
 
-  <!-- Deep Dive Analytics Card: Menu Mix, Saluran Pembayaran, Dampak Diskon -->
-  <div class="bg-white border border-[#d9d9dd] rounded-[24px] p-4 sm:p-6 space-y-4">
-    <!-- Sub-tab switcher with Icon-Only unselected state & Icon+Text selected state -->
-    <div class="flex items-center gap-1.5 bg-[#eeece7]/50 p-1 rounded-full w-full">
+  <!-- Deep Dive Analytics Card -->
+  <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-7 space-y-5 shadow-2xs">
+    <div class="flex items-center gap-1.5 bg-[#f4f4f6] p-1.5 rounded-2xl w-full">
       <button
         type="button"
         title="Komposisi Menu"
+        aria-label="Komposisi Menu"
+        aria-pressed={activeInsightTab === 'mix'}
         onclick={() => (activeInsightTab = 'mix')}
-        class={`py-1.5 text-xs font-medium rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+        class={`py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${focusRing} ${
           activeInsightTab === 'mix'
-            ? 'flex-1 bg-[#17171c] text-white shadow-xs px-3'
-            : 'text-[#616161] hover:text-[#212121] px-3 py-1.5'
+            ? 'flex-1 bg-white text-[#17171c] shadow-xs px-3'
+            : 'text-[#686873] hover:text-[#17171c] px-3'
         }`}
       >
-        <PieChart class="w-3.5 h-3.5 shrink-0" />
+        <PieChart class="w-4 h-4 shrink-0" />
         {#if activeInsightTab === 'mix'}
           <span class="whitespace-nowrap">Komposisi Menu</span>
         {/if}
@@ -408,14 +195,16 @@
       <button
         type="button"
         title="Saluran Pembayaran"
+        aria-label="Saluran Pembayaran"
+        aria-pressed={activeInsightTab === 'payments'}
         onclick={() => (activeInsightTab = 'payments')}
-        class={`py-1.5 text-xs font-medium rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+        class={`py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${focusRing} ${
           activeInsightTab === 'payments'
-            ? 'flex-1 bg-[#17171c] text-white shadow-xs px-3'
-            : 'text-[#616161] hover:text-[#212121] px-3 py-1.5'
+            ? 'flex-1 bg-white text-[#17171c] shadow-xs px-3'
+            : 'text-[#686873] hover:text-[#17171c] px-3'
         }`}
       >
-        <CreditCard class="w-3.5 h-3.5 shrink-0" />
+        <CreditCard class="w-4 h-4 shrink-0" />
         {#if activeInsightTab === 'payments'}
           <span class="whitespace-nowrap">Saluran Pembayaran</span>
         {/if}
@@ -424,31 +213,32 @@
       <button
         type="button"
         title="Dampak Diskon"
+        aria-label="Dampak Diskon"
+        aria-pressed={activeInsightTab === 'discount'}
         onclick={() => (activeInsightTab = 'discount')}
-        class={`py-1.5 text-xs font-medium rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+        class={`py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${focusRing} ${
           activeInsightTab === 'discount'
-            ? 'flex-1 bg-[#17171c] text-white shadow-xs px-3'
-            : 'text-[#616161] hover:text-[#212121] px-3 py-1.5'
+            ? 'flex-1 bg-white text-[#17171c] shadow-xs px-3'
+            : 'text-[#686873] hover:text-[#17171c] px-3'
         }`}
       >
-        <Percent class="w-3.5 h-3.5 shrink-0" />
+        <Percent class="w-4 h-4 shrink-0" />
         {#if activeInsightTab === 'discount'}
           <span class="whitespace-nowrap">Dampak Diskon</span>
         {/if}
       </button>
     </div>
 
-    <!-- TAB 1: PRODUCT MIX & CATEGORY SHARE (Donut & Ranked Bar) -->
     {#if activeInsightTab === 'mix'}
       <div class="space-y-4 pt-1">
-        <div class="flex items-center justify-between">
-          <span class="text-xs text-[#75758a]">Peringkat volume &amp; omzet produk</span>
-          <div class="flex items-center bg-[#eeece7]/60 p-0.5 rounded-full text-[11px] font-medium">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="text-xs text-[#8e8e93]">Peringkat volume &amp; omzet produk</span>
+          <div class="flex items-center bg-[#f4f4f6] p-1 rounded-full text-xs font-semibold">
             <button
               type="button"
               onclick={() => (activeMixSubTab = 'menu')}
-              class={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer ${
-                activeMixSubTab === 'menu' ? 'bg-[#17171c] text-white' : 'text-[#616161]'
+              class={`px-3 py-1 rounded-full transition-all cursor-pointer ${focusRing} ${
+                activeMixSubTab === 'menu' ? 'bg-[#17171c] text-white shadow-2xs' : 'text-[#686873]'
               }`}
             >
               Top 10 Menu
@@ -456,8 +246,8 @@
             <button
               type="button"
               onclick={() => (activeMixSubTab = 'kategori')}
-              class={`px-2.5 py-0.5 rounded-full transition-all cursor-pointer ${
-                activeMixSubTab === 'kategori' ? 'bg-[#17171c] text-white' : 'text-[#616161]'
+              class={`px-3 py-1 rounded-full transition-all cursor-pointer ${focusRing} ${
+                activeMixSubTab === 'kategori' ? 'bg-[#17171c] text-white shadow-2xs' : 'text-[#686873]'
               }`}
             >
               Top 5 Kategori
@@ -466,30 +256,29 @@
         </div>
 
         {#if timeframeData.top_products.length === 0}
-          <div class="py-10 text-center text-[#93939f] space-y-2">
-            <Package class="w-7 h-7 mx-auto text-[#93939f] opacity-40" />
-            <p class="text-xs font-medium text-[#17171c]">Belum ada data produk terjual</p>
-            <p class="text-[11px] text-[#75758a]">Data penjualan produk akan terakumulasi otomatis saat kasir memproses struk.</p>
+          <div class="py-12 text-center text-[#8e8e93] space-y-2">
+            <Package class="w-8 h-8 mx-auto opacity-40" />
+            <p class="text-xs font-semibold text-[#17171c]">Belum ada data produk terjual</p>
+            <p class="text-[11px] text-[#8e8e93] px-4">Data penjualan produk akan terakumulasi otomatis saat kasir memproses pesanan.</p>
           </div>
         {:else if activeMixSubTab === 'menu'}
-          <!-- Top 10 Horizontal Ranked Bar -->
-          <div class="space-y-3">
+          <div class="space-y-3.5">
             {#each timeframeData.top_products as prod, idx}
-              <div class="space-y-1">
-                <div class="flex items-center justify-between text-xs">
-                  <div class="flex items-center gap-2 min-w-0">
-                    <span class="w-4 h-4 rounded-full bg-[#eeece7] text-[#17171c] font-mono text-[9px] flex items-center justify-center shrink-0">
-                      0{idx + 1}
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between gap-2 text-xs">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="w-5 h-5 rounded-full bg-[#f4f4f6] text-[#17171c] font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border border-[#e5e5ea]">
+                      {idx + 1}
                     </span>
-                    <span class="font-medium text-[#212121] truncate">{prod.name}</span>
+                    <span class="font-bold text-[#17171c] truncate">{prod.name}</span>
                   </div>
-                  <div class="flex items-center gap-2 font-mono shrink-0">
-                    <span class="text-[#75758a] text-[11px]">{prod.quantity.toLocaleString('id-ID')}x</span>
-                    <span class="font-medium text-[#17171c]">{formatCurrency(prod.total_amount)}</span>
+                  <div class="flex items-center gap-2.5 font-mono shrink-0">
+                    <span class="text-[#8e8e93] text-xs">{prod.quantity.toLocaleString('id-ID')}x</span>
+                    <span class="font-bold text-[#17171c]">{formatRupiah(prod.total_amount)}</span>
                   </div>
                 </div>
 
-                <div class="w-full bg-[#eeece7]/60 h-1.5 rounded-full overflow-hidden">
+                <div class="w-full bg-[#f4f4f6] h-2 rounded-full overflow-hidden">
                   <div
                     style="width: {prod.share_percent}%"
                     class="bg-[#17171c] h-full rounded-full transition-all duration-500"
@@ -499,35 +288,34 @@
             {/each}
           </div>
         {:else}
-          <!-- Top 5 Categories Share -->
-          <div class="space-y-3">
-            <div class="w-full h-2 rounded-full bg-[#eeece7] flex overflow-hidden">
+          <div class="space-y-4">
+            <div class="w-full h-2.5 rounded-full bg-[#f4f4f6] flex overflow-hidden">
               {#each timeframeData.category_breakdown as cat, i}
                 <div
                   style="width: {cat.share_percent}%"
                   class={`h-full transition-all duration-500 ${
-                    i === 0 ? 'bg-[#17171c]' : i === 1 ? 'bg-[#00875a]' : i === 2 ? 'bg-[#1863dc]' : 'bg-[#75758a]'
+                    i === 0 ? 'bg-[#17171c]' : i === 1 ? 'bg-[#059669]' : i === 2 ? 'bg-[#2563eb]' : 'bg-[#8e8e93]'
                   }`}
                   title={`${cat.name}: ${cat.share_percent}%`}
                 ></div>
               {/each}
             </div>
 
-            <div class="space-y-2 pt-2">
+            <div class="space-y-2.5 pt-2">
               {#each timeframeData.category_breakdown as cat}
-                <div class="space-y-1">
-                  <div class="flex items-center justify-between text-xs">
-                    <span class="font-medium text-[#212121]">{cat.name}</span>
-                    <div class="flex items-center gap-2 font-mono">
-                      <span class="text-[#75758a] text-[11px]">{cat.share_percent}%</span>
-                      <span class="font-medium text-[#17171c]">{formatCurrency(cat.total_amount)}</span>
+                <div class="space-y-1.5">
+                  <div class="flex items-center justify-between gap-2 text-xs">
+                    <span class="font-bold text-[#17171c] truncate">{cat.name}</span>
+                    <div class="flex items-center gap-2.5 font-mono shrink-0">
+                      <span class="text-[#8e8e93] text-xs">{cat.share_percent}%</span>
+                      <span class="font-bold text-[#17171c]">{formatRupiah(cat.total_amount)}</span>
                     </div>
                   </div>
 
-                  <div class="w-full bg-[#eeece7]/60 h-1.5 rounded-full overflow-hidden">
+                  <div class="w-full bg-[#f4f4f6] h-1.5 rounded-full overflow-hidden">
                     <div
                       style="width: {cat.share_percent}%"
-                      class="bg-[#1863dc] h-full rounded-full transition-all duration-500"
+                      class="bg-[#2563eb] h-full rounded-full transition-all duration-500"
                     ></div>
                   </div>
                 </div>
@@ -536,11 +324,11 @@
           </div>
         {/if}
 
-        <div class="pt-2 border-t border-[#f2f2f2] text-right">
+        <div class="pt-3 border-t border-[#f2f2f4] text-right">
           <button
             type="button"
             onclick={() => onNavigate('katalog', 'menu')}
-            class="text-xs font-medium text-[#1863dc] hover:underline cursor-pointer inline-flex items-center gap-0.5"
+            class="text-xs font-semibold text-[#2563eb] hover:underline cursor-pointer inline-flex items-center gap-1 py-1 {focusRing}"
           >
             <span>Buka Katalog Menu Lengkap</span>
             <ChevronRight class="w-3.5 h-3.5" />
@@ -548,60 +336,57 @@
         </div>
       </div>
     {:else if activeInsightTab === 'payments'}
-      <!-- TAB 2: PAYMENT CHANNELS -->
       <div class="space-y-4 pt-1">
         {#if timeframeData.payment_methods.length === 0}
-          <div class="py-10 text-center text-[#93939f] space-y-1.5">
-            <CreditCard class="w-7 h-7 mx-auto text-[#93939f] opacity-40" />
-            <p class="text-xs font-medium text-[#17171c]">Belum ada riwayat transaksi pembayaran</p>
-            <p class="text-[11px] text-[#75758a]">Data metode pembayaran (QRIS, Tunai, EDC) akan muncul setelah kasir memproses pesanan.</p>
+          <div class="py-12 text-center text-[#8e8e93] space-y-2">
+            <CreditCard class="w-8 h-8 mx-auto opacity-40" />
+            <p class="text-xs font-semibold text-[#17171c]">Belum ada riwayat pembayaran</p>
+            <p class="text-[11px] text-[#8e8e93] px-4">Metode pembayaran (QRIS, Tunai, EDC) akan otomatis terdata.</p>
           </div>
         {:else}
-          <!-- Visual Stacked Bar -->
-          <div class="space-y-1.5">
-            <div class="w-full h-2.5 rounded-full bg-[#eeece7] flex overflow-hidden">
+          <div class="space-y-2">
+            <div class="w-full h-3 rounded-full bg-[#f4f4f6] flex overflow-hidden">
               {#each timeframeData.payment_methods as method, i}
                 <div
                   style="width: {method.percent}%"
                   class={`h-full transition-all duration-500 ${
-                    i === 0 ? 'bg-[#17171c]' : i === 1 ? 'bg-[#00875a]' : 'bg-[#1863dc]'
+                    i === 0 ? 'bg-[#17171c]' : i === 1 ? 'bg-[#059669]' : 'bg-[#2563eb]'
                   }`}
                   title={`${method.method}: ${method.percent}%`}
                 ></div>
               {/each}
             </div>
 
-            <div class="flex items-center justify-between text-[10px] font-mono text-[#75758a]">
+            <div class="flex items-center justify-between text-xs font-mono text-[#8e8e93]">
               <span>Cashless ({timeframeData.payment_methods[0].percent + (timeframeData.payment_methods[2]?.percent || 0)}%)</span>
               <span>Tunai ({timeframeData.payment_methods[1]?.percent || 0}%)</span>
             </div>
           </div>
 
-          <!-- Payment Channel Items -->
-          <div class="space-y-2">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {#each timeframeData.payment_methods as method, i}
-              <div class="p-3 rounded-xl bg-[#fbfbfb] border border-[#d9d9dd] flex items-center justify-between text-xs">
-                <div class="flex items-center gap-2.5 min-w-0">
-                  <span class={`p-1.5 rounded-lg ${
-                    i === 0 ? 'bg-[#17171c] text-white' : i === 1 ? 'bg-[#edfce9] text-[#003c33]' : 'bg-[#f1f5ff] text-[#1863dc]'
+              <div class="p-4 rounded-2xl bg-[#fafafc] border border-[#e5e5ea] flex items-center justify-between gap-3 text-xs shadow-2xs">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                    i === 0 ? 'bg-[#17171c] text-white' : i === 1 ? 'bg-[#ecfdf5] text-[#059669]' : 'bg-[#eff6ff] text-[#2563eb]'
                   }`}>
                     {#if i === 0}
-                      <QrCode class="w-3.5 h-3.5" />
+                      <QrCode class="w-4 h-4" />
                     {:else if i === 1}
-                      <Banknote class="w-3.5 h-3.5" />
+                      <Banknote class="w-4 h-4" />
                     {:else}
-                      <CreditCard class="w-3.5 h-3.5" />
+                      <CreditCard class="w-4 h-4" />
                     {/if}
-                  </span>
+                  </div>
                   <div class="truncate">
-                    <div class="font-medium text-[#212121] truncate">{method.method}</div>
-                    <div class="text-[10px] text-[#75758a] font-mono">{method.count.toLocaleString('id-ID')} transaksi</div>
+                    <div class="font-bold text-[#17171c] truncate">{method.method}</div>
+                    <div class="text-[11px] text-[#8e8e93] font-mono">{method.count.toLocaleString('id-ID')} transaksi</div>
                   </div>
                 </div>
 
                 <div class="text-right font-mono shrink-0">
-                  <div class="font-medium text-[#17171c]">{formatCurrency(method.amount)}</div>
-                  <div class="text-[10px] text-[#75758a]">{method.percent}% porsi</div>
+                  <div class="font-bold text-[#17171c]">{formatRupiah(method.amount)}</div>
+                  <div class="text-[10.5px] text-[#8e8e93]">{method.percent}% porsi</div>
                 </div>
               </div>
             {/each}
@@ -609,20 +394,14 @@
         {/if}
       </div>
     {:else}
-      <!-- TAB 3: DAMPAK DISKON & PROMOSI (Stacked Bar Chart) -->
       {@const gross = timeframeData.total_revenue + timeframeData.total_discount}
       {@const discountPercent = ((timeframeData.total_discount / (gross || 1)) * 100).toFixed(1)}
       {@const netPercent = (100 - Number(discountPercent)).toFixed(1)}
 
       <div class="space-y-4 pt-1">
-        <div>
-          <span class="text-xs text-[#75758a]">Visualisasi Nilai Pesanan Kotor vs Potongan Diskon vs Kas Bersih Diterima</span>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-[#fbfbfb] border border-[#d9d9dd] space-y-4 text-xs">
-          <!-- Stacked Bar Visual -->
-          <div class="space-y-1.5">
-            <div class="w-full h-3 rounded-full bg-[#eeece7] flex overflow-hidden">
+        <div class="p-5 rounded-2xl bg-[#fafafc] border border-[#e5e5ea] space-y-5 text-xs shadow-2xs">
+          <div class="space-y-2">
+            <div class="w-full h-3 rounded-full bg-[#f4f4f6] flex overflow-hidden">
               <div
                 style="width: {netPercent}%"
                 class="bg-[#17171c] h-full transition-all duration-500"
@@ -635,25 +414,24 @@
               ></div>
             </div>
 
-            <div class="flex items-center justify-between text-[10px] font-mono">
-              <span class="text-[#17171c] font-medium">Kas Bersih: {netPercent}%</span>
-              <span class="text-[#e5484d] font-medium">Diskon: {discountPercent}%</span>
+            <div class="flex items-center justify-between text-xs font-mono">
+              <span class="text-[#17171c] font-bold">Kas Bersih: {netPercent}%</span>
+              <span class="text-[#e5484d] font-bold">Diskon: {discountPercent}%</span>
             </div>
           </div>
 
-          <!-- Breakdown Numbers -->
-          <div class="grid grid-cols-3 gap-2 pt-2 border-t border-[#d9d9dd]/60 font-mono text-center">
+          <div class="grid grid-cols-3 gap-3 pt-3 border-t border-[#e5e5ea] font-mono text-center">
             <div>
-              <div class="text-[9px] text-[#75758a] uppercase">Nilai Kotor</div>
-              <div class="font-medium text-[#17171c] text-xs mt-0.5">{formatCurrency(gross)}</div>
+              <span class="text-[10px] text-[#8e8e93] uppercase font-sans font-semibold">Nilai Kotor</span>
+              <div class="font-bold text-[#17171c] text-sm mt-1">{formatRupiah(gross)}</div>
             </div>
             <div>
-              <div class="text-[9px] text-[#e5484d] uppercase">Diskon Promo</div>
-              <div class="font-medium text-[#e5484d] text-xs mt-0.5">-{formatCurrency(timeframeData.total_discount)}</div>
+              <span class="text-[10px] text-[#e5484d] uppercase font-sans font-semibold">Diskon Promo</span>
+              <div class="font-bold text-[#e5484d] text-sm mt-1">-{formatRupiah(timeframeData.total_discount)}</div>
             </div>
             <div>
-              <div class="text-[9px] text-[#00875a] uppercase">Kas Bersih (Net)</div>
-              <div class="font-medium text-[#00875a] text-xs mt-0.5">{formatCurrency(timeframeData.total_revenue)}</div>
+              <span class="text-[10px] text-[#059669] uppercase font-sans font-semibold">Kas Bersih (Net)</span>
+              <div class="font-bold text-[#059669] text-sm mt-1">{formatRupiah(timeframeData.total_revenue)}</div>
             </div>
           </div>
         </div>

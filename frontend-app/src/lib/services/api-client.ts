@@ -28,19 +28,10 @@ const STORAGE_KEY_WORKSPACE_ID = 'precis_workspace_id';
 
 export function getDefaultApiBaseUrl(): string {
   const envUrl = (import.meta.env.VITE_API_BASE_URL as string) || '';
-  if (typeof window !== 'undefined' && window.location?.hostname) {
-    const hostname = window.location.hostname;
-    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
-
-    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-        return envUrl;
-      }
-      return `${protocol}//${hostname}:8000/api/v1`;
-    }
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+    return envUrl;
   }
-
-  return envUrl || 'http://localhost:8000/api/v1';
+  return '/api/v1';
 }
 
 export class ApiClient {
@@ -133,8 +124,13 @@ export class ApiClient {
   }
 
   private buildUrl(endpoint: string, params?: RequestOptions['params']): string {
+    let cleanBase = (this.baseUrl || getDefaultApiBaseUrl()).replace(/\/+$/, '');
+    if (typeof window !== 'undefined' && (cleanBase.includes('localhost') || cleanBase.includes('127.0.0.1'))) {
+      cleanBase = '/api/v1';
+    }
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    const url = new URL(`${this.baseUrl}${cleanEndpoint}`);
+    const base = typeof window !== 'undefined' ? window.location.origin : 'http://127.0.0.1:8000';
+    const url = new URL(`${cleanBase}${cleanEndpoint}`, base);
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -181,6 +177,7 @@ export class ApiClient {
         body: formattedBody,
       });
     } catch (networkError) {
+      console.error('[ApiClient Network Error]:', networkError, 'Target URL:', url);
       throw new ApiError(0, 'Koneksi jaringan gagal. Periksa koneksi internet Anda.', null);
     }
 

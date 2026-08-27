@@ -11,7 +11,8 @@ class TeamService {
     name: string;
     email: string;
     job_title: string;
-    role: 'ADMIN' | 'MANAGER' | 'STAFF';
+    role?: string;
+    role_id?: string | null;
     branch_id?: string | null;
     base_salary: number;
   }): Promise<TeamMember> {
@@ -26,7 +27,8 @@ class TeamService {
     id: string,
     data: {
       job_title?: string;
-      role?: 'ADMIN' | 'MANAGER' | 'STAFF';
+      role?: string;
+      role_id?: string | null;
       branch_id?: string | null;
       base_salary?: number;
       is_active?: boolean;

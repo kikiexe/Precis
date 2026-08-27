@@ -23,6 +23,8 @@
   import ShiftSection from './lib/components/app/ShiftSection.svelte';
   import BillingModal from './lib/components/app/BillingModal.svelte';
   import CreateWorkspaceModal from './lib/components/app/CreateWorkspaceModal.svelte';
+  import PermissionModal from './lib/components/app/PermissionModal.svelte';
+  import { permissionService } from './lib/services/permission-service';
   import AcceptInvitationView from './lib/components/auth/AcceptInvitationView.svelte';
   import VerifyEmailView from './lib/components/auth/VerifyEmailView.svelte';
 
@@ -36,6 +38,7 @@
 
   let isBillingModalOpen = $state(false);
   let isCreateWorkspaceModalOpen = $state(false);
+  let isPermissionModalOpen = $state(false);
 
   onMount(() => {
     if (typeof window !== 'undefined') {
@@ -69,15 +72,31 @@
     };
   });
 
+  async function evaluateAppPermissions() {
+    if (typeof window === 'undefined') return;
+    try {
+      if (permissionService.isDismissed()) return;
+      const status = await permissionService.checkPermissions();
+      if (!status.requiredGranted) {
+        isPermissionModalOpen = true;
+      }
+    } catch {
+      // abaikan error pengecekan izin
+    }
+  }
+
   async function initialize() {
     isCheckingSession = true;
     try {
       isAuthenticated = await sessionManager.initializeSession();
       if (isAuthenticated) {
         activeDomain =
-          workspaceContext.currentUser.role === 'OWNER' || workspaceContext.currentUser.role === 'ADMIN'
+          workspaceContext.currentUser.role === 'OWNER' ||
+          workspaceContext.currentUser.role === 'ADMIN' ||
+          workspaceContext.currentUser.role === 'MANAGER'
             ? 'dashboard'
             : 'home';
+        await evaluateAppPermissions();
       }
     } finally {
       isCheckingSession = false;
@@ -88,12 +107,15 @@
     await sessionManager.handleLoginSuccess(data);
     isAuthenticated = true;
     activeDomain =
-      workspaceContext.currentUser.role === 'OWNER' || workspaceContext.currentUser.role === 'ADMIN'
+      workspaceContext.currentUser.role === 'OWNER' ||
+      workspaceContext.currentUser.role === 'ADMIN' ||
+      workspaceContext.currentUser.role === 'MANAGER'
         ? 'dashboard'
         : 'home';
     if (workspaceContext.userWorkspaces.length === 0) {
       isCreateWorkspaceModalOpen = true;
     }
+    await evaluateAppPermissions();
   }
 
   async function handleSwitchWorkspace(workspace: UserWorkspace) {
@@ -167,12 +189,6 @@
       currentUser={workspaceContext.currentUser}
       userWorkspaces={workspaceContext.userWorkspaces}
       activeWorkspaceId={workspaceContext.activeWorkspaceId}
-      branches={workspaceContext.workspaceBranches}
-      selectedBranchId={workspaceContext.selectedBranchFilter}
-      onSelectBranch={(id) => {
-        workspaceContext.selectedBranchFilter = id;
-        workspaceContext.loadWorkspaceData();
-      }}
       {activeDomain}
       {activeSubTab}
       pendingApprovalsCount={workspaceContext.pendingApprovalsCount}
@@ -182,17 +198,11 @@
       onLogout={handleLogout}
     />
 
-    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto bg-[#fafafc]">
       <AppHeader
         currentUser={workspaceContext.currentUser}
         userWorkspaces={workspaceContext.userWorkspaces}
         activeWorkspaceId={workspaceContext.activeWorkspaceId}
-        branches={workspaceContext.workspaceBranches}
-        selectedBranchId={workspaceContext.selectedBranchFilter}
-        onSelectBranch={(id) => {
-          workspaceContext.selectedBranchFilter = id;
-          workspaceContext.loadWorkspaceData();
-        }}
         onSwitchWorkspace={handleSwitchWorkspace}
         onOpenCreateWorkspaceModal={() => (isCreateWorkspaceModalOpen = true)}
         onOpenBilling={() => handleSelectNav('settings', 'billing')}
@@ -205,10 +215,6 @@
             currentUser={workspaceContext.currentUser}
             branches={workspaceContext.workspaceBranches}
             selectedBranchId={workspaceContext.selectedBranchFilter}
-            onSelectBranch={(id) => {
-              workspaceContext.selectedBranchFilter = id;
-              workspaceContext.loadWorkspaceData();
-            }}
             onNavigate={handleSelectNav}
           />
         {:else if activeDomain === 'katalog'}
@@ -246,11 +252,16 @@
               await shiftService.assignShift(tId, uId, d);
               await workspaceContext.loadWorkspaceData();
             }}
+            onDeleteShift={async (assignmentId) => {
+              await shiftService.deleteAssignment(assignmentId);
+              await workspaceContext.loadWorkspaceData();
+            }}
             onRefreshMembers={() => workspaceContext.loadWorkspaceData()}
           />
         {:else if activeDomain === 'finance'}
           <FinanceSection
             currentUser={workspaceContext.currentUser}
+            workspace={workspaceContext.currentWorkspace}
             branches={workspaceContext.workspaceBranches}
             initialSubTab={activeSubTab}
             cashAdvances={workspaceContext.myCashAdvances}
@@ -314,6 +325,7 @@
           <StaffPresensiSection
             currentUser={workspaceContext.currentUser}
             todayAttendance={workspaceContext.todayAttendance}
+            branches={workspaceContext.workspaceBranches}
             onSuccessAttendance={(record) => {
               workspaceContext.todayAttendance = record;
               workspaceContext.loadWorkspaceData();
@@ -324,7 +336,8 @@
           <ShiftSection
             currentUser={workspaceContext.currentUser}
             allUsers={workspaceContext.teamMembers.map((m) => ({
-              id: m.id,
+              id: m.user_id || m.id,
+              user_id: m.user_id,
               name: m.name,
               role: m.role,
               email: m.email,
@@ -371,6 +384,11 @@
       isOnboarding={workspaceContext.userWorkspaces.length === 0}
       onClose={() => (isCreateWorkspaceModalOpen = false)}
       onSubmit={handleCreateWorkspace}
+    />
+
+    <PermissionModal
+      isOpen={isPermissionModalOpen}
+      onClose={() => (isPermissionModalOpen = false)}
     />
   </div>
 {/if}

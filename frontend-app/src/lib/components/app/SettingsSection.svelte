@@ -33,82 +33,65 @@
     onBranchUpdated,
   }: Props = $props();
 
+  let isOwner = $derived(currentUser.role === 'OWNER' || currentUser.role === 'SUPERADMIN');
+
   let activeSubTab = $state<'profil' | 'cabang' | 'billing'>('profil');
 
   $effect(() => {
-    if (initialSubTab === 'billing' || initialSubTab === 'cabang' || initialSubTab === 'profil' || initialSubTab === 'outlet') {
-      activeSubTab = initialSubTab === 'outlet' ? 'cabang' : (initialSubTab as 'profil' | 'cabang' | 'billing');
+    if (initialSubTab === 'billing' && isOwner) {
+      activeSubTab = 'billing';
+    } else if (initialSubTab === 'cabang' || initialSubTab === 'outlet') {
+      activeSubTab = 'cabang';
+    } else {
+      activeSubTab = 'profil';
     }
   });
+
+  let settingsTabs = $derived([
+    { id: 'profil' as const, label: 'Profil Pengguna', icon: UserIcon },
+    { id: 'cabang' as const, label: 'Pengaturan Cabang', icon: Building2 },
+    ...(isOwner ? [{ id: 'billing' as const, label: 'Langganan & Tagihan', icon: CreditCard }] : []),
+  ]);
 </script>
 
-<div class="space-y-6 font-sans">
-  <!-- Top Segmented Navigation Wrapper -->
-  <div class="bg-white border border-[#d9d9dd] rounded-[24px] p-2 sm:p-2.5 flex items-center justify-between gap-2">
-    <div class="flex items-center gap-1.5 w-full sm:w-auto bg-[#eeece7]/40 sm:bg-transparent p-1 sm:p-0 rounded-full">
-      <button
-        type="button"
-        title="Profil Pengguna"
-        onclick={() => (activeSubTab = 'profil')}
-        class={`text-xs font-medium rounded-full transition-all cursor-pointer flex items-center justify-center gap-2 ${
-          activeSubTab === 'profil'
-            ? 'flex-1 sm:flex-initial bg-[#17171c] text-white shadow-xs px-4 py-2 sm:px-5 sm:py-2.5'
-            : 'text-[#616161] hover:text-[#212121] hover:bg-white/80 w-9 h-9 sm:w-auto sm:h-auto sm:p-2.5 shrink-0'
-        }`}
-      >
-        <UserIcon class="w-4 h-4 shrink-0" />
-        {#if activeSubTab === 'profil'}
-          <span class="whitespace-nowrap truncate">Profil Pengguna</span>
-        {/if}
-      </button>
-
-      <button
-        type="button"
-        title="Pengaturan Cabang"
-        onclick={() => (activeSubTab = 'cabang')}
-        class={`text-xs font-medium rounded-full transition-all cursor-pointer flex items-center justify-center gap-2 ${
-          activeSubTab === 'cabang'
-            ? 'flex-1 sm:flex-initial bg-[#17171c] text-white shadow-xs px-4 py-2 sm:px-5 sm:py-2.5'
-            : 'text-[#616161] hover:text-[#212121] hover:bg-white/80 w-9 h-9 sm:w-auto sm:h-auto sm:p-2.5 shrink-0'
-        }`}
-      >
-        <Building2 class="w-4 h-4 shrink-0" />
-        {#if activeSubTab === 'cabang'}
-          <span class="whitespace-nowrap truncate">Pengaturan Cabang</span>
-        {/if}
-      </button>
-
-      <button
-        type="button"
-        title="Langganan & Tagihan"
-        onclick={() => (activeSubTab = 'billing')}
-        class={`text-xs font-medium rounded-full transition-all cursor-pointer flex items-center justify-center gap-2 ${
-          activeSubTab === 'billing'
-            ? 'flex-1 sm:flex-initial bg-[#17171c] text-white shadow-xs px-4 py-2 sm:px-5 sm:py-2.5'
-            : 'text-[#616161] hover:text-[#212121] hover:bg-white/80 w-9 h-9 sm:w-auto sm:h-auto sm:p-2.5 shrink-0'
-        }`}
-      >
-        <CreditCard class="w-4 h-4 shrink-0" />
-        {#if activeSubTab === 'billing'}
-          <span class="whitespace-nowrap truncate">Langganan &amp; Tagihan</span>
-        {/if}
-      </button>
+<div class="space-y-6 font-sans pb-8">
+  <!-- Top Segmented Navigation -->
+  <div class="flex items-center justify-between gap-4 overflow-x-auto no-scrollbar py-1">
+    <div class="inline-flex items-center gap-1.5 p-1.5 bg-white border border-[#e5e5ea] rounded-2xl shadow-2xs">
+      {#each settingsTabs as tab}
+        {@const Icon = tab.icon}
+        {@const isActive = activeSubTab === tab.id}
+        <button
+          type="button"
+          onclick={() => (activeSubTab = tab.id)}
+          class={`px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-2 shrink-0 ${
+            isActive
+              ? 'bg-[#17171c] text-white shadow-xs font-semibold'
+              : 'text-[#686873] hover:text-[#17171c] hover:bg-[#f4f4f6]'
+          }`}
+        >
+          <Icon class={`w-4 h-4 ${isActive ? 'text-white' : 'text-[#8e8e93]'}`} />
+          <span class="whitespace-nowrap">{tab.label}</span>
+        </button>
+      {/each}
     </div>
   </div>
 
-  {#if activeSubTab === 'profil'}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <UserProfileTab {currentUser} />
-      <ChangePasswordCard />
-    </div>
-  {:else if activeSubTab === 'cabang'}
-    <BranchSettingsTab {branches} {onBranchUpdated} />
-  {:else if activeSubTab === 'billing'}
-    <BillingHistoryTab
-      {subscriptionInvoices}
-      {subscriptionPlans}
-      {onOpenBillingModal}
-      {onSubmitPaymentProof}
-    />
-  {/if}
+  <div class="min-w-0 animate-in fade-in duration-200">
+    {#if activeSubTab === 'profil'}
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <UserProfileTab {currentUser} />
+        <ChangePasswordCard />
+      </div>
+    {:else if activeSubTab === 'cabang'}
+      <BranchSettingsTab {branches} {onBranchUpdated} />
+    {:else if activeSubTab === 'billing'}
+      <BillingHistoryTab
+        {subscriptionInvoices}
+        {subscriptionPlans}
+        {onOpenBillingModal}
+        {onSubmitPaymentProof}
+      />
+    {/if}
+  </div>
 </div>

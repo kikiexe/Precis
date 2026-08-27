@@ -23,36 +23,36 @@
   }: Props = $props();
 </script>
 
-<div class="bg-white border border-[#d9d9dd] rounded-2xl p-4 sm:p-5 space-y-4 shadow-none font-sans">
-  <div class="flex items-center justify-between gap-2 border-b border-[#f2f2f2] pb-3">
-    <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-xl bg-[#17171c] text-white flex items-center justify-center">
-        <Clock class="w-4 h-4" />
+<div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-5 shadow-2xs font-sans">
+  <div class="flex items-center justify-between gap-3 border-b border-[#f2f2f4] pb-4">
+    <div class="flex items-center gap-3 min-w-0 flex-1">
+      <div class="w-10 h-10 rounded-2xl bg-[#f4f4f6] text-[#17171c] flex items-center justify-center border border-[#e5e5ea] shrink-0">
+        <Clock class="w-5 h-5" />
       </div>
-      <div>
-        <h2 class="text-xs sm:text-sm font-medium text-[#212121]">
+      <div class="min-w-0">
+        <h3 class="text-sm sm:text-base font-bold text-[#17171c] truncate">
           {todayShift?.template?.name || 'Shift Middle Barista'}
-        </h2>
-        <p class="text-[10px] font-mono text-[#75758a]">
-          {todayShift?.template?.expected_clock_in || '07:00'} - {todayShift?.template?.expected_clock_out || '15:00'} WIB
+        </h3>
+        <p class="text-xs font-mono text-[#8e8e93] mt-0.5 truncate">
+          {todayShift?.template?.expected_clock_in?.substring(0, 5) || '07:00'} - {todayShift?.template?.expected_clock_out?.substring(0, 5) || '15:00'} WIB
         </p>
       </div>
     </div>
 
-    <div>
+    <div class="shrink-0">
       {#if !todayAttendance}
-        <span class="inline-flex items-center gap-1 text-[10px] font-mono text-[#e5484d] bg-[#ffefef] px-2.5 py-1 rounded-full font-medium">
-          <AlertCircle class="w-3 h-3" />
+        <span class="inline-flex items-center gap-1.5 text-xs font-mono text-[#e5484d] bg-[#fef2f2] border border-[#fecaca] px-3 py-1 rounded-full font-semibold">
+          <AlertCircle class="w-3.5 h-3.5" />
           <span>Belum Hadir</span>
         </span>
       {:else if !todayAttendance.clock_out_time}
-        <span class="inline-flex items-center gap-1 text-[10px] font-mono text-[#1863dc] bg-[#f1f5ff] px-2.5 py-1 rounded-full font-medium">
-          <CheckCircle2 class="w-3 h-3" />
+        <span class="inline-flex items-center gap-1.5 text-xs font-mono text-[#2563eb] bg-[#eff6ff] border border-[#bfdbfe] px-3 py-1 rounded-full font-semibold">
+          <CheckCircle2 class="w-3.5 h-3.5" />
           <span>Sedang Bekerja</span>
         </span>
       {:else}
-        <span class="inline-flex items-center gap-1 text-[10px] font-mono text-[#00875a] bg-[#edfce9] px-2.5 py-1 rounded-full font-medium">
-          <CheckCircle2 class="w-3 h-3" />
+        <span class="inline-flex items-center gap-1.5 text-xs font-mono text-[#059669] bg-[#ecfdf5] border border-[#a7f3d0] px-3 py-1 rounded-full font-semibold">
+          <CheckCircle2 class="w-3.5 h-3.5" />
           <span>Selesai</span>
         </span>
       {/if}
@@ -61,34 +61,34 @@
 
   <!-- Countdown Bar -->
   {#if shiftCountdownText}
-    <div class="flex items-center justify-between text-[11px] bg-[#fbfbfb] border border-[#d9d9dd]/60 px-3 py-2 rounded-xl">
-      <span class="text-[#616161]">Waktu Shift:</span>
-      <span class="font-mono font-medium text-[#17171c]">{shiftCountdownText}</span>
+    <div class="flex items-center justify-between text-xs bg-[#f8f8fa] border border-[#ececee] px-4 py-3 rounded-2xl">
+      <span class="text-[#686873] font-medium">Status Jadwal Shift:</span>
+      <span class="font-mono font-bold text-[#17171c]">{shiftCountdownText}</span>
     </div>
   {/if}
 
   <!-- Shift Action CTA -->
   {#if !todayAttendance}
-    <div class="space-y-3">
-      <div class="text-[11px] text-[#616161] bg-[#eeece7]/30 border border-[#d9d9dd]/60 p-2.5 rounded-xl flex items-center justify-between">
-        <span>Toleransi batas masuk: <strong>15 Menit</strong></span>
-        <span class="font-mono text-[#e5484d] text-[10px]">Denda: Rp 2.000/mnt</span>
+    <div class="space-y-3.5">
+      <div class="text-xs text-[#686873] bg-[#f8f8fa] border border-[#ececee] p-3.5 rounded-2xl flex items-center justify-between">
+        <span>Toleransi batas masuk: <strong class="text-[#17171c]">15 Menit</strong></span>
+        <span class="font-mono text-[#e5484d] text-xs font-semibold">Denda: Rp 2.000/mnt</span>
       </div>
 
       <button
         type="button"
         onclick={onNavigatePresensi}
-        class="w-full py-3 bg-[#17171c] hover:bg-black active:scale-[0.99] text-white font-medium text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-none"
+        class="w-full py-3.5 bg-[#17171c] hover:bg-black active:scale-[0.99] text-white font-semibold text-xs rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-xs"
       >
         <Camera class="w-4 h-4" />
         <span>Buka Kamera Presensi Masuk</span>
-        <ArrowRight class="w-3.5 h-3.5" />
+        <ArrowRight class="w-4 h-4" />
       </button>
     </div>
   {:else if !todayAttendance.clock_out_time}
-    <div class="space-y-3">
-      <div class="p-3 bg-[#fbfbfb] border border-[#d9d9dd] rounded-xl flex items-center gap-3">
-        <div class="w-12 aspect-3/4 rounded-lg overflow-hidden border border-[#d9d9dd] bg-[#17171c] shrink-0">
+    <div class="space-y-3.5">
+      <div class="p-3.5 bg-[#f8f8fa] border border-[#e5e5ea] rounded-2xl flex items-center gap-3.5">
+        <div class="w-12 aspect-[3/4] rounded-xl overflow-hidden border border-[#e5e5ea] bg-[#17171c] shrink-0">
           <img
             src={todayAttendance.photo_in_url}
             alt="Selfie Presensi Masuk"
@@ -96,40 +96,33 @@
           />
         </div>
         <div class="flex-1 text-xs min-w-0 space-y-0.5">
-          <div class="font-medium text-[#212121] truncate">Presensi Masuk Tercatat</div>
-          <div class="font-mono text-[#75758a] text-[10px]">Masuk: {todayAttendance.clock_in_time} WIB</div>
-          <div class={`text-[10px] font-mono font-medium ${todayAttendance.status === 'ON_TIME' ? 'text-[#00875a]' : 'text-[#e5484d]'}`}>
-            {todayAttendance.status === 'ON_TIME' ? 'Status: Tepat Waktu' : `Terlambat ${todayAttendance.late_minutes} menit`}
-          </div>
+          <div class="font-bold text-[#17171c] truncate">Presensi Masuk Tercatat</div>
+          <div class="font-mono text-[#8e8e93] text-[11px]">Masuk: {todayAttendance.clock_in_time} WIB</div>
+          {#if todayAttendance.late_minutes && todayAttendance.late_minutes > 0}
+            <div class="text-[#e5484d] font-mono font-semibold text-[11px]">
+              Terlambat: {todayAttendance.late_minutes} menit
+            </div>
+          {/if}
         </div>
       </div>
 
       <button
         type="button"
         onclick={onNavigatePresensi}
-        class="w-full py-3 bg-[#e5484d] hover:bg-[#c93b40] active:scale-[0.99] text-white font-medium text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-none"
+        class="w-full py-3.5 bg-[#17171c] hover:bg-black active:scale-[0.99] text-white font-semibold text-xs rounded-2xl flex items-center justify-center gap-2 cursor-pointer transition-all shadow-xs"
       >
         <Camera class="w-4 h-4" />
-        <span>Buka Kamera Presensi Keluar (Clock-Out)</span>
-        <ArrowRight class="w-3.5 h-3.5" />
+        <span>Buka Kamera Presensi Pulang</span>
+        <ArrowRight class="w-4 h-4" />
       </button>
     </div>
   {:else}
-    <div class="p-3 bg-[#edfce9] border border-[#00875a]/20 rounded-xl flex items-center gap-3">
-      <div class="w-12 aspect-3/4 rounded-lg overflow-hidden border border-[#00875a]/30 bg-[#17171c] shrink-0">
-        <img
-          src={todayAttendance.photo_out_url || todayAttendance.photo_in_url}
-          alt="Selfie Presensi"
-          class="w-full h-full object-cover"
-        />
-      </div>
-      <div class="flex-1 text-xs min-w-0 space-y-0.5">
-        <div class="font-medium text-[#003c33] truncate">Presensi Hari Ini Selesai</div>
-        <div class="font-mono text-[#616161] text-[10px]">
-          Masuk: {todayAttendance.clock_in_time} &bull; Keluar: {todayAttendance.clock_out_time}
-        </div>
-        <div class="text-[10px] font-mono text-[#00875a]">
-          {todayAttendance.overtime_minutes ? `Lembur: ${todayAttendance.overtime_minutes} menit` : 'Jam kerja terpenuhi'}
+    <div class="p-4 bg-[#ecfdf5] border border-[#a7f3d0] rounded-2xl flex items-center gap-3">
+      <CheckCircle2 class="w-5 h-5 text-[#059669] shrink-0" />
+      <div class="text-xs text-[#065f46] space-y-0.5">
+        <div class="font-bold">Presensi Hari Ini Lengkap</div>
+        <div class="text-[11px] font-mono text-[#047857]">
+          Masuk: {todayAttendance.clock_in_time} WIB &bull; Pulang: {todayAttendance.clock_out_time} WIB
         </div>
       </div>
     </div>

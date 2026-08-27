@@ -57,6 +57,10 @@ export class WorkspaceContext {
     this.pendingSwaps.length + this.adminPendingKasbons.length
   );
 
+  currentWorkspace = $derived(
+    this.userWorkspaces.find((w) => w.workspace_id === this.activeWorkspaceId) || null
+  );
+
   setSessionData(
     profile: {
       id: string;
@@ -89,6 +93,8 @@ export class WorkspaceContext {
         id: profile.id,
         name: profile.name,
         role: matchedWs.role,
+        job_title: matchedWs.job_title,
+        permissions: matchedWs.permissions || [],
         email: profile.email,
         bank_name: profile.bank_name,
         bank_account_number: profile.bank_account_number,
@@ -122,6 +128,8 @@ export class WorkspaceContext {
     this.currentUser = {
       ...this.currentUser,
       role: workspace.role,
+      job_title: workspace.job_title,
+      permissions: workspace.permissions || [],
       branch_id: workspace.branch_id || this.currentUser.branch_id,
       branch_name: workspace.branch_name || workspace.workspace_name,
     };
@@ -150,7 +158,19 @@ export class WorkspaceContext {
         this.selectedBranchFilter !== 'ALL'
           ? this.selectedBranchFilter
           : (this.currentUser.branch_id || undefined);
-      const isAdminOrOwner = this.currentUser.role === 'OWNER' || this.currentUser.role === 'ADMIN';
+      
+      const isManagement =
+        this.currentUser.role === 'OWNER' ||
+        this.currentUser.role === 'ADMIN' ||
+        this.currentUser.role === 'MANAGER';
+
+      const canViewPayroll =
+        this.currentUser.role === 'OWNER' ||
+        this.currentUser.role === 'ADMIN' ||
+        Boolean(
+          this.currentUser.permissions?.includes('payroll.view') ||
+          this.currentUser.permissions?.includes('payroll.disburse')
+        );
 
       const [
         rosterData,
@@ -167,23 +187,23 @@ export class WorkspaceContext {
       ] = await Promise.all([
         shiftService.getRoster(branchId).catch(() => []),
         shiftService.getTemplates(branchId).catch(() => []),
-        isAdminOrOwner
+        isManagement
           ? shiftService.getPendingSwapRequests(branchId).catch(() => [])
           : Promise.resolve([]),
-        isAdminOrOwner
+        isManagement
           ? attendanceService.getWallOfFaces(branchId).catch(() => [])
           : Promise.resolve([]),
         cashAdvanceService.getMyCashAdvances().catch(() => []),
-        isAdminOrOwner
+        isManagement
           ? cashAdvanceService.getAdminCashAdvances('PENDING', branchId).catch(() => [])
           : Promise.resolve([]),
         payrollService.getMySlip().catch(() => null),
-        isAdminOrOwner
+        canViewPayroll
           ? payrollService.calculatePreview(undefined, undefined, branchId).catch(() => null)
           : Promise.resolve(null),
         billingService.getInvoices().catch(() => []),
         billingService.getPlans().catch(() => []),
-        isAdminOrOwner
+        isManagement
           ? teamService.getMembers().catch(() => [])
           : Promise.resolve([]),
       ]);

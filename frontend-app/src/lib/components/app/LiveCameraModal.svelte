@@ -310,7 +310,7 @@
             {actionType === 'CLOCK_IN' ? 'PRESENSI MASUK' : 'PRESENSI KELUAR'}
           </span>
         </div>
-        <div class="text-[11px] text-[#d9d9dd]">
+        <div class="text-[11px] text-[#e5e5ea]">
           {currentUser.branch_name} • Lat: {latitude.toFixed(6)}, Lng: {longitude.toFixed(6)}
         </div>
       </div>

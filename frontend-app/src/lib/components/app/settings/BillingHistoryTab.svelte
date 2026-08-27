@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Sparkles } from 'lucide-svelte';
+  import { Sparkles, CheckCircle2, Upload, X } from 'lucide-svelte';
   import type { SubscriptionInvoice, SubscriptionPlanItem } from '../../../types/app';
   import { formatRupiah } from '../../../utils/formatters';
 
@@ -38,17 +38,17 @@
 
 <div class="space-y-6 font-sans">
   <!-- Active Plan Card -->
-  <div class="bg-white border border-[#d9d9dd] rounded-[24px] p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-    <div>
+  <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+    <div class="space-y-1">
       <div class="flex items-center gap-2">
-        <span class="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[#17171c] text-white font-medium">
+        <span class="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[#17171c] text-white font-bold">
           Langganan SaaS
         </span>
-        <span class="text-xs text-[#003c33] font-medium bg-[#edfce9] px-2.5 py-0.5 rounded-full border border-[#bbf7d0]">
+        <span class="text-xs text-[#059669] font-bold bg-[#ecfdf5] px-2.5 py-0.5 rounded-full border border-[#a7f3d0]">
           Status: AKTIF
         </span>
       </div>
-      <p class="text-xs text-[#75758a] mt-1">
+      <p class="text-xs text-[#8e8e93] mt-1">
         Kuota 2 Outlet Aktif &bull; {subscriptionPlans.length > 0 ? subscriptionPlans.map((p) => p.name).join(' / ') : 'Sinkronisasi POS Realtime'}
       </p>
     </div>
@@ -56,59 +56,71 @@
     <button
       type="button"
       onclick={onOpenBillingModal}
-      class="px-4 py-2 bg-[#17171c] hover:bg-black text-white text-xs font-medium rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 self-stretch sm:self-auto"
+      class="px-5 py-2.5 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full transition-all cursor-pointer flex items-center justify-center gap-2 self-stretch sm:self-auto shadow-xs"
     >
-      <Sparkles class="w-3.5 h-3.5" />
+      <Sparkles class="w-4 h-4 text-[#f59e0b]" />
       <span>Perpanjang / Upgrade Paket</span>
     </button>
   </div>
 
   <!-- Invoices History -->
-  <div class="bg-white border border-[#d9d9dd] rounded-[24px] overflow-hidden">
-    <div class="p-5 border-b border-[#d9d9dd] flex items-center justify-between">
+  <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xs">
+    <div class="p-5 border-b border-[#e5e5ea] flex items-center justify-between">
       <div>
-        <h3 class="text-sm font-medium text-[#212121]">Riwayat Faktur &amp; Tagihan</h3>
-        <p class="text-xs text-[#75758a]">Daftar status pembayaran invoice langganan tenant</p>
+        <h3 class="text-base font-bold text-[#17171c]">Riwayat Faktur &amp; Tagihan</h3>
+        <p class="text-xs text-[#8e8e93]">Daftar status pembayaran invoice langganan tenant</p>
       </div>
-      <span class="text-[10px] font-mono text-[#75758a]">{subscriptionInvoices.length} Faktur</span>
+      <span class="text-xs font-mono font-semibold text-[#686873] bg-[#f4f4f6] px-3 py-1 rounded-full">{subscriptionInvoices.length} Faktur</span>
     </div>
 
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse text-xs">
         <thead>
-          <tr class="bg-[#eeece7]/40 border-b border-[#d9d9dd] text-[#75758a] font-mono uppercase text-[10px]">
-            <th class="py-3 px-4">Nomor Invoice</th>
-            <th class="py-3 px-4">Paket Layanan</th>
-            <th class="py-3 px-4 text-right">Total Tagihan</th>
-            <th class="py-3 px-4 text-center">Status</th>
-            <th class="py-3 px-4 text-center">Aksi</th>
+          <tr class="bg-[#fafafc] border-b border-[#e5e5ea] text-[#8e8e93] font-mono uppercase text-[10.5px]">
+            <th class="py-3.5 px-5 font-bold">Nomor Invoice</th>
+            <th class="py-3.5 px-5 font-bold">Paket Layanan</th>
+            <th class="py-3.5 px-5 text-right font-bold">Total Tagihan</th>
+            <th class="py-3.5 px-5 text-center font-bold">Status</th>
+            <th class="py-3.5 px-5 text-center font-bold">Aksi</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-[#d9d9dd]">
+        <tbody class="divide-y divide-[#e5e5ea]">
           {#if subscriptionInvoices.length === 0}
             <tr>
-              <td colspan="5" class="py-8 text-center text-[#75758a]">
+              <td colspan="5" class="py-12 text-center text-[#8e8e93]">
                 Belum ada riwayat tagihan faktur.
               </td>
             </tr>
           {:else}
             {#each subscriptionInvoices as inv}
-              <tr class="hover:bg-[#eeece7]/20 transition-all">
-                <td class="py-3 px-4">
-                  <div class="font-mono font-medium text-[#212121]">{inv.invoice_number}</div>
-                  <div class="text-[10px] text-[#75758a] font-mono">Jatuh Tempo: {inv.due_date}</div>
+              <tr class="hover:bg-[#fafafc] transition-all">
+                <td class="py-4 px-5">
+                  <div class="font-mono font-bold text-[#17171c]">{inv.invoice_number}</div>
+                  <div class="text-[11px] text-[#8e8e93] font-mono">Jatuh Tempo: {inv.due_date}</div>
                 </td>
-                <td class="py-3 px-4 text-[#616161]">{inv.plan_name || 'Standard Tier'}</td>
-                <td class="py-3 px-4 text-right font-mono font-medium text-[#17171c]">{formatRupiah(inv.total_amount)}</td>
-                <td class="py-3 px-4 text-center">
-                  <span class={`text-[10px] font-mono font-medium px-2 py-0.5 rounded-full ${
-                    inv.status === 'PAID' ? 'bg-[#edfce9] text-[#003c33]' : inv.status === 'PENDING_VERIFICATION' ? 'bg-[#f1f5ff] text-[#1863dc]' : 'bg-[#ffefef] text-[#e5484d]'
-                  }`}>
-                    {inv.status}
-                  </span>
+                <td class="py-4 px-5">
+                  <span class="font-bold text-[#17171c]">{inv.plan_name || 'Standard Tier'}</span>
                 </td>
-                <td class="py-3 px-4 text-center">
-                  {#if inv.status === 'UNPAID'}
+                <td class="py-4 px-5 text-right font-mono font-bold text-[#17171c]">
+                  {formatRupiah(inv.total_amount)}
+                </td>
+                <td class="py-4 px-5 text-center">
+                  {#if inv.status === 'PAID'}
+                    <span class="px-2.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#059669] text-[10.5px] font-mono font-semibold border border-[#a7f3d0]">
+                      LUNAS
+                    </span>
+                  {:else if inv.status === 'PENDING_VERIFICATION'}
+                    <span class="px-2.5 py-0.5 rounded-full bg-[#fffbeb] text-[#d97706] text-[10.5px] font-mono font-semibold border border-[#fef3c7]">
+                      PROSES VERIFIKASI
+                    </span>
+                  {:else}
+                    <span class="px-2.5 py-0.5 rounded-full bg-[#fef2f2] text-[#dc2626] text-[10.5px] font-mono font-semibold border border-[#fecaca]">
+                      BELUM BAYAR
+                    </span>
+                  {/if}
+                </td>
+                <td class="py-4 px-5 text-center">
+                  {#if inv.status !== 'PAID'}
                     <button
                       type="button"
                       onclick={() => {
@@ -116,12 +128,15 @@
                         proofAmount = inv.total_amount;
                         isProofModalOpen = true;
                       }}
-                      class="px-3 py-1 text-xs font-medium bg-[#17171c] hover:bg-black text-white rounded-full transition-all cursor-pointer"
+                      class="px-3.5 py-1.5 bg-[#17171c] hover:bg-black text-white rounded-xl text-xs font-semibold cursor-pointer transition-all shadow-2xs"
                     >
-                      Kirim Bukti Bayar
+                      Unggah Bukti
                     </button>
                   {:else}
-                    <span class="text-xs text-[#75758a] font-mono">-</span>
+                    <span class="text-xs text-[#059669] font-medium flex items-center justify-center gap-1">
+                      <CheckCircle2 class="w-3.5 h-3.5" />
+                      <span>Terverifikasi</span>
+                    </span>
                   {/if}
                 </td>
               </tr>
@@ -133,47 +148,67 @@
   </div>
 </div>
 
-<!-- Modal Kirim Bukti Pembayaran -->
+<!-- Modal: Upload Bukti Transfer -->
 {#if isProofModalOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans">
-    <div class="bg-white border border-[#d9d9dd] rounded-[24px] w-full max-w-md p-6 space-y-4 shadow-2xl">
-      <h3 class="text-base font-medium text-[#212121]">Kirim Bukti Pembayaran Faktur</h3>
-      <div class="space-y-3 text-xs">
-        <div class="space-y-1">
-          <label for="proof-sender-name" class="block font-medium text-[#212121]">Nama Rekening Pengirim (Atas Nama)</label>
-          <input
-            id="proof-sender-name"
-            type="text"
-            bind:value={proofBankName}
-            placeholder="Contoh: Arief Wicaksono"
-            class="w-full px-3.5 py-2 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-xl text-[#212121] focus:border-[#17171c] focus:outline-hidden"
-          />
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
+    <div class="bg-white border border-[#e5e5ea] rounded-3xl p-6 sm:p-7 w-full max-w-md space-y-5 shadow-xl animate-in fade-in zoom-in-95">
+      <div class="flex items-center justify-between pb-3 border-b border-[#f2f2f4]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-[#eff6ff] text-[#2563eb] flex items-center justify-center border border-[#bfdbfe]">
+            <Upload class="w-5 h-5" />
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-[#17171c]">Konfirmasi Pembayaran</h3>
+            <p class="text-xs text-[#8e8e93]">Kirim bukti transfer bank langganan SaaS</p>
+          </div>
         </div>
-        <div class="space-y-1">
-          <label for="proof-amount" class="block font-medium text-[#212121]">Nominal Transfer (IDR)</label>
-          <input
-            id="proof-amount"
-            type="number"
-            bind:value={proofAmount}
-            class="w-full px-3.5 py-2 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-xl font-mono text-[#212121] focus:border-[#17171c] focus:outline-hidden"
-          />
-        </div>
-      </div>
-      <div class="flex gap-3 pt-2">
         <button
           type="button"
           onclick={() => (isProofModalOpen = false)}
-          class="flex-1 py-2 text-xs font-medium border border-[#d9d9dd] rounded-full text-[#616161] hover:bg-[#eeece7] cursor-pointer"
+          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all"
+        >
+          <X class="w-5 h-5" />
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div class="space-y-1.5">
+          <label for="proof-bank" class="block font-bold text-[#17171c]">Nama Pemilik Rekening Pengirim</label>
+          <input
+            id="proof-bank"
+            type="text"
+            bind:value={proofBankName}
+            placeholder="Contoh: PT Norde Kuliner Jaya"
+            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label for="proof-amt" class="block font-bold text-[#17171c]">Nominal yang Ditransfer</label>
+          <input
+            id="proof-amt"
+            type="number"
+            bind:value={proofAmount}
+            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl font-mono text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+          />
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <button
+          type="button"
+          onclick={() => (isProofModalOpen = false)}
+          class="flex-1 py-3 border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] text-xs font-semibold rounded-full cursor-pointer transition-all"
         >
           Batal
         </button>
         <button
           type="button"
+          disabled={isUploadingProof || !proofBankName.trim()}
           onclick={handleSendProof}
-          disabled={isUploadingProof}
-          class="flex-1 py-2 text-xs font-medium bg-[#17171c] hover:bg-black text-white rounded-full cursor-pointer disabled:opacity-50"
+          class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all disabled:opacity-50 shadow-xs"
         >
-          Kirim Bukti
+          {isUploadingProof ? 'Mengirim...' : 'Kirim Bukti'}
         </button>
       </div>
     </div>

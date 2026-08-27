@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Wallet, X, Send } from 'lucide-svelte';
   import { DEFAULT_KASBON_AMOUNT_IDR } from '../../../../constants/defaults';
 
   interface Props {
@@ -42,48 +43,77 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans">
-    <div class="bg-white border border-[#d9d9dd] rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl">
-      <h3 class="text-base font-medium text-[#212121]">Ajukan Kasbon Karyawan</h3>
-      {#if kasbonErrorMessage}
-        <div class="p-3 bg-[#ffefef] text-[#e5484d] text-xs rounded-xl">{kasbonErrorMessage}</div>
-      {/if}
-      <div class="space-y-3 text-xs">
-        <div class="space-y-1">
-          <label for="kasbon-amount" class="block font-medium text-[#212121]">Nominal Pengajuan (IDR)</label>
-          <input
-            id="kasbon-amount"
-            type="number"
-            bind:value={requestAmount}
-            class="w-full px-3.5 py-2 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-xl font-mono text-[#212121] focus:border-[#17171c] focus:outline-hidden"
-          />
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
+    <div class="bg-white border border-[#e5e5ea] rounded-3xl w-full max-w-lg p-6 sm:p-7 space-y-5 shadow-xl animate-in fade-in zoom-in-95">
+      <div class="flex items-center justify-between pb-3 border-b border-[#f2f2f4]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-[#eff6ff] text-[#2563eb] flex items-center justify-center border border-[#bfdbfe]">
+            <Wallet class="w-5 h-5" />
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-[#17171c]">Ajukan Kasbon Karyawan</h3>
+            <p class="text-xs text-[#8e8e93]">Pengajuan pinjaman dipotong pada slip gaji berjalan</p>
+          </div>
         </div>
-        <div class="space-y-1">
-          <label for="kasbon-purpose" class="block font-medium text-[#212121]">Keperluan / Alasan</label>
-          <textarea
-            id="kasbon-purpose"
-            bind:value={requestPurpose}
-            rows="2"
-            placeholder="Keperluan mendesak..."
-            class="w-full px-3.5 py-2 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-xl text-[#212121] focus:border-[#17171c] focus:outline-hidden resize-none"
-          ></textarea>
-        </div>
-      </div>
-      <div class="flex gap-3 pt-2">
         <button
           type="button"
           onclick={onClose}
-          class="flex-1 py-2 text-xs font-medium border border-[#d9d9dd] rounded-full text-[#616161] hover:bg-[#eeece7] cursor-pointer"
+          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all"
+        >
+          <X class="w-5 h-5" />
+        </button>
+      </div>
+
+      {#if kasbonErrorMessage}
+        <div class="p-3.5 bg-[#fef2f2] text-[#991b1b] text-xs font-medium rounded-xl border border-[#fecaca]">
+          {kasbonErrorMessage}
+        </div>
+      {/if}
+
+      <div class="space-y-4 text-xs">
+        <div class="space-y-1.5">
+          <label for="kasbon-amount" class="block font-bold text-[#17171c]">Nominal Pengajuan (IDR)</label>
+          <input
+            id="kasbon-amount"
+            type="number"
+            step="50000"
+            bind:value={requestAmount}
+            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl font-mono text-sm text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+          />
+        </div>
+
+        <div class="space-y-1.5">
+          <label for="kasbon-purpose" class="block font-bold text-[#17171c]">Keperluan / Alasan Pinjaman</label>
+          <textarea
+            id="kasbon-purpose"
+            bind:value={requestPurpose}
+            rows="3"
+            placeholder="Jelaskan kebutuhan mendesak..."
+            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden resize-none transition-all shadow-2xs"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <button
+          type="button"
+          onclick={onClose}
+          class="flex-1 py-3 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] rounded-full text-[#686873] cursor-pointer transition-all"
         >
           Batal
         </button>
         <button
           type="button"
           onclick={handleSendKasbon}
-          disabled={isSubmittingKasbon}
-          class="flex-1 py-2 text-xs font-medium bg-[#17171c] hover:bg-black text-white rounded-full cursor-pointer disabled:opacity-50"
+          disabled={isSubmittingKasbon || requestAmount <= 0}
+          class="flex-1 py-3 text-xs font-semibold bg-[#17171c] hover:bg-black text-white rounded-full cursor-pointer transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
         >
-          {isSubmittingKasbon ? 'Mengirim...' : 'Kirim Pengajuan'}
+          {#if isSubmittingKasbon}
+            <span>Mengirim...</span>
+          {:else}
+            <Send class="w-4 h-4" />
+            <span>Kirim Pengajuan</span>
+          {/if}
         </button>
       </div>
     </div>

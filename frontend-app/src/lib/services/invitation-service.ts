@@ -18,7 +18,8 @@ export class InvitationService {
   async inviteMember(payload: {
     email: string;
     job_title: string;
-    role: 'ADMIN' | 'MANAGER' | 'STAFF';
+    role?: string;
+    role_id?: string | null;
     base_salary: number;
     branch_id?: string | null;
   }): Promise<WorkspaceInvitationItem> {

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { CheckCircle2, AlertCircle, User, Lock, ArrowRight, Shield, Sparkles } from 'lucide-svelte';
+  import { CheckCircle2, AlertCircle, ArrowRight, Shield, Building2 } from 'lucide-svelte';
   import { invitationService } from '../../services/invitation-service';
   import { apiClient, ApiError } from '../../services/api-client';
   import type { PublicInvitationDetails } from '../../types/app';
@@ -22,7 +22,6 @@
   // Form fields for registration if not logged in
   let newName = $state('');
   let newPassword = $state('');
-  let showPassword = $state(false);
 
   onMount(() => {
     loadInvitationDetails();
@@ -105,156 +104,181 @@
   }
 </script>
 
-<div class="min-h-screen bg-[#eeece7]/40 flex flex-col justify-center items-center p-4 sm:p-6 select-none font-sans">
+<div class="min-h-screen bg-[#fafafc] flex flex-col justify-center items-center p-4 sm:p-6 font-sans select-none">
   <!-- Brand Header -->
-  <div class="w-full max-w-md mb-6 text-center">
-    <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#17171c] text-white font-bold text-lg mb-3">
-      P
+  <div class="mb-8 text-center space-y-2">
+    <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white border border-[#e5e5ea] shadow-2xs mb-2">
+      <div class="w-3 h-3 rounded-full bg-[#17171c]"></div>
+      <span class="text-sm font-bold tracking-tight text-[#17171c]">PRÉCIS</span>
+      <span class="text-[10.5px] font-mono text-[#8e8e93] border-l border-[#e5e5ea] pl-2">Enterprise POS &amp; HR</span>
     </div>
-    <h1 class="text-2xl font-medium text-[#212121] tracking-tight">PRÉCIS WORKSPACE</h1>
-    <p class="text-xs text-[#616161] mt-1 font-normal">
-      Konfirmasi Undangan Bergabung Tim
+    <h1 class="text-xl sm:text-2xl font-bold text-[#17171c] tracking-tight">
+      Undangan Bergabung Tim
+    </h1>
+    <p class="text-xs text-[#8e8e93] max-w-sm mx-auto">
+      Konfirmasi akses ke sistem operasional outlet dan absensi tim
     </p>
   </div>
 
-  <!-- Invitation Card -->
-  <div class="w-full max-w-md bg-white border border-[#d9d9dd] rounded-3xl p-6 sm:p-8 shadow-none">
+  <div class="w-full max-w-md bg-white border border-[#e5e5ea] rounded-3xl p-6 sm:p-8 shadow-sm">
     {#if isLoading}
       <div class="py-12 text-center space-y-3">
-        <div class="w-7 h-7 border-2 border-[#17171c] border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p class="text-xs font-mono text-[#75758a]">Memverifikasi tautan undangan...</p>
+        <div class="w-8 h-8 border-2 border-[#17171c] border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <p class="text-xs font-mono text-[#8e8e93]">Memeriksa validitas token undangan...</p>
       </div>
     {:else if errorMessage && !invitation}
-      <div class="text-center py-6">
-        <div class="w-12 h-12 bg-[#ffefef] text-[#e5484d] rounded-full flex items-center justify-center mx-auto mb-3">
+      <div class="space-y-4 text-center py-4">
+        <div class="w-12 h-12 bg-[#fef2f2] text-[#dc2626] rounded-2xl flex items-center justify-center mx-auto border border-[#fecaca]">
           <AlertCircle class="w-6 h-6" />
         </div>
-        <h2 class="text-sm font-semibold text-[#212121] mb-1">Undangan Tidak Valid</h2>
-        <p class="text-xs text-[#616161] mb-6">{errorMessage}</p>
+        <div class="space-y-1">
+          <h2 class="text-base font-bold text-[#17171c]">Undangan Tidak Valid</h2>
+          <p class="text-xs text-[#686873]">{errorMessage}</p>
+        </div>
         <button
           type="button"
           onclick={onRejected}
-          class="py-2.5 px-6 bg-[#17171c] text-white text-xs font-medium rounded-full cursor-pointer hover:bg-black transition-all"
+          class="w-full py-3 bg-[#17171c] hover:bg-black text-white font-semibold text-xs rounded-full transition-all cursor-pointer shadow-xs"
         >
-          Kembali ke Halaman Utama
+          Kembali ke Halaman Login
         </button>
       </div>
+    {:else if successMessage}
+      <div class="space-y-4 text-center py-4">
+        <div class="w-12 h-12 bg-[#ecfdf5] text-[#059669] rounded-2xl flex items-center justify-center mx-auto border border-[#a7f3d0]">
+          <CheckCircle2 class="w-6 h-6" />
+        </div>
+        <div class="space-y-1">
+          <h2 class="text-base font-bold text-[#17171c]">Selamat Bergabung!</h2>
+          <p class="text-xs text-[#065f46]">{successMessage}</p>
+        </div>
+      </div>
     {:else if invitation}
-      {#if successMessage}
-        <div class="mb-5 p-4 bg-[#edfce9] border border-[#c7f3be] rounded-2xl text-xs text-[#003c33] flex items-center gap-3">
-          <CheckCircle2 class="w-5 h-5 shrink-0" />
-          <span>{successMessage}</span>
-        </div>
-      {/if}
+      <div class="space-y-5">
+        <!-- Info Workspace & Role Card -->
+        <div class="p-4 bg-[#f8f8fa] border border-[#e5e5ea] rounded-2xl space-y-3 shadow-2xs">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-[#17171c] text-white flex items-center justify-center font-bold text-sm">
+              <Building2 class="w-5 h-5" />
+            </div>
+            <div>
+              <span class="text-[10px] font-mono uppercase text-[#8e8e93] font-semibold">Workspace Tujuan</span>
+              <h3 class="text-sm font-bold text-[#17171c]">{invitation.workspace_name}</h3>
+            </div>
+          </div>
 
-      {#if errorMessage}
-        <div class="mb-5 p-3.5 bg-[#ffefef] border border-[#ffefef] rounded-2xl text-xs text-[#e5484d] flex items-start gap-2.5">
-          <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
-          <span>{errorMessage}</span>
-        </div>
-      {/if}
-
-      <div class="mb-6">
-        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#edfce9] text-[#003c33] rounded-full text-[11px] font-medium border border-[#c7f3be] mb-3">
-          <Sparkles class="w-3 h-3" />
-          <span>Undangan Tim</span>
-        </div>
-        <h2 class="text-lg font-semibold text-[#212121] tracking-tight">
-          {invitation.workspace_name}
-        </h2>
-        <p class="text-xs text-[#616161] mt-1">
-          Diundang oleh <strong>{invitation.invited_by_name}</strong>
-        </p>
-      </div>
-
-      <!-- Detail Box -->
-      <div class="bg-[#fafafa] border border-[#d9d9dd] rounded-2xl p-4 mb-6 space-y-2.5 text-xs">
-        <div class="flex justify-between items-center py-1 border-b border-[#eeece7]">
-          <span class="text-[#75758a]">Alamat Email:</span>
-          <span class="font-medium text-[#212121] font-mono">{invitation.email}</span>
-        </div>
-        <div class="flex justify-between items-center py-1 border-b border-[#eeece7]">
-          <span class="text-[#75758a]">Posisi / Jabatan:</span>
-          <span class="font-semibold text-[#212121]">{invitation.job_title}</span>
-        </div>
-        <div class="flex justify-between items-center py-1 border-b border-[#eeece7]">
-          <span class="text-[#75758a]">Hak Akses (Role):</span>
-          <span class="font-semibold text-[#003c33] px-2 py-0.5 bg-[#edfce9] rounded-md">{invitation.role}</span>
-        </div>
-        <div class="flex justify-between items-center py-1">
-          <span class="text-[#75758a]">Penempatan:</span>
-          <span class="font-medium text-[#212121]">{invitation.branch_name}</span>
-        </div>
-      </div>
-
-      <!-- Form Buat Password jika Akun Baru -->
-      <form onsubmit={handleAccept} class="space-y-4">
-        <div>
-          <label for="inv-name" class="block text-xs font-medium text-[#212121] mb-1.5">
-            Nama Lengkap Anda
-          </label>
-          <div class="relative">
-            <input
-              id="inv-name"
-              type="text"
-              bind:value={newName}
-              placeholder="Nama lengkap Anda"
-              disabled={isSubmitting}
-              class="w-full pl-9 pr-3.5 py-2.5 text-xs text-[#212121] placeholder-[#93939f] border border-[#d9d9dd] rounded-xl focus:border-[#17171c] focus:outline-hidden bg-white"
-            />
-            <User class="w-4 h-4 text-[#93939f] absolute left-3 top-1/2 -translate-y-1/2" />
+          <div class="pt-2 border-t border-[#ececee] grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <span class="text-[10.5px] text-[#8e8e93]">Peran Akses:</span>
+              <div class="font-bold text-[#17171c]">{invitation.role}</div>
+            </div>
+            <div>
+              <span class="text-[10.5px] text-[#8e8e93]">Penempatan:</span>
+              <div class="font-bold text-[#17171c]">{invitation.branch_name || 'Seluruh Outlet'}</div>
+            </div>
           </div>
         </div>
 
-        <div>
-          <label for="inv-password" class="block text-xs font-medium text-[#212121] mb-1.5">
-            Kata Sandi Akun
-          </label>
-          <div class="relative">
-            <input
-              id="inv-password"
-              type={showPassword ? 'text' : 'password'}
-              bind:value={newPassword}
-              placeholder="Minimal 6 karakter"
-              minlength="6"
-              disabled={isSubmitting}
-              class="w-full pl-9 pr-10 py-2.5 text-xs text-[#212121] placeholder-[#93939f] border border-[#d9d9dd] rounded-xl focus:border-[#17171c] focus:outline-hidden bg-white"
-            />
-            <Lock class="w-4 h-4 text-[#93939f] absolute left-3 top-1/2 -translate-y-1/2" />
+        {#if errorMessage}
+          <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] text-[#991b1b] text-xs font-semibold rounded-2xl flex items-start gap-2">
+            <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
+            <span>{errorMessage}</span>
           </div>
-          <p class="text-[10px] text-[#75758a] mt-1">Kosongkan jika Anda sudah memiliki kata sandi terdaftar.</p>
-        </div>
+        {/if}
 
-        <div class="pt-2 space-y-2">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            class="w-full py-3 px-5 bg-[#17171c] hover:bg-black text-white font-medium text-xs rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-none"
-          >
-            {#if isSubmitting}
-              <span>Memproses...</span>
-            {:else}
-              <span>Terima Undangan &amp; Bergabung</span>
-              <ArrowRight class="w-4 h-4" />
-            {/if}
-          </button>
+        {#if invitation.user_exists}
+          <!-- User Sudah Punya Akun -->
+          <div class="space-y-4 text-xs">
+            <div class="p-3.5 bg-[#eff6ff] rounded-2xl border border-[#bfdbfe] text-xs text-[#1e40af] leading-relaxed">
+              Email Anda <strong>{invitation.email}</strong> telah terdaftar. Tekan tombol di bawah untuk langsung menerima peran.
+            </div>
 
-          <button
-            type="button"
-            onclick={handleReject}
-            disabled={isSubmitting}
-            class="w-full py-2.5 px-4 bg-transparent hover:bg-[#fafafa] text-[#75758a] hover:text-[#b30000] font-medium text-xs rounded-full transition-all cursor-pointer"
-          >
-            Tolak Undangan Ini
-          </button>
-        </div>
-      </form>
+            <div class="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onclick={handleReject}
+                disabled={isSubmitting}
+                class="flex-1 py-3 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] rounded-full cursor-pointer transition-all disabled:opacity-50"
+              >
+                Tolak
+              </button>
+              <button
+                type="button"
+                onclick={() => handleAccept()}
+                disabled={isSubmitting}
+                class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50 shadow-xs"
+              >
+                {#if isSubmitting}
+                  <span>Memproses...</span>
+                {:else}
+                  <span>Terima &amp; Gabung</span>
+                  <ArrowRight class="w-4 h-4" />
+                {/if}
+              </button>
+            </div>
+          </div>
+        {:else}
+          <!-- User Belum Punya Akun, Form Registrasi Sekaligus -->
+          <form onsubmit={handleAccept} class="space-y-4 text-xs">
+            <div class="p-3 bg-[#f8f8fa] rounded-2xl border border-[#ececee] text-[11px] text-[#686873]">
+              Lengkapi nama dan buat kata sandi baru untuk akun Anda ({invitation.email}):
+            </div>
+
+            <div class="space-y-1.5">
+              <label for="inv-name" class="block font-bold text-[#17171c]">Nama Lengkap</label>
+              <input
+                id="inv-name"
+                type="text"
+                bind:value={newName}
+                placeholder="Contoh: Budi Santoso"
+                required
+                class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+              />
+            </div>
+
+            <div class="space-y-1.5">
+              <label for="inv-password" class="block font-bold text-[#17171c]">Kata Sandi Baru</label>
+              <input
+                id="inv-password"
+                type="password"
+                bind:value={newPassword}
+                placeholder="Minimal 6 karakter"
+                required
+                minlength="6"
+                class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+              />
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onclick={handleReject}
+                disabled={isSubmitting}
+                class="flex-1 py-3 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] rounded-full cursor-pointer transition-all disabled:opacity-50"
+              >
+                Tolak
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting || !newName.trim() || !newPassword}
+                class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50 shadow-xs"
+              >
+                {#if isSubmitting}
+                  <span>Membuat Akun...</span>
+                {:else}
+                  <span>Buat Akun &amp; Gabung</span>
+                  <ArrowRight class="w-4 h-4" />
+                {/if}
+              </button>
+            </div>
+          </form>
+        {/if}
+      </div>
     {/if}
   </div>
 
-  <!-- Security Footer -->
-  <div class="mt-6 flex items-center gap-2 text-[11px] text-[#75758a] font-mono">
-    <Shield class="w-3.5 h-3.5" />
-    <span>PRÉCIS Workspace Invitation System</span>
+  <div class="mt-8 flex items-center gap-2 text-xs text-[#8e8e93] font-mono">
+    <Shield class="w-4 h-4 text-[#8e8e93]" />
+    <span>PRÉCIS Secure Team Invitation</span>
   </div>
 </div>

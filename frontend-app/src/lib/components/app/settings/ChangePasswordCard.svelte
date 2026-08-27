@@ -40,68 +40,68 @@
   }
 </script>
 
-<div class="bg-white border border-[#d9d9dd] rounded-[24px] p-6 space-y-5 font-sans">
-  <div class="border-b border-[#f2f2f2] pb-3">
-    <h2 class="text-base font-medium text-[#212121]">Keamanan &amp; Kata Sandi</h2>
-    <p class="text-xs text-[#75758a]">Ubah kata sandi akun untuk akses portal aman</p>
+<div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-7 space-y-6 shadow-2xs font-sans">
+  <div class="border-b border-[#f2f2f4] pb-4">
+    <h3 class="text-base font-bold text-[#17171c]">Keamanan &amp; Kata Sandi</h3>
+    <p class="text-xs text-[#8e8e93]">Ubah kata sandi akun untuk akses portal aman</p>
   </div>
 
   {#if passwordSuccessMsg}
-    <div class="p-3 bg-[#edfce9] border border-[#bbf7d0] rounded-xl text-xs font-medium text-[#003c33] flex items-center gap-2">
+    <div class="p-3.5 bg-[#ecfdf5] border border-[#a7f3d0] rounded-2xl text-xs font-semibold text-[#065f46] flex items-center gap-2">
       <Check class="w-4 h-4 shrink-0" />
       <span>{passwordSuccessMsg}</span>
     </div>
   {/if}
 
   {#if passwordErrorMsg}
-    <div class="p-3 bg-[#ffefef] border border-[#fecaca] rounded-xl text-xs font-medium text-[#e5484d]">
+    <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] rounded-2xl text-xs font-semibold text-[#991b1b]">
       {passwordErrorMsg}
     </div>
   {/if}
 
   <div class="space-y-4 text-xs">
     <div class="space-y-1.5">
-      <label for="pwd-curr" class="block font-medium text-[#212121]">Kata Sandi Saat Ini</label>
+      <label for="pwd-curr" class="block font-bold text-[#17171c]">Kata Sandi Saat Ini</label>
       <input
         id="pwd-curr"
         type="password"
         bind:value={currentPassword}
         placeholder="••••••••"
-        class="w-full px-3.5 py-2.5 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-xl text-[#212121] focus:border-[#17171c] focus:outline-hidden"
+        class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
       />
     </div>
 
     <div class="space-y-1.5">
-      <label for="pwd-new" class="block font-medium text-[#212121]">Kata Sandi Baru</label>
+      <label for="pwd-new" class="block font-bold text-[#17171c]">Kata Sandi Baru</label>
       <input
         id="pwd-new"
         type="password"
         bind:value={newPassword}
         placeholder="Minimal 6 karakter"
-        class="w-full px-3.5 py-2.5 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-xl text-[#212121] focus:border-[#17171c] focus:outline-hidden"
+        class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
       />
     </div>
 
     <div class="space-y-1.5">
-      <label for="pwd-conf" class="block font-medium text-[#212121]">Ulangi Kata Sandi Baru</label>
+      <label for="pwd-conf" class="block font-bold text-[#17171c]">Ulangi Kata Sandi Baru</label>
       <input
         id="pwd-conf"
         type="password"
         bind:value={confirmPassword}
         placeholder="Ulangi kata sandi baru"
-        class="w-full px-3.5 py-2.5 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-xl text-[#212121] focus:border-[#17171c] focus:outline-hidden"
+        class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
       />
     </div>
 
-    <div class="pt-4">
+    <div class="pt-4 flex justify-end">
       <button
         type="button"
         onclick={handleSavePassword}
         disabled={isSavingPassword}
-        class="w-full py-2.5 bg-white hover:bg-[#eeece7] border border-[#d9d9dd] text-[#17171c] font-medium rounded-full transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+        class="px-6 py-2.5 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all disabled:opacity-50 flex items-center gap-2 shadow-xs"
       >
-        <KeyRound class="w-3.5 h-3.5" />
-        <span>Perbarui Kata Sandi</span>
+        <KeyRound class="w-4 h-4" />
+        <span>{isSavingPassword ? 'Memperbarui...' : 'Perbarui Kata Sandi'}</span>
       </button>
     </div>
   </div>

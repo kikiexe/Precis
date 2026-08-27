@@ -3,8 +3,6 @@
     Wallet,
     ArrowRightLeft,
     FileText,
-    TrendingDown,
-    TrendingUp,
     ChevronRight,
   } from 'lucide-svelte';
   import type { CashAdvance, PayrollSlipData, User } from '../../../types/app';
@@ -42,114 +40,83 @@
   );
 </script>
 
-<div class="space-y-3 sm:space-y-4 font-sans">
+<div class="space-y-4 font-sans">
   <!-- Quick Action Buttons -->
-  <div class="grid grid-cols-3 gap-2">
+  <div class="grid grid-cols-3 gap-3">
     <button
       type="button"
       onclick={onOpenSwapModal}
-      class="bg-white border border-[#d9d9dd] hover:border-[#17171c] rounded-2xl p-3 text-center transition-all cursor-pointer group shadow-none flex flex-col items-center justify-center gap-1.5"
+      class="bg-white border border-[#e5e5ea] hover:border-[#17171c] rounded-2xl sm:rounded-3xl p-4 text-center transition-all cursor-pointer group shadow-2xs flex flex-col items-center justify-center gap-2"
     >
-      <div class="w-7 h-7 rounded-full bg-[#f1f5ff] text-[#1863dc] flex items-center justify-center">
-        <ArrowRightLeft class="w-3.5 h-3.5" />
+      <div class="w-10 h-10 rounded-2xl bg-[#eff6ff] text-[#2563eb] flex items-center justify-center border border-[#bfdbfe]">
+        <ArrowRightLeft class="w-4 h-4" />
       </div>
-      <span class="text-[11px] font-medium text-[#212121]">Tukar Shift</span>
+      <span class="text-xs font-bold text-[#17171c]">Tukar Shift</span>
     </button>
 
     <button
       type="button"
       onclick={onOpenKasbonModal}
-      class="bg-white border border-[#d9d9dd] hover:border-[#17171c] rounded-2xl p-3 text-center transition-all cursor-pointer group shadow-none flex flex-col items-center justify-center gap-1.5"
+      class="bg-white border border-[#e5e5ea] hover:border-[#17171c] rounded-2xl sm:rounded-3xl p-4 text-center transition-all cursor-pointer group shadow-2xs flex flex-col items-center justify-center gap-2"
     >
-      <div class="w-7 h-7 rounded-full bg-[#edfce9] text-[#00875a] flex items-center justify-center">
-        <Wallet class="w-3.5 h-3.5" />
+      <div class="w-10 h-10 rounded-2xl bg-[#ecfdf5] text-[#059669] flex items-center justify-center border border-[#a7f3d0]">
+        <Wallet class="w-4 h-4" />
       </div>
-      <span class="text-[11px] font-medium text-[#212121]">Ajukan Kasbon</span>
+      <span class="text-xs font-bold text-[#17171c]">Ajukan Kasbon</span>
     </button>
 
     <button
       type="button"
       onclick={onOpenSlipModal}
-      class="bg-white border border-[#d9d9dd] hover:border-[#17171c] rounded-2xl p-3 text-center transition-all cursor-pointer group shadow-none flex flex-col items-center justify-center gap-1.5"
+      class="bg-white border border-[#e5e5ea] hover:border-[#17171c] rounded-2xl sm:rounded-3xl p-4 text-center transition-all cursor-pointer group shadow-2xs flex flex-col items-center justify-center gap-2"
     >
-      <div class="w-7 h-7 rounded-full bg-[#eeece7] text-[#17171c] flex items-center justify-center">
-        <FileText class="w-3.5 h-3.5" />
+      <div class="w-10 h-10 rounded-2xl bg-[#f4f4f6] text-[#17171c] flex items-center justify-center border border-[#e5e5ea]">
+        <FileText class="w-4 h-4" />
       </div>
-      <span class="text-[11px] font-medium text-[#212121]">Slip Gaji</span>
+      <span class="text-xs font-bold text-[#17171c]">Slip Gaji</span>
     </button>
   </div>
 
   <!-- Finansial & Kedisiplinan Berjalan -->
-  <div class="bg-white border border-[#d9d9dd] rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-none">
-    <div class="flex items-center justify-between border-b border-[#f2f2f2] pb-2.5">
-      <div class="flex items-center gap-2">
+  <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-4 shadow-2xs">
+    <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
+      <div class="flex items-center gap-2.5">
         <Wallet class="w-4 h-4 text-[#17171c]" />
-        <h3 class="text-xs sm:text-sm font-medium text-[#212121]">Finansial &amp; Kedisiplinan Berjalan</h3>
+        <h3 class="text-sm sm:text-base font-bold text-[#17171c]">Finansial &amp; Kedisiplinan Berjalan</h3>
       </div>
       <button
         type="button"
         onclick={onNavigateFinance}
-        class="text-[10px] font-mono text-[#1863dc] hover:underline cursor-pointer flex items-center gap-0.5"
+        class="text-xs font-mono font-semibold text-[#2563eb] hover:underline cursor-pointer flex items-center gap-1"
       >
         <span>Detail</span>
-        <ChevronRight class="w-3 h-3" />
+        <ChevronRight class="w-3.5 h-3.5" />
       </button>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-      <!-- Akumulasi Telat & Denda -->
-      <div class="bg-[#fbfbfb] border border-[#d9d9dd]/60 rounded-xl p-2.5 space-y-1">
-        <div class="flex items-center justify-between text-[10px] text-[#75758a] font-mono">
-          <span>Keterlambatan</span>
-          <TrendingDown class="w-3 h-3 text-[#e5484d]" />
-        </div>
-        <div class="font-mono text-sm font-semibold text-[#e5484d]">
-          {totalLateMinutes} Menit
-        </div>
-        <div class="text-[9px] text-[#93939f] font-mono">
-          Denda: -{formatRupiah(totalLatePenalty)}
-        </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div class="p-3.5 bg-[#f8f8fa] border border-[#ececee] rounded-2xl space-y-1">
+        <span class="text-[10.5px] font-mono text-[#8e8e93] uppercase font-semibold">Total Keterlambatan</span>
+        <div class="text-base font-bold font-mono text-[#e5484d]">{totalLateMinutes} mnt</div>
+        <div class="text-[11px] text-[#8e8e93]">Denda: {formatRupiah(totalLatePenalty)}</div>
       </div>
 
-      <!-- Akumulasi Lembur & Upah -->
-      <div class="bg-[#fbfbfb] border border-[#d9d9dd]/60 rounded-xl p-2.5 space-y-1">
-        <div class="flex items-center justify-between text-[10px] text-[#75758a] font-mono">
-          <span>Lembur Berjalan</span>
-          <TrendingUp class="w-3 h-3 text-[#00875a]" />
-        </div>
-        <div class="font-mono text-sm font-semibold text-[#00875a]">
-          {Math.round(totalOvertimeMinutes / 60)} Jam
-        </div>
-        <div class="text-[9px] text-[#93939f] font-mono">
-          Upah: +{formatRupiah(totalOvertimePay)}
-        </div>
+      <div class="p-3.5 bg-[#f8f8fa] border border-[#ececee] rounded-2xl space-y-1">
+        <span class="text-[10.5px] font-mono text-[#8e8e93] uppercase font-semibold">Upah Lembur</span>
+        <div class="text-base font-bold font-mono text-[#059669]">+{formatRupiah(totalOvertimePay)}</div>
+        <div class="text-[11px] text-[#8e8e93]">{totalOvertimeMinutes} menit lembur</div>
       </div>
 
-      <!-- Sisa Kasbon Aktif -->
-      <div class="bg-[#fbfbfb] border border-[#d9d9dd]/60 rounded-xl p-2.5 space-y-1">
-        <div class="flex items-center justify-between text-[10px] text-[#75758a] font-mono">
-          <span>Sisa Kasbon</span>
-          <Wallet class="w-3 h-3 text-[#75758a]" />
-        </div>
-        <div class="font-mono text-sm font-semibold text-[#17171c]">
-          {formatRupiah(totalActiveKasbon)}
-        </div>
-        <div class="text-[9px] text-[#93939f] font-mono">
-          {totalActiveKasbon > 0 ? 'Dipotong payroll' : 'Lunas'}
-        </div>
+      <div class="p-3.5 bg-[#f8f8fa] border border-[#ececee] rounded-2xl space-y-1">
+        <span class="text-[10.5px] font-mono text-[#8e8e93] uppercase font-semibold">Kasbon Aktif</span>
+        <div class="text-base font-bold font-mono text-[#e5484d]">-{formatRupiah(totalActiveKasbon)}</div>
+        <div class="text-[11px] text-[#8e8e93]">Dipotong saat gajian</div>
       </div>
 
-      <!-- Estimasi Take Home Pay -->
-      <div class="bg-[#17171c] text-white rounded-xl p-2.5 space-y-1">
-        <div class="text-[10px] text-white/70 font-mono">
-          Estimasi Gaji Bersih
-        </div>
-        <div class="font-mono text-sm font-semibold text-white truncate">
-          {formatRupiah(estimatedTakeHomePay)}
-        </div>
-        <div class="text-[9px] text-[#00875a] font-mono font-medium">
-          Periode Berjalan
-        </div>
+      <div class="p-3.5 bg-[#17171c] text-white rounded-2xl space-y-1 shadow-xs">
+        <span class="text-[10.5px] font-mono text-white/70 uppercase font-semibold">Estimasi Take-Home Pay</span>
+        <div class="text-base font-bold font-mono text-white">{formatRupiah(estimatedTakeHomePay)}</div>
+        <div class="text-[11px] text-white/70">Periode berjalan</div>
       </div>
     </div>
   </div>

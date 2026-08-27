@@ -158,7 +158,7 @@
   }
 </script>
 
-<div class="space-y-3 sm:space-y-4 max-w-4xl mx-auto font-sans pb-6">
+<div class="space-y-6 max-w-5xl mx-auto font-sans pb-8">
   <LiveClockCard
     {currentUser}
     {hasWorkspace}
@@ -167,47 +167,47 @@
   />
 
   {#if !hasWorkspace}
-    <div class="bg-white border border-[#d9d9dd] rounded-2xl p-5 space-y-4 shadow-none">
-      <div class="flex items-start justify-between gap-3 border-b border-[#f2f2f2] pb-3.5">
+    <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-6 sm:p-7 space-y-5 shadow-2xs">
+      <div class="flex items-start justify-between gap-3 border-b border-[#f2f2f4] pb-4">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-[#eeece7] border border-[#d9d9dd] flex items-center justify-center text-[#17171c]">
-            <Mail class="w-4 h-4" />
+          <div class="w-10 h-10 rounded-2xl bg-[#f4f4f6] border border-[#e5e5ea] flex items-center justify-center text-[#17171c]">
+            <Mail class="w-5 h-5" />
           </div>
           <div>
-            <h2 class="text-sm font-medium text-[#212121]">Belum Ada Outlet &amp; Jadwal Shift</h2>
-            <p class="text-[11px] text-[#75758a]">Akun personal Anda belum terhubung ke workspace bisnis mana pun.</p>
+            <h2 class="text-base font-bold text-[#17171c]">Belum Ada Outlet &amp; Jadwal Shift</h2>
+            <p class="text-xs text-[#8e8e93]">Akun personal Anda belum terhubung ke workspace bisnis mana pun.</p>
           </div>
         </div>
-        <span class="text-[10px] font-mono px-2.5 py-1 rounded-full bg-[#eeece7] text-[#616161] font-medium shrink-0">
+        <span class="text-xs font-mono px-3 py-1 rounded-full bg-[#f4f4f6] text-[#686873] font-semibold shrink-0">
           Standalone
         </span>
       </div>
 
-      <div class="bg-[#eeece7]/40 border border-[#d9d9dd] rounded-xl p-3.5 text-xs text-[#616161] space-y-1 leading-relaxed">
+      <div class="bg-[#f8f8fa] border border-[#e5e5ea] rounded-2xl p-4 text-xs text-[#686873] space-y-1 leading-relaxed">
         <div>Minta pemilik bisnis outlet Anda untuk mengirimkan email undangan ke:</div>
-        <div class="font-mono text-xs font-semibold text-[#17171c]">{currentUser.email}</div>
+        <div class="font-mono text-xs font-bold text-[#17171c]">{currentUser.email}</div>
       </div>
 
-      <div class="flex flex-col sm:flex-row items-center gap-2 pt-1">
+      <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
         {#if onRefreshSession}
           <button
             type="button"
             onclick={handleCheckInvite}
             disabled={isCheckingInvitation}
-            class="w-full sm:w-auto flex-1 py-2.5 px-4 border border-[#d9d9dd] hover:bg-[#eeece7] text-[#17171c] text-xs font-medium rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+            class="w-full sm:w-auto flex-1 py-3 px-5 border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#17171c] text-xs font-semibold rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
           >
-            <RefreshCw class={`w-3.5 h-3.5 ${isCheckingInvitation ? 'animate-spin' : ''}`} />
+            <RefreshCw class={`w-4 h-4 ${isCheckingInvitation ? 'animate-spin' : ''}`} />
             <span>{isCheckingInvitation ? 'Memeriksa...' : 'Cek Status Undangan'}</span>
           </button>
         {/if}
 
-        {#if onOpenCreateWorkspaceModal}
+        {#if onOpenCreateWorkspaceModal && (currentUser.role === 'OWNER' || currentUser.role === 'SUPERADMIN')}
           <button
             type="button"
             onclick={onOpenCreateWorkspaceModal}
-            class="w-full sm:w-auto py-2.5 px-4 bg-[#17171c] hover:bg-black text-white text-xs font-medium rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+            class="w-full sm:w-auto py-3 px-5 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
           >
-            <Plus class="w-3.5 h-3.5" />
+            <Plus class="w-4 h-4" />
             <span>Buat Bisnis Baru</span>
           </button>
         {/if}

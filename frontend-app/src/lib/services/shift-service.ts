@@ -45,6 +45,11 @@ export class ShiftService {
     throw new Error(response.message || 'Gagal menetapkan jadwal shift.');
   }
 
+  public async deleteAssignment(shiftAssignmentId: string): Promise<boolean> {
+    await apiClient.delete(`/shifts/assignments/${shiftAssignmentId}`);
+    return true;
+  }
+
   public async requestSwap(
     shiftAssignmentId: string,
     targetUserId: string

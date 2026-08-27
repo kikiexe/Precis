@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Search, Trash2 } from 'lucide-svelte';
+  import { Search, Trash2, X } from 'lucide-svelte';
   import type { CategoryItem, ProductMenuItem } from '../../../types/app';
   import { formatRupiah } from '../../../utils/formatters';
 
@@ -32,98 +32,123 @@
       return matchSearch && matchCat;
     })
   );
+
+  let menuCategories = $derived(categories.filter((c) => c.type === 'MENU'));
 </script>
 
-<div class="space-y-4 font-sans">
-  <!-- Search & Filters -->
-  <div class="bg-white border border-[#d9d9dd] rounded-[20px] p-3 sm:p-4 flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
-    <div class="relative flex-1 min-w-0">
-      <Search class="w-4 h-4 text-[#93939f] absolute left-3.5 top-1/2 -translate-y-1/2" />
+<div class="space-y-5 font-sans">
+  <!-- Search & Filters Container -->
+  <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 space-y-3 lg:space-y-0 lg:flex lg:items-center lg:justify-between lg:gap-4 shadow-2xs">
+    <!-- Search Input -->
+    <div class="relative w-full lg:w-72 xl:w-80 shrink-0">
+      <Search class="w-4 h-4 text-[#8e8e93] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
       <input
         type="text"
         bind:value={searchQuery}
         placeholder="Cari nama menu jualan..."
-        class="w-full bg-[#eeece7]/40 pl-10 pr-4 py-2 text-xs rounded-full border border-[#d9d9dd] placeholder-[#93939f] text-[#212121] focus:border-[#17171c] focus:outline-hidden transition-all"
+        class="w-full bg-[#f8f8fa] hover:bg-[#f2f2f5] pl-10 pr-9 py-2 text-xs rounded-full border border-[#e5e5ea] placeholder-[#8e8e93] text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
       />
-    </div>
-
-    <div class="flex items-center gap-1 overflow-x-auto no-scrollbar bg-[#eeece7]/60 p-1 rounded-full border border-[#d9d9dd] shrink-0 max-w-full">
-      <button
-        type="button"
-        onclick={() => (selectedCategoryFilter = 'ALL')}
-        class={`px-3 py-1 text-xs rounded-full transition-all cursor-pointer shrink-0 ${
-          selectedCategoryFilter === 'ALL'
-            ? 'bg-[#17171c] text-white font-medium'
-            : 'text-[#616161] hover:text-[#212121]'
-        }`}
-      >
-        Semua
-      </button>
-      {#each categories.filter((c) => c.type === 'MENU') as cat}
+      {#if searchQuery}
         <button
           type="button"
-          onclick={() => (selectedCategoryFilter = cat.id)}
-          class={`px-3 py-1 text-xs rounded-full transition-all cursor-pointer shrink-0 ${
-            selectedCategoryFilter === cat.id
-              ? 'bg-[#17171c] text-white font-medium'
-              : 'text-[#616161] hover:text-[#212121]'
+          onclick={() => (searchQuery = '')}
+          class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8e8e93] hover:text-[#17171c] p-0.5 rounded-full cursor-pointer"
+          title="Hapus pencarian"
+        >
+          <X class="w-3.5 h-3.5" />
+        </button>
+      {/if}
+    </div>
+
+    <!-- Category Filter Capsules -->
+    <div class="w-full lg:flex-1 min-w-0 overflow-hidden">
+      <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 w-full lg:justify-end">
+        <button
+          type="button"
+          onclick={() => (selectedCategoryFilter = 'ALL')}
+          class={`px-4 py-2 text-xs rounded-full transition-all cursor-pointer shrink-0 font-medium ${
+            selectedCategoryFilter === 'ALL'
+              ? 'bg-[#17171c] text-white shadow-xs font-semibold'
+              : 'bg-[#f4f4f6] text-[#686873] hover:text-[#17171c] hover:bg-[#ececee] border border-[#e5e5ea]'
           }`}
         >
-          {cat.name}
+          Semua ({menuItems.length})
         </button>
-      {/each}
+        {#each menuCategories as cat}
+          {@const count = menuItems.filter((m) => m.category_id === cat.id).length}
+          <button
+            type="button"
+            onclick={() => (selectedCategoryFilter = cat.id)}
+            class={`px-4 py-2 text-xs rounded-full transition-all cursor-pointer shrink-0 font-medium whitespace-nowrap ${
+              selectedCategoryFilter === cat.id
+                ? 'bg-[#17171c] text-white shadow-xs font-semibold'
+                : 'bg-[#f4f4f6] text-[#686873] hover:text-[#17171c] hover:bg-[#ececee] border border-[#e5e5ea]'
+            }`}
+          >
+            {cat.name} ({count})
+          </button>
+        {/each}
+      </div>
     </div>
   </div>
 
-  <!-- Menu Items Square-Grid -->
+  <!-- Menu Items Grid -->
   {#if isLoading}
-    <div class="bg-white border border-[#d9d9dd] rounded-3xl p-12 text-center text-[#75758a]">
-      <p class="text-xs font-medium">Memuat data menu jualan...</p>
+    <div class="bg-white border border-[#e5e5ea] rounded-3xl p-12 text-center text-[#8e8e93] shadow-2xs">
+      <p class="text-xs font-medium font-mono">Memuat data menu jualan...</p>
+    </div>
+  {:else if filteredMenuItems.length === 0}
+    <div class="bg-white border border-[#e5e5ea] rounded-3xl p-12 text-center space-y-2 shadow-2xs">
+      <p class="text-xs font-bold text-[#17171c]">Tidak ada menu yang sesuai</p>
+      <p class="text-[11px] text-[#8e8e93]">
+        {searchQuery ? `Tidak ditemukan menu dengan kata kunci "${searchQuery}".` : 'Belum ada menu di kategori ini.'}
+      </p>
     </div>
   {:else}
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {#each filteredMenuItems as item}
-        <div class="bg-white border border-[#d9d9dd] rounded-2xl p-3 sm:p-4 flex flex-col justify-between hover:border-[#17171c] transition-all min-h-[160px] space-y-2">
-          <div class="space-y-1">
-            <div class="flex items-center justify-between gap-1">
-              <span class="text-[9px] font-mono text-[#75758a] uppercase truncate">{item.category_name}</span>
-              <div class="flex items-center gap-1.5">
-                <span
-                  class={`w-2 h-2 rounded-full shrink-0 ${item.is_available ? 'bg-[#00875a]' : 'bg-[#e5484d]'}`}
-                  title={item.is_available ? 'Tersedia' : 'Habis'}
-                ></span>
-                <button
-                  type="button"
-                  onclick={() => onPromptDelete(item.id, item.name)}
-                  class="text-[#93939f] hover:text-[#e5484d] p-0.5 rounded hover:bg-[#ffefef] transition-all cursor-pointer"
-                  title="Hapus Menu"
-                >
-                  <Trash2 class="w-3 h-3" />
-                </button>
+        <div class="bg-white border border-[#e5e5ea] hover:border-[#17171c]/40 rounded-2xl p-5 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between group space-y-4">
+          <div class="space-y-2">
+            <div class="flex items-start justify-between gap-3">
+              <div class="space-y-1">
+                <span class="text-[10px] font-mono uppercase font-semibold text-[#8e8e93]">
+                  {item.category_name || categories.find((c) => c.id === item.category_id)?.name || 'Menu'}
+                </span>
+                <h4 class="font-bold text-sm text-[#17171c] group-hover:text-black leading-snug">
+                  {item.name}
+                </h4>
               </div>
+              <button
+                type="button"
+                onclick={() => onPromptDelete(item.id, item.name)}
+                class="p-2 text-[#8e8e93] hover:text-[#dc2626] hover:bg-[#fef2f2] rounded-xl transition-all cursor-pointer opacity-80 group-hover:opacity-100 shrink-0"
+                title="Hapus Menu"
+              >
+                <Trash2 class="w-4 h-4" />
+              </button>
             </div>
 
-            <h3 class="text-xs sm:text-sm font-medium text-[#212121] tracking-tight line-clamp-2">{item.name}</h3>
             {#if item.description}
-              <p class="text-[10px] text-[#75758a] line-clamp-1">{item.description}</p>
+              <p class="text-xs text-[#686873] line-clamp-2 leading-relaxed">
+                {item.description}
+              </p>
             {/if}
           </div>
 
-          <div class="pt-2 border-t border-[#f2f2f2] flex flex-col gap-1.5">
-            <div class="text-xs sm:text-sm font-medium font-mono text-[#17171c]">
+          <div class="pt-3 border-t border-[#f2f2f4] flex items-center justify-between">
+            <span class="font-mono font-bold text-sm text-[#17171c]">
               {formatRupiah(item.price)}
-            </div>
-
+            </span>
             <button
               type="button"
               onclick={() => onToggleAvailability(item)}
-              class={`w-full py-1 text-[10px] sm:text-[11px] font-medium rounded-lg border transition-all cursor-pointer text-center ${
+              class={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all ${
                 item.is_available
-                  ? 'border-[#d9d9dd] bg-[#fbfbfb] text-[#616161] hover:bg-[#ffefef] hover:text-[#e5484d] hover:border-[#e5484d]/30'
-                  : 'border-[#003c33] bg-[#edfce9] text-[#003c33]'
+                  ? 'bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0] hover:bg-[#d1fae5]'
+                  : 'bg-[#fef2f2] text-[#dc2626] border border-[#fecaca] hover:bg-[#fee2e2]'
               }`}
             >
-              {item.is_available ? 'Set Habis' : 'Set Tersedia'}
+              {item.is_available ? 'Tersedia' : 'Habis'}
             </button>
           </div>
         </div>

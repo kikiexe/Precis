@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Wallet, X, AlertCircle, Check } from 'lucide-svelte';
+  import { Wallet, X, AlertCircle, Check, Send } from 'lucide-svelte';
   import { DEFAULT_KASBON_AMOUNT_IDR } from '../../../../constants/defaults';
 
   interface Props {
@@ -50,67 +50,72 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 bg-[#17171c]/50 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white border border-[#d9d9dd] rounded-[24px] max-w-md w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 font-sans">
-      <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
-        <div class="flex items-center gap-2">
-          <Wallet class="w-4 h-4 text-[#00875a]" />
-          <h3 class="font-medium text-base text-[#212121]">Pengajuan Kasbon Staf</h3>
+  <div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
+    <div class="bg-white border border-[#e5e5ea] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-xl space-y-5 animate-in fade-in zoom-in-95">
+      <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-[#ecfdf5] text-[#059669] flex items-center justify-center border border-[#a7f3d0]">
+            <Wallet class="w-5 h-5" />
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-[#17171c]">Pengajuan Kasbon Staf</h3>
+            <p class="text-xs text-[#8e8e93]">Pengajuan pinjaman dipotong pada slip gaji bulanan</p>
+          </div>
         </div>
         <button
           type="button"
           onclick={onClose}
-          class="text-[#93939f] hover:text-[#212121] cursor-pointer p-1"
+          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all"
         >
-          <X class="w-4 h-4" />
+          <X class="w-5 h-5" />
         </button>
       </div>
 
       {#if kasbonErrorMessage}
-        <div class="p-3 bg-[#ffefef] border border-[#e5484d]/30 rounded-xl text-[#e5484d] text-xs flex items-start gap-2">
+        <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] rounded-xl text-[#991b1b] text-xs font-medium flex items-start gap-2">
           <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
           <span>{kasbonErrorMessage}</span>
         </div>
       {/if}
 
       {#if kasbonSuccessMessage}
-        <div class="p-3 bg-[#edfce9] border border-[#00875a]/30 rounded-xl text-[#00875a] text-xs flex items-start gap-2">
+        <div class="p-3.5 bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl text-[#065f46] text-xs font-semibold flex items-start gap-2">
           <Check class="w-4 h-4 shrink-0 mt-0.5" />
           <span>{kasbonSuccessMessage}</span>
         </div>
       {/if}
 
       <div class="space-y-4 text-xs">
-        <div>
-          <label for="modal-kasbon-amount" class="block font-medium text-[#212121] mb-1.5">Nominal Pinjaman Kasbon (IDR)</label>
+        <div class="space-y-1.5">
+          <label for="modal-kasbon-amount" class="block font-bold text-[#17171c]">Nominal Pinjaman Kasbon (IDR)</label>
           <input
             id="modal-kasbon-amount"
             type="number"
             bind:value={kasbonAmount}
             step="50000"
             min="50000"
-            class="w-full border border-[#d9d9dd] rounded-xl p-2.5 bg-white font-mono text-[#212121] focus:border-[#17171c] focus:outline-hidden"
+            class="w-full border border-[#e5e5ea] rounded-xl px-4 py-2.5 bg-[#f8f8fa] hover:bg-white font-mono text-sm text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
           />
-          <span class="text-[10px] text-[#75758a] mt-1 block">Otomatis dipotong pada slip gaji periode payroll berikutnya.</span>
+          <span class="text-[11px] text-[#8e8e93] block">Otomatis dipotong pada slip gaji periode payroll berikutnya.</span>
         </div>
 
-        <div>
-          <label for="modal-kasbon-purpose" class="block font-medium text-[#212121] mb-1.5">Keperluan / Keterangan</label>
+        <div class="space-y-1.5">
+          <label for="modal-kasbon-purpose" class="block font-bold text-[#17171c]">Keperluan / Keterangan</label>
           <input
             id="modal-kasbon-purpose"
             type="text"
             bind:value={kasbonPurpose}
-            placeholder="Contoh: Kebutuhan darurat medis / transportasi"
-            class="w-full border border-[#d9d9dd] rounded-xl p-2.5 bg-white text-[#212121] focus:border-[#17171c] focus:outline-hidden"
+            placeholder="Contoh: Kebutuhan medis darurat, servis motor"
+            class="w-full border border-[#e5e5ea] rounded-xl px-4 py-2.5 bg-[#f8f8fa] hover:bg-white text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
           />
         </div>
       </div>
 
-      <div class="flex gap-2.5 pt-3 border-t border-[#d9d9dd]">
+      <div class="flex items-center gap-3 pt-2">
         <button
           type="button"
           onclick={onClose}
-          class="flex-1 py-2.5 border border-[#d9d9dd] hover:bg-[#eeece7]/40 text-[#616161] text-xs font-medium rounded-full cursor-pointer transition-all"
+          class="flex-1 py-3 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] rounded-full text-[#686873] cursor-pointer transition-all"
         >
           Batal
         </button>
@@ -118,9 +123,14 @@
           type="button"
           disabled={isSubmittingKasbon || kasbonAmount <= 0}
           onclick={handleConfirmKasbon}
-          class="flex-1 py-2.5 bg-[#17171c] hover:bg-black text-white text-xs font-medium rounded-full cursor-pointer transition-all disabled:opacity-50"
+          class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
         >
-          {isSubmittingKasbon ? 'Mengajukan...' : 'Ajukan Kasbon'}
+          {#if isSubmittingKasbon}
+            <span>Mengajukan...</span>
+          {:else}
+            <Send class="w-4 h-4" />
+            <span>Kirim Pengajuan</span>
+          {/if}
         </button>
       </div>
     </div>
