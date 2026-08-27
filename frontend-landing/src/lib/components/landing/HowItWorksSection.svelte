@@ -74,7 +74,7 @@
     ></div>
   </div>
 
-  <div class="relative z-10 max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
+  <div class="relative z-10 max-w-350 mx-auto px-4 sm:px-6 lg:px-12">
     <!-- Header -->
     <div class="mb-12 sm:mb-16 lg:mb-24">
       <span class="inline-flex items-center gap-3 text-xs sm:text-sm font-mono text-white/50 mb-4 sm:mb-6">
@@ -142,7 +142,7 @@
           </div>
 
           <!-- Monitor content -->
-          <div class="p-4 sm:p-6 lg:p-8 font-mono text-xs sm:text-sm min-h-[180px] sm:min-h-[220px]">
+          <div class="p-4 sm:p-6 lg:p-8 font-mono text-xs sm:text-sm min-h-45 sm:min-h-55">
             <div class="text-white/70 space-y-2.5 sm:space-y-3">
               {#key activeStep}
                 {#each steps[activeStep].lines as line, lineIndex}
