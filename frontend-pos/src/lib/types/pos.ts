@@ -4,6 +4,7 @@ export interface PosTerminalInfo {
   workspace_id: string;
   branch_id: string;
   branch_name?: string;
+  cashiers?: CashierUser[];
 }
 
 export interface Product {
@@ -123,7 +124,7 @@ export interface OfflineOrder {
 export interface CashierUser {
   id: string;
   name: string;
-  role: 'STAFF' | 'ADMIN' | 'OWNER';
+  role: 'STAFF' | 'ADMIN' | 'OWNER' | string;
   pin: string; // 4-digit PIN
   avatar_url?: string;
 }

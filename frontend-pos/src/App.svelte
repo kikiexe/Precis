@@ -132,6 +132,13 @@
 
     try {
       terminalInfo = await posService.getTerminalInfo();
+      if (terminalInfo?.cashiers && terminalInfo.cashiers.length > 0) {
+        await db.cashiers.bulkPut(terminalInfo.cashiers);
+        cashiers = terminalInfo.cashiers;
+        if (!activeCashier.id || activeCashier.id === 'team-outlet') {
+          activeCashier = cashiers[0];
+        }
+      }
       // sinkronkan katalog terbaru ke IndexedDB secara background
       await posService.syncCatalogToLocalDb();
       await loadDbData();
@@ -145,6 +152,9 @@
       products = await db.products.toArray();
       categories = await db.categories.toArray();
       cashiers = await db.cashiers.toArray();
+      if (cashiers.length > 0 && (!activeCashier.id || activeCashier.id === 'team-outlet')) {
+        activeCashier = cashiers[0];
+      }
       allOrders = await db.orders.reverse().toArray();
 
       const openSess = await db.sessions.where('status').equals('OPEN').first();
@@ -161,6 +171,14 @@
   function handlePairingSuccess(info: PosTerminalInfo) {
     terminalInfo = info;
     isPairingModalOpen = false;
+    if (info.cashiers && info.cashiers.length > 0) {
+      db.cashiers.bulkPut(info.cashiers).then(() => {
+        cashiers = info.cashiers || [];
+        if (cashiers.length > 0) {
+          activeCashier = cashiers[0];
+        }
+      });
+    }
     posService.syncCatalogToLocalDb().then(() => loadDbData());
   }
 
@@ -391,7 +409,9 @@
 <SessionModal
   isOpen={isSessionModalOpen}
   {activeSession}
-  cashierUserId={activeCashier?.id || 'team-outlet'}
+  cashierUserId={activeCashier?.id}
+  {cashiers}
+  {activeCashier}
   onClose={() => (isSessionModalOpen = false)}
   onSessionOpened={handleSessionOpened}
   onSessionClosed={handleSessionClosed}

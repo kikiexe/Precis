@@ -13,12 +13,13 @@
   let { activeSession, closedSessions = [], onOpenSessionModal }: Props = $props();
 </script>
 
-<div class="flex-1 bg-[#eeece7]/30 p-4 sm:p-6 md:p-8 overflow-y-auto space-y-6 font-sans">
-  <div class="flex items-center justify-between">
-    <div>
-      <h2 class="text-xl font-medium text-[#212121] tracking-tight">Settlement Shift &amp; Tutup Kasir</h2>
-      <p class="text-xs text-[#616161] font-normal mt-0.5">Rekonsiliasi total transaksi kasir dan perhitungan selisih fisik laci</p>
-    </div>
+<div class="flex-1 bg-[#fbfbfa] p-4 sm:p-6 md:p-8 overflow-y-auto font-sans">
+  <div class="w-full max-w-6xl mx-auto space-y-6 pb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-medium text-[#212121] tracking-tight">Settlement Shift &amp; Tutup Kasir</h2>
+        <p class="text-xs text-[#616161] font-normal mt-0.5">Rekonsiliasi total transaksi kasir dan perhitungan selisih fisik laci</p>
+      </div>
 
     <button
       type="button"
@@ -154,5 +155,6 @@
         </table>
       </div>
     {/if}
+  </div>
   </div>
 </div>

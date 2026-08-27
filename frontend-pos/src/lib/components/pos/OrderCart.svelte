@@ -44,7 +44,7 @@
   );
 </script>
 
-<aside class="w-80 md:w-96 bg-white border-l border-[#d9d9dd] flex flex-col h-full shrink-0 select-none shadow-none font-sans">
+<aside class="w-72 sm:w-80 md:w-88 lg:w-96 bg-white border-l border-[#d9d9dd] flex flex-col h-full shrink-0 select-none shadow-none font-sans">
   <!-- Header: Cart Title & Items Count -->
   <div class="p-4 border-b border-[#d9d9dd] flex items-center justify-between bg-[#eeece7]/40">
     <div class="flex items-center gap-2">

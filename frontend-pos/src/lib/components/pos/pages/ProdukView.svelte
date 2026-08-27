@@ -146,8 +146,9 @@
   }
 </script>
 
-<div class="space-y-4 max-w-6xl mx-auto font-sans pb-8">
-  <div class="flex items-center justify-between gap-4 border-b border-[#e5e5e5] pb-3">
+<div class="flex-1 flex flex-col h-full bg-[#fbfbfa] overflow-y-auto p-4 sm:p-6 lg:p-8 font-sans">
+  <div class="w-full max-w-7xl mx-auto space-y-5 pb-8">
+    <div class="flex items-center justify-between gap-4 border-b border-[#e5e5e5] pb-3">
     <div class="flex items-center gap-2">
       <button
         type="button"
@@ -199,6 +200,7 @@
       onOpenAddModal={() => (isAddMenuModalOpen = true)}
     />
   {/if}
+  </div>
 </div>
 
 <PosAddMenuModal

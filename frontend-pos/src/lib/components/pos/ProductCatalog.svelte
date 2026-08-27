@@ -83,30 +83,30 @@
         <p class="text-xs text-[#75758a]">Coba ubah kata kunci pencarian atau kategori.</p>
       </div>
     {:else}
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-[repeat(auto-fill,minmax(175px,1fr))] gap-3.5 sm:gap-4">
         {#each filteredProducts as product (product.id)}
           <button
             type="button"
             onclick={() => onAddToCart(product)}
-            class="bg-white border border-[#d9d9dd] hover:border-[#17171c] rounded-[20px] p-4 text-left flex flex-col justify-between transition-all duration-150 active:scale-[0.98] group cursor-pointer h-40 relative select-none shadow-none"
+            class="bg-white border border-[#d9d9dd] hover:border-[#17171c] rounded-[20px] p-4 text-left flex flex-col justify-between transition-all duration-150 active:scale-[0.98] group cursor-pointer min-h-[148px] relative select-none shadow-2xs hover:shadow-xs"
           >
-            <div>
-              <div class="font-medium text-sm text-[#212121] group-hover:text-[#000000] transition-colors line-clamp-2 leading-snug">
+            <div class="space-y-1">
+              <div class="font-bold text-xs sm:text-[13px] text-[#17171c] group-hover:text-black transition-colors line-clamp-2 leading-snug">
                 {product.name}
               </div>
               {#if product.description}
-                <div class="text-[11px] text-[#75758a] line-clamp-2 mt-1 leading-tight font-normal">
+                <div class="text-[10.5px] text-[#8e8e93] line-clamp-2 leading-tight font-normal">
                   {product.description}
                 </div>
               {/if}
             </div>
 
-            <div class="flex items-end justify-between mt-2.5 pt-2.5 border-t border-[#d9d9dd]/60">
-              <div class="font-mono text-sm font-medium text-[#212121]">
+            <div class="flex items-center justify-between pt-2.5 mt-2 border-t border-[#f2f2f4]">
+              <span class="font-mono font-bold text-xs sm:text-[13px] text-[#17171c]">
                 {formatCurrency(product.base_price)}
-              </div>
-              <div class="w-8 h-8 rounded-full bg-[#eeece7] group-hover:bg-[#17171c] group-hover:text-white text-[#212121] flex items-center justify-center transition-all">
-                <Plus class="w-4 h-4" />
+              </span>
+              <div class="w-7 h-7 rounded-xl bg-[#f4f4f6] group-hover:bg-[#17171c] group-hover:text-white text-[#17171c] flex items-center justify-center transition-colors shrink-0">
+                <Plus class="w-3.5 h-3.5" />
               </div>
             </div>
           </button>

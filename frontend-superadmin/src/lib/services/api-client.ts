@@ -25,19 +25,10 @@ const STORAGE_KEY_SUPERADMIN_TOKEN = 'precis_superadmin_token';
 
 export function getDefaultSuperadminApiBaseUrl(): string {
   const envUrl = (import.meta.env.VITE_API_BASE_URL as string) || '';
-  if (typeof window !== 'undefined' && window.location?.hostname) {
-    const hostname = window.location.hostname;
-    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
-
-    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
-      if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
-        return envUrl;
-      }
-      return `${protocol}//${hostname}:8000/api/v1`;
-    }
+  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+    return envUrl;
   }
-
-  return envUrl || 'http://localhost:8000/api/v1';
+  return '/api/v1';
 }
 
 export class SuperadminApiClient {
@@ -95,8 +86,13 @@ export class SuperadminApiClient {
   }
 
   private buildUrl(endpoint: string, params?: RequestOptions['params']): string {
+    let cleanBase = (this.baseUrl || getDefaultSuperadminApiBaseUrl()).replace(/\/+$/, '');
+    if (typeof window !== 'undefined' && (cleanBase.includes('localhost') || cleanBase.includes('127.0.0.1'))) {
+      cleanBase = '/api/v1';
+    }
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    const url = new URL(`${this.baseUrl}${cleanEndpoint}`);
+    const base = typeof window !== 'undefined' ? window.location.origin : 'http://127.0.0.1:8000';
+    const url = new URL(`${cleanBase}${cleanEndpoint}`, base);
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {

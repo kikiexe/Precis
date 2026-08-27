@@ -81,7 +81,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
     {#each filteredProducts as product}
       <div class="bg-white border border-[#d9d9dd] rounded-2xl p-4 flex flex-col justify-between space-y-3 hover:border-[#17171c] transition-all">
         <div class="space-y-1">

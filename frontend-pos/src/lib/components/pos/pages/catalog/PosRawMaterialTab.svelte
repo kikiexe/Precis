@@ -53,7 +53,7 @@
     </button>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
     {#each filteredRawMaterials as mat}
       {@const isLow = mat.current_stock <= mat.min_stock_alert}
       <div class={`bg-white border rounded-2xl p-4 flex flex-col justify-between space-y-3 transition-all ${
