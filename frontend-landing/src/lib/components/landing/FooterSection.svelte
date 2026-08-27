@@ -5,7 +5,7 @@
   const footerLinks = {
     Produk: [
       { name: "Presensi Selfie GPS", href: "#features" },
-      { name: "Kasir POS Layar Sentuh", href: "#features" },
+      { name: "Kasir POS", href: "#features" },
       { name: "Payroll Otomatis", href: "#features" },
       { name: "Cara Kerja", href: "#how-it-works" },
       { name: "Paket Harga", href: "#pricing" },
@@ -37,15 +37,15 @@
 </script>
 
 <footer class="relative bg-white border-t border-[#e0e0e0] overflow-hidden">
-  <!-- Animated wave background -->
-  <div class="absolute inset-0 h-64 opacity-25 pointer-events-none overflow-hidden">
-    <AnimatedWave />
-  </div>
+  <div class="relative max-w-350 mx-auto px-6 lg:px-12">
+    <!-- Main Footer Content Area with full Animated Wave Background -->
+    <div class="relative py-16 lg:py-24">
+      <!-- Animated wave background filling the entire upper section above the bottom bar -->
+      <div class="absolute -inset-x-6 lg:-inset-x-12 inset-y-0 opacity-25 pointer-events-none overflow-hidden">
+        <AnimatedWave />
+      </div>
 
-  <div class="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
-    <!-- Main Footer -->
-    <div class="py-16 lg:py-24">
-      <div class="grid grid-cols-2 md:grid-cols-6 gap-12 lg:gap-8">
+      <div class="relative z-10 grid grid-cols-2 md:grid-cols-6 gap-12 lg:gap-8">
         <!-- Brand Column -->
         <div class="col-span-2">
           <a href="/" class="inline-flex items-baseline gap-2 mb-6">
@@ -96,18 +96,11 @@
       </div>
     </div>
 
-    <!-- Bottom Bar -->
-    <div class="py-8 border-t border-[#e0e0e0] flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- Bottom Bar (Clean boundary above copyright) -->
+    <div class="relative z-10 py-8 border-t border-[#e0e0e0] bg-white flex items-center justify-center text-center">
       <p class="text-sm text-[#8c8c8c]">
-        &copy; 2026 Précis. Hak cipta dilindungi undang-undang.
+        &copy; 2026 <span class="underline underline-offset-4 decoration-1 decoration-[#8c8c8c] text-[#525252] font-medium">Munk Studio</span>. Hak cipta dilindungi undang-undang.
       </p>
-
-      <div class="flex items-center gap-4 text-sm text-[#525252]">
-        <span class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-[#24a148]"></span>
-          Sistem Operasional 99.9% Normal
-        </span>
-      </div>
     </div>
   </div>
 </footer>

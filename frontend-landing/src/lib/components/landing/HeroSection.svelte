@@ -19,7 +19,7 @@
 <section class="relative min-h-screen flex flex-col justify-center overflow-hidden bg-white">
   <!-- Animated sphere background - Brightened & Positioned -->
   <div
-    class="absolute -right-8 sm:-right-10 lg:right-0 top-1/2 -translate-y-1/2 w-[680px] h-[680px] sm:w-[780px] sm:h-[780px] lg:w-[950px] lg:h-[950px] opacity-60 pointer-events-none"
+    class="absolute -right-8 sm:-right-10 lg:right-0 top-1/2 -translate-y-1/2 w-170 h-170 sm:w-195 sm:h-195 lg:w-237.5 lg:h-237.5 opacity-60 pointer-events-none"
   >
     <AnimatedSphere />
   </div>
@@ -40,7 +40,7 @@
     {/each}
   </div>
 
-  <div class="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12 pt-32 pb-44 lg:pt-40 lg:pb-52">
+  <div class="relative z-10 max-w-350 mx-auto px-6 lg:px-12 pt-32 pb-44 lg:pt-40 lg:pb-52">
     <!-- Eyebrow -->
     <div
       class={`mb-8 transition-all duration-700 ${
@@ -89,7 +89,7 @@
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         }`}
       >
-        Presensi selfie ber-watermark GPS anti-titip absen, kasir POS layar sentuh yang tetap jalan saat internet mati, dan kalkulasi payroll otomatis tanpa pusing rekap manual.
+        Presensi selfie ber-watermark GPS anti-titip absen, kasir POS yang tetap jalan saat internet mati, dan kalkulasi payroll otomatis tanpa pusing rekap manual.
       </p>
 
       <!-- CTAs -->

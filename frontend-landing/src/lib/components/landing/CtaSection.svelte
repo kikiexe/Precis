@@ -81,8 +81,12 @@
           </div>
 
           <!-- Right animation -->
-          <div class="hidden lg:flex items-center justify-center w-[460px] h-[460px] -mr-12">
-            <AnimatedTetrahedron />
+          <div class="hidden lg:flex items-center justify-center w-[460px] h-[460px] -mr-12 relative">
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div class="w-[740px] h-[740px] flex items-center justify-center shrink-0">
+                <AnimatedTetrahedron />
+              </div>
+            </div>
           </div>
         </div>
       </div>

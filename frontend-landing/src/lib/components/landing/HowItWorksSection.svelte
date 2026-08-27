@@ -5,7 +5,7 @@
     {
       number: "I",
       title: "Pasang Tablet di Meja Kasir Toko",
-      description: "Cukup buka peramban di tablet toko Anda dan masukkan PIN aktivasi outlet. Kasir tidak perlu membuat akun pribadi dan langsung siap melayani pesanan.",
+      description: "Cukup buka peramban di tablet toko Anda dan masukkan Token Aktivasi outlet. Kasir tidak perlu membuat akun pribadi dan langsung siap melayani pesanan.",
       lines: [
         "LOKASI: Outlet Sleman #01 (Aktif)",
         "DEVICE: Tablet Kasir Terkunci",

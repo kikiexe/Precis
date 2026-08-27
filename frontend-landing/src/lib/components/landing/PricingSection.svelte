@@ -10,7 +10,7 @@
       price: { monthly: "99.000", annual: "79.000" },
       features: [
         "1 Kuota Outlet / Cabang",
-        "Kasir POS Layar Sentuh Offline-Ready",
+        "Kasir POS Offline-Ready",
         "Presensi Selfie & Watermark GPS",
         "Wall of Faces Audit Harian",
         "Rekonsiliasi Kas Harian",

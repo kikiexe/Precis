@@ -13,31 +13,37 @@
     let animId: number;
 
     const handleResize = () => {
+      if (!canvasRef) return;
       const dpr = window.devicePixelRatio || 1;
       const rect = canvasRef.getBoundingClientRect();
-      canvasRef.width = rect.width * dpr;
-      canvasRef.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
+      canvasRef.width = Math.floor(rect.width * dpr);
+      canvasRef.height = Math.floor(rect.height * dpr);
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
 
     const render = () => {
-      const rect = canvasRef.getBoundingClientRect();
-      ctx.clearRect(0, 0, rect.width, rect.height);
+      if (!canvasRef) return;
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvasRef.width / dpr;
+      const height = canvasRef.height / dpr;
+
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, width, height);
 
       ctx.font = "14px monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      const cols = Math.floor(rect.width / 20);
-      const rows = Math.floor(rect.height / 20);
+      const cols = Math.max(Math.floor(width / 22), 10);
+      const rows = Math.max(Math.floor(height / 22), 5);
 
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
-          const posX = (x + 0.5) * (rect.width / cols);
-          const posY = (y + 0.5) * (rect.height / rows);
+          const posX = (x + 0.5) * (width / cols);
+          const posY = (y + 0.5) * (height / rows);
 
           const wave1 = Math.sin(x * 0.2 + time * 2) * Math.cos(y * 0.15 + time);
           const wave2 = Math.sin((x + y) * 0.1 + time * 1.5);
@@ -52,6 +58,8 @@
           ctx.fillText(chars[charIndex], posX, posY);
         }
       }
+
+      ctx.restore();
 
       time += 0.03;
       animId = requestAnimationFrame(render);

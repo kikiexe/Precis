@@ -10,7 +10,7 @@
     },
     {
       number: "02",
-      title: "Kasir POS Layar Sentuh Offline",
+      title: "Kasir POS Offline",
       description: "Kasir tidak pernah macet saat internet mati. Transaksi tersimpan aman di database lokal tablet dan otomatis sinkron saat online.",
       visual: "ai",
     },
@@ -22,7 +22,7 @@
     },
     {
       number: "04",
-      title: "Keamanan Sistem & Otorisasi PIN",
+      title: "Keamanan Kiosk & Kontrol Akses",
       description: "Penguncian tablet per outlet, proteksi laporan finansial dari kebocoran data, dan kontrol hak akses terpusat untuk Owner.",
       visual: "security",
     },
@@ -48,7 +48,7 @@
   bind:this={sectionEl}
   class="relative py-24 lg:py-32 bg-white border-t border-[#e0e0e0]"
 >
-  <div class="max-w-[1400px] mx-auto px-6 lg:px-12">
+  <div class="max-w-350 mx-auto px-6 lg:px-12">
     <!-- Header -->
     <div class="mb-16 lg:mb-24">
       <span class="inline-flex items-center gap-3 text-sm font-mono text-[#525252] mb-6">

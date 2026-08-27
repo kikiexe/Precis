@@ -13,23 +13,29 @@
     let animId: number;
 
     const handleResize = () => {
+      if (!canvasRef) return;
       const dpr = window.devicePixelRatio || 1;
       const rect = canvasRef.getBoundingClientRect();
-      canvasRef.width = rect.width * dpr;
-      canvasRef.height = rect.height * dpr;
-      ctx.scale(dpr, dpr);
+      canvasRef.width = Math.floor(rect.width * dpr);
+      canvasRef.height = Math.floor(rect.height * dpr);
     };
 
     handleResize();
     window.addEventListener("resize", handleResize);
 
     const render = () => {
-      const rect = canvasRef.getBoundingClientRect();
-      ctx.clearRect(0, 0, rect.width, rect.height);
+      if (!canvasRef) return;
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvasRef.width / dpr;
+      const height = canvasRef.height / dpr;
 
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const radius = Math.min(rect.width, rect.height) * 0.48;
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, width, height);
+
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const radius = Math.min(width, height) * 0.40;
 
       ctx.font = "12px monospace";
       ctx.textAlign = "center";
@@ -70,6 +76,8 @@
         ctx.fillStyle = `rgba(15, 98, 254, ${Math.min(1, alpha)})`;
         ctx.fillText(p.char, p.x, p.y);
       });
+
+      ctx.restore();
 
       angle += 0.02;
       animId = requestAnimationFrame(render);
