@@ -1,10 +1,47 @@
-export type Role = 'STAFF' | 'ADMIN' | 'OWNER' | 'MANAGER' | 'SUPERADMIN';
+export type Role = 'STAFF' | 'ADMIN' | 'OWNER' | 'MANAGER' | 'SUPERADMIN' | string;
+
+export interface PermissionItem {
+  name: string;
+  description: string;
+  is_high_risk: boolean;
+}
+
+export interface PermissionModule {
+  id: string;
+  name: string;
+  description: string;
+  permissions: Record<string, PermissionItem>;
+}
+
+export interface PermissionPreset {
+  name: string;
+  description: string;
+  permissions: string[];
+}
+
+export interface PermissionsCatalog {
+  modules: Record<string, PermissionModule>;
+  presets: Record<string, PermissionPreset>;
+}
+
+export interface WorkspaceRole {
+  id: string;
+  name: string;
+  description?: string | null;
+  is_system: boolean;
+  members_count: number;
+  permissions: string[];
+  created_at?: string;
+  updated_at?: string;
+}
 
 export interface UserWorkspace {
   workspace_id: string;
   workspace_name: string;
   workspace_slug: string;
   role: Role;
+  job_title?: string;
+  permissions?: string[];
   branch_id: string | null;
   branch_name: string | null;
 }
@@ -28,7 +65,10 @@ export interface TeamMember {
   name: string;
   email: string;
   job_title: string;
-  role: 'OWNER' | 'ADMIN' | 'MANAGER' | 'STAFF';
+  role: string;
+  role_id?: string | null;
+  role_name?: string;
+  permissions?: string[];
   branch_id: string | null;
   branch_name: string;
   base_salary: number;
@@ -48,12 +88,15 @@ export interface LoginResponseData {
     subscription_status?: string;
   };
   workspaces: UserWorkspace[];
+  email_verification_required?: boolean;
 }
 
 export interface User {
   id: string;
   name: string;
   role: Role;
+  job_title?: string;
+  permissions?: string[];
   email: string;
   avatar_url?: string;
   bank_name?: string | null;
@@ -238,6 +281,8 @@ export interface PayrollMemberItem {
   overtime_pay: number;
   cash_advance_deduction: number;
   net_salary: number;
+  status?: 'DISBURSED' | 'ESTIMATED';
+  disbursed_at?: string | null;
 }
 
 export interface PayrollPreviewTotals {
@@ -393,7 +438,7 @@ export interface StockAdjustmentLog {
   created_at: string;
 }
 
-export type TimeframePeriod = 'day' | 'week' | 'month' | 'year';
+export type TimeframePeriod = 'day' | 'week' | 'month' | 'year' | 'all';
 
 export interface TimeframeSalesPoint {
   id: string;
@@ -434,13 +479,23 @@ export interface WorkspaceInvitationItem {
   id: string;
   email: string;
   job_title: string;
-  role: 'ADMIN' | 'MANAGER' | 'STAFF';
+  role: string;
+  role_id?: string | null;
+  role_name?: string;
   base_salary: number;
   branch_id: string | null;
   branch_name: string;
   invited_by_name?: string;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'CANCELLED';
   expires_at: string;
+  created_at?: string;
+}
+
+export interface PosTerminalItem {
+  id: string;
+  terminal_name: string;
+  device_token: string;
+  is_active: boolean;
   created_at?: string;
 }
 
@@ -455,6 +510,7 @@ export interface BranchItem {
   overtime_pay_per_hour: number;
   min_overtime_threshold_minutes: number;
   terminals_count?: number;
+  terminals?: PosTerminalItem[];
   created_at?: string;
 }
 
@@ -467,6 +523,7 @@ export interface PublicInvitationDetails {
   branch_name: string;
   invited_by_name?: string;
   expires_at: string;
+  user_exists?: boolean;
 }
 
 

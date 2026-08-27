@@ -13,6 +13,10 @@ use Illuminate\Support\Str;
 
 class WorkspaceService
 {
+    public function __construct(
+        private readonly RoleService $roleService = new RoleService()
+    ) {}
+
     /**
      * buat workspace baru, cabang utama pertama, dan daftarkan pembuat sebagai OWNER
      *
@@ -27,12 +31,33 @@ class WorkspaceService
                 'owner_user_id' => $user->id,
             ]);
 
+            // Seed default system roles untuk workspace baru ini
+            $this->roleService->createDefaultRolesForWorkspace($workspace->id);
+
             $branch = Branch::create([
                 'workspace_id' => $workspace->id,
                 'name' => $branchName && trim($branchName) !== '' ? trim($branchName) : 'Cabang Utama #01',
                 'lat' => -7.7829,
                 'lng' => 110.3671,
                 'radius_meters' => 50,
+            ]);
+
+            \App\Models\BranchSetting::create([
+                'workspace_id' => $workspace->id,
+                'branch_id' => $branch->id,
+                'late_penalty_per_minute' => 1000.00,
+                'overtime_pay_per_hour' => 20000.00,
+                'min_overtime_threshold_minutes' => 30,
+            ]);
+
+            $rawToken = 'pos-' . Str::slug($branch->name) . '-' . Str::lower(Str::random(6));
+            \App\Models\PosTerminal::create([
+                'workspace_id' => $workspace->id,
+                'branch_id' => $branch->id,
+                'terminal_name' => 'Terminal Kasir Utama #01',
+                'device_token' => $rawToken,
+                'device_token_hash' => hash('sha256', $rawToken),
+                'is_active' => true,
             ]);
 
             $member = WorkspaceMember::create([

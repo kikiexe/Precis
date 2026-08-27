@@ -24,6 +24,7 @@ class PosTerminal extends Model
         'workspace_id',
         'branch_id',
         'terminal_name',
+        'device_token',
         'device_token_hash',
         'is_active',
     ];
