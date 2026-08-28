@@ -209,12 +209,19 @@
     }
   }
 
+  let customDeviceToken = $state('');
+
   async function handleCreateTerminal() {
     if (!activeBranch) return;
     isCreatingTerminal = true;
     try {
-      await inventoryService.createTerminal(activeBranch.id, newTerminalName || undefined);
+      await inventoryService.createTerminal(
+        activeBranch.id,
+        newTerminalName || undefined,
+        customDeviceToken.trim() || undefined
+      );
       newTerminalName = '';
+      customDeviceToken = '';
       isShowAddTerminalModal = false;
       terminalActionMsg = 'Terminal kasir POS baru berhasil ditambahkan.';
       setTimeout(() => (terminalActionMsg = null), 4000);
@@ -620,6 +627,20 @@
           placeholder="e.g. Kasir Utama Lantai 1"
           class="w-full px-3.5 py-2 bg-[#fafafc] border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] focus:outline-hidden focus:border-[#17171c]"
         />
+      </div>
+
+      <div class="space-y-1.5">
+        <label for="new-terminal-token" class="text-xs font-semibold text-[#17171c] block">
+          Kustom Device Token (Mudah Dihafal)
+        </label>
+        <input
+          id="new-terminal-token"
+          type="text"
+          bind:value={customDeviceToken}
+          placeholder="e.g. KASIR-01 atau SETURAN-BAR"
+          class="w-full px-3.5 py-2 bg-[#fafafc] border border-[#e5e5ea] rounded-xl text-xs font-mono font-bold text-[#17171c] focus:outline-hidden focus:border-[#17171c]"
+        />
+        <p class="text-[10px] text-[#8e8e93]">Kosongkan jika ingin token di-generate otomatis oleh sistem.</p>
       </div>
 
       <div class="flex items-center gap-2 pt-2">

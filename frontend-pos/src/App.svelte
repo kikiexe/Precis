@@ -14,21 +14,26 @@
     OrderType,
     PosTerminalInfo,
     CloseSessionResponse,
+    OpenBill,
+    PosPage,
   } from './lib/types/pos';
   import PosSidebar from './lib/components/pos/PosSidebar.svelte';
   import PenjualanView from './lib/components/pos/pages/PenjualanView.svelte';
   import TransaksiView from './lib/components/pos/pages/TransaksiView.svelte';
+  import ShiftView from './lib/components/pos/pages/ShiftView.svelte';
   import SettlementView from './lib/components/pos/pages/SettlementView.svelte';
-  import ProdukView from './lib/components/pos/pages/ProdukView.svelte';
+  import MenuView from './lib/components/pos/pages/MenuView.svelte';
+  import InventoriView from './lib/components/pos/pages/InventoriView.svelte';
   import ProfilView from './lib/components/pos/pages/ProfilView.svelte';
   import PaymentModal from './lib/components/pos/PaymentModal.svelte';
   import ReceiptModal from './lib/components/pos/ReceiptModal.svelte';
   import SessionModal from './lib/components/pos/SessionModal.svelte';
   import MasterLockModal from './lib/components/pos/MasterLockModal.svelte';
   import DevicePairingModal from './lib/components/pos/DevicePairingModal.svelte';
+  import OpenBillsModal from './lib/components/pos/OpenBillsModal.svelte';
 
   // state navigasi halaman
-  let activePage = $state<'penjualan' | 'transaksi' | 'settlement' | 'produk' | 'profil'>('penjualan');
+  let activePage = $state<PosPage>('penjualan');
   let isSidebarCollapsed = $state(false);
 
   // state data terminal dan master
@@ -58,7 +63,6 @@
   let discountNominal = $state(0);
   let orderType = $state<OrderType>('DINE_IN');
   let customerName = $state('');
-  let tableNumber = $state('');
 
   // visibilitas modal
   let isPaymentModalOpen = $state(false);
@@ -66,6 +70,10 @@
   let isSessionModalOpen = $state(false);
   let isMasterLockModalOpen = $state(false);
   let isPairingModalOpen = $state(false);
+  let isOpenBillsModalOpen = $state(false);
+
+  // open bills (pesanan tertahan / bayar nanti)
+  let openBills = $state<OpenBill[]>([]);
 
   // pesanan terakhir untuk cetak struk
   let lastCompletedOrder = $state<OfflineOrder | null>(null);
@@ -100,6 +108,7 @@
     });
 
     initTerminalAndDb();
+    loadOpenBills();
 
     // baca perubahan status koneksi internet
     const updateOnline = () => {
@@ -141,6 +150,8 @@
       }
       // sinkronkan katalog terbaru ke IndexedDB secara background
       await posService.syncCatalogToLocalDb();
+      // sinkronkan riwayat transaksi server ke IndexedDB
+      await posService.syncRecentOrdersToLocalDb();
       await loadDbData();
     } catch {
       isPairingModalOpen = true;
@@ -158,28 +169,26 @@
       allOrders = await db.orders.reverse().toArray();
 
       const openSess = await db.sessions.where('status').equals('OPEN').first();
-      if (openSess) {
-        activeSession = openSess;
-      }
-
+      activeSession = openSess || null;
       closedSessions = await db.sessions.where('status').equals('CLOSED').reverse().toArray();
     } catch (e) {
       console.warn('Gagal memuat data dari IndexedDB:', e);
     }
   }
 
-  function handlePairingSuccess(info: PosTerminalInfo) {
+  async function handlePairingSuccess(info: PosTerminalInfo) {
     terminalInfo = info;
     isPairingModalOpen = false;
     if (info.cashiers && info.cashiers.length > 0) {
-      db.cashiers.bulkPut(info.cashiers).then(() => {
-        cashiers = info.cashiers || [];
-        if (cashiers.length > 0) {
-          activeCashier = cashiers[0];
-        }
-      });
+      await db.cashiers.bulkPut(info.cashiers);
+      cashiers = info.cashiers || [];
+      if (cashiers.length > 0) {
+        activeCashier = cashiers[0];
+      }
     }
-    posService.syncCatalogToLocalDb().then(() => loadDbData());
+    await posService.syncCatalogToLocalDb();
+    await posService.syncRecentOrdersToLocalDb();
+    await loadDbData();
   }
 
   // fungsi keranjang belanja
@@ -225,14 +234,76 @@
     discountPercent = 0;
     discountNominal = 0;
     customerName = '';
-    tableNumber = '';
+  }
+
+  // fungsi manajemen open bills (simpan pesanan untuk bayar nanti)
+  function loadOpenBills() {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('precis_pos_open_bills');
+        if (raw) {
+          openBills = JSON.parse(raw);
+        }
+      } catch (e) {
+        console.warn('Gagal memuat open bills dari localStorage:', e);
+      }
+    }
+  }
+
+  function saveOpenBillsToStorage(bills: OpenBill[]) {
+    openBills = bills;
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('precis_pos_open_bills', JSON.stringify(bills));
+      } catch (e) {
+        console.warn('Gagal menyimpan open bills ke localStorage:', e);
+      }
+    }
+  }
+
+  function handleSaveOpenBill() {
+    if (cartItems.length === 0) return;
+
+    const newBill: OpenBill = {
+      id: 'bill-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      order_number: `BILL-${String(openBills.length + 1).padStart(3, '0')}`,
+      order_type: orderType,
+      customer_name: customerName.trim() || 'Tamu #' + (openBills.length + 1),
+      items: [...cartItems],
+      discount_percent: discountPercent,
+      discount_nominal: discountNominal,
+      subtotal: subtotalAmount,
+      final_total: finalPayableAmount,
+      saved_at: new Date().toISOString(),
+    };
+
+    saveOpenBillsToStorage([newBill, ...openBills]);
+    handleClearCart();
+  }
+
+  function handleRestoreOpenBill(billId: string) {
+    const bill = openBills.find((b) => b.id === billId);
+    if (!bill) return;
+
+    cartItems = [...bill.items];
+    orderType = bill.order_type;
+    customerName = bill.customer_name;
+    discountPercent = bill.discount_percent;
+    discountNominal = bill.discount_nominal;
+
+    // Hapus bill yang telah dimuat dari open bills
+    saveOpenBillsToStorage(openBills.filter((b) => b.id !== billId));
+  }
+
+  function handleDeleteOpenBill(billId: string) {
+    saveOpenBillsToStorage(openBills.filter((b) => b.id !== billId));
   }
 
   // fungsi transaksi penjualan
   async function handleCompleteOrder(order: OfflineOrder) {
     order.order_type = orderType;
     order.customer_name = customerName || undefined;
-    order.table_number = orderType === 'DINE_IN' ? tableNumber : undefined;
+    order.table_number = undefined;
 
     try {
       await db.orders.add(order);
@@ -248,7 +319,8 @@
         updatedSess.total_cash_sales += order.final_amount;
       } else if (order.payment_method === 'QRIS') {
         updatedSess.total_qris_sales += order.final_amount;
-      } else if (order.payment_method === 'TRANSFER') {
+      } else if (order.payment_method === 'EDC' || order.payment_method === 'TRANSFER') {
+        updatedSess.total_edc_sales = (updatedSess.total_edc_sales || 0) + order.final_amount;
         updatedSess.total_transfer_sales += order.final_amount;
       }
       await db.sessions.put(updatedSess);
@@ -298,6 +370,22 @@
     products = [newProd, ...products];
   }
 
+  async function handleUpdateProduct(updatedProd: Product) {
+    await db.products.put(updatedProd);
+    products = products.map((p) => (p.id === updatedProd.id ? updatedProd : p));
+  }
+
+  async function handleDeleteProduct(productId: string) {
+    await db.products.delete(productId);
+    products = products.filter((p) => p.id !== productId);
+  }
+
+  async function handleUpdateCategories(updatedCategories: Category[]) {
+    await db.categories.clear();
+    await db.categories.bulkAdd(updatedCategories);
+    categories = updatedCategories;
+  }
+
   async function handleClearLocalCache() {
     await db.delete();
     window.location.reload();
@@ -332,7 +420,7 @@
           {discountNominal}
           {orderType}
           {customerName}
-          {tableNumber}
+          openBillsCount={openBills.length}
           onSelectCategory={(id: string) => (selectedCategoryId = id)}
           onAddToCart={handleAddToCart}
           onUpdateQuantity={handleUpdateQuantity}
@@ -341,11 +429,16 @@
           onClearCart={handleClearCart}
           onSetOrderType={(type: OrderType) => (orderType = type)}
           onSetCustomerName={(name: string) => (customerName = name)}
-          onSetTableNumber={(table: string) => (tableNumber = table)}
           onSetDiscountPercent={(percent: number) => {
             discountPercent = percent;
             discountNominal = 0;
           }}
+          onSetDiscountNominal={(nominal: number) => {
+            discountNominal = nominal;
+            discountPercent = 0;
+          }}
+          onSaveOpenBill={handleSaveOpenBill}
+          onOpenBillsModal={() => (isOpenBillsModalOpen = true)}
           onOpenPaymentModal={() => (isPaymentModalOpen = true)}
         />
       {:else if activePage === 'transaksi'}
@@ -353,20 +446,32 @@
           orders={allOrders}
           onPrintOrder={handlePrintOrderDirect}
         />
+      {:else if activePage === 'shift'}
+        <ShiftView
+          {activeSession}
+          {activeCashier}
+          onOpenSessionModal={() => (isSessionModalOpen = true)}
+          onGoToSettlement={() => (activePage = 'settlement')}
+        />
       {:else if activePage === 'settlement'}
         <SettlementView
           {activeSession}
           {activeCashier}
           closedSessions={closedSessions}
-          onOpenSessionModal={() => (isSessionModalOpen = true)}
+          onGoToShift={() => (activePage = 'shift')}
         />
-      {:else if activePage === 'produk'}
-        <ProdukView
+      {:else if activePage === 'menu'}
+        <MenuView
           {products}
           {categories}
           onToggleProductActive={handleToggleProductActive}
           onAddNewProduct={handleAddNewProduct}
+          onUpdateProduct={handleUpdateProduct}
+          onDeleteProduct={handleDeleteProduct}
+          onUpdateCategories={handleUpdateCategories}
         />
+      {:else if activePage === 'inventori'}
+        <InventoriView />
       {:else if activePage === 'profil'}
         <ProfilView
           {activeCashier}
@@ -430,4 +535,13 @@
 <DevicePairingModal
   isOpen={isPairingModalOpen}
   onSuccess={handlePairingSuccess}
+/>
+
+<!-- modal daftar open bills / pesanan tertahan -->
+<OpenBillsModal
+  isOpen={isOpenBillsModalOpen}
+  {openBills}
+  onClose={() => (isOpenBillsModalOpen = false)}
+  onRestoreBill={handleRestoreOpenBill}
+  onDeleteBill={handleDeleteOpenBill}
 />

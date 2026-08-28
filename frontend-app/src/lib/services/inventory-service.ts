@@ -34,9 +34,10 @@ class InventoryService {
     return res.data;
   }
 
-  async createTerminal(branchId: string, terminalName?: string): Promise<PosTerminalItem> {
+  async createTerminal(branchId: string, terminalName?: string, customToken?: string): Promise<PosTerminalItem> {
     const res = await apiClient.post<PosTerminalItem>(`/branches/${branchId}/terminals`, {
       terminal_name: terminalName,
+      device_token: customToken || undefined,
     });
     if (!res.data) {
       throw new Error(res.message || 'Gagal membuat terminal kasir baru.');
@@ -44,8 +45,10 @@ class InventoryService {
     return res.data;
   }
 
-  async regenerateTerminalToken(branchId: string, terminalId: string): Promise<PosTerminalItem> {
-    const res = await apiClient.post<PosTerminalItem>(`/branches/${branchId}/terminals/${terminalId}/regenerate-token`, {});
+  async regenerateTerminalToken(branchId: string, terminalId: string, customToken?: string): Promise<PosTerminalItem> {
+    const res = await apiClient.post<PosTerminalItem>(`/branches/${branchId}/terminals/${terminalId}/regenerate-token`, {
+      device_token: customToken || undefined,
+    });
     if (!res.data) {
       throw new Error(res.message || 'Gagal memperbarui token terminal kasir.');
     }
