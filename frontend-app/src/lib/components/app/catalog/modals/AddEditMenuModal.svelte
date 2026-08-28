@@ -54,12 +54,18 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl w-full max-w-lg p-6 sm:p-7 space-y-5 shadow-xl animate-in fade-in zoom-in-95">
-      <div class="flex items-center justify-between pb-3 border-b border-[#f2f2f4]">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 font-sans backdrop-blur-xs"
+  >
+    <div
+      class="animate-in fade-in zoom-in-95 w-full max-w-lg space-y-5 rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-xl sm:p-7"
+    >
+      <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-[#f4f4f6] text-[#17171c] flex items-center justify-center border border-[#e5e5ea]">
-            <Package class="w-5 h-5" />
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
+          >
+            <Package class="h-5 w-5" />
           </div>
           <div>
             <h3 class="text-base font-bold text-[#17171c]">Tambah Menu Jualan Baru</h3>
@@ -69,9 +75,9 @@
         <button
           type="button"
           onclick={onClose}
-          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all"
+          class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="w-5 h-5" />
+          <X class="h-5 w-5" />
         </button>
       </div>
 
@@ -83,7 +89,7 @@
             type="text"
             bind:value={name}
             placeholder="Contoh: Es Kopi Susu Aren"
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
 
@@ -93,13 +99,15 @@
             <select
               id="menu-category"
               bind:value={category_id}
-              class="appearance-none w-full border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl px-4 pr-10 py-2.5 bg-[#f8f8fa] hover:bg-white text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden cursor-pointer transition-all shadow-2xs"
+              class="w-full cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 pr-10 text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
             >
               {#each categories.filter((c) => c.type === 'MENU') as cat}
                 <option value={cat.id}>{cat.name}</option>
               {/each}
             </select>
-            <ChevronDown class="w-4 h-4 text-[#8e8e93] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown
+              class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+            />
           </div>
         </div>
 
@@ -109,30 +117,34 @@
             id="menu-price"
             type="number"
             bind:value={price}
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl font-mono text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
 
         <div class="space-y-1.5">
-          <label for="menu-desc" class="block font-bold text-[#17171c]">Deskripsi / Resep Singkat</label>
+          <label for="menu-desc" class="block font-bold text-[#17171c]"
+            >Deskripsi / Resep Singkat</label
+          >
           <textarea
             id="menu-desc"
             bind:value={description}
             rows="2"
             placeholder="Keterangan rasa, komposisi, atau panduan penyajian"
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden resize-none transition-all shadow-2xs"
+            class="w-full resize-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           ></textarea>
         </div>
 
-        <div class="flex items-center justify-between p-3.5 bg-[#f8f8fa] rounded-2xl border border-[#ececee]">
+        <div
+          class="flex items-center justify-between rounded-2xl border border-[#ececee] bg-[#f8f8fa] p-3.5"
+        >
           <span class="font-bold text-[#17171c]">Status Ketersediaan Langsung</span>
           <button
             type="button"
             onclick={() => (is_available = !is_available)}
-            class={`px-3.5 py-1 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
+            class={`cursor-pointer rounded-full px-3.5 py-1 font-mono text-xs font-semibold transition-all ${
               is_available
-                ? 'bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]'
-                : 'bg-[#fef2f2] text-[#dc2626] border border-[#fecaca]'
+                ? 'border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]'
+                : 'border border-[#fecaca] bg-[#fef2f2] text-[#dc2626]'
             }`}
           >
             {is_available ? 'Tersedia' : 'Habis'}
@@ -144,7 +156,7 @@
         <button
           type="button"
           onclick={onClose}
-          class="flex-1 py-3 border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] text-xs font-semibold rounded-full cursor-pointer transition-all"
+          class="flex-1 cursor-pointer rounded-full border border-[#e5e5ea] py-3 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
         >
           Batal
         </button>
@@ -152,12 +164,12 @@
           type="button"
           disabled={isSubmitting || !name.trim() || price <= 0}
           onclick={handleSubmit}
-          class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
+          class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
         >
           {#if isSubmitting}
             <span>Menyimpan...</span>
           {:else}
-            <Plus class="w-4 h-4" />
+            <Plus class="h-4 w-4" />
             <span>Simpan Menu</span>
           {/if}
         </button>

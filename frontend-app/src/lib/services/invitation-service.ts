@@ -6,9 +6,7 @@ export class InvitationService {
    * Ambil daftar undangan pending untuk workspace yang aktif
    */
   async getPendingInvitations(): Promise<WorkspaceInvitationItem[]> {
-    const res = await apiClient.get<WorkspaceInvitationItem[]>(
-      '/admin/invitations'
-    );
+    const res = await apiClient.get<WorkspaceInvitationItem[]>('/admin/invitations');
     return res.data || [];
   }
 
@@ -23,10 +21,7 @@ export class InvitationService {
     base_salary: number;
     branch_id?: string | null;
   }): Promise<WorkspaceInvitationItem> {
-    const res = await apiClient.post<WorkspaceInvitationItem>(
-      '/admin/invitations',
-      payload
-    );
+    const res = await apiClient.post<WorkspaceInvitationItem>('/admin/invitations', payload);
     if (res.data) {
       return res.data;
     }
@@ -57,10 +52,10 @@ export class InvitationService {
    * Ambil informasi detail undangan berdasarkan token publik
    */
   async getInvitationByToken(token: string): Promise<PublicInvitationDetails> {
-    const res = await apiClient.get<PublicInvitationDetails>(
-      `/invitations/${token}`,
-      { skipAuth: true, skipWorkspace: true }
-    );
+    const res = await apiClient.get<PublicInvitationDetails>(`/invitations/${token}`, {
+      skipAuth: true,
+      skipWorkspace: true,
+    });
     if (res.data) {
       return res.data;
     }
@@ -74,7 +69,11 @@ export class InvitationService {
     token: string,
     name?: string,
     password?: string
-  ): Promise<{ token: string; user: { id: string; name: string; email: string }; member: { id: string; role: string; job_title: string } }> {
+  ): Promise<{
+    token: string;
+    user: { id: string; name: string; email: string };
+    member: { id: string; role: string; job_title: string };
+  }> {
     const res = await apiClient.post<{
       token: string;
       user: { id: string; name: string; email: string };
@@ -106,4 +105,3 @@ export class InvitationService {
 }
 
 export const invitationService = new InvitationService();
-

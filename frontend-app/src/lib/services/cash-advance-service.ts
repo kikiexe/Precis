@@ -32,10 +32,7 @@ export class CashAdvanceService {
     return [];
   }
 
-  public async getAdminCashAdvances(
-    status?: string,
-    branchId?: string
-  ): Promise<CashAdvance[]> {
+  public async getAdminCashAdvances(status?: string, branchId?: string): Promise<CashAdvance[]> {
     const params: Record<string, string> = {};
     if (status) params.status = status;
     if (branchId) params.branch_id = branchId;

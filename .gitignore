@@ -42,13 +42,12 @@ Thumbs.db
 # Testing & Coverage
 coverage/
 .nyc_output/
+playwright-report/
+test-results/
 .phpunit.result.cache
 .phpunit.cache/
 backend/.phpunit.result.cache
 backend/.phpunit.cache/
-.phpunit.result.cache
-backend/.phpunit.result.cache
-*.phpunit.result.cache
 
 # Framework Specific
 *.sqlite

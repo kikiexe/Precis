@@ -33,7 +33,11 @@
     rosterShifts?: ShiftRosterItem[];
     shiftTemplates?: ShiftTemplateItem[];
     onSubmitSwap: (shiftAssignmentId: string, targetUserId: string) => Promise<void>;
-    onAssignShift?: (shiftTemplateId: string, assignedUserId: string, date: string) => Promise<void>;
+    onAssignShift?: (
+      shiftTemplateId: string,
+      assignedUserId: string,
+      date: string
+    ) => Promise<void>;
     onRefreshTemplates?: () => Promise<void>;
   }
 
@@ -198,7 +202,11 @@
         dayName: d.toLocaleDateString('id-ID', { weekday: 'short' }),
         fullDayName: d.toLocaleDateString('id-ID', { weekday: 'long' }),
         dayDate: `${dayStr}/${m}`,
-        fullDateFormatted: d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+        fullDateFormatted: d.toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        }),
         isToday: iso === todayStr,
       });
     }
@@ -260,7 +268,20 @@
   function formatDateIndo(dateStr: string): string {
     try {
       const d = new Date(dateStr + 'T00:00:00');
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'Mei',
+        'Jun',
+        'Jul',
+        'Agu',
+        'Sep',
+        'Okt',
+        'Nov',
+        'Des',
+      ];
       return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     } catch {
       return dateStr;
@@ -317,7 +338,12 @@
     isSwapModalOpen = true;
   }
 
-  function openAssignModal(userId: string, date: string, templateId?: string, assignmentId?: string) {
+  function openAssignModal(
+    userId: string,
+    date: string,
+    templateId?: string,
+    assignmentId?: string
+  ) {
     modalInitialUserId = userId;
     modalInitialDate = date;
     modalInitialTemplateId = templateId || shiftTemplates[0]?.id || '';
@@ -382,14 +408,20 @@
   }
 </script>
 
-<div class="space-y-6 max-w-7xl mx-auto font-sans pb-8">
+<div class="mx-auto max-w-7xl space-y-6 pb-8 font-sans">
   <!-- Section Header & Quick Actions -->
-  <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+  <div
+    class="flex flex-col justify-between gap-4 rounded-2xl border border-[#e5e5ea] bg-white p-5 shadow-2xs sm:flex-row sm:items-center sm:rounded-3xl sm:p-6"
+  >
     <div class="space-y-1">
-      <div class="flex items-center gap-2 flex-wrap">
-        <h2 class="text-base sm:text-lg font-bold text-[#17171c]">Jadwal &amp; Roster Shift</h2>
-        <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-semibold bg-[#f4f4f6] text-[#17171c]">
-          {viewPeriod === 'week' ? '7 Hari (Sen - Min)' : `${availableMonths.find(m => m.value === selectedMonth)?.label} ${selectedYear}`}
+      <div class="flex flex-wrap items-center gap-2">
+        <h2 class="text-base font-bold text-[#17171c] sm:text-lg">Jadwal &amp; Roster Shift</h2>
+        <span
+          class="rounded-full bg-[#f4f4f6] px-2.5 py-0.5 font-mono text-[10.5px] font-semibold text-[#17171c]"
+        >
+          {viewPeriod === 'week'
+            ? '7 Hari (Sen - Min)'
+            : `${availableMonths.find((m) => m.value === selectedMonth)?.label} ${selectedYear}`}
         </span>
       </div>
       <p class="text-xs text-[#8e8e93]">
@@ -397,7 +429,7 @@
       </p>
     </div>
 
-    <div class="flex items-center gap-2.5 flex-wrap">
+    <div class="flex flex-wrap items-center gap-2.5">
       {#if currentUser.role === 'OWNER' || currentUser.role === 'ADMIN' || currentUser.role === 'MANAGER'}
         <button
           type="button"
@@ -406,13 +438,13 @@
             templateSuccess = null;
             isTemplateBuilderOpen = !isTemplateBuilderOpen;
           }}
-          class={`px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-1.5 cursor-pointer transition-all ${
+          class={`flex cursor-pointer items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold transition-all ${
             isTemplateBuilderOpen
               ? 'bg-[#1863dc] text-white shadow-xs'
-              : 'bg-white hover:bg-[#f4f4f6] border border-[#e5e5ea] text-[#17171c]'
+              : 'border border-[#e5e5ea] bg-white text-[#17171c] hover:bg-[#f4f4f6]'
           }`}
         >
-          <Layers class="w-4 h-4" />
+          <Layers class="h-4 w-4" />
           <span>Template Shift</span>
         </button>
 
@@ -422,9 +454,9 @@
             const todayIso = (weekDays.find((w) => w.isToday) || weekDays[0])?.iso || '';
             openAssignModal(staffList[0]?.id || '', todayIso);
           }}
-          class="bg-[#17171c] hover:bg-black text-white px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-1.5 cursor-pointer transition-all shadow-xs"
+          class="flex cursor-pointer items-center gap-1.5 rounded-full bg-[#17171c] px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
         >
-          <Plus class="w-4 h-4" />
+          <Plus class="h-4 w-4" />
           <span>+ Tetapkan Shift</span>
         </button>
       {/if}
@@ -437,9 +469,9 @@
           targetUserId = '';
           isSwapModalOpen = true;
         }}
-        class="bg-[#f4f4f6] hover:bg-[#ececee] text-[#17171c] border border-[#e5e5ea] px-4 py-2 text-xs font-semibold rounded-full flex items-center gap-1.5 cursor-pointer transition-all"
+        class="flex cursor-pointer items-center gap-1.5 rounded-full border border-[#e5e5ea] bg-[#f4f4f6] px-4 py-2 text-xs font-semibold text-[#17171c] transition-all hover:bg-[#ececee]"
       >
-        <RefreshCw class="w-3.5 h-3.5" />
+        <RefreshCw class="h-3.5 w-3.5" />
         <span>Tukar Shift</span>
       </button>
     </div>
@@ -447,64 +479,78 @@
 
   <!-- Shift Template Builder Form (Collapsible) -->
   {#if isTemplateBuilderOpen}
-    <div class="bg-white border border-[#2563eb]/20 rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in slide-in-from-top-2">
+    <div
+      class="animate-in fade-in slide-in-from-top-2 space-y-5 rounded-2xl border border-[#2563eb]/20 bg-white p-5 shadow-xs sm:rounded-3xl sm:p-6"
+    >
       <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-[#eff6ff] text-[#2563eb] flex items-center justify-center">
-            <Layers class="w-4 h-4" />
+          <div
+            class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#eff6ff] text-[#2563eb]"
+          >
+            <Layers class="h-4 w-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-[#17171c]">Shift Template Builder</h3>
             <p class="text-xs text-[#8e8e93]">Buat pola jam kerja baru untuk outlet</p>
           </div>
         </div>
-        <span class="text-[10.5px] font-mono font-semibold px-2 py-0.5 rounded-full bg-[#eff6ff] text-[#2563eb]">
+        <span
+          class="rounded-full bg-[#eff6ff] px-2 py-0.5 font-mono text-[10.5px] font-semibold text-[#2563eb]"
+        >
           POST /shifts/templates
         </span>
       </div>
 
       {#if templateError}
-        <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] text-[#991b1b] text-xs rounded-xl flex items-start gap-2 font-medium">
-          <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
+        <div
+          class="flex items-start gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
+        >
+          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
           <span>{templateError}</span>
         </div>
       {/if}
 
       {#if templateSuccess}
-        <div class="p-3.5 bg-[#ecfdf5] border border-[#a7f3d0] text-[#065f46] text-xs rounded-xl font-medium">
+        <div
+          class="rounded-xl border border-[#a7f3d0] bg-[#ecfdf5] p-3.5 text-xs font-medium text-[#065f46]"
+        >
           {templateSuccess}
         </div>
       {/if}
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-        <div class="sm:col-span-2 space-y-1.5">
+      <div class="grid grid-cols-1 gap-4 text-xs sm:grid-cols-2">
+        <div class="space-y-1.5 sm:col-span-2">
           <label for="tpl-name" class="block font-bold text-[#17171c]">Nama Pola Shift</label>
           <input
             id="tpl-name"
             type="text"
             bind:value={templateName}
             placeholder="Contoh: Middle Barista, Shift Malam, Weekend Open"
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-[#17171c] transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
 
         <div class="space-y-1.5">
-          <label for="tpl-clock-in" class="block font-bold text-[#17171c]">Jam Masuk (Clock In)</label>
+          <label for="tpl-clock-in" class="block font-bold text-[#17171c]"
+            >Jam Masuk (Clock In)</label
+          >
           <input
             id="tpl-clock-in"
             type="time"
             bind:value={templateClockIn}
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl font-mono text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-[#17171c] transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
 
         <div class="space-y-1.5">
-          <label for="tpl-clock-out" class="block font-bold text-[#17171c]">Jam Pulang (Clock Out)</label>
+          <label for="tpl-clock-out" class="block font-bold text-[#17171c]"
+            >Jam Pulang (Clock Out)</label
+          >
           <input
             id="tpl-clock-out"
             type="time"
             bind:value={templateClockOut}
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl font-mono text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-[#17171c] transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
 
@@ -519,9 +565,11 @@
             max="60"
             step="5"
             bind:value={templateLateTolerance}
-            class="w-full accent-[#17171c] cursor-pointer"
+            class="w-full cursor-pointer accent-[#17171c]"
           />
-          <span class="text-[11px] text-[#8e8e93]">Keterlambatan di atas nilai ini akan dihitung denda potongan gaji</span>
+          <span class="text-[11px] text-[#8e8e93]"
+            >Keterlambatan di atas nilai ini akan dihitung denda potongan gaji</span
+          >
         </div>
 
         <div class="space-y-1.5">
@@ -535,17 +583,19 @@
             max="120"
             step="15"
             bind:value={templateMinOvertime}
-            class="w-full accent-[#17171c] cursor-pointer"
+            class="w-full cursor-pointer accent-[#17171c]"
           />
-          <span class="text-[11px] text-[#8e8e93]">Kelebihan jam kerja di bawah batas ini tidak dihitung upah lembur</span>
+          <span class="text-[11px] text-[#8e8e93]"
+            >Kelebihan jam kerja di bawah batas ini tidak dihitung upah lembur</span
+          >
         </div>
       </div>
 
-      <div class="flex items-center gap-3 pt-2 border-t border-[#f2f2f4]">
+      <div class="flex items-center gap-3 border-t border-[#f2f2f4] pt-2">
         <button
           type="button"
           onclick={() => (isTemplateBuilderOpen = false)}
-          class="px-4 py-2.5 border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] text-xs font-semibold rounded-full cursor-pointer transition-all"
+          class="cursor-pointer rounded-full border border-[#e5e5ea] px-4 py-2.5 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
         >
           Tutup
         </button>
@@ -553,9 +603,9 @@
           type="button"
           disabled={isSubmittingTemplate || !templateName.trim()}
           onclick={handleCreateTemplate}
-          class="px-5 py-2.5 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
+          class="flex cursor-pointer items-center gap-1.5 rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
         >
-          <Plus class="w-4 h-4" />
+          <Plus class="h-4 w-4" />
           <span>{isSubmittingTemplate ? 'Menyimpan...' : 'Buat Template Shift'}</span>
         </button>
       </div>
@@ -563,19 +613,21 @@
   {/if}
 
   <!-- Interactive Date Range Filter Toolbar (7 Hari vs 1 Bulan Penuh - 5 Tahun History) -->
-  <div class="bg-white border border-[#e5e5ea] rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3.5">
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+  <div class="space-y-3.5 rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs sm:p-5">
+    <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
       <!-- Mode Switcher: 7 Hari vs Bulan Penuh -->
-      <div class="flex items-center gap-1 bg-[#f4f4f6] p-1 rounded-full border border-[#e5e5ea] self-start">
+      <div
+        class="flex items-center gap-1 self-start rounded-full border border-[#e5e5ea] bg-[#f4f4f6] p-1"
+      >
         <button
           type="button"
           onclick={() => {
             viewPeriod = 'week';
             weekOffset = 0;
           }}
-          class={`px-3.5 py-1.5 text-xs font-medium rounded-full transition-all cursor-pointer ${
+          class={`cursor-pointer rounded-full px-3.5 py-1.5 text-xs font-medium transition-all ${
             viewPeriod === 'week'
-              ? 'bg-[#17171c] text-white font-bold shadow-xs'
+              ? 'bg-[#17171c] font-bold text-white shadow-xs'
               : 'text-[#686873] hover:text-[#17171c]'
           }`}
         >
@@ -584,9 +636,9 @@
         <button
           type="button"
           onclick={() => (viewPeriod = 'month')}
-          class={`px-3.5 py-1.5 text-xs font-medium rounded-full transition-all cursor-pointer ${
+          class={`cursor-pointer rounded-full px-3.5 py-1.5 text-xs font-medium transition-all ${
             viewPeriod === 'month'
-              ? 'bg-[#17171c] text-white font-bold shadow-xs'
+              ? 'bg-[#17171c] font-bold text-white shadow-xs'
               : 'text-[#686873] hover:text-[#17171c]'
           }`}
         >
@@ -595,50 +647,54 @@
       </div>
 
       <!-- Navigation & Selectors -->
-      <div class="flex items-center flex-wrap gap-2.5">
+      <div class="flex flex-wrap items-center gap-2.5">
         {#if viewPeriod === 'month'}
           <!-- Month Selector -->
           <div class="relative">
             <select
               bind:value={selectedMonth}
-              class="appearance-none bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl px-3.5 pr-8 py-1.5 text-xs font-bold text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all cursor-pointer shadow-2xs"
+              class="cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-3.5 py-1.5 pr-8 text-xs font-bold text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
             >
               {#each availableMonths as m}
                 <option value={m.value}>{m.label}</option>
               {/each}
             </select>
-            <ChevronDown class="w-3.5 h-3.5 text-[#8e8e93] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown
+              class="pointer-events-none absolute top-1/2 right-2.5 h-3.5 w-3.5 -translate-y-1/2 text-[#8e8e93]"
+            />
           </div>
 
           <!-- Year Selector (5 Years Seeder History) -->
           <div class="relative">
             <select
               bind:value={selectedYear}
-              class="appearance-none bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl px-3.5 pr-8 py-1.5 text-xs font-mono font-bold text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all cursor-pointer shadow-2xs"
+              class="cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-3.5 py-1.5 pr-8 font-mono text-xs font-bold text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
             >
               {#each availableYears as yr}
                 <option value={yr}>Tahun {yr}</option>
               {/each}
             </select>
-            <ChevronDown class="w-3.5 h-3.5 text-[#8e8e93] absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown
+              class="pointer-events-none absolute top-1/2 right-2.5 h-3.5 w-3.5 -translate-y-1/2 text-[#8e8e93]"
+            />
           </div>
         {/if}
 
         <!-- Step Prev / Next Buttons -->
-        <div class="flex items-center gap-1 bg-[#f8f8fa] p-0.5 rounded-xl border border-[#e5e5ea]">
+        <div class="flex items-center gap-1 rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] p-0.5">
           <button
             type="button"
             onclick={handlePrev}
-            class="p-1.5 text-[#686873] hover:text-[#17171c] hover:bg-white rounded-lg transition-all cursor-pointer"
+            class="cursor-pointer rounded-lg p-1.5 text-[#686873] transition-all hover:bg-white hover:text-[#17171c]"
             title={viewPeriod === 'week' ? 'Pekan Sebelumnya' : 'Bulan Sebelumnya'}
           >
-            <ChevronLeft class="w-4 h-4" />
+            <ChevronLeft class="h-4 w-4" />
           </button>
 
           <button
             type="button"
             onclick={handleResetToday}
-            class="px-2.5 py-1 text-[11px] font-semibold text-[#17171c] hover:bg-white rounded-lg transition-all cursor-pointer"
+            class="cursor-pointer rounded-lg px-2.5 py-1 text-[11px] font-semibold text-[#17171c] transition-all hover:bg-white"
           >
             {viewPeriod === 'week' ? 'Pekan Ini' : 'Bulan Ini'}
           </button>
@@ -646,16 +702,18 @@
           <button
             type="button"
             onclick={handleNext}
-            class="p-1.5 text-[#686873] hover:text-[#17171c] hover:bg-white rounded-lg transition-all cursor-pointer"
+            class="cursor-pointer rounded-lg p-1.5 text-[#686873] transition-all hover:bg-white hover:text-[#17171c]"
             title={viewPeriod === 'week' ? 'Pekan Berikutnya' : 'Bulan Berikutnya'}
           >
-            <ChevronRight class="w-4 h-4" />
+            <ChevronRight class="h-4 w-4" />
           </button>
         </div>
 
         <!-- Formatted Date Range Pill -->
-        <div class="px-3 py-1.5 bg-[#f4f4f6] text-[#17171c] border border-[#e5e5ea] rounded-xl text-xs font-mono font-semibold flex items-center gap-1.5">
-          <Calendar class="w-3.5 h-3.5 text-[#8e8e93]" />
+        <div
+          class="flex items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-[#f4f4f6] px-3 py-1.5 font-mono text-xs font-semibold text-[#17171c]"
+        >
+          <Calendar class="h-3.5 w-3.5 text-[#8e8e93]" />
           <span>{formatDateIndo(startDate)} &mdash; {formatDateIndo(endDate)}</span>
         </div>
       </div>
@@ -663,33 +721,37 @@
   </div>
 
   {#if isLoadingShifts}
-    <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-12 text-center space-y-3 shadow-2xs animate-pulse">
-      <div class="w-8 h-8 rounded-full bg-[#17171c]/20 mx-auto"></div>
-      <div class="text-xs font-mono text-[#8e8e93]">Memuat data jadwal roster shift...</div>
+    <div
+      class="animate-pulse space-y-3 rounded-2xl border border-[#e5e5ea] bg-white p-12 text-center shadow-2xs sm:rounded-3xl"
+    >
+      <div class="mx-auto h-8 w-8 rounded-full bg-[#17171c]/20"></div>
+      <div class="font-mono text-xs text-[#8e8e93]">Memuat data jadwal roster shift...</div>
     </div>
   {:else if viewPeriod === 'week'}
     <!-- ==================== VIEW 1: PEKAN (7 HARI MATRIX) ==================== -->
     <!-- MOBILE VIEW (< 768px / md): Interactive Day Carousel -->
-    <div class="block md:hidden space-y-4">
+    <div class="block space-y-4 md:hidden">
       <!-- Day Strip Carousel -->
-      <div class="bg-white border border-[#e5e5ea] rounded-2xl p-2 shadow-2xs">
-        <div class="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
+      <div class="rounded-2xl border border-[#e5e5ea] bg-white p-2 shadow-2xs">
+        <div class="no-scrollbar flex items-center justify-between gap-1 overflow-x-auto">
           {#each weekDays as day, idx}
             <button
               type="button"
               onclick={() => (selectedDayIndex = idx)}
-              class={`flex-1 min-w-[50px] py-2 px-1.5 rounded-xl text-center transition-all cursor-pointer ${
+              class={`min-w-[50px] flex-1 cursor-pointer rounded-xl px-1.5 py-2 text-center transition-all ${
                 selectedDayIndex === idx
                   ? 'bg-[#17171c] text-white shadow-xs'
                   : day.isToday
-                    ? 'bg-[#f4f4f6] text-[#17171c] font-semibold border border-[#d1d1d6]'
+                    ? 'border border-[#d1d1d6] bg-[#f4f4f6] font-semibold text-[#17171c]'
                     : 'text-[#686873] hover:bg-[#f4f4f6]'
               }`}
             >
-              <div class="text-[10px] uppercase font-bold tracking-wider opacity-80">{day.dayName}</div>
-              <div class="text-xs font-mono font-bold mt-0.5">{day.dayDate}</div>
+              <div class="text-[10px] font-bold tracking-wider uppercase opacity-80">
+                {day.dayName}
+              </div>
+              <div class="mt-0.5 font-mono text-xs font-bold">{day.dayDate}</div>
               {#if day.isToday && selectedDayIndex !== idx}
-                <div class="w-1 h-1 rounded-full bg-[#1863dc] mx-auto mt-1"></div>
+                <div class="mx-auto mt-1 h-1 w-1 rounded-full bg-[#1863dc]"></div>
               {/if}
             </button>
           {/each}
@@ -697,14 +759,16 @@
       </div>
 
       <!-- Active Day Staff List Card -->
-      <div class="bg-white border border-[#e5e5ea] rounded-2xl p-4 space-y-3 shadow-2xs">
-        <div class="flex items-center justify-between pb-3 border-b border-[#f2f2f4]">
+      <div class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs">
+        <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
           <div class="flex items-center gap-2">
-            <Calendar class="w-4 h-4 text-[#17171c]" />
+            <Calendar class="h-4 w-4 text-[#17171c]" />
             <div>
-              <h3 class="font-bold text-xs text-[#17171c]">{activeMobileDay.fullDayName}, {activeMobileDay.fullDateFormatted}</h3>
+              <h3 class="text-xs font-bold text-[#17171c]">
+                {activeMobileDay.fullDayName}, {activeMobileDay.fullDateFormatted}
+              </h3>
               {#if activeMobileDay.isToday}
-                <span class="text-[10px] font-mono text-[#10b981] font-semibold">Hari Ini</span>
+                <span class="font-mono text-[10px] font-semibold text-[#10b981]">Hari Ini</span>
               {/if}
             </div>
           </div>
@@ -712,26 +776,36 @@
 
         <!-- Staff shifts list for this active day -->
         {#if staffList.length === 0}
-          <p class="text-xs text-[#8e8e93] text-center py-6">Belum ada karyawan terdaftar.</p>
+          <p class="py-6 text-center text-xs text-[#8e8e93]">Belum ada karyawan terdaftar.</p>
         {:else}
           <div class="space-y-2.5">
             {#each staffList as staff}
               {@const staffUserId = staff.user_id || staff.id}
               {@const isMe = staffUserId === currentUser.id}
               {@const shift = dynamicShifts.find(
-                (s) => (s.assigned_user?.id === staffUserId || s.assigned_user?.id === staff.id) && s.date === activeMobileDay.iso
+                (s) =>
+                  (s.assigned_user?.id === staffUserId || s.assigned_user?.id === staff.id) &&
+                  s.date === activeMobileDay.iso
               )}
-              <div class="flex items-center justify-between p-3 rounded-xl border gap-2 {isMe ? 'bg-[#eff6ff]/40 border-[#bfdbfe]' : 'bg-[#fbfbfa] border-[#ececee]'}">
+              <div
+                class="flex items-center justify-between gap-2 rounded-xl border p-3 {isMe
+                  ? 'border-[#bfdbfe] bg-[#eff6ff]/40'
+                  : 'border-[#ececee] bg-[#fbfbfa]'}"
+              >
                 <div class="min-w-0">
-                  <div class="font-semibold text-xs text-[#17171c] truncate flex items-center gap-1.5">
+                  <div
+                    class="flex items-center gap-1.5 truncate text-xs font-semibold text-[#17171c]"
+                  >
                     <span>{staff.name}</span>
                     {#if isMe}
-                      <span class="px-1.5 py-0.2 rounded-md bg-[#eff6ff] text-[#2563eb] text-[9.5px] font-mono font-bold border border-[#bfdbfe]">
+                      <span
+                        class="py-0.2 rounded-md border border-[#bfdbfe] bg-[#eff6ff] px-1.5 font-mono text-[9.5px] font-bold text-[#2563eb]"
+                      >
                         Anda
                       </span>
                     {/if}
                   </div>
-                  <div class="text-[11px] text-[#8e8e93] truncate">{staff.job_title || 'Staf'}</div>
+                  <div class="truncate text-[11px] text-[#8e8e93]">{staff.job_title || 'Staf'}</div>
                 </div>
 
                 {#if shift && shift.template}
@@ -739,26 +813,32 @@
                     <button
                       type="button"
                       onclick={() => openSwapForShift(shift.id)}
-                      class="px-3 py-1.5 rounded-xl bg-[#17171c] text-white text-right cursor-pointer hover:bg-black transition-all shadow-2xs shrink-0"
+                      class="shrink-0 cursor-pointer rounded-xl bg-[#17171c] px-3 py-1.5 text-right text-white shadow-2xs transition-all hover:bg-black"
                       title="Klik untuk ajukan tukar shift ini"
                     >
-                      <div class="font-bold text-[11px]">{shift.template.name}</div>
-                      <div class="text-[9.5px] text-white/80 font-mono">
-                        {shift.template.expected_clock_in?.substring(0, 5)} - {shift.template.expected_clock_out?.substring(0, 5)}
+                      <div class="text-[11px] font-bold">{shift.template.name}</div>
+                      <div class="font-mono text-[9.5px] text-white/80">
+                        {shift.template.expected_clock_in?.substring(0, 5)} - {shift.template.expected_clock_out?.substring(
+                          0,
+                          5
+                        )}
                       </div>
                     </button>
                   {:else}
-                    <div class="px-3 py-1.5 rounded-xl bg-[#f4f4f6] border border-[#e5e5ea] text-right shrink-0">
-                      <div class="font-bold text-[11px] text-[#17171c]">{shift.template.name}</div>
-                      <div class="text-[9.5px] text-[#8e8e93] font-mono">
-                        {shift.template.expected_clock_in?.substring(0, 5)} - {shift.template.expected_clock_out?.substring(0, 5)}
+                    <div
+                      class="shrink-0 rounded-xl border border-[#e5e5ea] bg-[#f4f4f6] px-3 py-1.5 text-right"
+                    >
+                      <div class="text-[11px] font-bold text-[#17171c]">{shift.template.name}</div>
+                      <div class="font-mono text-[9.5px] text-[#8e8e93]">
+                        {shift.template.expected_clock_in?.substring(0, 5)} - {shift.template.expected_clock_out?.substring(
+                          0,
+                          5
+                        )}
                       </div>
                     </div>
                   {/if}
                 {:else}
-                  <span class="text-xs font-mono text-[#a1a1aa] px-3 py-1.5">
-                    Off
-                  </span>
+                  <span class="px-3 py-1.5 font-mono text-xs text-[#a1a1aa]"> Off </span>
                 {/if}
               </div>
             {/each}
@@ -768,22 +848,32 @@
     </div>
 
     <!-- DESKTOP VIEW (>= 768px / md): Spacious Clean Weekly Grid Table -->
-    <div class="hidden md:block bg-white border border-[#e5e5ea] rounded-3xl overflow-hidden shadow-2xs">
-      <div class="p-5 border-b border-[#e5e5ea] flex items-center justify-between">
+    <div
+      class="hidden overflow-hidden rounded-3xl border border-[#e5e5ea] bg-white shadow-2xs md:block"
+    >
+      <div class="flex items-center justify-between border-b border-[#e5e5ea] p-5">
         <div class="flex items-center gap-2.5">
-          <Calendar class="w-4 h-4 text-[#17171c]" />
-          <h3 class="text-xs font-bold uppercase tracking-wider text-[#17171c]">Matriks Roster Mingguan</h3>
+          <Calendar class="h-4 w-4 text-[#17171c]" />
+          <h3 class="text-xs font-bold tracking-wider text-[#17171c] uppercase">
+            Matriks Roster Mingguan
+          </h3>
         </div>
-        <span class="text-xs text-[#8e8e93] font-mono">Klik shift Anda untuk mengajukan pertukaran jadwal</span>
+        <span class="font-mono text-xs text-[#8e8e93]"
+          >Klik shift Anda untuk mengajukan pertukaran jadwal</span
+        >
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
+        <table class="w-full border-collapse text-left text-xs">
           <thead>
-            <tr class="border-b border-[#e5e5ea] bg-[#fafafc] font-mono text-[10.5px] text-[#686873]">
-              <th class="py-3.5 px-5 font-bold uppercase min-w-[160px]">Nama Karyawan</th>
+            <tr
+              class="border-b border-[#e5e5ea] bg-[#fafafc] font-mono text-[10.5px] text-[#686873]"
+            >
+              <th class="min-w-[160px] px-5 py-3.5 font-bold uppercase">Nama Karyawan</th>
               {#each weekDays as day}
-                <th class={`py-3.5 px-3 text-center min-w-[100px] ${day.isToday ? 'bg-[#17171c] text-white' : ''}`}>
+                <th
+                  class={`min-w-[100px] px-3 py-3.5 text-center ${day.isToday ? 'bg-[#17171c] text-white' : ''}`}
+                >
                   <div class="font-bold">{day.dayName.toUpperCase()}</div>
                   <div class="text-[9.5px] opacity-80">{day.dayDate}</div>
                 </th>
@@ -793,7 +883,7 @@
           <tbody class="divide-y divide-[#e5e5ea]">
             {#if staffList.length === 0}
               <tr>
-                <td colspan={8} class="py-10 text-center text-[#8e8e93] font-mono">
+                <td colspan={8} class="py-10 text-center font-mono text-[#8e8e93]">
                   Belum ada staf yang terdaftar di cabang ini.
                 </td>
               </tr>
@@ -801,50 +891,68 @@
               {#each staffList as staff}
                 {@const staffUserId = staff.user_id || staff.id}
                 {@const isMe = staffUserId === currentUser.id}
-                <tr class="hover:bg-[#fafafc] transition-colors {isMe ? 'bg-[#eff6ff]/25' : ''}">
-                  <td class="py-4 px-5 font-medium text-[#17171c]">
-                    <div class="font-bold text-xs flex items-center gap-1.5">
+                <tr class="transition-colors hover:bg-[#fafafc] {isMe ? 'bg-[#eff6ff]/25' : ''}">
+                  <td class="px-5 py-4 font-medium text-[#17171c]">
+                    <div class="flex items-center gap-1.5 text-xs font-bold">
                       <span>{staff.name}</span>
                       {#if isMe}
-                        <span class="px-1.5 py-0.2 rounded-md bg-[#eff6ff] text-[#2563eb] text-[9.5px] font-mono font-bold border border-[#bfdbfe]">
+                        <span
+                          class="py-0.2 rounded-md border border-[#bfdbfe] bg-[#eff6ff] px-1.5 font-mono text-[9.5px] font-bold text-[#2563eb]"
+                        >
                           Anda
                         </span>
                       {/if}
                     </div>
-                    <div class="text-[11px] text-[#8e8e93] font-normal">{staff.job_title || 'Staf'}</div>
+                    <div class="text-[11px] font-normal text-[#8e8e93]">
+                      {staff.job_title || 'Staf'}
+                    </div>
                   </td>
 
                   {#each weekDays as day}
                     {@const shift = dynamicShifts.find(
-                      (s) => (s.assigned_user?.id === staffUserId || s.assigned_user?.id === staff.id) && s.date === day.iso
+                      (s) =>
+                        (s.assigned_user?.id === staffUserId || s.assigned_user?.id === staff.id) &&
+                        s.date === day.iso
                     )}
-                    <td class={`py-2.5 px-2 text-center align-middle ${day.isToday ? 'bg-[#fafafc]' : ''}`}>
+                    <td
+                      class={`px-2 py-2.5 text-center align-middle ${day.isToday ? 'bg-[#fafafc]' : ''}`}
+                    >
                       {#if shift && shift.template}
                         {#if isMe && day.iso >= todayStr}
                           <button
                             type="button"
                             onclick={() => openSwapForShift(shift.id)}
-                            class="w-full py-2 px-2.5 rounded-xl text-[10.5px] font-mono font-semibold bg-[#17171c] text-white hover:bg-black transition-all cursor-pointer block truncate text-center shadow-2xs"
+                            class="block w-full cursor-pointer truncate rounded-xl bg-[#17171c] px-2.5 py-2 text-center font-mono text-[10.5px] font-semibold text-white shadow-2xs transition-all hover:bg-black"
                             title={`Shift Anda: ${shift.template.name} (${shift.template.expected_clock_in} - ${shift.template.expected_clock_out}) - Klik untuk tukar`}
                           >
-                            <div class="font-bold truncate">{shift.template.name}</div>
-                            <div class="text-[9px] text-white/75 mt-0.5">
-                              {shift.template.expected_clock_in?.substring(0, 5)} - {shift.template.expected_clock_out?.substring(0, 5)}
+                            <div class="truncate font-bold">{shift.template.name}</div>
+                            <div class="mt-0.5 text-[9px] text-white/75">
+                              {shift.template.expected_clock_in?.substring(0, 5)} - {shift.template.expected_clock_out?.substring(
+                                0,
+                                5
+                              )}
                             </div>
                           </button>
                         {:else}
                           <div
-                            class="w-full py-2 px-2.5 rounded-xl text-[10.5px] font-mono font-semibold bg-[#f4f4f6] text-[#686873] border border-[#e5e5ea] block truncate text-center"
+                            class="block w-full truncate rounded-xl border border-[#e5e5ea] bg-[#f4f4f6] px-2.5 py-2 text-center font-mono text-[10.5px] font-semibold text-[#686873]"
                             title={`${shift.template.name} (${shift.template.expected_clock_in} - ${shift.template.expected_clock_out})`}
                           >
-                            <div class="font-semibold truncate text-[#17171c]">{shift.template.name}</div>
-                            <div class="text-[9px] text-[#8e8e93] mt-0.5">
-                              {shift.template.expected_clock_in?.substring(0, 5)} - {shift.template.expected_clock_out?.substring(0, 5)}
+                            <div class="truncate font-semibold text-[#17171c]">
+                              {shift.template.name}
+                            </div>
+                            <div class="mt-0.5 text-[9px] text-[#8e8e93]">
+                              {shift.template.expected_clock_in?.substring(0, 5)} - {shift.template.expected_clock_out?.substring(
+                                0,
+                                5
+                              )}
                             </div>
                           </div>
                         {/if}
                       {:else}
-                        <span class="text-[10.5px] font-mono text-[#a1a1aa] block text-center py-2.5">
+                        <span
+                          class="block py-2.5 text-center font-mono text-[10.5px] text-[#a1a1aa]"
+                        >
                           Off
                         </span>
                       {/if}
@@ -859,107 +967,126 @@
     </div>
   {:else}
     <!-- ==================== VIEW 2: BULAN (1 BULAN PENUH TABLE) ==================== -->
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl overflow-hidden shadow-2xs space-y-4">
-      <div class="p-5 border-b border-[#e5e5ea] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div class="space-y-4 overflow-hidden rounded-3xl border border-[#e5e5ea] bg-white shadow-2xs">
+      <div
+        class="flex flex-col justify-between gap-3 border-b border-[#e5e5ea] p-5 sm:flex-row sm:items-center"
+      >
         <div class="flex items-center gap-2.5">
-          <Calendar class="w-4 h-4 text-[#17171c]" />
+          <Calendar class="h-4 w-4 text-[#17171c]" />
           <div>
-            <h3 class="text-xs font-bold uppercase tracking-wider text-[#17171c]">
+            <h3 class="text-xs font-bold tracking-wider text-[#17171c] uppercase">
               Daftar Penugasan Shift Bulanan ({filteredMonthShifts.length})
             </h3>
             <p class="text-[11px] text-[#8e8e93]">
-              Periode {availableMonths.find(m => m.value === selectedMonth)?.label} {selectedYear}
+              Periode {availableMonths.find((m) => m.value === selectedMonth)?.label}
+              {selectedYear}
             </p>
           </div>
         </div>
 
         <div class="relative min-w-0 sm:w-64">
-          <Search class="w-3.5 h-3.5 text-[#8e8e93] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search class="absolute top-1/2 left-3.5 h-3.5 w-3.5 -translate-y-1/2 text-[#8e8e93]" />
           <input
             type="text"
             bind:value={monthSearchQuery}
             placeholder="Cari staf, shift, tanggal..."
-            class="w-full pl-9 pr-4 py-1.5 text-xs bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-full text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+            class="w-full rounded-full border border-[#e5e5ea] bg-[#f8f8fa] py-1.5 pr-4 pl-9 text-xs text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
       </div>
 
       {#if filteredMonthShifts.length === 0}
-        <div class="p-12 text-center text-[#8e8e93] text-xs font-mono">
-          Tidak ada penugasan shift pada bulan {availableMonths.find(m => m.value === selectedMonth)?.label} {selectedYear}.
+        <div class="p-12 text-center font-mono text-xs text-[#8e8e93]">
+          Tidak ada penugasan shift pada bulan {availableMonths.find(
+            (m) => m.value === selectedMonth
+          )?.label}
+          {selectedYear}.
         </div>
       {:else}
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
+          <table class="w-full border-collapse text-left text-xs">
             <thead>
-              <tr class="bg-[#f8f8fa] border-b border-[#e5e5ea] text-[#686873] font-mono text-[10.5px] uppercase tracking-wider">
-                <th class="py-3 px-5 font-bold">Tanggal &amp; Hari</th>
-                <th class="py-3 px-4 font-bold">Karyawan Bertugas</th>
-                <th class="py-3 px-4 font-bold">Pola Shift &amp; Jam</th>
-                <th class="py-3 px-4 font-bold">Status Penugasan</th>
-                <th class="py-3 px-5 font-bold text-right">Aksi</th>
+              <tr
+                class="border-b border-[#e5e5ea] bg-[#f8f8fa] font-mono text-[10.5px] tracking-wider text-[#686873] uppercase"
+              >
+                <th class="px-5 py-3 font-bold">Tanggal &amp; Hari</th>
+                <th class="px-4 py-3 font-bold">Karyawan Bertugas</th>
+                <th class="px-4 py-3 font-bold">Pola Shift &amp; Jam</th>
+                <th class="px-4 py-3 font-bold">Status Penugasan</th>
+                <th class="px-5 py-3 text-right font-bold">Aksi</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-[#f2f2f4]">
               {#each filteredMonthShifts as shift (shift.id)}
-                {@const isMe = shift.assigned_user?.id === currentUser.id || shift.actual_user?.id === currentUser.id}
-                <tr class="hover:bg-[#fafafc] transition-colors {isMe ? 'bg-[#eff6ff]/30' : ''}">
-                  <td class="py-3 px-5 whitespace-nowrap">
+                {@const isMe =
+                  shift.assigned_user?.id === currentUser.id ||
+                  shift.actual_user?.id === currentUser.id}
+                <tr class="transition-colors hover:bg-[#fafafc] {isMe ? 'bg-[#eff6ff]/30' : ''}">
+                  <td class="px-5 py-3 whitespace-nowrap">
                     <div class="flex items-center gap-2">
                       <span class="font-mono font-bold text-[#17171c]">{shift.date}</span>
                       <span class="text-[11px] text-[#8e8e93]">({getDayNameIndo(shift.date)})</span>
                     </div>
                   </td>
-                  <td class="py-3 px-4 whitespace-nowrap">
-                    <div class="font-semibold text-[#17171c] flex items-center gap-1.5">
+                  <td class="px-4 py-3 whitespace-nowrap">
+                    <div class="flex items-center gap-1.5 font-semibold text-[#17171c]">
                       <span>{shift.assigned_user?.name || 'Staf'}</span>
                       {#if isMe}
-                        <span class="px-1.5 py-0.2 rounded-md bg-[#eff6ff] text-[#2563eb] text-[9.5px] font-mono font-bold border border-[#bfdbfe]">
+                        <span
+                          class="py-0.2 rounded-md border border-[#bfdbfe] bg-[#eff6ff] px-1.5 font-mono text-[9.5px] font-bold text-[#2563eb]"
+                        >
                           Anda
                         </span>
                       {/if}
                     </div>
                     {#if shift.is_swap && shift.actual_user}
-                      <div class="text-[10px] text-[#2563eb] font-mono">
+                      <div class="font-mono text-[10px] text-[#2563eb]">
                         Pengganti: {shift.actual_user.name}
                       </div>
                     {/if}
                   </td>
-                  <td class="py-3 px-4 whitespace-nowrap">
+                  <td class="px-4 py-3 whitespace-nowrap">
                     <div class="font-bold text-[#17171c]">{shift.template?.name || 'Shift'}</div>
-                    <div class="text-[10.5px] font-mono text-[#8e8e93]">
-                      {shift.template?.expected_clock_in?.substring(0, 5)} - {shift.template?.expected_clock_out?.substring(0, 5)} WIB
+                    <div class="font-mono text-[10.5px] text-[#8e8e93]">
+                      {shift.template?.expected_clock_in?.substring(0, 5)} - {shift.template?.expected_clock_out?.substring(
+                        0,
+                        5
+                      )} WIB
                     </div>
                   </td>
-                  <td class="py-3 px-4 whitespace-nowrap">
+                  <td class="px-4 py-3 whitespace-nowrap">
                     {#if shift.is_swap}
-                      <span class={`text-[9.5px] font-mono px-2 py-0.5 rounded-full font-semibold ${
-                        shift.swap_status === 'APPROVED'
-                          ? 'bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]'
-                          : shift.swap_status === 'PENDING'
-                          ? 'bg-[#fffbeb] text-[#d97706] border border-[#fef3c7]'
-                          : 'bg-[#fef2f2] text-[#dc2626] border border-[#fecaca]'
-                      }`}>
+                      <span
+                        class={`rounded-full px-2 py-0.5 font-mono text-[9.5px] font-semibold ${
+                          shift.swap_status === 'APPROVED'
+                            ? 'border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]'
+                            : shift.swap_status === 'PENDING'
+                              ? 'border border-[#fef3c7] bg-[#fffbeb] text-[#d97706]'
+                              : 'border border-[#fecaca] bg-[#fef2f2] text-[#dc2626]'
+                        }`}
+                      >
                         Tukar: {shift.swap_status}
                       </span>
                     {:else}
-                      <span class="text-[9.5px] font-mono bg-[#f4f4f6] text-[#686873] px-2 py-0.5 rounded-full font-semibold border border-[#e5e5ea]">
+                      <span
+                        class="rounded-full border border-[#e5e5ea] bg-[#f4f4f6] px-2 py-0.5 font-mono text-[9.5px] font-semibold text-[#686873]"
+                      >
                         Reguler
                       </span>
                     {/if}
                   </td>
-                  <td class="py-3 px-5 whitespace-nowrap text-right">
+                  <td class="px-5 py-3 text-right whitespace-nowrap">
                     {#if isMe && shift.date >= todayStr && (!shift.is_swap || shift.swap_status === 'REJECTED')}
                       <button
                         type="button"
                         onclick={() => openSwapForShift(shift.id)}
-                        class="px-2.5 py-1 text-[11px] font-semibold text-[#17171c] bg-[#f4f4f6] hover:bg-[#e5e5ea] rounded-lg transition-all cursor-pointer border border-[#e5e5ea] inline-flex items-center gap-1 shadow-2xs"
+                        class="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[#e5e5ea] bg-[#f4f4f6] px-2.5 py-1 text-[11px] font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#e5e5ea]"
                       >
-                        <RefreshCw class="w-3 h-3 text-[#2563eb]" />
+                        <RefreshCw class="h-3 w-3 text-[#2563eb]" />
                         <span>Ajukan Tukar</span>
                       </button>
                     {:else}
-                      <span class="text-[11px] font-mono text-[#8e8e93]">-</span>
+                      <span class="font-mono text-[11px] text-[#8e8e93]">-</span>
                     {/if}
                   </td>
                 </tr>
@@ -974,39 +1101,51 @@
 
 <!-- Modal Permohonan Tukar Shift -->
 {#if isSwapModalOpen}
-  <div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-xl space-y-5 animate-in fade-in zoom-in-95">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 font-sans backdrop-blur-xs"
+  >
+    <div
+      class="animate-in fade-in zoom-in-95 w-full max-w-lg space-y-5 rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-xl sm:p-7"
+    >
       <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-[#eff6ff] text-[#2563eb] flex items-center justify-center border border-[#bfdbfe]">
-            <RefreshCw class="w-5 h-5" />
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
+          >
+            <RefreshCw class="h-5 w-5" />
           </div>
           <div>
-            <h3 class="font-bold text-base text-[#17171c]">Permohonan Tukar Shift</h3>
+            <h3 class="text-base font-bold text-[#17171c]">Permohonan Tukar Shift</h3>
             <p class="text-xs text-[#8e8e93]">Ajukan penggantian jadwal dengan rekan kerja</p>
           </div>
         </div>
         <button
           type="button"
           onclick={() => (isSwapModalOpen = false)}
-          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all"
+          class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="w-5 h-5" />
+          <X class="h-5 w-5" />
         </button>
       </div>
 
       {#if swapErrorMessage}
-        <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] rounded-xl text-[#991b1b] text-xs font-medium flex items-start gap-2">
-          <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
+        <div
+          class="flex items-start gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
+        >
+          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
           <span>{swapErrorMessage}</span>
         </div>
       {/if}
 
       <div class="space-y-4 text-xs">
         <div class="space-y-1.5">
-          <label for="swap-shift-select" class="block font-bold text-[#17171c]">Pilih Jadwal Shift Anda</label>
+          <label for="swap-shift-select" class="block font-bold text-[#17171c]"
+            >Pilih Jadwal Shift Anda</label
+          >
           {#if myUpcomingShifts.length === 0}
-            <div class="p-3.5 bg-[#f8f8fa] text-[#8e8e93] text-xs font-mono rounded-2xl border border-[#e5e5ea]">
+            <div
+              class="rounded-2xl border border-[#e5e5ea] bg-[#f8f8fa] p-3.5 font-mono text-xs text-[#8e8e93]"
+            >
               Anda tidak memiliki jadwal shift mendatang aktif pada periode ini.
             </div>
           {:else}
@@ -1014,34 +1153,43 @@
               <select
                 id="swap-shift-select"
                 bind:value={selectedShiftAssignmentId}
-                class="appearance-none w-full border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl px-4 pr-10 py-2.5 bg-[#f8f8fa] hover:bg-white text-xs text-[#17171c] font-mono focus:border-[#17171c] focus:outline-hidden cursor-pointer transition-all shadow-2xs"
+                class="w-full cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 pr-10 font-mono text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               >
                 <option value="">Pilih Shift yang Ingin Ditukar...</option>
                 {#each myUpcomingShifts as s}
                   <option value={s.id}>
-                    {s.date} &bull; {s.template?.name || 'Shift'} ({s.template?.expected_clock_in?.substring(0, 5)} - {s.template?.expected_clock_out?.substring(0, 5)})
+                    {s.date} &bull; {s.template?.name || 'Shift'} ({s.template?.expected_clock_in?.substring(
+                      0,
+                      5
+                    )} - {s.template?.expected_clock_out?.substring(0, 5)})
                   </option>
                 {/each}
               </select>
-              <ChevronDown class="w-4 h-4 text-[#8e8e93] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown
+                class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+              />
             </div>
           {/if}
         </div>
 
         <div class="space-y-1.5">
-          <label for="swap-target-user" class="block font-bold text-[#17171c]">Pilih Rekan Pengganti (Staf Cabang)</label>
+          <label for="swap-target-user" class="block font-bold text-[#17171c]"
+            >Pilih Rekan Pengganti (Staf Cabang)</label
+          >
           <div class="relative">
             <select
               id="swap-target-user"
               bind:value={targetUserId}
-              class="appearance-none w-full border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl px-4 pr-10 py-2.5 bg-[#f8f8fa] hover:bg-white text-xs text-[#17171c] font-mono focus:border-[#17171c] focus:outline-hidden cursor-pointer transition-all shadow-2xs"
+              class="w-full cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 pr-10 font-mono text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
             >
               <option value="">Pilih Rekan Kerja Pengganti...</option>
               {#each availableColleagues as col}
                 <option value={col.id}>{col.name} ({col.role || 'Staf'})</option>
               {/each}
             </select>
-            <ChevronDown class="w-4 h-4 text-[#8e8e93] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown
+              class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+            />
           </div>
         </div>
       </div>
@@ -1050,7 +1198,7 @@
         <button
           type="button"
           onclick={() => (isSwapModalOpen = false)}
-          class="flex-1 py-3 border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] text-xs font-semibold rounded-full cursor-pointer transition-all"
+          class="flex-1 cursor-pointer rounded-full border border-[#e5e5ea] py-3 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
         >
           Batal
         </button>
@@ -1058,7 +1206,7 @@
           type="button"
           disabled={isSubmittingSwap || !selectedShiftAssignmentId || !targetUserId}
           onclick={handleConfirmSwap}
-          class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all disabled:opacity-50 shadow-xs"
+          class="flex-1 cursor-pointer rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
         >
           {isSubmittingSwap ? 'Mengajukan...' : 'Kirim Permohonan'}
         </button>

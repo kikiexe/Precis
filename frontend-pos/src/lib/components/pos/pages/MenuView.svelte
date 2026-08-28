@@ -196,56 +196,59 @@
   }
 </script>
 
-<div class="flex-1 flex flex-col h-full bg-[#f4f6f9] overflow-hidden font-sans select-none">
+<div class="flex h-full flex-1 flex-col overflow-hidden bg-[#f4f6f9] font-sans select-none">
   <!-- Top Bar -->
-  <div class="h-14 bg-white border-b border-zinc-200 px-6 flex items-center justify-between shrink-0 shadow-2xs">
+  <div
+    class="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-6 shadow-2xs"
+  >
     <div class="flex items-center gap-3">
-      <h1 class="text-base font-bold text-zinc-900 tracking-tight">Katalog Menu Jualan</h1>
-      <span class="text-xs font-mono text-zinc-400">|</span>
-      <span class="text-xs text-zinc-500 font-medium">Pengaturan Produk POS</span>
+      <h1 class="text-base font-bold tracking-tight text-zinc-900">Katalog Menu Jualan</h1>
+      <span class="font-mono text-xs text-zinc-400">|</span>
+      <span class="text-xs font-medium text-zinc-500">Pengaturan Produk POS</span>
     </div>
 
     <div class="flex items-center gap-2">
       <button
         type="button"
         onclick={() => (isCategoryModalOpen = true)}
-        class="px-3 py-2 bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-800 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all"
+        class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-100"
       >
-        <FolderPlus class="w-3.5 h-3.5 text-zinc-600" />
+        <FolderPlus class="h-3.5 w-3.5 text-zinc-600" />
         <span>Kelola Kategori</span>
       </button>
 
       <button
         type="button"
         onclick={handleOpenAddModal}
-        class="px-3.5 py-2 bg-zinc-900 hover:bg-black text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all active:scale-[0.99]"
+        class="flex cursor-pointer items-center gap-1.5 rounded-xl bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black active:scale-[0.99]"
       >
-        <Plus class="w-3.5 h-3.5" />
+        <Plus class="h-3.5 w-3.5" />
         <span>+ Tambah Menu Baru</span>
       </button>
     </div>
   </div>
 
   <!-- Content Body -->
-  <div class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto space-y-4">
-    <div class="w-full max-w-7xl mx-auto space-y-3">
-      
+  <div class="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6 lg:p-8">
+    <div class="mx-auto w-full max-w-7xl space-y-3">
       <!-- Excel-like Toolbar: Search & Category Filter -->
-      <div class="bg-white border border-zinc-200 rounded-xl p-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
-        <div class="flex items-center gap-2 flex-1">
-          <div class="relative flex-1 max-w-md">
-            <Search class="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+      <div
+        class="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-2xs sm:flex-row sm:items-center"
+      >
+        <div class="flex flex-1 items-center gap-2">
+          <div class="relative max-w-md flex-1">
+            <Search class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
             <input
               type="text"
               bind:value={searchQuery}
               placeholder="Cari menu minuman, makanan, kopi, pastry..."
-              class="w-full pl-9 pr-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 placeholder-zinc-400 focus:bg-white focus:border-zinc-900 focus:outline-hidden transition-all"
+              class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2 pr-4 pl-9 text-xs text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:outline-hidden"
             />
             {#if searchQuery}
               <button
                 type="button"
                 onclick={() => (searchQuery = '')}
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-zinc-400 hover:text-zinc-700 cursor-pointer"
+                class="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer font-mono text-xs text-zinc-400 hover:text-zinc-700"
               >
                 ✕
               </button>
@@ -255,7 +258,7 @@
           <!-- Category Filter -->
           <select
             bind:value={selectedCategoryFilter}
-            class="h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-semibold text-zinc-700 cursor-pointer focus:bg-white focus:border-zinc-900 focus:outline-hidden"
+            class="h-9 cursor-pointer rounded-lg border border-zinc-200 bg-zinc-50 px-3 text-xs font-semibold text-zinc-700 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
           >
             <option value="cat-all">Semua Kategori ({products.length})</option>
             {#each categories as cat}
@@ -264,103 +267,115 @@
           </select>
         </div>
 
-        <div class="text-xs font-mono text-zinc-500 self-center">
+        <div class="self-center font-mono text-xs text-zinc-500">
           Total Menu: <strong class="text-zinc-900">{filteredProducts.length}</strong> Produk
         </div>
       </div>
 
       <!-- Excel-like Spreadsheet Table -->
-      <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-2xs">
+      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xs">
         <div class="overflow-x-auto">
-          <table class="w-full text-xs text-left border-collapse">
-            <thead class="bg-zinc-100/90 border-b border-zinc-200 font-mono text-[11px] font-bold text-zinc-600 uppercase tracking-wider">
+          <table class="w-full border-collapse text-left text-xs">
+            <thead
+              class="border-b border-zinc-200 bg-zinc-100/90 font-mono text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
+            >
               <tr class="divide-x divide-zinc-200/80">
-                <th class="py-3 px-3 w-12 text-center">No.</th>
-                <th class="py-3 px-3 w-16 text-center">Foto</th>
-                <th class="py-3 px-4">Nama Produk / Menu</th>
-                <th class="py-3 px-4 w-40">Kategori</th>
-                <th class="py-3 px-4 w-36 text-right font-bold">Harga Jual</th>
-                <th class="py-3 px-4 w-32 text-center">Status</th>
-                <th class="py-3 px-4 w-40 text-center">Aksi</th>
+                <th class="w-12 px-3 py-3 text-center">No.</th>
+                <th class="w-16 px-3 py-3 text-center">Foto</th>
+                <th class="px-4 py-3">Nama Produk / Menu</th>
+                <th class="w-40 px-4 py-3">Kategori</th>
+                <th class="w-36 px-4 py-3 text-right font-bold">Harga Jual</th>
+                <th class="w-32 px-4 py-3 text-center">Status</th>
+                <th class="w-40 px-4 py-3 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-zinc-200/70 font-mono">
               {#if filteredProducts.length === 0}
                 <tr>
-                  <td colspan="7" class="py-16 text-center text-zinc-400 font-sans">
-                    <UtensilsCrossed class="w-8 h-8 mx-auto opacity-30 text-zinc-400 mb-2" />
+                  <td colspan="7" class="py-16 text-center font-sans text-zinc-400">
+                    <UtensilsCrossed class="mx-auto mb-2 h-8 w-8 text-zinc-400 opacity-30" />
                     <p class="text-sm font-semibold text-zinc-800">Tidak ada produk menu</p>
-                    <p class="text-xs text-zinc-500 mt-0.5">Ubah kata kunci pencarian atau tambah menu jualan baru.</p>
+                    <p class="mt-0.5 text-xs text-zinc-500">
+                      Ubah kata kunci pencarian atau tambah menu jualan baru.
+                    </p>
                   </td>
                 </tr>
               {:else}
                 {#each filteredProducts as product, idx (product.id)}
-                  <tr class={`divide-x divide-zinc-200/60 transition-colors hover:bg-zinc-50/80 ${
-                    idx % 2 === 1 ? 'bg-zinc-50/30' : 'bg-white'
-                  }`}>
+                  <tr
+                    class={`divide-x divide-zinc-200/60 transition-colors hover:bg-zinc-50/80 ${
+                      idx % 2 === 1 ? 'bg-zinc-50/30' : 'bg-white'
+                    }`}
+                  >
                     <!-- No -->
-                    <td class="py-3 px-3 text-center text-zinc-400 text-[11px]">
+                    <td class="px-3 py-3 text-center text-[11px] text-zinc-400">
                       {idx + 1}
                     </td>
 
                     <!-- Foto Thumbnail (Optional Image Support) -->
-                    <td class="py-2 px-3 text-center">
+                    <td class="px-3 py-2 text-center">
                       {#if product.image_url}
                         <img
                           src={product.image_url}
                           alt={product.name}
-                          class="w-10 h-10 rounded-lg object-cover mx-auto border border-zinc-200 shadow-2xs"
+                          class="mx-auto h-10 w-10 rounded-lg border border-zinc-200 object-cover shadow-2xs"
                         />
                       {:else}
-                        <div class="w-10 h-10 rounded-lg bg-zinc-100 border border-zinc-200 text-zinc-400 flex items-center justify-center mx-auto text-[10px] font-bold">
+                        <div
+                          class="mx-auto flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 text-[10px] font-bold text-zinc-400"
+                        >
                           {product.name.substring(0, 2).toUpperCase()}
                         </div>
                       {/if}
                     </td>
 
                     <!-- Nama & Deskripsi -->
-                    <td class="py-3 px-4 font-sans font-semibold text-zinc-900">
+                    <td class="px-4 py-3 font-sans font-semibold text-zinc-900">
                       <div>{product.name}</div>
                       {#if product.description}
-                        <div class="text-[11px] text-zinc-500 font-normal mt-0.5 line-clamp-1">
+                        <div class="mt-0.5 line-clamp-1 text-[11px] font-normal text-zinc-500">
                           {product.description}
                         </div>
                       {/if}
                     </td>
 
                     <!-- Kategori -->
-                    <td class="py-3 px-4 font-sans">
-                      <span class="inline-block px-2.5 py-0.5 bg-zinc-100 text-zinc-700 rounded-md text-[11px] font-medium border border-zinc-200/60">
+                    <td class="px-4 py-3 font-sans">
+                      <span
+                        class="inline-block rounded-md border border-zinc-200/60 bg-zinc-100 px-2.5 py-0.5 text-[11px] font-medium text-zinc-700"
+                      >
                         {getCategoryName(product.category_id)}
                       </span>
                     </td>
 
                     <!-- Harga Jual -->
-                    <td class="py-3 px-4 text-right font-bold text-zinc-900 text-xs">
+                    <td class="px-4 py-3 text-right text-xs font-bold text-zinc-900">
                       {formatCurrency(product.base_price)}
                     </td>
 
                     <!-- Status Penjualan -->
-                    <td class="py-3 px-4 text-center font-sans">
-                      <span class={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                        product.is_active
-                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                          : 'bg-zinc-200 text-zinc-600'
-                      }`}>
+                    <td class="px-4 py-3 text-center font-sans">
+                      <span
+                        class={`inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                          product.is_active
+                            ? 'border border-emerald-200 bg-emerald-100 text-emerald-800'
+                            : 'bg-zinc-200 text-zinc-600'
+                        }`}
+                      >
                         {product.is_active ? 'Dijual' : 'Nonaktif'}
                       </span>
                     </td>
 
                     <!-- Aksi -->
-                    <td class="py-3 px-4 text-center font-sans">
+                    <td class="px-4 py-3 text-center font-sans">
                       <div class="flex items-center justify-center gap-1.5">
                         <button
                           type="button"
                           onclick={() => onToggleProductActive(product.id)}
-                          class={`px-2 py-1 rounded text-[10px] font-semibold border transition-all cursor-pointer ${
+                          class={`cursor-pointer rounded border px-2 py-1 text-[10px] font-semibold transition-all ${
                             product.is_active
-                              ? 'bg-zinc-100 text-zinc-700 border-zinc-300 hover:bg-zinc-200'
-                              : 'bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700'
+                              ? 'border-zinc-300 bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                              : 'border-emerald-600 bg-emerald-600 text-white hover:bg-emerald-700'
                           }`}
                         >
                           {product.is_active ? 'Nonaktifkan' : 'Aktifkan'}
@@ -368,18 +383,18 @@
                         <button
                           type="button"
                           onclick={() => handleOpenEditModal(product)}
-                          class="p-1 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded cursor-pointer"
+                          class="cursor-pointer rounded p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
                           title="Edit Menu"
                         >
-                          <Edit2 class="w-3.5 h-3.5" />
+                          <Edit2 class="h-3.5 w-3.5" />
                         </button>
                         <button
                           type="button"
                           onclick={() => handleDeleteProduct(product.id)}
-                          class="p-1 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded cursor-pointer"
+                          class="cursor-pointer rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600"
                           title="Hapus Menu"
                         >
-                          <Trash2 class="w-3.5 h-3.5" />
+                          <Trash2 class="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </td>
@@ -391,10 +406,10 @@
         </div>
 
         <!-- Summary Footer -->
-        <div class="bg-zinc-50 border-t border-zinc-200 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-zinc-600">
-          <div>
-            Katalog aktif disinkronkan langsung ke layar kasir Point of Sale
-          </div>
+        <div
+          class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-2.5 font-mono text-xs text-zinc-600"
+        >
+          <div>Katalog aktif disinkronkan langsung ke layar kasir Point of Sale</div>
           <div>
             Total Terdaftar: <strong class="text-zinc-900">{filteredProducts.length}</strong> Menu
           </div>
@@ -406,35 +421,49 @@
 
 <!-- Modal: Tambah / Edit Menu Jualan (Termasuk Foto Opsional) -->
 {#if isAddMenuModalOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans select-none">
-    <div class="bg-white border border-zinc-200 rounded-2xl w-full max-w-lg p-6 space-y-4 shadow-2xl animate-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 font-sans backdrop-blur-xs select-none"
+  >
+    <div
+      class="animate-in zoom-in-95 max-h-[90vh] w-full max-w-lg space-y-4 overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl duration-150"
+    >
       <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center border border-zinc-200">
-            <UtensilsCrossed class="w-4 h-4" />
+          <div
+            class="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+          >
+            <UtensilsCrossed class="h-4 w-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-zinc-900">
               {editingProductId ? 'Ubah Menu Jualan' : 'Tambah Menu Jualan Baru'}
             </h3>
-            <p class="text-[11px] text-zinc-500">Konfigurasi nama, kategori, harga, dan foto produk</p>
+            <p class="text-[11px] text-zinc-500">
+              Konfigurasi nama, kategori, harga, dan foto produk
+            </p>
           </div>
         </div>
-        <button type="button" onclick={() => (isAddMenuModalOpen = false)} class="text-zinc-400 hover:text-zinc-700 cursor-pointer p-1">
-          <X class="w-4 h-4" />
+        <button
+          type="button"
+          onclick={() => (isAddMenuModalOpen = false)}
+          class="cursor-pointer p-1 text-zinc-400 hover:text-zinc-700"
+        >
+          <X class="h-4 w-4" />
         </button>
       </div>
 
       {#if formErrorMessage}
-        <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2">
-          <AlertCircle class="w-4 h-4 shrink-0" />
+        <div
+          class="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700"
+        >
+          <AlertCircle class="h-4 w-4 shrink-0" />
           <span>{formErrorMessage}</span>
         </div>
       {/if}
 
       <form onsubmit={handleSaveProduct} class="space-y-3.5 text-xs">
         <div class="space-y-1">
-          <label for="menu-name" class="font-semibold text-zinc-900 block">
+          <label for="menu-name" class="block font-semibold text-zinc-900">
             Nama Produk / Menu <span class="text-red-500">*</span>
           </label>
           <input
@@ -443,19 +472,19 @@
             bind:value={formName}
             placeholder="Contoh: Iced Caramel Macchiato"
             required
-            class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:border-zinc-900 focus:outline-hidden text-xs"
+            class="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-xs text-zinc-900 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
           />
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div class="space-y-1">
-            <label for="menu-category" class="font-semibold text-zinc-900 block">
+            <label for="menu-category" class="block font-semibold text-zinc-900">
               Kategori Menu <span class="text-red-500">*</span>
             </label>
             <select
               id="menu-category"
               bind:value={formCategoryId}
-              class="w-full px-3 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:border-zinc-900 focus:outline-hidden text-xs font-medium cursor-pointer"
+              class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs font-medium text-zinc-900 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
             >
               {#each categories as cat}
                 <option value={cat.id}>{cat.name}</option>
@@ -464,7 +493,7 @@
           </div>
 
           <div class="space-y-1">
-            <label for="menu-price" class="font-semibold text-zinc-900 block">
+            <label for="menu-price" class="block font-semibold text-zinc-900">
               Harga Jual (Rp) <span class="text-red-500">*</span>
             </label>
             <input
@@ -474,13 +503,13 @@
               min="0"
               step="500"
               required
-              class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:border-zinc-900 focus:outline-hidden text-xs font-mono font-bold"
+              class="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 font-mono text-xs font-bold text-zinc-900 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
             />
           </div>
         </div>
 
         <div class="space-y-1">
-          <label for="menu-desc" class="font-semibold text-zinc-900 block">
+          <label for="menu-desc" class="block font-semibold text-zinc-900">
             Deskripsi Menu (Opsional)
           </label>
           <textarea
@@ -488,22 +517,22 @@
             bind:value={formDescription}
             rows="2"
             placeholder="Keterangan singkat komposisi atau varian rasa..."
-            class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:border-zinc-900 focus:outline-hidden text-xs resize-none"
+            class="w-full resize-none rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-xs text-zinc-900 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
           ></textarea>
         </div>
 
         <!-- Foto Produk (Opsional) -->
-        <div class="space-y-2 p-3 bg-zinc-50 rounded-xl border border-zinc-200">
+        <div class="space-y-2 rounded-xl border border-zinc-200 bg-zinc-50 p-3">
           <div class="flex items-center justify-between">
-            <label class="font-semibold text-zinc-900 flex items-center gap-1.5">
-              <ImageIcon class="w-3.5 h-3.5 text-zinc-600" />
+            <label class="flex items-center gap-1.5 font-semibold text-zinc-900">
+              <ImageIcon class="h-3.5 w-3.5 text-zinc-600" />
               <span>Foto Produk Menu (Opsional)</span>
             </label>
             {#if formImageUrl}
               <button
                 type="button"
                 onclick={() => (formImageUrl = '')}
-                class="text-[10px] text-red-600 hover:underline cursor-pointer"
+                class="cursor-pointer text-[10px] text-red-600 hover:underline"
               >
                 Hapus Foto
               </button>
@@ -512,17 +541,21 @@
 
           <div class="flex items-center gap-3">
             <!-- Preview Box -->
-            <div class="w-16 h-16 rounded-xl border border-zinc-200 bg-white overflow-hidden flex items-center justify-center shrink-0">
+            <div
+              class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-zinc-200 bg-white"
+            >
               {#if formImageUrl}
-                <img src={formImageUrl} alt="Preview" class="w-full h-full object-cover" />
+                <img src={formImageUrl} alt="Preview" class="h-full w-full object-cover" />
               {:else}
-                <ImageIcon class="w-6 h-6 text-zinc-300" />
+                <ImageIcon class="h-6 w-6 text-zinc-300" />
               {/if}
             </div>
 
             <div class="flex-1 space-y-1.5">
-              <label class="px-3 py-1.5 bg-white hover:bg-zinc-100 border border-zinc-200 text-zinc-800 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all">
-                <Upload class="w-3.5 h-3.5 text-zinc-600" />
+              <label
+                class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-100"
+              >
+                <Upload class="h-3.5 w-3.5 text-zinc-600" />
                 <span>Pilih File Gambar</span>
                 <input
                   type="file"
@@ -532,30 +565,28 @@
                 />
               </label>
 
-              <div class="text-[10px] text-zinc-400">
-                Atau masukkan tautan URL gambar online:
-              </div>
+              <div class="text-[10px] text-zinc-400">Atau masukkan tautan URL gambar online:</div>
               <input
                 type="url"
                 bind:value={formImageUrl}
                 placeholder="https://example.com/foto-kopi.jpg"
-                class="w-full px-2.5 py-1 bg-white border border-zinc-200 rounded-lg text-[11px] font-mono text-zinc-900 focus:outline-hidden focus:border-zinc-900"
+                class="w-full rounded-lg border border-zinc-200 bg-white px-2.5 py-1 font-mono text-[11px] text-zinc-900 focus:border-zinc-900 focus:outline-hidden"
               />
             </div>
           </div>
         </div>
 
-        <div class="pt-2 flex gap-2.5">
+        <div class="flex gap-2.5 pt-2">
           <button
             type="button"
             onclick={() => (isAddMenuModalOpen = false)}
-            class="flex-1 py-2.5 text-xs font-semibold border border-zinc-200 rounded-xl text-zinc-700 hover:bg-zinc-100 cursor-pointer transition-colors"
+            class="flex-1 cursor-pointer rounded-xl border border-zinc-200 py-2.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-100"
           >
             Batal
           </button>
           <button
             type="submit"
-            class="flex-1 py-2.5 text-xs font-semibold bg-zinc-900 hover:bg-black text-white rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-[0.99]"
+            class="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
           >
             <span>{editingProductId ? 'Simpan Perubahan' : 'Tambah Menu'}</span>
           </button>
@@ -567,20 +598,30 @@
 
 <!-- Modal: Kelola Kategori Menu -->
 {#if isCategoryModalOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans select-none">
-    <div class="bg-white border border-zinc-200 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl animate-in zoom-in-95 duration-150">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 font-sans backdrop-blur-xs select-none"
+  >
+    <div
+      class="animate-in zoom-in-95 w-full max-w-md space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl duration-150"
+    >
       <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center border border-zinc-200">
-            <FolderPlus class="w-4 h-4" />
+          <div
+            class="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+          >
+            <FolderPlus class="h-4 w-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-zinc-900">Kelola Kategori Menu</h3>
             <p class="text-[11px] text-zinc-500">Kategori produk yang tampil pada kasir</p>
           </div>
         </div>
-        <button type="button" onclick={() => (isCategoryModalOpen = false)} class="text-zinc-400 hover:text-zinc-700 cursor-pointer p-1">
-          <X class="w-4 h-4" />
+        <button
+          type="button"
+          onclick={() => (isCategoryModalOpen = false)}
+          class="cursor-pointer p-1 text-zinc-400 hover:text-zinc-700"
+        >
+          <X class="h-4 w-4" />
         </button>
       </div>
 
@@ -590,41 +631,43 @@
           type="text"
           bind:value={newCategoryName}
           placeholder="Nama kategori menu baru..."
-          class="flex-1 px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:border-zinc-900 focus:outline-hidden"
+          class="flex-1 rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-xs text-zinc-900 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
         />
         <button
           type="button"
           onclick={handleAddCategory}
-          class="px-3.5 py-2 bg-zinc-900 hover:bg-black text-white text-xs font-semibold rounded-xl cursor-pointer shadow-2xs transition-all active:scale-95 shrink-0"
+          class="shrink-0 cursor-pointer rounded-xl bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black active:scale-95"
         >
           + Tambah
         </button>
       </div>
 
       <!-- Categories List -->
-      <div class="max-h-60 overflow-y-auto divide-y divide-zinc-100 border border-zinc-200 rounded-xl">
+      <div
+        class="max-h-60 divide-y divide-zinc-100 overflow-y-auto rounded-xl border border-zinc-200"
+      >
         {#each categories as cat (cat.id)}
-          <div class="p-3 flex items-center justify-between gap-2 hover:bg-zinc-50">
+          <div class="flex items-center justify-between gap-2 p-3 hover:bg-zinc-50">
             {#if editingCategoryId === cat.id}
               <input
                 type="text"
                 bind:value={editingCategoryName}
-                class="flex-1 px-2 py-1 bg-white border border-zinc-300 rounded text-xs text-zinc-900 focus:outline-hidden"
+                class="flex-1 rounded border border-zinc-300 bg-white px-2 py-1 text-xs text-zinc-900 focus:outline-hidden"
               />
               <div class="flex items-center gap-1">
                 <button
                   type="button"
                   onclick={() => handleSaveEditCategory(cat.id)}
-                  class="p-1 text-emerald-600 hover:bg-emerald-50 rounded"
+                  class="rounded p-1 text-emerald-600 hover:bg-emerald-50"
                 >
-                  <Check class="w-4 h-4" />
+                  <Check class="h-4 w-4" />
                 </button>
                 <button
                   type="button"
                   onclick={() => (editingCategoryId = null)}
-                  class="p-1 text-zinc-400 hover:bg-zinc-100 rounded"
+                  class="rounded p-1 text-zinc-400 hover:bg-zinc-100"
                 >
-                  <X class="w-4 h-4" />
+                  <X class="h-4 w-4" />
                 </button>
               </div>
             {:else}
@@ -636,16 +679,16 @@
                     editingCategoryId = cat.id;
                     editingCategoryName = cat.name;
                   }}
-                  class="p-1 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 rounded cursor-pointer"
+                  class="cursor-pointer rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
                 >
-                  <Edit2 class="w-3.5 h-3.5" />
+                  <Edit2 class="h-3.5 w-3.5" />
                 </button>
                 <button
                   type="button"
                   onclick={() => handleDeleteCategory(cat.id)}
-                  class="p-1 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded cursor-pointer"
+                  class="cursor-pointer rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600"
                 >
-                  <Trash2 class="w-3.5 h-3.5" />
+                  <Trash2 class="h-3.5 w-3.5" />
                 </button>
               </div>
             {/if}
@@ -657,7 +700,7 @@
         <button
           type="button"
           onclick={() => (isCategoryModalOpen = false)}
-          class="w-full py-2.5 text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-xl cursor-pointer transition-colors"
+          class="w-full cursor-pointer rounded-xl bg-zinc-100 py-2.5 text-xs font-semibold text-zinc-800 transition-colors hover:bg-zinc-200"
         >
           Selesai
         </button>

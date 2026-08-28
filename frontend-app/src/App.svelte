@@ -33,7 +33,9 @@
   let invitationToken = $state<string | null>(null);
   let verificationToken = $state<string | null>(null);
 
-  let activeDomain = $state<'home' | 'dashboard' | 'katalog' | 'tim' | 'finance' | 'settings' | 'presensi' | 'shift'>('dashboard');
+  let activeDomain = $state<
+    'home' | 'dashboard' | 'katalog' | 'tim' | 'finance' | 'settings' | 'presensi' | 'shift'
+  >('dashboard');
   let activeSubTab = $state<string>('');
 
   let isBillingModalOpen = $state(false);
@@ -45,8 +47,11 @@
       const urlParams = new URLSearchParams(window.location.search);
       const path = window.location.pathname;
 
-      const invToken = urlParams.get('invite_token') || (path.includes('invite') ? urlParams.get('token') : null);
-      const vToken = urlParams.get('verify_token') || (path.includes('verify-email') ? urlParams.get('token') : null);
+      const invToken =
+        urlParams.get('invite_token') || (path.includes('invite') ? urlParams.get('token') : null);
+      const vToken =
+        urlParams.get('verify_token') ||
+        (path.includes('verify-email') ? urlParams.get('token') : null);
 
       if (invToken) {
         invitationToken = invToken;
@@ -120,8 +125,7 @@
 
   async function handleSwitchWorkspace(workspace: UserWorkspace) {
     await workspaceContext.switchWorkspace(workspace);
-    activeDomain =
-      workspace.role === 'OWNER' || workspace.role === 'ADMIN' ? 'dashboard' : 'home';
+    activeDomain = workspace.role === 'OWNER' || workspace.role === 'ADMIN' ? 'dashboard' : 'home';
   }
 
   async function handleLogout() {
@@ -129,7 +133,11 @@
     isAuthenticated = false;
   }
 
-  function handleSelectNav(domain: 'home' | 'dashboard' | 'katalog' | 'tim' | 'finance' | 'settings' | 'presensi' | 'shift', subTab?: string) {
+  function handleSelectNav(
+    domain:
+      'home' | 'dashboard' | 'katalog' | 'tim' | 'finance' | 'settings' | 'presensi' | 'shift',
+    subTab?: string
+  ) {
     activeDomain = domain;
     activeSubTab = subTab || '';
   }
@@ -175,16 +183,16 @@
     }}
   />
 {:else if isCheckingSession}
-  <div class="min-h-screen bg-[#eeece7] flex items-center justify-center font-sans">
-    <div class="text-center space-y-3">
-      <div class="w-8 h-8 bg-[#17171c] rounded-lg mx-auto animate-pulse"></div>
-      <div class="text-xs font-mono text-[#75758a]">Memuat Sesi Pr&eacute;cis...</div>
+  <div class="flex min-h-screen items-center justify-center bg-[#eeece7] font-sans">
+    <div class="space-y-3 text-center">
+      <div class="mx-auto h-8 w-8 animate-pulse rounded-lg bg-[#17171c]"></div>
+      <div class="font-mono text-xs text-[#75758a]">Memuat Sesi Pr&eacute;cis...</div>
     </div>
   </div>
 {:else if !isAuthenticated}
   <LoginView onLoginSuccess={handleLoginSuccess} />
 {:else}
-  <div class="min-h-screen bg-[#eeece7]/40 flex flex-row overflow-x-hidden font-sans select-none">
+  <div class="flex min-h-screen flex-row overflow-x-hidden bg-[#eeece7]/40 font-sans select-none">
     <AppSidebar
       currentUser={workspaceContext.currentUser}
       userWorkspaces={workspaceContext.userWorkspaces}
@@ -198,7 +206,7 @@
       onLogout={handleLogout}
     />
 
-    <div class="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto bg-[#fafafc]">
+    <div class="flex h-screen min-w-0 flex-1 flex-col overflow-y-auto bg-[#fafafc]">
       <AppHeader
         currentUser={workspaceContext.currentUser}
         userWorkspaces={workspaceContext.userWorkspaces}
@@ -209,7 +217,9 @@
         onLogout={handleLogout}
       />
 
-      <main class="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full pb-24 lg:pb-8 min-w-0 overflow-x-hidden">
+      <main
+        class="mx-auto w-full max-w-7xl min-w-0 flex-1 overflow-x-hidden p-4 pb-24 sm:p-6 md:p-8 lg:pb-8"
+      >
         {#if activeDomain === 'dashboard'}
           <DashboardSection
             currentUser={workspaceContext.currentUser}
@@ -218,10 +228,7 @@
             onNavigate={handleSelectNav}
           />
         {:else if activeDomain === 'katalog'}
-          <KatalogSection
-            currentUser={workspaceContext.currentUser}
-            initialSubTab={activeSubTab}
-          />
+          <KatalogSection currentUser={workspaceContext.currentUser} initialSubTab={activeSubTab} />
         {:else if activeDomain === 'tim'}
           <TimSection
             currentUser={workspaceContext.currentUser}

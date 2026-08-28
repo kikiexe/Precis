@@ -67,9 +67,7 @@
     }
   });
 
-  let allModules = $derived<PermissionModule[]>(
-    catalog ? Object.values(catalog.modules) : []
-  );
+  let allModules = $derived<PermissionModule[]>(catalog ? Object.values(catalog.modules) : []);
 
   let totalPermissionsCount = $derived(
     allModules.reduce((acc, m) => acc + Object.keys(m.permissions).length, 0)
@@ -152,47 +150,60 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 font-sans backdrop-blur-xs"
+  >
     <div
-      class="bg-white border border-[#e5e5ea] rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl animate-in fade-in zoom-in-95 overflow-hidden"
+      class="animate-in fade-in zoom-in-95 flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-[#e5e5ea] bg-white shadow-2xl"
     >
       <!-- Modal Header -->
-      <div class="px-6 py-5 border-b border-[#f2f2f4] flex items-center justify-between shrink-0 bg-[#fafafc]">
+      <div
+        class="flex shrink-0 items-center justify-between border-b border-[#f2f2f4] bg-[#fafafc] px-6 py-5"
+      >
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-[#17171c] text-white flex items-center justify-center shadow-xs">
-            <ShieldCheck class="w-5 h-5 text-[#10b981]" />
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#17171c] text-white shadow-xs"
+          >
+            <ShieldCheck class="h-5 w-5 text-[#10b981]" />
           </div>
           <div>
             <h3 class="text-base font-bold text-[#17171c]">
               {roleToEdit ? 'Ubah Akses Role' : 'Buat Role Baru'}
             </h3>
             <p class="text-xs text-[#8e8e93]">
-              {roleToEdit ? `Sesuaikan checklist akses untuk role "${roleToEdit.name}"` : 'Tentukan kewenangan fitur untuk role baru'}
+              {roleToEdit
+                ? `Sesuaikan checklist akses untuk role "${roleToEdit.name}"`
+                : 'Tentukan kewenangan fitur untuk role baru'}
             </p>
           </div>
         </div>
         <button
           type="button"
           onclick={onClose}
-          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all"
+          class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="w-5 h-5" />
+          <X class="h-5 w-5" />
         </button>
       </div>
 
       <!-- Modal Body (Scrollable) -->
-      <div class="flex-1 overflow-y-auto p-5 sm:p-7 space-y-6">
+      <div class="flex-1 space-y-6 overflow-y-auto p-5 sm:p-7">
         {#if errorMessage}
-          <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] text-[#991b1b] text-xs rounded-2xl flex items-center gap-2 font-medium">
-            <AlertTriangle class="w-4 h-4 shrink-0" />
+          <div
+            class="flex items-center gap-2 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
+          >
+            <AlertTriangle class="h-4 w-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         {/if}
 
         <!-- Role Basic Info Form -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div class="space-y-1.5">
-            <label for="role-name-input" class="text-xs font-bold text-[#17171c] flex items-center gap-1">
+            <label
+              for="role-name-input"
+              class="flex items-center gap-1 text-xs font-bold text-[#17171c]"
+            >
               Nama Role <span class="text-red-500">*</span>
             </label>
             <input
@@ -201,7 +212,7 @@
               bind:value={formName}
               placeholder="Contoh: Head Barista, Supervisor Shift"
               disabled={roleToEdit?.is_system}
-              class="w-full px-4 py-2.5 text-xs bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden disabled:bg-[#f5f5f7] disabled:text-[#8e8e93] transition-all shadow-2xs"
+              class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden disabled:bg-[#f5f5f7] disabled:text-[#8e8e93]"
             />
             {#if roleToEdit?.is_system}
               <p class="text-[11px] text-[#8e8e93]">Nama role bawaan sistem dilindungi.</p>
@@ -217,7 +228,7 @@
               type="text"
               bind:value={formDescription}
               placeholder="Ringkasan tugas utama role ini"
-              class="w-full px-4 py-2.5 text-xs bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+              class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
             />
           </div>
         </div>
@@ -225,7 +236,7 @@
         <!-- Grouped Permissions Checkbox Matrix -->
         <div class="space-y-4">
           <div class="flex items-center justify-between">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-[#8e8e93]">
+            <h4 class="text-xs font-bold tracking-wider text-[#8e8e93] uppercase">
               Checklist Hak Akses Modul ({selectedPermissions.length}/{totalPermissionsCount} Terpilih)
             </h4>
           </div>
@@ -235,28 +246,32 @@
               {@const IconComp = getModuleIcon(mod.id)}
               {@const isAll = isModuleAllChecked(mod)}
               {@const isPartial = isModulePartialChecked(mod)}
-              <div class="border border-[#e5e5ea] rounded-2xl overflow-hidden bg-white shadow-2xs">
+              <div class="overflow-hidden rounded-2xl border border-[#e5e5ea] bg-white shadow-2xs">
                 <!-- Module Header -->
-                <div class="px-5 py-3.5 bg-[#fafafc] border-b border-[#f0f0f4] flex items-center justify-between">
-                  <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-8 h-8 rounded-xl bg-white border border-[#e5e5ea] flex items-center justify-center shrink-0">
-                      <IconComp class="w-4 h-4 text-[#17171c]" />
+                <div
+                  class="flex items-center justify-between border-b border-[#f0f0f4] bg-[#fafafc] px-5 py-3.5"
+                >
+                  <div class="flex min-w-0 items-center gap-3">
+                    <div
+                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-[#e5e5ea] bg-white"
+                    >
+                      <IconComp class="h-4 w-4 text-[#17171c]" />
                     </div>
                     <div class="min-w-0">
                       <div class="text-xs font-bold text-[#17171c]">{mod.name}</div>
-                      <div class="text-[11px] text-[#8e8e93] truncate">{mod.description}</div>
+                      <div class="truncate text-[11px] text-[#8e8e93]">{mod.description}</div>
                     </div>
                   </div>
 
                   <button
                     type="button"
                     onclick={() => toggleModuleAll(mod)}
-                    class={`px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer shrink-0 ${
+                    class={`shrink-0 cursor-pointer rounded-full border px-3 py-1 text-xs font-semibold transition-all ${
                       isAll
-                        ? 'bg-[#ecfdf5] text-[#059669] border-[#a7f3d0]'
+                        ? 'border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]'
                         : isPartial
-                        ? 'bg-[#fffbeb] text-[#d97706] border-[#fef3c7]'
-                        : 'bg-white text-[#686873] border-[#e5e5ea] hover:border-[#17171c]'
+                          ? 'border-[#fef3c7] bg-[#fffbeb] text-[#d97706]'
+                          : 'border-[#e5e5ea] bg-white text-[#686873] hover:border-[#17171c]'
                     }`}
                   >
                     {isAll ? 'Semua Aktif' : isPartial ? 'Sebagian' : 'Pilih Semua'}
@@ -268,12 +283,12 @@
                   {#each Object.entries(mod.permissions) as [permSlug, permItem]}
                     {@const isChecked = isPermissionChecked(permSlug)}
                     <label
-                      class={`flex items-start gap-3.5 p-3 rounded-xl transition-all cursor-pointer select-none ${
+                      class={`flex cursor-pointer items-start gap-3.5 rounded-xl p-3 transition-all select-none ${
                         isChecked ? 'bg-[#fafafc]' : 'hover:bg-[#f9f9fb]'
                       }`}
                     >
                       <!-- Custom Checkbox -->
-                      <div class="pt-0.5 shrink-0">
+                      <div class="shrink-0 pt-0.5">
                         <input
                           type="checkbox"
                           checked={isChecked}
@@ -281,30 +296,34 @@
                           class="sr-only"
                         />
                         <div
-                          class={`w-4 h-4 rounded-md flex items-center justify-center transition-all ${
+                          class={`flex h-4 w-4 items-center justify-center rounded-md transition-all ${
                             isChecked
                               ? 'bg-[#17171c] text-white'
                               : 'border border-[#d1d1d6] bg-white hover:border-[#17171c]'
                           }`}
                         >
                           {#if isChecked}
-                            <Check class="w-3 h-3 stroke-[3]" />
+                            <Check class="h-3 w-3 stroke-[3]" />
                           {/if}
                         </div>
                       </div>
 
                       <!-- Permission Info -->
-                      <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap">
+                      <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
                           <span class="text-xs font-bold text-[#17171c]">{permItem.name}</span>
                           {#if permItem.is_high_risk}
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-[#fee2e2] text-[#991b1b] uppercase">
-                              <AlertTriangle class="w-2.5 h-2.5" />
+                            <span
+                              class="inline-flex items-center gap-1 rounded-full bg-[#fee2e2] px-2 py-0.5 text-[9.5px] font-bold text-[#991b1b] uppercase"
+                            >
+                              <AlertTriangle class="h-2.5 w-2.5" />
                               Sensitif
                             </span>
                           {/if}
                         </div>
-                        <p class="text-xs text-[#686873] mt-0.5 leading-relaxed">{permItem.description}</p>
+                        <p class="mt-0.5 text-xs leading-relaxed text-[#686873]">
+                          {permItem.description}
+                        </p>
                       </div>
                     </label>
                   {/each}
@@ -316,15 +335,17 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="px-6 py-4 border-t border-[#f2f2f4] bg-[#fafafc] flex items-center justify-between shrink-0">
-        <div class="text-xs text-[#8e8e93] font-mono">
-          <strong class="text-[#17171c] font-bold">{selectedPermissions.length}</strong> izin dipilih
+      <div
+        class="flex shrink-0 items-center justify-between border-t border-[#f2f2f4] bg-[#fafafc] px-6 py-4"
+      >
+        <div class="font-mono text-xs text-[#8e8e93]">
+          <strong class="font-bold text-[#17171c]">{selectedPermissions.length}</strong> izin dipilih
         </div>
         <div class="flex gap-2.5">
           <button
             type="button"
             onclick={onClose}
-            class="px-4 py-2.5 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] rounded-full text-[#686873] cursor-pointer transition-all"
+            class="cursor-pointer rounded-full border border-[#e5e5ea] px-4 py-2.5 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
           >
             Batal
           </button>
@@ -332,12 +353,12 @@
             type="button"
             onclick={handleSubmit}
             disabled={isSubmitting}
-            class="px-6 py-2.5 text-xs font-semibold bg-[#17171c] hover:bg-black text-white rounded-full cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-xs transition-all"
+            class="flex cursor-pointer items-center gap-1.5 rounded-full bg-[#17171c] px-6 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
           >
             {#if isSubmitting}
               <span>Menyimpan...</span>
             {:else}
-              <Check class="w-4 h-4" />
+              <Check class="h-4 w-4" />
               <span>{roleToEdit ? 'Simpan Perubahan' : 'Buat Role'}</span>
             {/if}
           </button>

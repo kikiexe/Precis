@@ -11,7 +11,8 @@
     "./defaults": "./src/defaults.ts"
   },
   "scripts": {
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "test": "vitest run"
   },
   "devDependencies": {
     "typescript": "^5.7.3"

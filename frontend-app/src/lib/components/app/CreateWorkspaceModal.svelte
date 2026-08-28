@@ -38,15 +38,21 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans select-none">
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl w-full max-w-lg p-6 sm:p-7 space-y-5 shadow-xl animate-in fade-in zoom-in-95 duration-150">
-      <div class="flex items-center justify-between pb-3 border-b border-[#f2f2f4]">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 font-sans backdrop-blur-xs select-none"
+  >
+    <div
+      class="animate-in fade-in zoom-in-95 w-full max-w-lg space-y-5 rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-xl duration-150 sm:p-7"
+    >
+      <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-[#17171c] text-white flex items-center justify-center">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#17171c] text-white"
+          >
             {#if isOnboarding}
-              <Sparkles class="w-5 h-5 text-[#34d399]" />
+              <Sparkles class="h-5 w-5 text-[#34d399]" />
             {:else}
-              <Building2 class="w-5 h-5" />
+              <Building2 class="h-5 w-5" />
             {/if}
           </div>
           <div>
@@ -54,7 +60,9 @@
               {isOnboarding ? 'Selamat Datang! Siapkan Usaha Anda' : 'Buat Workspace Bisnis Baru'}
             </h3>
             <p class="text-xs text-[#8e8e93]">
-              {isOnboarding ? 'Mulai trial 14 hari dengan brand & outlet pertama Anda' : 'Tambah brand F&B baru di bawah akun langganan Anda'}
+              {isOnboarding
+                ? 'Mulai trial 14 hari dengan brand & outlet pertama Anda'
+                : 'Tambah brand F&B baru di bawah akun langganan Anda'}
             </p>
           </div>
         </div>
@@ -62,41 +70,49 @@
           <button
             type="button"
             onclick={onClose}
-            class="p-2 rounded-xl text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] cursor-pointer transition-all"
+            class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
           >
-            <X class="w-5 h-5" />
+            <X class="h-5 w-5" />
           </button>
         {/if}
       </div>
 
       {#if errorMessage}
-        <div class="p-3.5 bg-[#fef2f2] text-[#991b1b] text-xs font-medium rounded-xl border border-[#fecaca]">
+        <div
+          class="rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
+        >
           {errorMessage}
         </div>
       {/if}
 
       <div class="space-y-4 text-xs">
         <div class="space-y-1.5">
-          <label for="ws-name" class="block font-bold text-[#17171c]">Nama Workspace / Brand Usaha</label>
+          <label for="ws-name" class="block font-bold text-[#17171c]"
+            >Nama Workspace / Brand Usaha</label
+          >
           <input
             id="ws-name"
             type="text"
             bind:value={workspaceName}
             placeholder="Contoh: Kopi Senja Artisan"
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
 
         <div class="space-y-1.5">
-          <label for="branch-name" class="block font-bold text-[#17171c]">Nama Cabang Outlet Pertama</label>
+          <label for="branch-name" class="block font-bold text-[#17171c]"
+            >Nama Cabang Outlet Pertama</label
+          >
           <input
             id="branch-name"
             type="text"
             bind:value={branchName}
             placeholder="Contoh: Outlet Sleman #01"
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
-          <span class="text-[11px] text-[#8e8e93]">Outlet pertama akan otomatis disiapkan untuk POS kasir dan GPS presensi.</span>
+          <span class="text-[11px] text-[#8e8e93]"
+            >Outlet pertama akan otomatis disiapkan untuk POS kasir dan GPS presensi.</span
+          >
         </div>
       </div>
 
@@ -105,7 +121,7 @@
           <button
             type="button"
             onclick={onClose}
-            class="flex-1 py-3 border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] text-xs font-semibold rounded-full cursor-pointer transition-all"
+            class="flex-1 cursor-pointer rounded-full border border-[#e5e5ea] py-3 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
           >
             Batal
           </button>
@@ -114,15 +130,15 @@
           type="button"
           disabled={isSubmitting || !workspaceName.trim()}
           onclick={handleCreate}
-          class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
+          class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
         >
           {#if isSubmitting}
             <span>Membuat Workspace...</span>
           {:else if isOnboarding}
             <span>Mulai Gunakan Précis</span>
-            <ArrowRight class="w-4 h-4" />
+            <ArrowRight class="h-4 w-4" />
           {:else}
-            <Plus class="w-4 h-4" />
+            <Plus class="h-4 w-4" />
             <span>Buat Workspace</span>
           {/if}
         </button>

@@ -23,7 +23,10 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-export function generateReceiptText(order: OfflineOrder, options: PrintReceiptOptions = defaultPrintOptions): string {
+export function generateReceiptText(
+  order: OfflineOrder,
+  options: PrintReceiptOptions = defaultPrintOptions
+): string {
   const line = '--------------------------------';
   const doubleLine = '================================';
   const center = (text: string, width = 32) => {
@@ -43,7 +46,13 @@ export function generateReceiptText(order: OfflineOrder, options: PrintReceiptOp
   text += row('No:', order.order_number) + '\n';
   text += row('Tgl:', new Date(order.created_at).toLocaleString('id-ID')) + '\n';
   text += row('Kasir:', order.cashier_name) + '\n';
-  text += row('Tipe:', order.order_type === 'DINE_IN' ? `Dine In (Meja ${order.table_number || '-'})` : order.order_type) + '\n';
+  text +=
+    row(
+      'Tipe:',
+      order.order_type === 'DINE_IN'
+        ? `Dine In (Meja ${order.table_number || '-'})`
+        : order.order_type
+    ) + '\n';
   if (order.customer_name) {
     text += row('Pelanggan:', order.customer_name) + '\n';
   }
@@ -52,7 +61,11 @@ export function generateReceiptText(order: OfflineOrder, options: PrintReceiptOp
 
   order.items.forEach((item) => {
     text += `${item.product_name}\n`;
-    text += row(`  ${item.quantity} x ${formatCurrency(item.unit_price)}`, formatCurrency(item.subtotal)) + '\n';
+    text +=
+      row(
+        `  ${item.quantity} x ${formatCurrency(item.unit_price)}`,
+        formatCurrency(item.subtotal)
+      ) + '\n';
     if (item.notes) {
       text += `  * ${item.notes}\n`;
     }

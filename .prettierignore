@@ -1,0 +1,9 @@
+node_modules
+dist
+build
+backend
+vendor
+.git
+.tempmediaStorage
+.user_uploaded
+pnpm-lock.yaml

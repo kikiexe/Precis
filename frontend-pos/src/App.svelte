@@ -84,14 +84,10 @@
   );
 
   let calculatedDiscountAmount = $derived(
-    discountPercent > 0
-      ? Math.round((subtotalAmount * discountPercent) / 100)
-      : discountNominal
+    discountPercent > 0 ? Math.round((subtotalAmount * discountPercent) / 100) : discountNominal
   );
 
-  let finalPayableAmount = $derived(
-    Math.max(0, subtotalAmount - calculatedDiscountAmount)
-  );
+  let finalPayableAmount = $derived(Math.max(0, subtotalAmount - calculatedDiscountAmount));
 
   onMount(() => {
     // daftarkan interceptor token tidak sah untuk membuka modal pairing
@@ -397,7 +393,7 @@
   }
 </script>
 
-<div class="h-screen w-screen bg-[#f4f4f4] flex flex-row overflow-hidden font-sans select-none">
+<div class="flex h-screen w-screen flex-row overflow-hidden bg-[#f4f4f4] font-sans select-none">
   <!-- navigasi sidebar kiosk -->
   <PosSidebar
     {activePage}
@@ -407,9 +403,9 @@
   />
 
   <!-- area workspace utama -->
-  <div class="flex-1 flex flex-col h-full overflow-hidden">
+  <div class="flex h-full flex-1 flex-col overflow-hidden">
     <!-- area tampilan aktif -->
-    <main class="flex-1 flex overflow-hidden">
+    <main class="flex flex-1 overflow-hidden">
       {#if activePage === 'penjualan'}
         <PenjualanView
           {categories}
@@ -442,10 +438,7 @@
           onOpenPaymentModal={() => (isPaymentModalOpen = true)}
         />
       {:else if activePage === 'transaksi'}
-        <TransaksiView
-          orders={allOrders}
-          onPrintOrder={handlePrintOrderDirect}
-        />
+        <TransaksiView orders={allOrders} onPrintOrder={handlePrintOrderDirect} />
       {:else if activePage === 'shift'}
         <ShiftView
           {activeSession}
@@ -457,7 +450,7 @@
         <SettlementView
           {activeSession}
           {activeCashier}
-          closedSessions={closedSessions}
+          {closedSessions}
           onGoToShift={() => (activePage = 'shift')}
         />
       {:else if activePage === 'menu'}
@@ -532,10 +525,7 @@
 />
 
 <!-- modal pairing perangkat tablet -->
-<DevicePairingModal
-  isOpen={isPairingModalOpen}
-  onSuccess={handlePairingSuccess}
-/>
+<DevicePairingModal isOpen={isPairingModalOpen} onSuccess={handlePairingSuccess} />
 
 <!-- modal daftar open bills / pesanan tertahan -->
 <OpenBillsModal

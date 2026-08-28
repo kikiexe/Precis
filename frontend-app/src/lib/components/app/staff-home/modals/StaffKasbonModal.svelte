@@ -50,63 +50,79 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-xl space-y-5 animate-in fade-in zoom-in-95">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 font-sans backdrop-blur-xs"
+  >
+    <div
+      class="animate-in fade-in zoom-in-95 w-full max-w-lg space-y-5 rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-xl sm:p-7"
+    >
       <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-[#ecfdf5] text-[#059669] flex items-center justify-center border border-[#a7f3d0]">
-            <Wallet class="w-5 h-5" />
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
+          >
+            <Wallet class="h-5 w-5" />
           </div>
           <div>
-            <h3 class="font-bold text-base text-[#17171c]">Pengajuan Kasbon Staf</h3>
+            <h3 class="text-base font-bold text-[#17171c]">Pengajuan Kasbon Staf</h3>
             <p class="text-xs text-[#8e8e93]">Pengajuan pinjaman dipotong pada slip gaji bulanan</p>
           </div>
         </div>
         <button
           type="button"
           onclick={onClose}
-          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all"
+          class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="w-5 h-5" />
+          <X class="h-5 w-5" />
         </button>
       </div>
 
       {#if kasbonErrorMessage}
-        <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] rounded-xl text-[#991b1b] text-xs font-medium flex items-start gap-2">
-          <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
+        <div
+          class="flex items-start gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
+        >
+          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
           <span>{kasbonErrorMessage}</span>
         </div>
       {/if}
 
       {#if kasbonSuccessMessage}
-        <div class="p-3.5 bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl text-[#065f46] text-xs font-semibold flex items-start gap-2">
-          <Check class="w-4 h-4 shrink-0 mt-0.5" />
+        <div
+          class="flex items-start gap-2 rounded-xl border border-[#a7f3d0] bg-[#ecfdf5] p-3.5 text-xs font-semibold text-[#065f46]"
+        >
+          <Check class="mt-0.5 h-4 w-4 shrink-0" />
           <span>{kasbonSuccessMessage}</span>
         </div>
       {/if}
 
       <div class="space-y-4 text-xs">
         <div class="space-y-1.5">
-          <label for="modal-kasbon-amount" class="block font-bold text-[#17171c]">Nominal Pinjaman Kasbon (IDR)</label>
+          <label for="modal-kasbon-amount" class="block font-bold text-[#17171c]"
+            >Nominal Pinjaman Kasbon (IDR)</label
+          >
           <input
             id="modal-kasbon-amount"
             type="number"
             bind:value={kasbonAmount}
             step="50000"
             min="50000"
-            class="w-full border border-[#e5e5ea] rounded-xl px-4 py-2.5 bg-[#f8f8fa] hover:bg-white font-mono text-sm text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-sm text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
-          <span class="text-[11px] text-[#8e8e93] block">Otomatis dipotong pada slip gaji periode payroll berikutnya.</span>
+          <span class="block text-[11px] text-[#8e8e93]"
+            >Otomatis dipotong pada slip gaji periode payroll berikutnya.</span
+          >
         </div>
 
         <div class="space-y-1.5">
-          <label for="modal-kasbon-purpose" class="block font-bold text-[#17171c]">Keperluan / Keterangan</label>
+          <label for="modal-kasbon-purpose" class="block font-bold text-[#17171c]"
+            >Keperluan / Keterangan</label
+          >
           <input
             id="modal-kasbon-purpose"
             type="text"
             bind:value={kasbonPurpose}
             placeholder="Contoh: Kebutuhan medis darurat, servis motor"
-            class="w-full border border-[#e5e5ea] rounded-xl px-4 py-2.5 bg-[#f8f8fa] hover:bg-white text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-xs text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
       </div>
@@ -115,7 +131,7 @@
         <button
           type="button"
           onclick={onClose}
-          class="flex-1 py-3 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] rounded-full text-[#686873] cursor-pointer transition-all"
+          class="flex-1 cursor-pointer rounded-full border border-[#e5e5ea] py-3 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
         >
           Batal
         </button>
@@ -123,12 +139,12 @@
           type="button"
           disabled={isSubmittingKasbon || kasbonAmount <= 0}
           onclick={handleConfirmKasbon}
-          class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
+          class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
         >
           {#if isSubmittingKasbon}
             <span>Mengajukan...</span>
           {:else}
-            <Send class="w-4 h-4" />
+            <Send class="h-4 w-4" />
             <span>Kirim Pengajuan</span>
           {/if}
         </button>

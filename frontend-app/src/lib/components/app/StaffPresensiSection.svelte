@@ -101,12 +101,14 @@
     const latDelta = latTo - latFrom;
     const lngDelta = lngTo - lngFrom;
 
-    const angle = 2 * Math.asin(
-      Math.sqrt(
-        Math.sin(latDelta / 2) ** 2 +
-        Math.cos(latFrom) * Math.cos(latTo) * Math.sin(lngDelta / 2) ** 2
-      )
-    );
+    const angle =
+      2 *
+      Math.asin(
+        Math.sqrt(
+          Math.sin(latDelta / 2) ** 2 +
+            Math.cos(latFrom) * Math.cos(latTo) * Math.sin(lngDelta / 2) ** 2
+        )
+      );
 
     return Math.round(angle * EARTH_RADIUS_METERS * 100) / 100;
   }
@@ -149,14 +151,15 @@
 
     const updateTime = () => {
       const now = new Date();
-      liveTimestamp = now.toLocaleDateString('id-ID', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      }) + ' WIB';
+      liveTimestamp =
+        now.toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }) + ' WIB';
     };
     updateTime();
     timeInterval = setInterval(updateTime, 1000);
@@ -203,7 +206,8 @@
       (err) => {
         isCheckingGps = false;
         if (err.code === 1) {
-          gpsErrorMessage = 'Izin akses lokasi (GPS) ditolak. Aktifkan izin lokasi pada browser/perangkat Anda.';
+          gpsErrorMessage =
+            'Izin akses lokasi (GPS) ditolak. Aktifkan izin lokasi pada browser/perangkat Anda.';
         } else if (err.code === 2) {
           gpsErrorMessage = 'Lokasi GPS tidak dapat diperoleh. Pastikan GPS perangkat Anda aktif.';
         } else {
@@ -294,7 +298,10 @@
         const videoRatio = vW / vH;
         const targetRatio = 3 / 4;
 
-        let sX = 0, sY = 0, sW = vW, sH = vH;
+        let sX = 0,
+          sY = 0,
+          sW = vW,
+          sH = vH;
         if (videoRatio > targetRatio) {
           sW = vH * targetRatio;
           sX = (vW - sW) / 2;
@@ -322,7 +329,11 @@
           ctx.fillStyle = '#ffffff';
           ctx.font = 'bold 24px sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText(`SELFIE PRESENSI (${currentUser.name})`, targetWidth / 2, targetHeight / 2 - 20);
+          ctx.fillText(
+            `SELFIE PRESENSI (${currentUser.name})`,
+            targetWidth / 2,
+            targetHeight / 2 - 20
+          );
 
           ctx.font = '16px monospace';
           ctx.fillStyle = '#93939f';
@@ -454,7 +465,7 @@
   }
 </script>
 
-<div class="max-w-md mx-auto font-sans pb-8 space-y-4">
+<div class="mx-auto max-w-md space-y-4 pb-8 font-sans">
   <!-- Top Navigation & Action Mode Selector -->
   <div class="flex items-center justify-between gap-2 px-1">
     <div class="flex items-center gap-3">
@@ -462,25 +473,29 @@
         <button
           type="button"
           onclick={onNavigateHome}
-          class="p-2.5 rounded-2xl bg-white border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#17171c] cursor-pointer transition-all shadow-2xs"
+          class="cursor-pointer rounded-2xl border border-[#e5e5ea] bg-white p-2.5 text-[#17171c] shadow-2xs transition-all hover:bg-[#f4f4f6]"
           title="Kembali ke Home"
         >
-          <ArrowLeft class="w-4 h-4" />
+          <ArrowLeft class="h-4 w-4" />
         </button>
       {/if}
       <div>
         <h1 class="text-base font-bold text-[#17171c]">Kamera Presensi</h1>
-        <p class="text-xs font-mono text-[#8e8e93]">{activeBranch.name}</p>
+        <p class="font-mono text-xs text-[#8e8e93]">{activeBranch.name}</p>
       </div>
     </div>
 
     <!-- Mode Selector: Clock-In vs Clock-Out -->
-    <div class="flex items-center p-1 bg-[#f4f4f6] rounded-full border border-[#e5e5ea] text-xs font-mono font-semibold">
+    <div
+      class="flex items-center rounded-full border border-[#e5e5ea] bg-[#f4f4f6] p-1 font-mono text-xs font-semibold"
+    >
       <button
         type="button"
         onclick={() => (actionType = 'CLOCK_IN')}
-        class={`px-3 py-1.5 rounded-full transition-all cursor-pointer ${
-          actionType === 'CLOCK_IN' ? 'bg-[#059669] text-white shadow-xs' : 'text-[#686873] hover:text-[#17171c]'
+        class={`cursor-pointer rounded-full px-3 py-1.5 transition-all ${
+          actionType === 'CLOCK_IN'
+            ? 'bg-[#059669] text-white shadow-xs'
+            : 'text-[#686873] hover:text-[#17171c]'
         }`}
       >
         Masuk
@@ -488,8 +503,10 @@
       <button
         type="button"
         onclick={() => (actionType = 'CLOCK_OUT')}
-        class={`px-3 py-1.5 rounded-full transition-all cursor-pointer ${
-          actionType === 'CLOCK_OUT' ? 'bg-[#e5484d] text-white shadow-xs' : 'text-[#686873] hover:text-[#17171c]'
+        class={`cursor-pointer rounded-full px-3 py-1.5 transition-all ${
+          actionType === 'CLOCK_OUT'
+            ? 'bg-[#e5484d] text-white shadow-xs'
+            : 'text-[#686873] hover:text-[#17171c]'
         }`}
       >
         Keluar
@@ -499,9 +516,13 @@
 
   {#if successRecord}
     <!-- Success Celebration View -->
-    <div class="bg-white border border-[#a7f3d0] rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-xl animate-in zoom-in-95">
-      <div class="w-16 h-16 rounded-3xl bg-[#ecfdf5] text-[#059669] flex items-center justify-center mx-auto border border-[#a7f3d0]">
-        <CheckCircle2 class="w-8 h-8" />
+    <div
+      class="animate-in zoom-in-95 space-y-5 rounded-3xl border border-[#a7f3d0] bg-white p-6 text-center shadow-xl sm:p-8"
+    >
+      <div
+        class="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
+      >
+        <CheckCircle2 class="h-8 w-8" />
       </div>
 
       <div class="space-y-1">
@@ -509,22 +530,26 @@
           {actionType === 'CLOCK_IN' ? 'Presensi Masuk Berhasil!' : 'Presensi Keluar Berhasil!'}
         </h2>
         <p class="text-xs text-[#8e8e93]">
-          Tercatat pada <strong class="font-mono text-[#17171c]">{successRecord.clock_in_time || liveTimestamp}</strong>
+          Tercatat pada <strong class="font-mono text-[#17171c]"
+            >{successRecord.clock_in_time || liveTimestamp}</strong
+          >
         </p>
       </div>
 
       {#if capturedPhotoUrl}
-        <div class="w-36 aspect-[3/4] rounded-2xl overflow-hidden border border-[#e5e5ea] mx-auto shadow-sm bg-[#17171c]">
-          <img src={capturedPhotoUrl} alt="Selfie Presensi" class="w-full h-full object-cover" />
+        <div
+          class="mx-auto aspect-[3/4] w-36 overflow-hidden rounded-2xl border border-[#e5e5ea] bg-[#17171c] shadow-sm"
+        >
+          <img src={capturedPhotoUrl} alt="Selfie Presensi" class="h-full w-full object-cover" />
         </div>
       {/if}
 
-      <div class="pt-2 flex flex-col gap-2.5">
+      <div class="flex flex-col gap-2.5 pt-2">
         {#if onNavigateHome}
           <button
             type="button"
             onclick={onNavigateHome}
-            class="w-full py-3 bg-[#17171c] hover:bg-black text-white font-semibold text-xs rounded-full cursor-pointer transition-all shadow-xs"
+            class="w-full cursor-pointer rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
           >
             Kembali ke Dashboard Home
           </button>
@@ -539,7 +564,7 @@
               startCamera();
             }
           }}
-          class="w-full py-2.5 text-xs font-semibold border border-[#e5e5ea] text-[#686873] hover:bg-[#f4f4f6] rounded-full cursor-pointer transition-all"
+          class="w-full cursor-pointer rounded-full border border-[#e5e5ea] py-2.5 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
         >
           Ambil Foto Baru
         </button>
@@ -547,9 +572,11 @@
     </div>
   {:else if isCheckingGps}
     <!-- GPS Loading Screen -->
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl p-8 text-center space-y-4 shadow-2xs">
-      <div class="w-14 h-14 rounded-2xl bg-[#f4f4f6] text-[#17171c] flex items-center justify-center mx-auto">
-        <Navigation class="w-6 h-6 animate-spin text-[#1863dc]" />
+    <div class="space-y-4 rounded-3xl border border-[#e5e5ea] bg-white p-8 text-center shadow-2xs">
+      <div
+        class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#17171c]"
+      >
+        <Navigation class="h-6 w-6 animate-spin text-[#1863dc]" />
       </div>
       <div class="space-y-1">
         <h3 class="text-sm font-bold text-[#17171c]">Memverifikasi Lokasi GPS Toko</h3>
@@ -560,13 +587,15 @@
     </div>
   {:else if gpsErrorMessage}
     <!-- GPS Error / Permission Denied Guard Screen -->
-    <div class="bg-white border border-[#fecaca] rounded-3xl p-7 text-center space-y-5 shadow-2xs">
-      <div class="w-14 h-14 rounded-2xl bg-[#fef2f2] text-[#e5484d] flex items-center justify-center mx-auto border border-[#fecaca]">
-        <Lock class="w-6 h-6" />
+    <div class="space-y-5 rounded-3xl border border-[#fecaca] bg-white p-7 text-center shadow-2xs">
+      <div
+        class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#fecaca] bg-[#fef2f2] text-[#e5484d]"
+      >
+        <Lock class="h-6 w-6" />
       </div>
       <div class="space-y-1.5">
         <h3 class="text-sm font-bold text-[#17171c]">Izin Lokasi (GPS) Diperlukan</h3>
-        <p class="text-xs text-[#8e8e93] leading-relaxed">
+        <p class="text-xs leading-relaxed text-[#8e8e93]">
           {gpsErrorMessage}
         </p>
       </div>
@@ -574,52 +603,59 @@
       <button
         type="button"
         onclick={detectGps}
-        class="w-full py-2.5 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-xs"
+        class="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-full bg-[#17171c] py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
       >
-        <RefreshCw class="w-3.5 h-3.5" />
+        <RefreshCw class="h-3.5 w-3.5" />
         <span>Deteksi Ulang GPS</span>
       </button>
     </div>
   {:else if !isInsideRadius}
     <!-- CAMERA ACCESS BLOCKED: OUTSIDE GEOFENCE RADIUS -->
-    <div class="bg-white border border-[#fecaca] rounded-3xl p-6 sm:p-7 space-y-5 shadow-2xs animate-in fade-in">
-      <div class="text-center space-y-3">
-        <div class="w-16 h-16 rounded-3xl bg-[#fef2f2] text-[#e5484d] flex items-center justify-center mx-auto border border-[#fecaca] shadow-xs">
-          <ShieldAlert class="w-8 h-8" />
+    <div
+      class="animate-in fade-in space-y-5 rounded-3xl border border-[#fecaca] bg-white p-6 shadow-2xs sm:p-7"
+    >
+      <div class="space-y-3 text-center">
+        <div
+          class="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-[#fecaca] bg-[#fef2f2] text-[#e5484d] shadow-xs"
+        >
+          <ShieldAlert class="h-8 w-8" />
         </div>
 
         <div class="space-y-1">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fef2f2] text-[#dc2626] border border-[#fecaca] text-[10.5px] font-mono font-bold">
-            <span class="w-1.5 h-1.5 rounded-full bg-[#dc2626] animate-ping"></span>
+          <span
+            class="inline-flex items-center gap-1.5 rounded-full border border-[#fecaca] bg-[#fef2f2] px-3 py-1 font-mono text-[10.5px] font-bold text-[#dc2626]"
+          >
+            <span class="h-1.5 w-1.5 animate-ping rounded-full bg-[#dc2626]"></span>
             DI LUAR RADIUS TOKO
           </span>
-          <h2 class="text-base font-bold text-[#17171c] pt-1">Akses Kamera Terkunci</h2>
-          <p class="text-xs text-[#8e8e93] leading-relaxed">
-            Kamera presensi tidak dapat diakses karena Anda berada di luar radius toko yang ditentukan.
+          <h2 class="pt-1 text-base font-bold text-[#17171c]">Akses Kamera Terkunci</h2>
+          <p class="text-xs leading-relaxed text-[#8e8e93]">
+            Kamera presensi tidak dapat diakses karena Anda berada di luar radius toko yang
+            ditentukan.
           </p>
         </div>
       </div>
 
       <!-- Distance & Coordinates Comparison Box -->
-      <div class="bg-[#f8f8fa] border border-[#e5e5ea] rounded-2xl p-4 space-y-3 text-xs">
-        <div class="flex items-center justify-between pb-2.5 border-b border-[#ececee]">
+      <div class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-[#f8f8fa] p-4 text-xs">
+        <div class="flex items-center justify-between border-b border-[#ececee] pb-2.5">
           <span class="text-[#8e8e93]">Toko Penugasan</span>
           <strong class="text-[#17171c]">{activeBranch.name}</strong>
         </div>
 
-        <div class="flex items-center justify-between pb-2.5 border-b border-[#ececee]">
+        <div class="flex items-center justify-between border-b border-[#ececee] pb-2.5">
           <span class="text-[#8e8e93]">Batas Radius Diizinkan</span>
           <span class="font-mono font-bold text-[#059669]">{activeBranch.radius_meters} meter</span>
         </div>
 
-        <div class="flex items-center justify-between pb-2.5 border-b border-[#ececee]">
+        <div class="flex items-center justify-between border-b border-[#ececee] pb-2.5">
           <span class="text-[#8e8e93]">Jarak Anda Saat Ini</span>
           <span class="font-mono font-bold text-[#dc2626]">
             {distanceMeters !== null ? `${Math.round(distanceMeters)} meter` : 'Tidak terdeteksi'}
           </span>
         </div>
 
-        <div class="flex items-center justify-between text-[11px] font-mono text-[#8e8e93]">
+        <div class="flex items-center justify-between font-mono text-[11px] text-[#8e8e93]">
           <span>Koordinat Anda:</span>
           <span>{latitude?.toFixed(5)}, {longitude?.toFixed(5)}</span>
         </div>
@@ -629,9 +665,9 @@
         <button
           type="button"
           onclick={detectGps}
-          class="w-full py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all flex items-center justify-center gap-2 shadow-xs"
+          class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
         >
-          <RefreshCw class="w-3.5 h-3.5" />
+          <RefreshCw class="h-3.5 w-3.5" />
           <span>Perbarui Posisi GPS</span>
         </button>
 
@@ -639,7 +675,7 @@
           <button
             type="button"
             onclick={onNavigateHome}
-            class="w-full py-2.5 border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] text-xs font-semibold rounded-full cursor-pointer transition-all"
+            class="w-full cursor-pointer rounded-full border border-[#e5e5ea] py-2.5 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
           >
             Kembali ke Beranda
           </button>
@@ -649,7 +685,9 @@
   {:else}
     <!-- CAMERA ACCESS GRANTED: INSIDE RADIUS -->
     <!-- 3:4 Camera Viewfinder Container -->
-    <div class="relative aspect-[3/4] w-full bg-black rounded-3xl overflow-hidden shadow-2xl border border-[#e5e5ea] flex flex-col justify-between p-4 select-none">
+    <div
+      class="relative flex aspect-[3/4] w-full flex-col justify-between overflow-hidden rounded-3xl border border-[#e5e5ea] bg-black p-4 shadow-2xl select-none"
+    >
       {#if !capturedPhotoUrl}
         <!-- Live Video Element -->
         <video
@@ -657,15 +695,19 @@
           autoplay
           playsinline
           muted
-          class={`absolute inset-0 w-full h-full object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
+          class={`absolute inset-0 h-full w-full object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
         ></video>
 
         {#if !isCameraActive}
           <!-- Video Stream Fallback Graphic -->
-          <div class="absolute inset-0 flex flex-col items-center justify-center bg-[#17171c] text-white p-6 text-center space-y-2">
-            <Camera class="w-12 h-12 text-[#a1a1aa] animate-pulse" />
+          <div
+            class="absolute inset-0 flex flex-col items-center justify-center space-y-2 bg-[#17171c] p-6 text-center text-white"
+          >
+            <Camera class="h-12 w-12 animate-pulse text-[#a1a1aa]" />
             <div class="text-xs font-semibold">{currentUser.name}</div>
-            <div class="text-[10px] text-[#a1a1aa] font-mono">[KAMERA AKTIF: SIAP JEPRET SELFIE]</div>
+            <div class="font-mono text-[10px] text-[#a1a1aa]">
+              [KAMERA AKTIF: SIAP JEPRET SELFIE]
+            </div>
           </div>
         {/if}
       {:else}
@@ -673,43 +715,51 @@
         <img
           src={capturedPhotoUrl}
           alt="Snapshot Preview"
-          class="absolute inset-0 w-full h-full object-cover"
+          class="absolute inset-0 h-full w-full object-cover"
         />
       {/if}
 
       <!-- Top Overlay: Live GPS status & Camera Flip -->
-      <div class="relative z-10 flex items-center justify-between text-white text-xs">
-        <div class="flex items-center gap-1.5 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10 text-[10px] font-mono">
-          <ShieldCheck class="w-3.5 h-3.5 text-[#34d399]" />
-          <span>DI DALAM RADIUS ({distanceMeters !== null ? Math.round(distanceMeters) : 0}m / maks {activeBranch.radius_meters}m)</span>
+      <div class="relative z-10 flex items-center justify-between text-xs text-white">
+        <div
+          class="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/60 px-3 py-1 font-mono text-[10px] backdrop-blur-md"
+        >
+          <ShieldCheck class="h-3.5 w-3.5 text-[#34d399]" />
+          <span
+            >DI DALAM RADIUS ({distanceMeters !== null ? Math.round(distanceMeters) : 0}m / maks {activeBranch.radius_meters}m)</span
+          >
         </div>
 
         {#if !capturedPhotoUrl}
           <button
             type="button"
             onclick={toggleCameraFlip}
-            class="p-2.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white hover:bg-black cursor-pointer transition-all"
+            class="cursor-pointer rounded-full border border-white/10 bg-black/60 p-2.5 text-white backdrop-blur-md transition-all hover:bg-black"
             title="Putar Kamera"
           >
-            <RotateCcw class="w-4 h-4" />
+            <RotateCcw class="h-4 w-4" />
           </button>
         {/if}
       </div>
 
       <!-- Center Watermark Overlay (Simulated Live) -->
-      <div class="relative z-10 pointer-events-none self-start">
-        <div class="bg-black/50 backdrop-blur-xs p-2.5 rounded-2xl text-white font-mono text-[9.5px] space-y-0.5 border border-white/10 max-w-56">
-          <div class="font-bold text-white truncate">{currentUser.name}</div>
+      <div class="pointer-events-none relative z-10 self-start">
+        <div
+          class="max-w-56 space-y-0.5 rounded-2xl border border-white/10 bg-black/50 p-2.5 font-mono text-[9.5px] text-white backdrop-blur-xs"
+        >
+          <div class="truncate font-bold text-white">{currentUser.name}</div>
           <div class="text-white/80">{liveTimestamp}</div>
-          <div class="text-[#a7f3d0] truncate">{latitude?.toFixed(5)}, {longitude?.toFixed(5)}</div>
+          <div class="truncate text-[#a7f3d0]">{latitude?.toFixed(5)}, {longitude?.toFixed(5)}</div>
         </div>
       </div>
 
       <!-- Bottom Control Bar -->
       <div class="relative z-10 flex flex-col items-center gap-3">
         {#if errorMessage}
-          <div class="bg-[#fef2f2]/90 backdrop-blur-xs text-[#991b1b] text-xs font-semibold px-4 py-2 rounded-full border border-[#fecaca] flex items-center gap-2">
-            <AlertCircle class="w-4 h-4 shrink-0" />
+          <div
+            class="flex items-center gap-2 rounded-full border border-[#fecaca] bg-[#fef2f2]/90 px-4 py-2 text-xs font-semibold text-[#991b1b] backdrop-blur-xs"
+          >
+            <AlertCircle class="h-4 w-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         {/if}
@@ -721,22 +771,24 @@
               type="button"
               onclick={handleTakeSnapshot}
               disabled={isCapturing || !isInsideRadius}
-              class="w-20 h-20 rounded-full border-4 border-white bg-white/30 backdrop-blur-xs p-1.5 flex items-center justify-center active:scale-95 transition-all cursor-pointer group shadow-xl"
+              class="group flex h-20 w-20 cursor-pointer items-center justify-center rounded-full border-4 border-white bg-white/30 p-1.5 shadow-xl backdrop-blur-xs transition-all active:scale-95"
               title="Ambil Foto Selfie"
             >
-              <div class="w-full h-full rounded-full bg-white group-hover:bg-[#f4f4f6] transition-colors flex items-center justify-center shadow-inner">
-                <Camera class="w-7 h-7 text-[#17171c]" />
+              <div
+                class="flex h-full w-full items-center justify-center rounded-full bg-white shadow-inner transition-colors group-hover:bg-[#f4f4f6]"
+              >
+                <Camera class="h-7 w-7 text-[#17171c]" />
               </div>
             </button>
           </div>
         {:else}
           <!-- Preview Confirmation Actions -->
-          <div class="w-full flex items-center gap-3 pb-2">
+          <div class="flex w-full items-center gap-3 pb-2">
             <button
               type="button"
               onclick={handleRetake}
               disabled={isSubmitting}
-              class="flex-1 py-3 bg-black/70 hover:bg-black text-white text-xs font-semibold rounded-2xl border border-white/20 backdrop-blur-md cursor-pointer transition-all text-center"
+              class="flex-1 cursor-pointer rounded-2xl border border-white/20 bg-black/70 py-3 text-center text-xs font-semibold text-white backdrop-blur-md transition-all hover:bg-black"
             >
               Ulangi Foto
             </button>
@@ -744,13 +796,13 @@
               type="button"
               onclick={handleSubmitAttendance}
               disabled={isSubmitting}
-              class="flex-1 py-3 bg-[#059669] hover:bg-[#047857] text-white text-xs font-semibold rounded-2xl shadow-xl cursor-pointer transition-all flex items-center justify-center gap-2"
+              class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#059669] py-3 text-xs font-semibold text-white shadow-xl transition-all hover:bg-[#047857]"
             >
               {#if isSubmitting}
-                <RefreshCw class="w-4 h-4 animate-spin" />
+                <RefreshCw class="h-4 w-4 animate-spin" />
                 <span>Mengirim...</span>
               {:else}
-                <Check class="w-4 h-4" />
+                <Check class="h-4 w-4" />
                 <span>Kirim Presensi</span>
               {/if}
             </button>

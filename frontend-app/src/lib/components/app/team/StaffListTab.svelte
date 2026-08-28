@@ -35,18 +35,18 @@
 
   let canManageMembers = $derived(
     currentUser?.role === 'OWNER' ||
-    currentUser?.role === 'ADMIN' ||
-    Boolean(currentUser?.permissions?.includes('members.manage'))
+      currentUser?.role === 'ADMIN' ||
+      Boolean(currentUser?.permissions?.includes('members.manage'))
   );
 
   let canViewSalary = $derived(
     currentUser?.role === 'OWNER' ||
-    currentUser?.role === 'ADMIN' ||
-    Boolean(
-      currentUser?.permissions?.includes('payroll.view') ||
-      currentUser?.permissions?.includes('payroll.disburse') ||
-      currentUser?.permissions?.includes('members.manage')
-    )
+      currentUser?.role === 'ADMIN' ||
+      Boolean(
+        currentUser?.permissions?.includes('payroll.view') ||
+        currentUser?.permissions?.includes('payroll.disburse') ||
+        currentUser?.permissions?.includes('members.manage')
+      )
   );
 
   let pendingInvitations = $state<WorkspaceInvitationItem[]>([]);
@@ -131,22 +131,28 @@
 
 <div class="space-y-6 font-sans">
   <!-- Clean KPI Header & Action Bar -->
-  <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xs">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
+  <div class="rounded-2xl border border-[#e5e5ea] bg-white p-5 shadow-2xs sm:rounded-3xl sm:p-6">
+    <div class="flex flex-col justify-between gap-5 md:flex-row md:items-center">
       <!-- Metrics Grid -->
-      <div class="grid grid-cols-2 sm:flex sm:items-center gap-6 sm:gap-10">
+      <div class="grid grid-cols-2 gap-6 sm:flex sm:items-center sm:gap-10">
         <div>
-          <span class="text-[11px] font-medium uppercase tracking-wider text-[#8e8e93]">Karyawan Aktif</span>
-          <div class="text-xl sm:text-2xl font-bold font-mono text-[#17171c] mt-1 flex items-baseline gap-1.5">
+          <span class="text-[11px] font-medium tracking-wider text-[#8e8e93] uppercase"
+            >Karyawan Aktif</span
+          >
+          <div
+            class="mt-1 flex items-baseline gap-1.5 font-mono text-xl font-bold text-[#17171c] sm:text-2xl"
+          >
             <span>{totalEmployees}</span>
-            <span class="text-xs font-normal text-[#8e8e93] font-sans">Orang</span>
+            <span class="font-sans text-xs font-normal text-[#8e8e93]">Orang</span>
           </div>
         </div>
 
         {#if canViewSalary}
           <div class="sm:border-l sm:border-[#e5e5ea] sm:pl-8">
-            <span class="text-[11px] font-medium uppercase tracking-wider text-[#8e8e93]">Total Gaji Pokok</span>
-            <div class="text-xl sm:text-2xl font-bold font-mono text-[#17171c] mt-1">
+            <span class="text-[11px] font-medium tracking-wider text-[#8e8e93] uppercase"
+              >Total Gaji Pokok</span
+            >
+            <div class="mt-1 font-mono text-xl font-bold text-[#17171c] sm:text-2xl">
               {formatRupiah(totalBasePayroll)}
             </div>
           </div>
@@ -154,10 +160,14 @@
 
         {#if pendingInvitations.length > 0 && canManageMembers}
           <div class="col-span-2 sm:col-span-1 sm:border-l sm:border-[#e5e5ea] sm:pl-8">
-            <span class="text-[11px] font-medium uppercase tracking-wider text-[#d97706]">Undangan Pending</span>
-            <div class="text-xl sm:text-2xl font-bold font-mono text-[#d97706] mt-1 flex items-baseline gap-1.5">
+            <span class="text-[11px] font-medium tracking-wider text-[#d97706] uppercase"
+              >Undangan Pending</span
+            >
+            <div
+              class="mt-1 flex items-baseline gap-1.5 font-mono text-xl font-bold text-[#d97706] sm:text-2xl"
+            >
               <span>{pendingInvitations.length}</span>
-              <span class="text-xs font-normal text-[#8e8e93] font-sans">Menunggu</span>
+              <span class="font-sans text-xs font-normal text-[#8e8e93]">Menunggu</span>
             </div>
           </div>
         {/if}
@@ -168,9 +178,9 @@
         <button
           type="button"
           onclick={onOpenAddModal}
-          class="px-5 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full flex items-center justify-center gap-2 cursor-pointer transition-all shadow-xs self-stretch md:self-auto shrink-0"
+          class="flex shrink-0 cursor-pointer items-center justify-center gap-2 self-stretch rounded-full bg-[#17171c] px-5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black md:self-auto"
         >
-          <Mail class="w-4 h-4" />
+          <Mail class="h-4 w-4" />
           <span>+ Undang Karyawan</span>
         </button>
       {/if}
@@ -179,30 +189,36 @@
 
   <!-- Search & Filter Controls -->
   <div class="flex items-center justify-between gap-3">
-    <div class="relative flex-1 max-w-md">
-      <Search class="w-4 h-4 text-[#8e8e93] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+    <div class="relative max-w-md flex-1">
+      <Search
+        class="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+      />
       <input
         type="text"
         bind:value={searchQuery}
         placeholder="Cari nama, email, posisi, atau cabang..."
-        class="w-full pl-10 pr-4 py-2.5 bg-white border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-full text-xs text-[#17171c] placeholder-[#8e8e93] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+        class="w-full rounded-full border border-[#e5e5ea] bg-white py-2.5 pr-4 pl-10 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:border-[#d1d1d6] focus:border-[#17171c] focus:outline-hidden"
       />
     </div>
 
-    <span class="text-xs text-[#8e8e93] font-mono shrink-0">
+    <span class="shrink-0 font-mono text-xs text-[#8e8e93]">
       Menampilkan {displayedMembers.length} staf
     </span>
   </div>
 
   <!-- SECTION 1: KARYAWAN AKTIF GRID -->
   {#if displayedMembers.length === 0}
-    <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-12 text-center space-y-3 shadow-2xs">
-      <div class="w-12 h-12 rounded-2xl bg-[#f4f4f6] text-[#8e8e93] flex items-center justify-center mx-auto">
-        <Users class="w-6 h-6" />
+    <div
+      class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-white p-12 text-center shadow-2xs sm:rounded-3xl"
+    >
+      <div
+        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#8e8e93]"
+      >
+        <Users class="h-6 w-6" />
       </div>
       <div>
         <h3 class="text-sm font-bold text-[#17171c]">Tidak Ada Karyawan Ditemukan</h3>
-        <p class="text-xs text-[#8e8e93] mt-1 max-w-sm mx-auto">
+        <p class="mx-auto mt-1 max-w-sm text-xs text-[#8e8e93]">
           {searchQuery
             ? `Tidak ada staf yang cocok dengan "${searchQuery}".`
             : 'Belum ada staf yang terdaftar di cabang ini.'}
@@ -212,35 +228,45 @@
         <button
           type="button"
           onclick={onOpenAddModal}
-          class="px-4 py-2 bg-[#17171c] text-white text-xs font-semibold rounded-full inline-flex items-center gap-1.5 cursor-pointer shadow-xs"
+          class="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#17171c] px-4 py-2 text-xs font-semibold text-white shadow-xs"
         >
-          <Mail class="w-3.5 h-3.5" />
+          <Mail class="h-3.5 w-3.5" />
           <span>Kirim Undangan Staf</span>
         </button>
       {/if}
     </div>
   {:else}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {#each displayedMembers as member}
-        <div class="bg-white border border-[#e5e5ea] hover:border-[#17171c]/40 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-2xs hover:shadow-xs transition-all duration-200">
+        <div
+          class="flex flex-col justify-between space-y-4 rounded-2xl border border-[#e5e5ea] bg-white p-5 shadow-2xs transition-all duration-200 hover:border-[#17171c]/40 hover:shadow-xs"
+        >
           <!-- Top Row: Avatar, Name & Role Badge -->
           <div class="space-y-3">
             <div class="flex items-start justify-between gap-2.5">
-              <div class="flex items-center gap-3 min-w-0">
-                <div class="w-11 h-11 rounded-2xl bg-[#f4f4f6] text-[#17171c] font-bold text-sm flex items-center justify-center shrink-0 border border-[#e5e5ea]">
+              <div class="flex min-w-0 items-center gap-3">
+                <div
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-sm font-bold text-[#17171c]"
+                >
                   {member.name.charAt(0).toUpperCase()}
                 </div>
                 <div class="min-w-0">
-                  <h4 class="font-bold text-sm text-[#17171c] truncate leading-snug">{member.name}</h4>
-                  <p class="text-xs font-medium text-[#686873] truncate">{member.job_title || 'Staf'}</p>
+                  <h4 class="truncate text-sm leading-snug font-bold text-[#17171c]">
+                    {member.name}
+                  </h4>
+                  <p class="truncate text-xs font-medium text-[#686873]">
+                    {member.job_title || 'Staf'}
+                  </p>
                 </div>
               </div>
 
-              <span class={`text-[10px] font-mono font-semibold px-2.5 py-1 rounded-full shrink-0 ${
-                member.role === 'OWNER'
-                  ? 'bg-[#17171c] text-white'
-                  : 'bg-[#f4f4f6] text-[#17171c] border border-[#e5e5ea]'
-              }`}>
+              <span
+                class={`shrink-0 rounded-full px-2.5 py-1 font-mono text-[10px] font-semibold ${
+                  member.role === 'OWNER'
+                    ? 'bg-[#17171c] text-white'
+                    : 'border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]'
+                }`}
+              >
                 {member.role_name || member.role}
               </span>
             </div>
@@ -249,16 +275,16 @@
             <div class="space-y-1 text-xs text-[#8e8e93]">
               <div class="truncate font-mono text-[11px] text-[#686873]">{member.email}</div>
               <div class="flex items-center gap-1 text-[11.5px] text-[#8e8e93]">
-                <Building2 class="w-3.5 h-3.5 shrink-0 text-[#8e8e93]" />
+                <Building2 class="h-3.5 w-3.5 shrink-0 text-[#8e8e93]" />
                 <span class="truncate">{member.branch_name || 'Outlet Utama'}</span>
               </div>
             </div>
 
             <!-- Clean Salary Display (No Nested Gray Box) -->
             {#if canViewSalary}
-              <div class="pt-3 border-t border-[#f2f2f4] flex items-center justify-between">
+              <div class="flex items-center justify-between border-t border-[#f2f2f4] pt-3">
                 <span class="text-[11px] font-medium text-[#8e8e93]">Gaji Pokok:</span>
-                <span class="font-mono font-bold text-xs sm:text-sm text-[#17171c]">
+                <span class="font-mono text-xs font-bold text-[#17171c] sm:text-sm">
                   {member.role === 'OWNER' ? 'Pemilik Bisnis' : formatRupiah(member.base_salary)}
                 </span>
               </div>
@@ -267,13 +293,13 @@
 
           <!-- Bottom Action Buttons -->
           {#if canManageMembers}
-            <div class="pt-2 flex items-center justify-end gap-2">
+            <div class="flex items-center justify-end gap-2 pt-2">
               <button
                 type="button"
                 onclick={() => onOpenEditModal(member)}
-                class="px-3 py-1.5 text-xs font-medium bg-[#f8f8fa] hover:bg-[#eeece7] text-[#17171c] border border-[#e5e5ea] rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
+                class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-3 py-1.5 text-xs font-medium text-[#17171c] transition-all hover:bg-[#eeece7]"
               >
-                <Edit2 class="w-3.5 h-3.5 text-[#686873]" />
+                <Edit2 class="h-3.5 w-3.5 text-[#686873]" />
                 <span>Edit</span>
               </button>
 
@@ -281,10 +307,10 @@
                 <button
                   type="button"
                   onclick={() => handleDeleteMember(member)}
-                  class="p-2 text-[#8e8e93] hover:text-[#e5484d] hover:bg-[#fef2f2] border border-[#e5e5ea] hover:border-[#fecaca] rounded-xl transition-all cursor-pointer shrink-0"
+                  class="shrink-0 cursor-pointer rounded-xl border border-[#e5e5ea] p-2 text-[#8e8e93] transition-all hover:border-[#fecaca] hover:bg-[#fef2f2] hover:text-[#e5484d]"
                   title="Hapus Karyawan"
                 >
-                  <Trash2 class="w-3.5 h-3.5" />
+                  <Trash2 class="h-3.5 w-3.5" />
                 </button>
               {/if}
             </div>
@@ -296,59 +322,71 @@
 
   <!-- SECTION 2: MENUNGGU KONFIRMASI UNDANGAN -->
   {#if pendingInvitations.length > 0}
-    <div class="space-y-3 pt-4 border-t border-[#e5e5ea]">
+    <div class="space-y-3 border-t border-[#e5e5ea] pt-4">
       <div class="flex items-center justify-between px-1">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-[#8e8e93] flex items-center gap-2">
-          <Clock class="w-3.5 h-3.5 text-[#d97706]" />
+        <h3
+          class="flex items-center gap-2 text-xs font-bold tracking-wider text-[#8e8e93] uppercase"
+        >
+          <Clock class="h-3.5 w-3.5 text-[#d97706]" />
           <span>Undangan Menunggu Konfirmasi ({pendingInvitations.length})</span>
         </h3>
         <button
           type="button"
           onclick={loadPendingInvitations}
-          class="text-xs text-[#686873] hover:text-[#17171c] flex items-center gap-1 cursor-pointer"
+          class="flex cursor-pointer items-center gap-1 text-xs text-[#686873] hover:text-[#17171c]"
         >
-          <RotateCw class={`w-3 h-3 ${isLoadingInvitations ? 'animate-spin' : ''}`} />
+          <RotateCw class={`h-3 w-3 ${isLoadingInvitations ? 'animate-spin' : ''}`} />
           <span>Segarkan</span>
         </button>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+      <div class="grid grid-cols-1 gap-3.5 md:grid-cols-2">
         {#each pendingInvitations as inv}
-          <div class="bg-white border border-[#e5e5ea] rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-2xs">
+          <div
+            class="flex flex-col justify-between space-y-3 rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs"
+          >
             <div class="space-y-1.5">
               <div class="flex items-center justify-between gap-2">
-                <span class="font-bold text-xs text-[#17171c] truncate">{inv.email}</span>
-                <span class="px-2 py-0.5 rounded-full text-[9.5px] font-mono font-semibold bg-[#fffbeb] text-[#d97706] border border-[#fef3c7]">
+                <span class="truncate text-xs font-bold text-[#17171c]">{inv.email}</span>
+                <span
+                  class="rounded-full border border-[#fef3c7] bg-[#fffbeb] px-2 py-0.5 font-mono text-[9.5px] font-semibold text-[#d97706]"
+                >
                   PENDING
                 </span>
               </div>
-              <div class="text-[11px] text-[#686873] flex items-center gap-2">
-                <span>Peran: <strong class="text-[#17171c]">{inv.role_name || inv.role}</strong></span>
+              <div class="flex items-center gap-2 text-[11px] text-[#686873]">
+                <span
+                  >Peran: <strong class="text-[#17171c]">{inv.role_name || inv.role}</strong></span
+                >
                 <span>&bull;</span>
-                <span>Gaji: <strong class="font-mono text-[#17171c]">{formatRupiah(inv.base_salary)}</strong></span>
+                <span
+                  >Gaji: <strong class="font-mono text-[#17171c]"
+                    >{formatRupiah(inv.base_salary)}</strong
+                  ></span
+                >
               </div>
-              <div class="text-[10px] text-[#8e8e93] font-mono">
+              <div class="font-mono text-[10px] text-[#8e8e93]">
                 Kedaluwarsa: {formatDateTimeIndo(inv.expires_at)}
               </div>
             </div>
 
-            <div class="pt-2 border-t border-[#f2f2f4] flex items-center justify-end gap-2">
+            <div class="flex items-center justify-end gap-2 border-t border-[#f2f2f4] pt-2">
               <button
                 type="button"
                 onclick={() => handleResendInvitation(inv.id)}
-                class="px-3 py-1.5 text-xs font-medium bg-[#f8f8fa] hover:bg-[#eeece7] text-[#17171c] border border-[#e5e5ea] rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
+                class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-3 py-1.5 text-xs font-medium text-[#17171c] transition-all hover:bg-[#eeece7]"
               >
-                <Send class="w-3 h-3 text-[#1863dc]" />
+                <Send class="h-3 w-3 text-[#1863dc]" />
                 <span>Kirim Ulang</span>
               </button>
 
               <button
                 type="button"
                 onclick={() => handleCancelInvitation(inv.id)}
-                class="p-1.5 text-[#8e8e93] hover:text-[#e5484d] hover:bg-[#fef2f2] border border-[#e5e5ea] rounded-xl transition-all cursor-pointer shrink-0"
+                class="shrink-0 cursor-pointer rounded-xl border border-[#e5e5ea] p-1.5 text-[#8e8e93] transition-all hover:bg-[#fef2f2] hover:text-[#e5484d]"
                 title="Batalkan Undangan"
               >
-                <XCircle class="w-4 h-4" />
+                <XCircle class="h-4 w-4" />
               </button>
             </div>
           </div>

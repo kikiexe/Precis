@@ -20,68 +20,89 @@
 </script>
 
 {#if attendance}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs font-sans">
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in-95">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 font-sans backdrop-blur-xs"
+  >
+    <div
+      class="animate-in fade-in zoom-in-95 w-full max-w-lg overflow-hidden rounded-3xl border border-[#e5e5ea] bg-white shadow-2xl"
+    >
       <!-- Modal Header -->
-      <div class="p-5 border-b border-[#f2f2f4] flex items-center justify-between">
+      <div class="flex items-center justify-between border-b border-[#f2f2f4] p-5">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-[#f4f4f6] text-[#17171c] flex items-center justify-center font-bold">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f4f4f6] font-bold text-[#17171c]"
+          >
             {attendance.user_name?.charAt(0) || 'U'}
           </div>
           <div>
             <h3 class="text-sm font-bold text-[#17171c]">{attendance.user_name}</h3>
-            <div class="text-[11px] text-[#8e8e93] font-mono">
-              {attendance.branch_name || 'Outlet Sleman #01'} &bull; {attendance.created_at?.substring(0, 10)}
+            <div class="font-mono text-[11px] text-[#8e8e93]">
+              {attendance.branch_name || 'Outlet Sleman #01'} &bull; {attendance.created_at?.substring(
+                0,
+                10
+              )}
             </div>
           </div>
         </div>
         <button
           type="button"
           onclick={onClose}
-          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-full transition-all cursor-pointer"
+          class="cursor-pointer rounded-full p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="w-4 h-4" />
+          <X class="h-4 w-4" />
         </button>
       </div>
 
       <!-- Modal Body -->
-      <div class="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
+      <div class="max-h-[75vh] space-y-4 overflow-y-auto p-5">
         <!-- Selfie Photo in 3:4 Aspect Ratio -->
-        <div class="aspect-[3/4] max-h-72 mx-auto rounded-2xl overflow-hidden bg-[#f4f4f6] border border-[#e5e5ea] relative">
+        <div
+          class="relative mx-auto aspect-[3/4] max-h-72 overflow-hidden rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6]"
+        >
           {#if attendance.photo_in_url || attendance.avatar_url}
             <img
               src={attendance.photo_in_url || attendance.avatar_url}
               alt={attendance.user_name}
-              class="w-full h-full object-cover"
+              class="h-full w-full object-cover"
             />
           {:else}
-            <div class="w-full h-full flex flex-col items-center justify-center text-[#8e8e93] space-y-2">
-              <Camera class="w-8 h-8" />
-              <span class="text-xs font-mono">Tidak ada foto presensi</span>
+            <div
+              class="flex h-full w-full flex-col items-center justify-center space-y-2 text-[#8e8e93]"
+            >
+              <Camera class="h-8 w-8" />
+              <span class="font-mono text-xs">Tidak ada foto presensi</span>
             </div>
           {/if}
         </div>
 
         <!-- Shift & Clock Stats -->
         <div class="grid grid-cols-2 gap-3">
-          <div class="p-3.5 bg-[#fafafc] border border-[#e5e5ea] rounded-2xl space-y-1">
-            <span class="text-[10px] font-mono uppercase text-[#8e8e93] font-semibold">Clock In</span>
-            <div class="font-mono font-bold text-[#17171c] text-sm">
+          <div class="space-y-1 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-3.5">
+            <span class="font-mono text-[10px] font-semibold text-[#8e8e93] uppercase"
+              >Clock In</span
+            >
+            <div class="font-mono text-sm font-bold text-[#17171c]">
               {formatTime(attendance.clock_in_time)}
             </div>
-            <div class="text-[11px] font-mono">
+            <div class="font-mono text-[11px]">
               {#if !attendance.late_minutes || attendance.late_minutes === 0}
-                <span class="text-[#059669] font-semibold">Tepat Waktu</span>
+                <span class="font-semibold text-[#059669]">Tepat Waktu</span>
               {:else}
-                <span class="text-[#e5484d] font-semibold">Terlambat {attendance.late_minutes} Menit</span>
+                <span class="font-semibold text-[#e5484d]"
+                  >Terlambat {attendance.late_minutes} Menit</span
+                >
               {/if}
             </div>
           </div>
 
-          <div class="p-3.5 bg-[#fafafc] border border-[#e5e5ea] rounded-2xl space-y-1">
-            <span class="text-[10px] font-mono uppercase text-[#8e8e93] font-semibold">Clock Out</span>
-            <div class="font-mono font-bold text-[#17171c] text-sm">
-              {attendance.clock_out_time ? formatTime(attendance.clock_out_time) : 'Sedang Bertugas'}
+          <div class="space-y-1 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-3.5">
+            <span class="font-mono text-[10px] font-semibold text-[#8e8e93] uppercase"
+              >Clock Out</span
+            >
+            <div class="font-mono text-sm font-bold text-[#17171c]">
+              {attendance.clock_out_time
+                ? formatTime(attendance.clock_out_time)
+                : 'Sedang Bertugas'}
             </div>
             <div class="text-[11px] text-[#8e8e93]">
               {attendance.clock_out_time ? 'Selesai bertugas' : 'Belum clock out'}
@@ -90,20 +111,28 @@
         </div>
 
         <!-- Geolocation & GPS Coordinate Verification -->
-        <div class="p-4 bg-[#fafafc] border border-[#e5e5ea] rounded-2xl space-y-2.5">
+        <div class="space-y-2.5 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2 text-xs font-bold text-[#17171c]">
-              <MapPin class="w-4 h-4 text-[#1863dc]" />
+              <MapPin class="h-4 w-4 text-[#1863dc]" />
               <span>Verifikasi Geolocation GPS</span>
             </div>
-            <span class="text-[10.5px] font-mono px-2 py-0.5 rounded-full bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0] font-semibold">
+            <span
+              class="rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-2 py-0.5 font-mono text-[10.5px] font-semibold text-[#059669]"
+            >
               Valid Radius
             </span>
           </div>
 
-          <div class="text-xs text-[#686873] space-y-1 font-mono">
-            <div>Koordinat: <strong class="text-[#17171c]">{attendance.lat_in || '-'}, {attendance.lng_in || '-'}</strong></div>
-            <div class="text-[11px] text-[#8e8e93]">Presensi terverifikasi dalam geofence outlet</div>
+          <div class="space-y-1 font-mono text-xs text-[#686873]">
+            <div>
+              Koordinat: <strong class="text-[#17171c]"
+                >{attendance.lat_in || '-'}, {attendance.lng_in || '-'}</strong
+              >
+            </div>
+            <div class="text-[11px] text-[#8e8e93]">
+              Presensi terverifikasi dalam geofence outlet
+            </div>
           </div>
 
           {#if attendance.lat_in && attendance.lng_in}
@@ -111,21 +140,21 @@
               href={`https://www.google.com/maps?q=${attendance.lat_in},${attendance.lng_in}`}
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-1.5 text-xs text-[#1863dc] hover:underline font-medium pt-1 cursor-pointer"
+              class="inline-flex cursor-pointer items-center gap-1.5 pt-1 text-xs font-medium text-[#1863dc] hover:underline"
             >
               <span>Buka di Google Maps</span>
-              <ExternalLink class="w-3 h-3" />
+              <ExternalLink class="h-3 w-3" />
             </a>
           {/if}
         </div>
       </div>
 
       <!-- Modal Footer -->
-      <div class="p-4 border-t border-[#f2f2f4] bg-[#fafafc] flex justify-end">
+      <div class="flex justify-end border-t border-[#f2f2f4] bg-[#fafafc] p-4">
         <button
           type="button"
           onclick={onClose}
-          class="px-5 py-2.5 text-xs font-semibold bg-[#17171c] hover:bg-black text-white rounded-full cursor-pointer transition-all shadow-xs"
+          class="cursor-pointer rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
         >
           Tutup
         </button>

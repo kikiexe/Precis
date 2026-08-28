@@ -51,17 +51,11 @@
     payrollItems.length > 0 && payrollItems.every((item) => item.status === 'DISBURSED')
   );
 
-  let totalBaseSalary = $derived(
-    payrollItems.reduce((sum, item) => sum + item.base_salary, 0)
-  );
+  let totalBaseSalary = $derived(payrollItems.reduce((sum, item) => sum + item.base_salary, 0));
 
-  let totalLatePenalty = $derived(
-    payrollItems.reduce((sum, item) => sum + item.late_penalty, 0)
-  );
+  let totalLatePenalty = $derived(payrollItems.reduce((sum, item) => sum + item.late_penalty, 0));
 
-  let totalOvertimePay = $derived(
-    payrollItems.reduce((sum, item) => sum + item.overtime_pay, 0)
-  );
+  let totalOvertimePay = $derived(payrollItems.reduce((sum, item) => sum + item.overtime_pay, 0));
 
   let totalCashAdvanceDeduction = $derived(
     payrollItems.reduce((sum, item) => sum + item.cash_advance_deduction, 0)
@@ -100,31 +94,41 @@
 
 <div class="space-y-6 font-sans">
   {#if actionMessage}
-    <div class="p-4 bg-[#eff6ff] border border-[#bfdbfe] rounded-2xl text-xs font-semibold text-[#1d4ed8] flex items-center justify-between shadow-2xs">
+    <div
+      class="flex items-center justify-between rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] p-4 text-xs font-semibold text-[#1d4ed8] shadow-2xs"
+    >
       <span>{actionMessage}</span>
-      <button type="button" onclick={() => (actionMessage = null)} class="text-[#8e8e93] hover:text-[#17171c] cursor-pointer">&times;</button>
+      <button
+        type="button"
+        onclick={() => (actionMessage = null)}
+        class="cursor-pointer text-[#8e8e93] hover:text-[#17171c]">&times;</button
+      >
     </div>
   {/if}
 
   <!-- Unified Payroll Control Toolbar -->
-  <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-4 shadow-2xs">
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+  <div
+    class="space-y-4 rounded-2xl border border-[#e5e5ea] bg-white p-5 shadow-2xs sm:rounded-3xl sm:p-6"
+  >
+    <div class="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
       <!-- Date Range & Refresh -->
-      <div class="flex items-center gap-2.5 flex-1 max-w-lg">
-        <div class="flex items-center gap-2 font-mono text-xs bg-[#f8f8fa] border border-[#e5e5ea] rounded-2xl px-4 py-2.5 flex-1 min-w-0 shadow-2xs">
-          <Calendar class="w-4 h-4 text-[#8e8e93] shrink-0" />
+      <div class="flex max-w-lg flex-1 items-center gap-2.5">
+        <div
+          class="flex min-w-0 flex-1 items-center gap-2 rounded-2xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-xs shadow-2xs"
+        >
+          <Calendar class="h-4 w-4 shrink-0 text-[#8e8e93]" />
           <input
             id="filter-period-start"
             type="date"
             bind:value={filterPeriodStart}
-            class="bg-transparent text-xs text-[#17171c] focus:outline-hidden cursor-pointer w-full min-w-0"
+            class="w-full min-w-0 cursor-pointer bg-transparent text-xs text-[#17171c] focus:outline-hidden"
           />
-          <span class="text-[#8e8e93] font-sans px-1">s/d</span>
+          <span class="px-1 font-sans text-[#8e8e93]">s/d</span>
           <input
             id="filter-period-end"
             type="date"
             bind:value={filterPeriodEnd}
-            class="bg-transparent text-xs text-[#17171c] focus:outline-hidden cursor-pointer w-full min-w-0"
+            class="w-full min-w-0 cursor-pointer bg-transparent text-xs text-[#17171c] focus:outline-hidden"
           />
         </div>
 
@@ -132,24 +136,24 @@
           type="button"
           onclick={handleFilter}
           disabled={isFiltering}
-          class="px-4 py-2.5 bg-[#17171c] hover:bg-black text-white rounded-2xl text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shrink-0 shadow-xs"
+          class="flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#17171c] px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
           title="Hitung ulang kalkulasi penggajian"
         >
-          <RefreshCw class={`w-3.5 h-3.5 ${isFiltering ? 'animate-spin' : ''}`} />
+          <RefreshCw class={`h-3.5 w-3.5 ${isFiltering ? 'animate-spin' : ''}`} />
           <span class="hidden sm:inline">{isFiltering ? 'Memuat...' : 'Hitung Ulang'}</span>
         </button>
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <div class="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
         {#if canDisbursePayroll}
           <button
             type="button"
             onclick={handleExport}
             disabled={isExporting || !payrollPreview}
-            class="py-2.5 px-4 border border-[#e5e5ea] bg-white hover:bg-[#f8f8fa] text-[#17171c] rounded-2xl text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-2xs flex-1 sm:flex-none"
+            class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-[#e5e5ea] bg-white px-4 py-2.5 text-xs font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#f8f8fa] disabled:opacity-50 sm:flex-none"
           >
-            <Download class="w-4 h-4 text-[#8e8e93] shrink-0" />
+            <Download class="h-4 w-4 shrink-0 text-[#8e8e93]" />
             <span>{isExporting ? 'Mengunduh...' : 'Export CSV (BCA)'}</span>
           </button>
 
@@ -157,13 +161,17 @@
             type="button"
             onclick={onOpenConfirmDisburse}
             disabled={!payrollPreview || isAllDisbursed}
-            class="py-2.5 px-5 {isAllDisbursed ? 'bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0] cursor-default' : 'bg-[#059669] hover:bg-[#047857] text-white cursor-pointer'} rounded-2xl text-xs font-semibold transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs flex-1 sm:flex-none"
+            class="px-5 py-2.5 {isAllDisbursed
+              ? 'cursor-default border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]'
+              : 'cursor-pointer bg-[#059669] text-white hover:bg-[#047857]'} flex flex-1 items-center justify-center gap-2 rounded-2xl text-xs font-semibold shadow-xs transition-all disabled:opacity-50 sm:flex-none"
           >
-            <Check class="w-4 h-4 shrink-0" />
+            <Check class="h-4 w-4 shrink-0" />
             <span>{isAllDisbursed ? 'Sudah Dicairkan' : 'Cairkan Payroll'}</span>
           </button>
         {:else}
-          <div class="py-2 px-3.5 bg-[#f8f8fa] border border-[#e5e5ea] rounded-2xl text-[11px] font-medium text-[#8e8e93] flex items-center gap-2">
+          <div
+            class="flex items-center gap-2 rounded-2xl border border-[#e5e5ea] bg-[#f8f8fa] px-3.5 py-2 text-[11px] font-medium text-[#8e8e93]"
+          >
             <span>Pratinjau Rekap (Pencairan Khusus Owner / Manager Payroll)</span>
           </div>
         {/if}
@@ -172,132 +180,198 @@
   </div>
 
   <!-- Financial KPI Metrics Grid -->
-  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3.5">
-    <div class="bg-white border border-[#e5e5ea] rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-2xs">
-      <span class="text-[11px] font-medium uppercase tracking-wider text-[#8e8e93] truncate">Gaji Pokok Total</span>
-      <div class="text-sm sm:text-base font-bold font-mono text-[#17171c] mt-1 truncate">{formatRupiah(totalBaseSalary)}</div>
+  <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-4 lg:grid-cols-5">
+    <div
+      class="flex flex-col justify-between rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs sm:p-5"
+    >
+      <span class="truncate text-[11px] font-medium tracking-wider text-[#8e8e93] uppercase"
+        >Gaji Pokok Total</span
+      >
+      <div class="mt-1 truncate font-mono text-sm font-bold text-[#17171c] sm:text-base">
+        {formatRupiah(totalBaseSalary)}
+      </div>
     </div>
-    <div class="bg-white border border-[#e5e5ea] rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-2xs">
-      <span class="text-[11px] font-medium uppercase tracking-wider text-[#059669] truncate">Upah Lembur</span>
-      <div class="text-sm sm:text-base font-bold font-mono text-[#059669] mt-1 truncate">+{formatRupiah(totalOvertimePay)}</div>
+    <div
+      class="flex flex-col justify-between rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs sm:p-5"
+    >
+      <span class="truncate text-[11px] font-medium tracking-wider text-[#059669] uppercase"
+        >Upah Lembur</span
+      >
+      <div class="mt-1 truncate font-mono text-sm font-bold text-[#059669] sm:text-base">
+        +{formatRupiah(totalOvertimePay)}
+      </div>
     </div>
-    <div class="bg-white border border-[#e5e5ea] rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-2xs">
-      <span class="text-[11px] font-medium uppercase tracking-wider text-[#e5484d] truncate">Denda Telat</span>
-      <div class="text-sm sm:text-base font-bold font-mono text-[#e5484d] mt-1 truncate">-{formatRupiah(totalLatePenalty)}</div>
+    <div
+      class="flex flex-col justify-between rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs sm:p-5"
+    >
+      <span class="truncate text-[11px] font-medium tracking-wider text-[#e5484d] uppercase"
+        >Denda Telat</span
+      >
+      <div class="mt-1 truncate font-mono text-sm font-bold text-[#e5484d] sm:text-base">
+        -{formatRupiah(totalLatePenalty)}
+      </div>
     </div>
-    <div class="bg-white border border-[#e5e5ea] rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-2xs">
-      <span class="text-[11px] font-medium uppercase tracking-wider text-[#e5484d] truncate">Potongan Kasbon</span>
-      <div class="text-sm sm:text-base font-bold font-mono text-[#e5484d] mt-1 truncate">-{formatRupiah(totalCashAdvanceDeduction)}</div>
+    <div
+      class="flex flex-col justify-between rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs sm:p-5"
+    >
+      <span class="truncate text-[11px] font-medium tracking-wider text-[#e5484d] uppercase"
+        >Potongan Kasbon</span
+      >
+      <div class="mt-1 truncate font-mono text-sm font-bold text-[#e5484d] sm:text-base">
+        -{formatRupiah(totalCashAdvanceDeduction)}
+      </div>
     </div>
-    <div class="col-span-2 sm:col-span-4 lg:col-span-1 bg-[#17171c] text-white rounded-2xl p-4 sm:p-5 flex flex-col justify-between shadow-xs">
-      <span class="text-[11px] font-medium uppercase tracking-wider text-white/70 truncate">Total Pencairan Bersih</span>
-      <div class="text-base sm:text-lg font-bold font-mono text-white mt-1 truncate">{formatRupiah(totalPayrollDisbursement)}</div>
+    <div
+      class="col-span-2 flex flex-col justify-between rounded-2xl bg-[#17171c] p-4 text-white shadow-xs sm:col-span-4 sm:p-5 lg:col-span-1"
+    >
+      <span class="truncate text-[11px] font-medium tracking-wider text-white/70 uppercase"
+        >Total Pencairan Bersih</span
+      >
+      <div class="mt-1 truncate font-mono text-base font-bold text-white sm:text-lg">
+        {formatRupiah(totalPayrollDisbursement)}
+      </div>
     </div>
   </div>
 
   <!-- Payroll Breakdown Table -->
-  <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xs">
-    <div class="p-5 border-b border-[#e5e5ea] flex items-center justify-between gap-3">
+  <div
+    class="overflow-hidden rounded-2xl border border-[#e5e5ea] bg-white shadow-2xs sm:rounded-3xl"
+  >
+    <div class="flex items-center justify-between gap-3 border-b border-[#e5e5ea] p-5">
       <div>
         <h3 class="text-base font-bold text-[#17171c]">Rincian Gaji Bersih per Karyawan</h3>
-        <p class="text-xs text-[#8e8e93] mt-0.5">Kalkulasi presensi, absensi, denda terlambat, dan potongan kasbon</p>
+        <p class="mt-0.5 text-xs text-[#8e8e93]">
+          Kalkulasi presensi, absensi, denda terlambat, dan potongan kasbon
+        </p>
       </div>
-      <span class="text-xs font-mono font-semibold text-[#686873] bg-[#f4f4f6] px-3 py-1 rounded-full">
+      <span
+        class="rounded-full bg-[#f4f4f6] px-3 py-1 font-mono text-xs font-semibold text-[#686873]"
+      >
         {payrollItems.length} Karyawan
       </span>
     </div>
 
     <!-- Mobile Card View -->
-    <div class="block md:hidden divide-y divide-[#f2f2f4]">
+    <div class="block divide-y divide-[#f2f2f4] md:hidden">
       {#if payrollItems.length > 0}
         {#each payrollItems as item}
-          <div class="p-5 space-y-3.5">
+          <div class="space-y-3.5 p-5">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <h4 class="font-bold text-sm text-[#17171c]">{item.name}</h4>
-                <p class="text-xs text-[#8e8e93] font-mono mt-0.5">{item.role}</p>
+                <h4 class="text-sm font-bold text-[#17171c]">{item.name}</h4>
+                <p class="mt-0.5 font-mono text-xs text-[#8e8e93]">{item.role}</p>
               </div>
               {#if item.status === 'DISBURSED'}
-                <span class="text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0] flex items-center gap-1">
-                  <Check class="w-3 h-3" />
+                <span
+                  class="flex items-center gap-1 rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#059669]"
+                >
+                  <Check class="h-3 w-3" />
                   <span>DICAIRKAN</span>
                 </span>
               {:else}
-                <span class="text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-[#fffbeb] text-[#d97706] border border-[#fde68a]">
+                <span
+                  class="rounded-full border border-[#fde68a] bg-[#fffbeb] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#d97706]"
+                >
                   ESTIMASI
                 </span>
               {/if}
             </div>
 
             <!-- Breakdown 2x2 Grid -->
-            <div class="grid grid-cols-2 gap-2 bg-[#f8f8fa] border border-[#ececee] rounded-2xl p-3 text-xs font-mono">
+            <div
+              class="grid grid-cols-2 gap-2 rounded-2xl border border-[#ececee] bg-[#f8f8fa] p-3 font-mono text-xs"
+            >
               <div>
                 <div class="text-[10px] text-[#8e8e93] uppercase">Gaji Pokok</div>
-                <div class="font-bold text-[#17171c] mt-0.5">{formatRupiah(item.base_salary)}</div>
+                <div class="mt-0.5 font-bold text-[#17171c]">{formatRupiah(item.base_salary)}</div>
               </div>
               <div>
                 <div class="text-[10px] text-[#8e8e93] uppercase">Upah Lembur</div>
-                <div class="font-bold text-[#059669] mt-0.5">+{formatRupiah(item.overtime_pay)}</div>
+                <div class="mt-0.5 font-bold text-[#059669]">
+                  +{formatRupiah(item.overtime_pay)}
+                </div>
               </div>
               <div>
                 <div class="text-[10px] text-[#8e8e93] uppercase">Denda Telat</div>
-                <div class="font-bold text-[#e5484d] mt-0.5">-{formatRupiah(item.late_penalty)}</div>
+                <div class="mt-0.5 font-bold text-[#e5484d]">
+                  -{formatRupiah(item.late_penalty)}
+                </div>
               </div>
               <div>
                 <div class="text-[10px] text-[#8e8e93] uppercase">Kasbon</div>
-                <div class="font-bold text-[#e5484d] mt-0.5">-{formatRupiah(item.cash_advance_deduction)}</div>
+                <div class="mt-0.5 font-bold text-[#e5484d]">
+                  -{formatRupiah(item.cash_advance_deduction)}
+                </div>
               </div>
             </div>
 
             <!-- Net Salary Footer -->
-            <div class="flex items-center justify-between pt-1 border-t border-[#f2f2f4]">
+            <div class="flex items-center justify-between border-t border-[#f2f2f4] pt-1">
               <span class="text-xs font-medium text-[#8e8e93]">Gaji Bersih Diterima</span>
-              <span class="text-base font-bold font-mono text-[#17171c]">{formatRupiah(item.net_salary)}</span>
+              <span class="font-mono text-base font-bold text-[#17171c]"
+                >{formatRupiah(item.net_salary)}</span
+              >
             </div>
           </div>
         {/each}
       {:else}
-        <div class="py-12 text-center text-[#8e8e93] text-xs">
+        <div class="py-12 text-center text-xs text-[#8e8e93]">
           Belum ada data staf untuk periode ini.
         </div>
       {/if}
     </div>
 
     <!-- Desktop Table View -->
-    <div class="hidden md:block overflow-x-auto">
-      <table class="w-full text-left border-collapse text-xs">
+    <div class="hidden overflow-x-auto md:block">
+      <table class="w-full border-collapse text-left text-xs">
         <thead>
-          <tr class="bg-[#fafafc] border-b border-[#e5e5ea] text-[#8e8e93] font-mono uppercase text-[10.5px]">
-            <th class="py-4 px-5 font-bold">Nama Karyawan</th>
-            <th class="py-4 px-5 text-right font-bold">Gaji Pokok</th>
-            <th class="py-4 px-5 text-right font-bold text-[#059669]">Lembur</th>
-            <th class="py-4 px-5 text-right font-bold text-[#e5484d]">Denda Telat</th>
-            <th class="py-4 px-5 text-right font-bold text-[#e5484d]">Kasbon</th>
-            <th class="py-4 px-5 text-right font-bold text-[#17171c]">Gaji Bersih (Net)</th>
-            <th class="py-4 px-5 text-center font-bold">Status</th>
+          <tr
+            class="border-b border-[#e5e5ea] bg-[#fafafc] font-mono text-[10.5px] text-[#8e8e93] uppercase"
+          >
+            <th class="px-5 py-4 font-bold">Nama Karyawan</th>
+            <th class="px-5 py-4 text-right font-bold">Gaji Pokok</th>
+            <th class="px-5 py-4 text-right font-bold text-[#059669]">Lembur</th>
+            <th class="px-5 py-4 text-right font-bold text-[#e5484d]">Denda Telat</th>
+            <th class="px-5 py-4 text-right font-bold text-[#e5484d]">Kasbon</th>
+            <th class="px-5 py-4 text-right font-bold text-[#17171c]">Gaji Bersih (Net)</th>
+            <th class="px-5 py-4 text-center font-bold">Status</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-[#e5e5ea]">
           {#if payrollItems.length > 0}
             {#each payrollItems as item}
-              <tr class="hover:bg-[#fafafc] transition-all">
-                <td class="py-4 px-5">
-                  <div class="font-bold text-xs text-[#17171c]">{item.name}</div>
-                  <div class="text-[11px] text-[#8e8e93] font-mono">{item.role}</div>
+              <tr class="transition-all hover:bg-[#fafafc]">
+                <td class="px-5 py-4">
+                  <div class="text-xs font-bold text-[#17171c]">{item.name}</div>
+                  <div class="font-mono text-[11px] text-[#8e8e93]">{item.role}</div>
                 </td>
-                <td class="py-4 px-5 text-right font-mono text-[#17171c]">{formatRupiah(item.base_salary)}</td>
-                <td class="py-4 px-5 text-right font-mono font-semibold text-[#059669]">+{formatRupiah(item.overtime_pay)}</td>
-                <td class="py-4 px-5 text-right font-mono font-semibold text-[#e5484d]">-{formatRupiah(item.late_penalty)}</td>
-                <td class="py-4 px-5 text-right font-mono font-semibold text-[#e5484d]">-{formatRupiah(item.cash_advance_deduction)}</td>
-                <td class="py-4 px-5 text-right font-mono font-bold text-sm text-[#17171c]">{formatRupiah(item.net_salary)}</td>
-                <td class="py-4 px-5 text-center">
+                <td class="px-5 py-4 text-right font-mono text-[#17171c]"
+                  >{formatRupiah(item.base_salary)}</td
+                >
+                <td class="px-5 py-4 text-right font-mono font-semibold text-[#059669]"
+                  >+{formatRupiah(item.overtime_pay)}</td
+                >
+                <td class="px-5 py-4 text-right font-mono font-semibold text-[#e5484d]"
+                  >-{formatRupiah(item.late_penalty)}</td
+                >
+                <td class="px-5 py-4 text-right font-mono font-semibold text-[#e5484d]"
+                  >-{formatRupiah(item.cash_advance_deduction)}</td
+                >
+                <td class="px-5 py-4 text-right font-mono text-sm font-bold text-[#17171c]"
+                  >{formatRupiah(item.net_salary)}</td
+                >
+                <td class="px-5 py-4 text-center">
                   {#if item.status === 'DISBURSED'}
-                    <span class="text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0] inline-flex items-center gap-1">
-                      <Check class="w-3 h-3" />
+                    <span
+                      class="inline-flex items-center gap-1 rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#059669]"
+                    >
+                      <Check class="h-3 w-3" />
                       <span>DICAIRKAN</span>
                     </span>
                   {:else}
-                    <span class="text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-[#fffbeb] text-[#d97706] border border-[#fde68a]">
+                    <span
+                      class="rounded-full border border-[#fde68a] bg-[#fffbeb] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#d97706]"
+                    >
                       ESTIMASI
                     </span>
                   {/if}

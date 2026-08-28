@@ -1,31 +1,39 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { Shield, Lock, Eye, FileCheck } from "lucide-svelte";
+  import { onMount } from 'svelte';
+  import { Shield, Lock, Eye, FileCheck } from 'lucide-svelte';
 
   const securityFeatures = [
     {
       icon: Lock,
-      title: "Penguncian Tablet Kasir",
-      description: "Setiap perangkat tablet kasir diikat dengan token otorisasi unik per cabang toko.",
+      title: 'Penguncian Tablet Kasir',
+      description:
+        'Setiap perangkat tablet kasir diikat dengan token otorisasi unik per cabang toko.',
     },
     {
       icon: Shield,
-      title: "Isolasi Data Multi-Tenant",
-      description: "Data penjualan, laba, dan gaji cabang Anda terisolasi aman di level database.",
+      title: 'Isolasi Data Multi-Tenant',
+      description: 'Data penjualan, laba, dan gaji cabang Anda terisolasi aman di level database.',
     },
     {
       icon: Eye,
-      title: "Verifikasi Geofence GPS",
-      description: "Foto presensi diverifikasi otomatis dengan radius toleransi titik koordinat toko.",
+      title: 'Verifikasi Geofence GPS',
+      description:
+        'Foto presensi diverifikasi otomatis dengan radius toleransi titik koordinat toko.',
     },
     {
       icon: FileCheck,
-      title: "Audit Trail Finansial Lengkap",
-      description: "Seluruh pencatatan kas, diskon kasir, dan penyesuaian gaji terekam permanen.",
+      title: 'Audit Trail Finansial Lengkap',
+      description: 'Seluruh pencatatan kas, diskon kasir, dan penyesuaian gaji terekam permanen.',
     },
   ];
 
-  const badges = ["Device Lock", "Multi-Tenant Safe", "GPS Geofenced", "Audit Trailed", "Cloudflare Encrypted"];
+  const badges = [
+    'Device Lock',
+    'Multi-Tenant Safe',
+    'GPS Geofenced',
+    'Audit Trailed',
+    'Cloudflare Encrypted',
+  ];
 
   let isVisible = $state(false);
   let sectionEl: HTMLElement;
@@ -42,34 +50,39 @@
   });
 </script>
 
-<section id="security" bind:this={sectionEl} class="relative py-24 lg:py-32 bg-white overflow-hidden border-t border-[#e0e0e0]">
-  <div class="max-w-[1400px] mx-auto px-6 lg:px-12">
-    <div class="grid lg:grid-cols-2 gap-16 lg:gap-24">
+<section
+  id="security"
+  bind:this={sectionEl}
+  class="relative overflow-hidden border-t border-[#e0e0e0] bg-white py-24 lg:py-32"
+>
+  <div class="mx-auto max-w-[1400px] px-6 lg:px-12">
+    <div class="grid gap-16 lg:grid-cols-2 lg:gap-24">
       <!-- Left: Content -->
       <div
         class={`transition-all duration-700 ${
-          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
         }`}
       >
-        <span class="inline-flex items-center gap-3 text-sm font-mono text-[#525252] mb-6">
-          <span class="w-8 h-px bg-[#0f62fe]"></span>
+        <span class="mb-6 inline-flex items-center gap-3 font-mono text-sm text-[#525252]">
+          <span class="h-px w-8 bg-[#0f62fe]"></span>
           Keamanan &amp; Integritas
         </span>
-        <h2 class="text-4xl lg:text-6xl font-display tracking-tight mb-8 text-[#161616]">
+        <h2 class="font-display mb-8 text-4xl tracking-tight text-[#161616] lg:text-6xl">
           Keamanan data adalah
           <br />
           prioritas mutlak.
         </h2>
-        <p class="text-xl text-[#525252] leading-relaxed mb-12">
-          Perlindungan data finansial dan integritas kehadiran dibangun di setiap lapisan sistem, menjamin bisnis Anda beroperasi dengan tenang.
+        <p class="mb-12 text-xl leading-relaxed text-[#525252]">
+          Perlindungan data finansial dan integritas kehadiran dibangun di setiap lapisan sistem,
+          menjamin bisnis Anda beroperasi dengan tenang.
         </p>
 
         <!-- Badges -->
         <div class="flex flex-wrap gap-3">
           {#each badges as badge, index}
             <span
-              class={`px-4 py-2 border border-[#e0e0e0] text-sm font-mono text-[#161616] bg-[#f4f4f4] transition-all duration-500 ${
-                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              class={`border border-[#e0e0e0] bg-[#f4f4f4] px-4 py-2 font-mono text-sm text-[#161616] transition-all duration-500 ${
+                isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
               }`}
               style={`transition-delay: ${index * 50 + 200}ms;`}
             >
@@ -83,20 +96,24 @@
       <div class="grid gap-6">
         {#each securityFeatures as feature, index}
           <div
-            class={`p-6 border border-[#e0e0e0] bg-[#f4f4f4] hover:border-[#0f62fe] transition-all duration-500 group ${
-              isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+            class={`group border border-[#e0e0e0] bg-[#f4f4f4] p-6 transition-all duration-500 hover:border-[#0f62fe] ${
+              isVisible ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0'
             }`}
             style={`transition-delay: ${index * 100}ms;`}
           >
             <div class="flex items-start gap-4">
-              <div class="shrink-0 w-10 h-10 flex items-center justify-center bg-white border border-[#e0e0e0] group-hover:bg-[#0f62fe] group-hover:text-white transition-colors duration-300">
-                <feature.icon class="w-5 h-5 text-[#0f62fe] group-hover:text-white" />
+              <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center border border-[#e0e0e0] bg-white transition-colors duration-300 group-hover:bg-[#0f62fe] group-hover:text-white"
+              >
+                <feature.icon class="h-5 w-5 text-[#0f62fe] group-hover:text-white" />
               </div>
               <div>
-                <h3 class="text-lg font-medium text-[#161616] mb-1 group-hover:translate-x-1 transition-transform duration-300">
+                <h3
+                  class="mb-1 text-lg font-medium text-[#161616] transition-transform duration-300 group-hover:translate-x-1"
+                >
                   {feature.title}
                 </h3>
-                <p class="text-[#525252] text-sm leading-relaxed">{feature.description}</p>
+                <p class="text-sm leading-relaxed text-[#525252]">{feature.description}</p>
               </div>
             </div>
           </div>

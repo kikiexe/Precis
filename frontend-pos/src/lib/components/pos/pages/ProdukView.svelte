@@ -1,6 +1,12 @@
 <script lang="ts">
   import { Package, Layers, Calendar, History } from 'lucide-svelte';
-  import type { Product, Category, RawMaterial, StockAdjustmentReason, StockAdjustmentLog } from '../../../types/pos';
+  import type {
+    Product,
+    Category,
+    RawMaterial,
+    StockAdjustmentReason,
+    StockAdjustmentLog,
+  } from '../../../types/pos';
   import PosMenuTab from './catalog/PosMenuTab.svelte';
   import PosRawMaterialTab from './catalog/PosRawMaterialTab.svelte';
   import PosDailyReconciliationTab from './catalog/PosDailyReconciliationTab.svelte';
@@ -225,60 +231,62 @@
   }
 </script>
 
-<div class="flex-1 flex flex-col h-full bg-[#f4f6f9] overflow-y-auto p-4 sm:p-6 lg:p-8 font-sans">
-  <div class="w-full max-w-7xl mx-auto space-y-5 pb-8">
+<div class="flex h-full flex-1 flex-col overflow-y-auto bg-[#f4f6f9] p-4 font-sans sm:p-6 lg:p-8">
+  <div class="mx-auto w-full max-w-7xl space-y-5 pb-8">
     <!-- Header Sub-Tabs (Excel / Enterprise POS Architecture) -->
-    <div class="flex items-center justify-between gap-4 border-b border-zinc-200 pb-3 overflow-x-auto no-scrollbar">
+    <div
+      class="no-scrollbar flex items-center justify-between gap-4 overflow-x-auto border-b border-zinc-200 pb-3"
+    >
       <div class="flex items-center gap-2">
         <button
           type="button"
           onclick={() => (activeSubTab = 'bahan')}
-          class={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer border whitespace-nowrap ${
+          class={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
             activeSubTab === 'bahan'
-              ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
-              : 'bg-white border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/70'
+              ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
+              : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900'
           }`}
         >
-          <Layers class="w-4 h-4" />
+          <Layers class="h-4 w-4" />
           <span>Stok Bahan Baku ({rawMaterials.length})</span>
         </button>
 
         <button
           type="button"
           onclick={() => (activeSubTab = 'rekap')}
-          class={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer border whitespace-nowrap ${
+          class={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
             activeSubTab === 'rekap'
-              ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
-              : 'bg-white border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/70'
+              ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
+              : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900'
           }`}
         >
-          <Calendar class="w-4 h-4" />
+          <Calendar class="h-4 w-4" />
           <span>Rekap Harian &amp; Mutasi</span>
         </button>
 
         <button
           type="button"
           onclick={() => (activeSubTab = 'menu')}
-          class={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer border whitespace-nowrap ${
+          class={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
             activeSubTab === 'menu'
-              ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
-              : 'bg-white border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/70'
+              ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
+              : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900'
           }`}
         >
-          <Package class="w-4 h-4" />
+          <Package class="h-4 w-4" />
           <span>Menu Jualan POS ({products.length})</span>
         </button>
 
         <button
           type="button"
           onclick={() => (activeSubTab = 'logs')}
-          class={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer border whitespace-nowrap ${
+          class={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
             activeSubTab === 'logs'
-              ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
-              : 'bg-white border-zinc-200 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/70'
+              ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
+              : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900'
           }`}
         >
-          <History class="w-4 h-4" />
+          <History class="h-4 w-4" />
           <span>Log Audit Opname ({stockLogs.length})</span>
         </button>
       </div>
@@ -300,10 +308,7 @@
         onDeleteMaterial={handleDeleteMaterial}
       />
     {:else if activeSubTab === 'rekap'}
-      <PosDailyReconciliationTab
-        {rawMaterials}
-        onOpenOpname={(mat) => (adjustingMaterial = mat)}
-      />
+      <PosDailyReconciliationTab {rawMaterials} onOpenOpname={(mat) => (adjustingMaterial = mat)} />
     {:else if activeSubTab === 'menu'}
       <PosMenuTab
         {products}

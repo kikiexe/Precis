@@ -1,5 +1,15 @@
 <script lang="ts">
-  import { Search, Printer, Send, RotateCcw, CreditCard, QrCode, Banknote, Clock, Receipt } from 'lucide-svelte';
+  import {
+    Search,
+    Printer,
+    Send,
+    RotateCcw,
+    CreditCard,
+    QrCode,
+    Banknote,
+    Clock,
+    Receipt,
+  } from 'lucide-svelte';
   import type { OfflineOrder } from '../../../types/pos';
   import { formatCurrency } from '../../../services/printer-service';
 
@@ -15,7 +25,7 @@
   let timeframeFilter = $state<'TODAY' | 'THIS_MONTH' | 'THIS_YEAR' | 'CUSTOM'>('TODAY');
 
   const todayStr = new Date().toISOString().substring(0, 10);
-  
+
   let earliestDate = $derived(() => {
     if (orders && orders.length > 0) {
       const sorted = [...orders]
@@ -55,8 +65,7 @@
           orderDate.getDate() === now.getDate();
       } else if (timeframeFilter === 'THIS_MONTH') {
         matchTimeframe =
-          orderDate.getFullYear() === now.getFullYear() &&
-          orderDate.getMonth() === now.getMonth();
+          orderDate.getFullYear() === now.getFullYear() && orderDate.getMonth() === now.getMonth();
       } else if (timeframeFilter === 'THIS_YEAR') {
         matchTimeframe = orderDate.getFullYear() === now.getFullYear();
       } else if (timeframeFilter === 'CUSTOM') {
@@ -136,30 +145,33 @@
   }
 </script>
 
-<div class="flex-1 flex flex-col h-full bg-[#f4f6f9] overflow-hidden font-sans select-none">
+<div class="flex h-full flex-1 flex-col overflow-hidden bg-[#f4f6f9] font-sans select-none">
   <!-- Top Header -->
-  <div class="h-14 bg-white border-b border-zinc-200 px-6 flex items-center justify-between shrink-0 shadow-2xs">
-    <h1 class="text-base font-bold text-zinc-900 tracking-tight">Aktivitas Transaksi</h1>
-    <div class="text-xs font-mono text-zinc-500">
+  <div
+    class="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-6 shadow-2xs"
+  >
+    <h1 class="text-base font-bold tracking-tight text-zinc-900">Aktivitas Transaksi</h1>
+    <div class="font-mono text-xs text-zinc-500">
       Total: <span class="font-bold text-zinc-900">{filteredOrders.length}</span> Transaksi Terfilter
     </div>
   </div>
 
   <!-- Split Screen: Left List, Right Detail -->
-  <div class="flex-1 flex overflow-hidden">
+  <div class="flex flex-1 overflow-hidden">
     <!-- Left Column: Filter, Search & Transaction List -->
-    <div class="w-84 sm:w-96 md:w-104 bg-white border-r border-zinc-200 flex flex-col h-full shrink-0">
-      
+    <div
+      class="flex h-full w-84 shrink-0 flex-col border-r border-zinc-200 bg-white sm:w-96 md:w-104"
+    >
       <!-- Timeframe Filter Buttons -->
-      <div class="p-3 border-b border-zinc-200 bg-zinc-50/50 space-y-2">
+      <div class="space-y-2 border-b border-zinc-200 bg-zinc-50/50 p-3">
         <div class="grid grid-cols-4 gap-1">
           <button
             type="button"
             onclick={() => (timeframeFilter = 'TODAY')}
-            class={`py-1.5 px-2 rounded-lg text-[11px] font-semibold transition-all cursor-pointer border ${
+            class={`cursor-pointer rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-all ${
               timeframeFilter === 'TODAY'
-                ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
-                : 'bg-white text-zinc-600 hover:text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+                ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
+                : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
             }`}
           >
             Hari Ini
@@ -168,10 +180,10 @@
           <button
             type="button"
             onclick={() => (timeframeFilter = 'THIS_MONTH')}
-            class={`py-1.5 px-2 rounded-lg text-[11px] font-semibold transition-all cursor-pointer border ${
+            class={`cursor-pointer rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-all ${
               timeframeFilter === 'THIS_MONTH'
-                ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
-                : 'bg-white text-zinc-600 hover:text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+                ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
+                : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
             }`}
           >
             Bulan Ini
@@ -180,10 +192,10 @@
           <button
             type="button"
             onclick={() => (timeframeFilter = 'THIS_YEAR')}
-            class={`py-1.5 px-2 rounded-lg text-[11px] font-semibold transition-all cursor-pointer border ${
+            class={`cursor-pointer rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-all ${
               timeframeFilter === 'THIS_YEAR'
-                ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
-                : 'bg-white text-zinc-600 hover:text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+                ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
+                : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
             }`}
           >
             Tahun Ini
@@ -196,10 +208,10 @@
               customStartDate = earliestDate();
               customEndDate = todayStr;
             }}
-            class={`py-1.5 px-2 rounded-lg text-[11px] font-semibold transition-all cursor-pointer border ${
+            class={`cursor-pointer rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-all ${
               timeframeFilter === 'CUSTOM'
-                ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
-                : 'bg-white text-zinc-600 hover:text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+                ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
+                : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
             }`}
           >
             Kustom
@@ -209,7 +221,10 @@
         {#if timeframeFilter === 'CUSTOM'}
           <div class="grid grid-cols-2 gap-2 pt-1">
             <div>
-              <label for="filter-start-date" class="text-[10px] font-semibold text-zinc-500 block mb-0.5">
+              <label
+                for="filter-start-date"
+                class="mb-0.5 block text-[10px] font-semibold text-zinc-500"
+              >
                 Dari (Min: {earliestDate()})
               </label>
               <input
@@ -218,11 +233,14 @@
                 min={earliestDate()}
                 max={todayStr}
                 bind:value={customStartDate}
-                class="w-full px-2 py-1 bg-white border border-zinc-200 rounded-md text-[11px] font-mono text-zinc-900 focus:outline-hidden focus:border-zinc-900"
+                class="w-full rounded-md border border-zinc-200 bg-white px-2 py-1 font-mono text-[11px] text-zinc-900 focus:border-zinc-900 focus:outline-hidden"
               />
             </div>
             <div>
-              <label for="filter-end-date" class="text-[10px] font-semibold text-zinc-500 block mb-0.5">
+              <label
+                for="filter-end-date"
+                class="mb-0.5 block text-[10px] font-semibold text-zinc-500"
+              >
                 Sampai (Max: {todayStr})
               </label>
               <input
@@ -231,7 +249,7 @@
                 min={customStartDate || earliestDate()}
                 max={todayStr}
                 bind:value={customEndDate}
-                class="w-full px-2 py-1 bg-white border border-zinc-200 rounded-md text-[11px] font-mono text-zinc-900 focus:outline-hidden focus:border-zinc-900"
+                class="w-full rounded-md border border-zinc-200 bg-white px-2 py-1 font-mono text-[11px] text-zinc-900 focus:border-zinc-900 focus:outline-hidden"
               />
             </div>
           </div>
@@ -239,29 +257,33 @@
 
         <!-- Search Input -->
         <div class="relative pt-0.5">
-          <Search class="w-4 h-4 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-400" />
           <input
             type="text"
             bind:value={searchQuery}
             placeholder="Cari struk, nama pelanggan, menu..."
-            class="w-full h-8.5 bg-white border border-zinc-200 rounded-lg pl-9 pr-3 text-xs text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:outline-hidden transition-all"
+            class="h-8.5 w-full rounded-lg border border-zinc-200 bg-white pr-3 pl-9 text-xs text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:outline-hidden"
           />
         </div>
       </div>
 
       <!-- Date Group Header -->
-      <div class="px-4 py-2 bg-zinc-100/90 border-b border-zinc-200 text-[11px] font-bold text-zinc-600 tracking-wider uppercase flex items-center justify-between">
+      <div
+        class="flex items-center justify-between border-b border-zinc-200 bg-zinc-100/90 px-4 py-2 text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
+      >
         <span>{dateGroupLabel()}</span>
-        <span class="font-mono text-zinc-400 font-normal">({filteredOrders.length})</span>
+        <span class="font-mono font-normal text-zinc-400">({filteredOrders.length})</span>
       </div>
 
       <!-- List of Transactions -->
-      <div class="flex-1 overflow-y-auto divide-y divide-zinc-100">
+      <div class="flex-1 divide-y divide-zinc-100 overflow-y-auto">
         {#if filteredOrders.length === 0}
-          <div class="py-16 flex flex-col items-center justify-center text-center text-zinc-400">
-            <Receipt class="w-9 h-9 mb-2 opacity-30 text-zinc-400" />
+          <div class="flex flex-col items-center justify-center py-16 text-center text-zinc-400">
+            <Receipt class="mb-2 h-9 w-9 text-zinc-400 opacity-30" />
             <p class="text-sm font-semibold text-zinc-800">Tidak ada transaksi</p>
-            <p class="text-xs text-zinc-500 mt-0.5">Transaksi yang telah dibayar akan muncul di sini.</p>
+            <p class="mt-0.5 text-xs text-zinc-500">
+              Transaksi yang telah dibayar akan muncul di sini.
+            </p>
           </div>
         {:else}
           {#each filteredOrders as order (order.client_order_id)}
@@ -270,29 +292,37 @@
             <button
               type="button"
               onclick={() => (selectedOrderId = order.client_order_id)}
-              class={`w-full p-4 text-left transition-colors cursor-pointer flex items-start gap-3 ${
+              class={`flex w-full cursor-pointer items-start gap-3 p-4 text-left transition-colors ${
                 isSelected
                   ? 'bg-zinc-900 text-white shadow-xs'
-                  : 'hover:bg-zinc-50 text-zinc-900 bg-white'
+                  : 'bg-white text-zinc-900 hover:bg-zinc-50'
               }`}
             >
-              <div class={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                isSelected ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-zinc-600'
-              }`}>
-                <PayIcon class="w-4.5 h-4.5" />
+              <div
+                class={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                  isSelected ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-zinc-600'
+                }`}
+              >
+                <PayIcon class="h-4.5 w-4.5" />
               </div>
 
-              <div class="flex-1 min-w-0">
+              <div class="min-w-0 flex-1">
                 <div class="flex items-center justify-between gap-1">
-                  <span class={`font-mono font-bold text-xs sm:text-sm ${isSelected ? 'text-white' : 'text-zinc-900'}`}>
+                  <span
+                    class={`font-mono text-xs font-bold sm:text-sm ${isSelected ? 'text-white' : 'text-zinc-900'}`}
+                  >
                     {formatCurrency(order.final_amount)}
                   </span>
-                  <span class={`font-mono text-[11px] ${isSelected ? 'text-zinc-400' : 'text-zinc-400'}`}>
+                  <span
+                    class={`font-mono text-[11px] ${isSelected ? 'text-zinc-400' : 'text-zinc-400'}`}
+                  >
                     {formatTime(order.created_at)}
                   </span>
                 </div>
 
-                <div class={`text-[11px] mt-0.5 truncate ${isSelected ? 'text-zinc-300' : 'text-zinc-500'}`}>
+                <div
+                  class={`mt-0.5 truncate text-[11px] ${isSelected ? 'text-zinc-300' : 'text-zinc-500'}`}
+                >
                   {order.items.map((i) => i.product_name).join(', ')}
                 </div>
               </div>
@@ -303,57 +333,61 @@
     </div>
 
     <!-- Right Column: Detail View -->
-    <div class="flex-1 bg-[#f4f6f9] p-6 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto bg-[#f4f6f9] p-6">
       {#if selectedOrder}
-        <div class="max-w-2xl mx-auto space-y-6">
+        <div class="mx-auto max-w-2xl space-y-6">
           <!-- Top Action Buttons (Kirim Struk | Cetak Ulang | Pilih Refund) -->
           <div class="grid grid-cols-3 gap-3">
             <button
               type="button"
               onclick={() => onPrintOrder(selectedOrder!)}
-              class="py-3 px-4 bg-white hover:bg-zinc-50 border border-zinc-300 text-zinc-800 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-2xs transition-all active:scale-[0.99]"
+              class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50 active:scale-[0.99]"
             >
-              <Printer class="w-4 h-4 text-zinc-900" />
+              <Printer class="h-4 w-4 text-zinc-900" />
               <span>Cetak Struk</span>
             </button>
 
             <button
               type="button"
-              class="py-3 px-4 bg-white hover:bg-zinc-50 border border-zinc-300 text-zinc-800 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-2xs transition-all active:scale-[0.99]"
+              class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50 active:scale-[0.99]"
             >
-              <Send class="w-4 h-4 text-zinc-600" />
+              <Send class="h-4 w-4 text-zinc-600" />
               <span>Kirim Struk</span>
             </button>
 
             <button
               type="button"
-              class="py-3 px-4 bg-white hover:bg-zinc-50 border border-zinc-300 text-zinc-800 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-2xs transition-all active:scale-[0.99]"
+              class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50 active:scale-[0.99]"
             >
-              <RotateCcw class="w-4 h-4 text-zinc-600" />
+              <RotateCcw class="h-4 w-4 text-zinc-600" />
               <span>Pilih Refund</span>
             </button>
           </div>
 
           <!-- Section: Detail Transaksi -->
-          <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
-            <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider border-b border-zinc-100 pb-2">
+          <div class="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <div
+              class="border-b border-zinc-100 pb-2 text-xs font-bold tracking-wider text-zinc-500 uppercase"
+            >
               Detail Transaksi
             </div>
 
             <div class="space-y-3 text-xs">
               <div class="flex items-center justify-between">
-                <span class="text-zinc-500 flex items-center gap-2">
-                  <CreditCard class="w-4 h-4 text-zinc-400" />
+                <span class="flex items-center gap-2 text-zinc-500">
+                  <CreditCard class="h-4 w-4 text-zinc-400" />
                   <span>Metode Pembayaran</span>
                 </span>
-                <span class="font-bold text-zinc-900 bg-zinc-100 px-2.5 py-1 rounded-md">
-                  {selectedOrder.payment_method === 'TRANSFER' ? 'EDC' : selectedOrder.payment_method}
+                <span class="rounded-md bg-zinc-100 px-2.5 py-1 font-bold text-zinc-900">
+                  {selectedOrder.payment_method === 'TRANSFER'
+                    ? 'EDC'
+                    : selectedOrder.payment_method}
                 </span>
               </div>
 
               <div class="flex items-center justify-between">
-                <span class="text-zinc-500 flex items-center gap-2">
-                  <Receipt class="w-4 h-4 text-zinc-400" />
+                <span class="flex items-center gap-2 text-zinc-500">
+                  <Receipt class="h-4 w-4 text-zinc-400" />
                   <span>Nomor Struk</span>
                 </span>
                 <span class="font-mono font-bold text-zinc-900">
@@ -362,8 +396,8 @@
               </div>
 
               <div class="flex items-center justify-between">
-                <span class="text-zinc-500 flex items-center gap-2">
-                  <Clock class="w-4 h-4 text-zinc-400" />
+                <span class="flex items-center gap-2 text-zinc-500">
+                  <Clock class="h-4 w-4 text-zinc-400" />
                   <span>Waktu Pembelian</span>
                 </span>
                 <span class="font-medium text-zinc-800">
@@ -391,21 +425,23 @@
           </div>
 
           <!-- Section: Produk -->
-          <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
-            <div class="text-xs font-bold text-zinc-500 uppercase tracking-wider border-b border-zinc-100 pb-2">
+          <div class="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
+            <div
+              class="border-b border-zinc-100 pb-2 text-xs font-bold tracking-wider text-zinc-500 uppercase"
+            >
               Produk ({selectedOrder.items.reduce((s, i) => s + i.quantity, 0)} Item)
             </div>
 
             <div class="divide-y divide-zinc-100">
               {#each selectedOrder.items as item}
-                <div class="py-3 flex items-start justify-between gap-3 text-xs">
+                <div class="flex items-start justify-between gap-3 py-3 text-xs">
                   <div>
                     <div class="font-bold text-zinc-900">{item.product_name}</div>
-                    <div class="text-zinc-500 font-mono text-[11px] mt-0.5">
+                    <div class="mt-0.5 font-mono text-[11px] text-zinc-500">
                       {item.quantity} x {formatCurrency(item.unit_price)}
                     </div>
                     {#if item.notes}
-                      <div class="text-[11px] text-zinc-600 mt-0.5">Catatan: {item.notes}</div>
+                      <div class="mt-0.5 text-[11px] text-zinc-600">Catatan: {item.notes}</div>
                     {/if}
                   </div>
                   <div class="font-mono font-bold text-zinc-900">
@@ -416,10 +452,12 @@
             </div>
 
             <!-- Total Breakdown -->
-            <div class="border-t border-zinc-200 pt-3 space-y-1.5 text-xs">
+            <div class="space-y-1.5 border-t border-zinc-200 pt-3 text-xs">
               <div class="flex justify-between text-zinc-500">
                 <span>Subtotal</span>
-                <span class="font-mono text-zinc-700">{formatCurrency(selectedOrder.total_amount)}</span>
+                <span class="font-mono text-zinc-700"
+                  >{formatCurrency(selectedOrder.total_amount)}</span
+                >
               </div>
               {#if selectedOrder.discount_amount > 0}
                 <div class="flex justify-between text-red-600">
@@ -427,18 +465,24 @@
                   <span class="font-mono">-{formatCurrency(selectedOrder.discount_amount)}</span>
                 </div>
               {/if}
-              <div class="flex justify-between text-base font-bold text-zinc-900 pt-2 border-t border-zinc-200">
+              <div
+                class="flex justify-between border-t border-zinc-200 pt-2 text-base font-bold text-zinc-900"
+              >
                 <span>Total</span>
-                <span class="font-mono text-zinc-900 font-bold">{formatCurrency(selectedOrder.final_amount)}</span>
+                <span class="font-mono font-bold text-zinc-900"
+                  >{formatCurrency(selectedOrder.final_amount)}</span
+                >
               </div>
             </div>
           </div>
         </div>
       {:else}
-        <div class="h-full flex flex-col items-center justify-center text-center text-zinc-400">
-          <Receipt class="w-12 h-12 mb-3 opacity-30 text-zinc-400" />
+        <div class="flex h-full flex-col items-center justify-center text-center text-zinc-400">
+          <Receipt class="mb-3 h-12 w-12 text-zinc-400 opacity-30" />
           <p class="text-base font-semibold text-zinc-800">Pilih Transaksi</p>
-          <p class="text-xs text-zinc-500 mt-1">Klik salah satu transaksi dari daftar di sebelah kiri untuk melihat detail struk.</p>
+          <p class="mt-1 text-xs text-zinc-500">
+            Klik salah satu transaksi dari daftar di sebelah kiri untuk melihat detail struk.
+          </p>
         </div>
       {/if}
     </div>

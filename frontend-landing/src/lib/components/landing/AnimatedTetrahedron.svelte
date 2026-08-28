@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte';
 
   let canvasRef: HTMLCanvasElement;
 
   onMount(() => {
     if (!canvasRef) return;
-    const ctx = canvasRef.getContext("2d");
+    const ctx = canvasRef.getContext('2d');
     if (!ctx) return;
 
-    const chars = "░▒▓█▀▄▌▐│─┤├┴┬╭╮╰╯";
+    const chars = '░▒▓█▀▄▌▐│─┤├┴┬╭╮╰╯';
     let angle = 0;
     let animId: number;
 
@@ -21,7 +21,7 @@
     };
 
     handleResize();
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
 
     const vertices = [
       { x: 0, y: 1, z: 0 },
@@ -31,8 +31,12 @@
     ];
 
     const edges = [
-      [0, 1], [0, 2], [0, 3],
-      [1, 2], [2, 3], [3, 1],
+      [0, 1],
+      [0, 2],
+      [0, 3],
+      [1, 2],
+      [2, 3],
+      [3, 1],
     ];
 
     const faces = [
@@ -74,9 +78,9 @@
       const centerY = height / 2;
       const size = 322;
 
-      ctx.font = "18px monospace";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
+      ctx.font = '18px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
       const points: Array<{ x: number; y: number; z: number; char: string }> = [];
 
@@ -152,10 +156,10 @@
     render();
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animId);
     };
   });
 </script>
 
-<canvas bind:this={canvasRef} class="w-full h-full block"></canvas>
+<canvas bind:this={canvasRef} class="block h-full w-full"></canvas>

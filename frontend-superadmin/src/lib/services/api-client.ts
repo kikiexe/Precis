@@ -87,7 +87,10 @@ export class SuperadminApiClient {
 
   private buildUrl(endpoint: string, params?: RequestOptions['params']): string {
     let cleanBase = (this.baseUrl || getDefaultSuperadminApiBaseUrl()).replace(/\/+$/, '');
-    if (typeof window !== 'undefined' && (cleanBase.includes('localhost') || cleanBase.includes('127.0.0.1'))) {
+    if (
+      typeof window !== 'undefined' &&
+      (cleanBase.includes('localhost') || cleanBase.includes('127.0.0.1'))
+    ) {
       cleanBase = '/api/v1';
     }
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
@@ -105,7 +108,10 @@ export class SuperadminApiClient {
     return url.toString();
   }
 
-  public async request<T = unknown>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+  public async request<T = unknown>(
+    endpoint: string,
+    options: RequestOptions = {}
+  ): Promise<ApiResponse<T>> {
     const { params, skipAuth = false, body, headers = {}, ...customInit } = options;
 
     const url = this.buildUrl(endpoint, params);
@@ -157,7 +163,11 @@ export class SuperadminApiClient {
       // Extract specific validation message if available
       if (errorData?.errors && typeof errorData.errors === 'object') {
         const errorEntries = Object.values(errorData.errors);
-        if (errorEntries.length > 0 && Array.isArray(errorEntries[0]) && errorEntries[0].length > 0) {
+        if (
+          errorEntries.length > 0 &&
+          Array.isArray(errorEntries[0]) &&
+          errorEntries[0].length > 0
+        ) {
           errorMessage = errorEntries[0][0];
         }
       }
@@ -167,8 +177,13 @@ export class SuperadminApiClient {
       }
 
       // Sanitize raw database or SQLSTATE leakages
-      if (errorMessage.includes('SQLSTATE') || errorMessage.includes('syntax error') || errorMessage.includes('Connection refused')) {
-        errorMessage = 'Terjadi kendala pada penyimpanan database server. Silakan coba beberapa saat lagi.';
+      if (
+        errorMessage.includes('SQLSTATE') ||
+        errorMessage.includes('syntax error') ||
+        errorMessage.includes('Connection refused')
+      ) {
+        errorMessage =
+          'Terjadi kendala pada penyimpanan database server. Silakan coba beberapa saat lagi.';
       }
 
       if (status === 401) {
@@ -183,11 +198,18 @@ export class SuperadminApiClient {
     return (responsePayload as ApiResponse<T>) || { message: 'Operasi berhasil.' };
   }
 
-  public get<T = unknown>(endpoint: string, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
+  public get<T = unknown>(
+    endpoint: string,
+    options?: Omit<RequestOptions, 'method' | 'body'>
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  public post<T = unknown>(endpoint: string, body?: unknown, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
+  public post<T = unknown>(
+    endpoint: string,
+    body?: unknown,
+    options?: Omit<RequestOptions, 'method' | 'body'>
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'POST', body });
   }
 }

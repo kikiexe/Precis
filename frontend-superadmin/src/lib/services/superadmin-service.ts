@@ -41,30 +41,47 @@ export const superadminService = {
 
   async getInvoices(status?: string): Promise<InvoiceRecord[]> {
     const params = status ? { status } : undefined;
-    const response = await superadminApiClient.get<InvoiceRecord[]>('/superadmin/invoices', { params });
+    const response = await superadminApiClient.get<InvoiceRecord[]>('/superadmin/invoices', {
+      params,
+    });
     return response.data || [];
   },
 
-  async verifyInvoice(invoiceId: string): Promise<{ id: string; status: string; subscription_status: string }> {
-    const response = await superadminApiClient.post<{ id: string; status: string; subscription_status: string }>(
-      `/superadmin/invoices/${invoiceId}/verify`
-    );
+  async verifyInvoice(
+    invoiceId: string
+  ): Promise<{ id: string; status: string; subscription_status: string }> {
+    const response = await superadminApiClient.post<{
+      id: string;
+      status: string;
+      subscription_status: string;
+    }>(`/superadmin/invoices/${invoiceId}/verify`);
     return response.data!;
   },
 
   async getTenants(status?: string): Promise<TenantRecord[]> {
     const params = status ? { status } : undefined;
-    const response = await superadminApiClient.get<TenantRecord[]>('/superadmin/tenants', { params });
+    const response = await superadminApiClient.get<TenantRecord[]>('/superadmin/tenants', {
+      params,
+    });
     return response.data || [];
   },
 
-  async updateTenantStatus(tenantId: string, status: 'ACTIVE' | 'SUSPENDED' | 'GRACE_PERIOD' | 'TRIAL'): Promise<TenantRecord> {
-    const response = await superadminApiClient.post<TenantRecord>(`/superadmin/tenants/${tenantId}/status`, { status });
+  async updateTenantStatus(
+    tenantId: string,
+    status: 'ACTIVE' | 'SUSPENDED' | 'GRACE_PERIOD' | 'TRIAL'
+  ): Promise<TenantRecord> {
+    const response = await superadminApiClient.post<TenantRecord>(
+      `/superadmin/tenants/${tenantId}/status`,
+      { status }
+    );
     return response.data!;
   },
 
   async extendTenantSubscription(tenantId: string, days: number = 30): Promise<TenantRecord> {
-    const response = await superadminApiClient.post<TenantRecord>(`/superadmin/tenants/${tenantId}/extend`, { days });
+    const response = await superadminApiClient.post<TenantRecord>(
+      `/superadmin/tenants/${tenantId}/extend`,
+      { days }
+    );
     return response.data!;
   },
 

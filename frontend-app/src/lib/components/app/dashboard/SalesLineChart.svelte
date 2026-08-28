@@ -2,11 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import type { TimeframeSalesPoint, TimeframePeriod } from '../../../types/app';
   import { formatRupiah } from '@precis/shared-utils';
-  import {
-    ZoomIn,
-    ZoomOut,
-    RotateCcw,
-  } from 'lucide-svelte';
+  import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-svelte';
 
   interface Props {
     breakdown: TimeframeSalesPoint[];
@@ -75,7 +71,9 @@
   let netColor = $derived(isTrendingUp ? '#10b981' : '#ef4444');
   let netFillRgba = $derived(isTrendingUp ? 'rgba(16, 185, 129, 0.16)' : 'rgba(239, 68, 68, 0.16)');
   let grossColor = $derived(isTrendingUp ? '#6366f1' : '#f97316');
-  let grossFillRgba = $derived(isTrendingUp ? 'rgba(99, 102, 241, 0.12)' : 'rgba(249, 115, 22, 0.12)');
+  let grossFillRgba = $derived(
+    isTrendingUp ? 'rgba(99, 102, 241, 0.12)' : 'rgba(249, 115, 22, 0.12)'
+  );
 
   // Series visibility toggles
   let showNet = $state(true);
@@ -277,7 +275,8 @@
       const x = pad.left + u * contentW + panX;
 
       const targetNetY = pad.top + plotH - (Math.max(0, pt.revenue) / currentMaxVal) * plotH + panY;
-      const targetGrossY = pad.top + plotH - (Math.max(0, pt.revenue + avgDisc) / currentMaxVal) * plotH + panY;
+      const targetGrossY =
+        pad.top + plotH - (Math.max(0, pt.revenue + avgDisc) / currentMaxVal) * plotH + panY;
 
       animatedNetY[i] = lerp(animatedNetY[i], targetNetY, 0.2, dt);
       animatedGrossY[i] = lerp(animatedGrossY[i], targetGrossY, 0.2, dt);
@@ -403,7 +402,9 @@
 
         ctx.beginPath();
         ctx.arc(lastNet[0], lastNet[1], pulseRadius, 0, Math.PI * 2);
-        ctx.fillStyle = isTrendingUp ? `rgba(16, 185, 129, ${pulseAlpha})` : `rgba(239, 68, 68, ${pulseAlpha})`;
+        ctx.fillStyle = isTrendingUp
+          ? `rgba(16, 185, 129, ${pulseAlpha})`
+          : `rgba(239, 68, 68, ${pulseAlpha})`;
         ctx.fill();
 
         ctx.beginPath();
@@ -540,7 +541,9 @@
           const isSelected = activeIndex === i;
 
           if (!isSelected) {
-            ctx.fillStyle = isHoveringXAxis ? 'rgba(255, 255, 255, 0.65)' : 'rgba(255, 255, 255, 0.35)';
+            ctx.fillStyle = isHoveringXAxis
+              ? 'rgba(255, 255, 255, 0.65)'
+              : 'rgba(255, 255, 255, 0.35)';
             ctx.font = `${isCompact ? '8.5px' : '9.5px'} "SF Mono", Menlo, monospace`;
             ctx.textAlign = 'center';
             ctx.fillText(label, x, h - 5);
@@ -752,7 +755,9 @@
   });
 
   // Active scrubbed point values
-  let activePoint = $derived(activeIndex !== null && breakdown[activeIndex] ? breakdown[activeIndex] : null);
+  let activePoint = $derived(
+    activeIndex !== null && breakdown[activeIndex] ? breakdown[activeIndex] : null
+  );
   let activeGrossVal = $derived.by(() => {
     if (!activePoint) return 0;
     const avgDisc = breakdown.length > 0 ? totalDiscount / breakdown.length : 0;
@@ -763,7 +768,9 @@
   let displayedRevenue = $derived(activePoint ? activePoint.revenue : totalRevenue);
   let displayedGross = $derived(activePoint ? activeGrossVal : totalRevenue + totalDiscount);
   let displayedOrders = $derived(activePoint ? activePoint.orders_count : totalOrders);
-  let displayedAOV = $derived(activePoint && activePoint.average_ticket > 0 ? activePoint.average_ticket : averageOrderValue);
+  let displayedAOV = $derived(
+    activePoint && activePoint.average_ticket > 0 ? activePoint.average_ticket : averageOrderValue
+  );
 
   // Dynamic cursor based on hover region
   let activeCursorClass = $derived.by(() => {
@@ -776,35 +783,50 @@
     return 'cursor-crosshair';
   });
 
-  let isAlteredScale = $derived(zoomX > 1.02 || zoomY > 1.02 || zoomY < 0.98 || panX !== 0 || panY !== 0);
+  let isAlteredScale = $derived(
+    zoomX > 1.02 || zoomY > 1.02 || zoomY < 0.98 || panX !== 0 || panY !== 0
+  );
 </script>
 
-<div class="w-full select-none font-sans">
+<div class="w-full font-sans select-none">
   <!-- TradingView-Grade Interactive Dark Chart Card -->
   <div
-    class="bg-[#0c0c0e] text-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/10 shadow-2xl space-y-4 relative overflow-hidden transition-all"
+    class="relative space-y-4 overflow-hidden rounded-2xl border border-white/10 bg-[#0c0c0e] p-4 text-white shadow-2xl transition-all sm:rounded-3xl sm:p-6"
   >
     <!-- Top Header: Live Metric Overlay & Time Window Tabs -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-1 border-b border-white/10">
+    <div
+      class="flex flex-col gap-3 border-b border-white/10 pb-1 sm:flex-row sm:items-center sm:justify-between"
+    >
       <!-- Live Value Overlay -->
       <div class="min-w-0">
-        <div class="flex items-center gap-2 text-[11px] font-mono text-white/50">
+        <div class="flex items-center gap-2 font-mono text-[11px] text-white/50">
           <span>{activePoint ? activePoint.label : 'Pendapatan Bersih'}</span>
           <span class="text-white/30">•</span>
           <span class="text-white/40">{activePoint ? 'Titik Terpilih' : periodLabel}</span>
         </div>
 
-        <div class="flex flex-wrap items-baseline gap-2.5 mt-1">
-          <span class="text-2xl sm:text-3xl lg:text-4xl font-bold font-mono tracking-tight transition-colors duration-150 {isTrendingUp ? 'text-[#10b981]' : 'text-[#ef4444]'}">
+        <div class="mt-1 flex flex-wrap items-baseline gap-2.5">
+          <span
+            class="font-mono text-2xl font-bold tracking-tight transition-colors duration-150 sm:text-3xl lg:text-4xl {isTrendingUp
+              ? 'text-[#10b981]'
+              : 'text-[#ef4444]'}"
+          >
             {formatRupiah(displayedRevenue)}
           </span>
 
           {#if !activePoint}
-            <span class="inline-flex items-center gap-1 text-[11px] sm:text-xs font-mono font-medium px-2 py-0.5 rounded-full {growthPercent >= 0 ? 'bg-[#10b981]/15 text-[#10b981]' : 'bg-[#ef4444]/15 text-[#ef4444]'}">
-              {growthPercent >= 0 ? '↑' : '↓'} {growthPercent >= 0 ? `+${growthPercent}%` : `${growthPercent}%`} {growthLabel}
+            <span
+              class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-mono text-[11px] font-medium sm:text-xs {growthPercent >=
+              0
+                ? 'bg-[#10b981]/15 text-[#10b981]'
+                : 'bg-[#ef4444]/15 text-[#ef4444]'}"
+            >
+              {growthPercent >= 0 ? '↑' : '↓'}
+              {growthPercent >= 0 ? `+${growthPercent}%` : `${growthPercent}%`}
+              {growthLabel}
             </span>
           {:else}
-            <span class="text-[11px] font-mono text-white/50">
+            <span class="font-mono text-[11px] text-white/50">
               (Gross {formatRupiah(displayedGross)})
             </span>
           {/if}
@@ -812,15 +834,17 @@
       </div>
 
       <!-- Time Windows Pills -->
-      <div class="flex items-center self-start sm:self-auto bg-white/5 p-1 rounded-full border border-white/10 shrink-0">
+      <div
+        class="flex shrink-0 items-center self-start rounded-full border border-white/10 bg-white/5 p-1 sm:self-auto"
+      >
         {#each timeWindows as tw}
           <button
             type="button"
             onclick={() => onSelectTimeframe(tw.value)}
-            class={`px-3 py-1 text-xs font-medium rounded-full transition-all cursor-pointer ${
+            class={`cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition-all ${
               selectedTimeframe === tw.value
-                ? 'bg-white text-[#0c0c0e] font-semibold shadow-xs'
-                : 'text-white/60 hover:text-white hover:bg-white/5'
+                ? 'bg-white font-semibold text-[#0c0c0e] shadow-xs'
+                : 'text-white/60 hover:bg-white/5 hover:text-white'
             }`}
           >
             {tw.label}
@@ -830,71 +854,75 @@
     </div>
 
     <!-- Secondary Metrics & TradingView Controls Bar -->
-    <div class="flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+    <div class="flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
       <!-- Minimalist Stats Strip -->
-      <div class="flex items-center flex-wrap gap-x-4 gap-y-1 text-white/70">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-white/70">
         <div class="flex items-center gap-1.5">
-          <span class="text-white/40 text-[10px] uppercase">Kotor:</span>
+          <span class="text-[10px] text-white/40 uppercase">Kotor:</span>
           <span class="font-semibold text-white/90">{formatRupiah(displayedGross)}</span>
         </div>
-        <div class="hidden sm:block h-3.5 w-px bg-white/15"></div>
+        <div class="hidden h-3.5 w-px bg-white/15 sm:block"></div>
         <div class="flex items-center gap-1.5">
-          <span class="text-white/40 text-[10px] uppercase">Volume:</span>
-          <span class="font-semibold text-white/90">{displayedOrders.toLocaleString('id-ID')} order</span>
+          <span class="text-[10px] text-white/40 uppercase">Volume:</span>
+          <span class="font-semibold text-white/90"
+            >{displayedOrders.toLocaleString('id-ID')} order</span
+          >
         </div>
-        <div class="hidden sm:block h-3.5 w-px bg-white/15"></div>
+        <div class="hidden h-3.5 w-px bg-white/15 sm:block"></div>
         <div class="flex items-center gap-1.5">
-          <span class="text-white/40 text-[10px] uppercase">AOV:</span>
+          <span class="text-[10px] text-white/40 uppercase">AOV:</span>
           <span class="font-semibold text-white/90">{formatRupiah(displayedAOV)}</span>
         </div>
       </div>
 
       <!-- Series Visibility & TradingView Scaling Tools -->
-      <div class="flex items-center flex-wrap gap-1.5 shrink-0">
+      <div class="flex shrink-0 flex-wrap items-center gap-1.5">
         <!-- Series Toggles -->
         <button
           type="button"
           onclick={() => (showNet = !showNet)}
-          class={`px-2 py-0.5 rounded-full text-[10.5px] font-medium flex items-center gap-1.5 transition-all cursor-pointer border ${
+          class={`flex cursor-pointer items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10.5px] font-medium transition-all ${
             showNet
               ? isTrendingUp
-                ? 'bg-[#10b981]/15 text-[#10b981] border-[#10b981]/40'
-                : 'bg-[#ef4444]/15 text-[#ef4444] border-[#ef4444]/40'
-              : 'bg-white/5 text-white/40 border-white/10 hover:text-white/70'
+                ? 'border-[#10b981]/40 bg-[#10b981]/15 text-[#10b981]'
+                : 'border-[#ef4444]/40 bg-[#ef4444]/15 text-[#ef4444]'
+              : 'border-white/10 bg-white/5 text-white/40 hover:text-white/70'
           }`}
           title="Tampilkan / Sembunyikan garis omzet bersih"
         >
-          <span class="w-1.5 h-1.5 rounded-full {isTrendingUp ? 'bg-[#10b981]' : 'bg-[#ef4444]'}"></span>
+          <span class="h-1.5 w-1.5 rounded-full {isTrendingUp ? 'bg-[#10b981]' : 'bg-[#ef4444]'}"
+          ></span>
           <span>Bersih</span>
         </button>
 
         <button
           type="button"
           onclick={() => (showGross = !showGross)}
-          class={`px-2 py-0.5 rounded-full text-[10.5px] font-medium flex items-center gap-1.5 transition-all cursor-pointer border ${
+          class={`flex cursor-pointer items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10.5px] font-medium transition-all ${
             showGross
               ? isTrendingUp
-                ? 'bg-[#6366f1]/15 text-[#818cf8] border-[#6366f1]/40'
-                : 'bg-[#f97316]/15 text-[#fb923c] border-[#f97316]/40'
-              : 'bg-white/5 text-white/40 border-white/10 hover:text-white/70'
+                ? 'border-[#6366f1]/40 bg-[#6366f1]/15 text-[#818cf8]'
+                : 'border-[#f97316]/40 bg-[#f97316]/15 text-[#fb923c]'
+              : 'border-white/10 bg-white/5 text-white/40 hover:text-white/70'
           }`}
           title="Tampilkan / Sembunyikan garis omzet kotor"
         >
-          <span class="w-1.5 h-1.5 rounded-full {isTrendingUp ? 'bg-[#6366f1]' : 'bg-[#f97316]'}"></span>
+          <span class="h-1.5 w-1.5 rounded-full {isTrendingUp ? 'bg-[#6366f1]' : 'bg-[#f97316]'}"
+          ></span>
           <span>Kotor</span>
         </button>
 
         <!-- TradingView Action Buttons -->
-        <div class="flex items-center gap-1 ml-1 pl-2 border-l border-white/10">
+        <div class="ml-1 flex items-center gap-1 border-l border-white/10 pl-2">
           <!-- Zoom Out X (Rapatkan Skala X) -->
           <button
             type="button"
             onclick={() => adjustZoomX(1 / 1.25)}
             disabled={zoomX <= 1.0}
-            class="p-1 rounded-md bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed border border-white/10 text-white/80 transition-all cursor-pointer"
+            class="cursor-pointer rounded-md border border-white/10 bg-white/5 p-1 text-white/80 transition-all hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30"
             title="Persempit rentang waktu (Zoom Out)"
           >
-            <ZoomOut class="w-3.5 h-3.5" />
+            <ZoomOut class="h-3.5 w-3.5" />
           </button>
 
           <!-- Zoom In X (Lebarkan Skala X) -->
@@ -902,24 +930,24 @@
             type="button"
             onclick={() => adjustZoomX(1.25)}
             disabled={zoomX >= 15.0}
-            class="p-1 rounded-md bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed border border-white/10 text-white/80 transition-all cursor-pointer"
+            class="cursor-pointer rounded-md border border-white/10 bg-white/5 p-1 text-white/80 transition-all hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30"
             title="Lebarkan rentang waktu (Zoom In)"
           >
-            <ZoomIn class="w-3.5 h-3.5" />
+            <ZoomIn class="h-3.5 w-3.5" />
           </button>
 
           <!-- Auto Fit / Reset Button -->
           <button
             type="button"
             onclick={resetScaleAndPan}
-            class={`px-2 py-1 rounded-md text-[10px] font-semibold flex items-center gap-1 transition-all cursor-pointer border ${
+            class={`flex cursor-pointer items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-semibold transition-all ${
               isAlteredScale
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-xs'
-                : 'bg-white/5 text-white/50 border-white/10 hover:text-white/80'
+                ? 'border-amber-500/40 bg-amber-500/20 text-amber-300 shadow-xs'
+                : 'border-white/10 bg-white/5 text-white/50 hover:text-white/80'
             }`}
             title="Reset skala &amp; posisi ke default auto-fit (Double-click juga bisa)"
           >
-            <RotateCcw class="w-3 h-3" />
+            <RotateCcw class="h-3 w-3" />
             <span>Auto</span>
           </button>
         </div>
@@ -931,7 +959,7 @@
       bind:this={containerEl}
       role="application"
       aria-label="Grafik tren penjualan interaktif TradingView"
-      class="w-full h-52 sm:h-64 md:h-72 relative touch-none select-none {activeCursorClass}"
+      class="relative h-52 w-full touch-none select-none sm:h-64 md:h-72 {activeCursorClass}"
     >
       <canvas
         bind:this={canvasEl}
@@ -941,25 +969,31 @@
         onmouseleave={handleMouseLeave}
         onwheel={handleWheel}
         ondblclick={resetScaleAndPan}
-        class="w-full h-full block"
+        class="block h-full w-full"
       ></canvas>
 
       <!-- TradingView Interactive Axis Hover Tooltip Hints -->
       {#if isHoveringYAxis}
-        <div class="absolute right-1 top-2 bg-black/80 backdrop-blur-xs text-[9.5px] font-mono text-white/80 px-2 py-0.5 rounded-md border border-white/20 pointer-events-none shadow-md">
+        <div
+          class="pointer-events-none absolute top-2 right-1 rounded-md border border-white/20 bg-black/80 px-2 py-0.5 font-mono text-[9.5px] text-white/80 shadow-md backdrop-blur-xs"
+        >
           ↕ Tarik vertikal untuk tinggikan skala Y
         </div>
       {/if}
 
       {#if isHoveringXAxis}
-        <div class="absolute left-2 bottom-1 bg-black/80 backdrop-blur-xs text-[9.5px] font-mono text-white/80 px-2 py-0.5 rounded-md border border-white/20 pointer-events-none shadow-md">
+        <div
+          class="pointer-events-none absolute bottom-1 left-2 rounded-md border border-white/20 bg-black/80 px-2 py-0.5 font-mono text-[9.5px] text-white/80 shadow-md backdrop-blur-xs"
+        >
           ↔ Tarik horizontal untuk lebarkan skala X
         </div>
       {/if}
 
       <!-- Floating Zoom Ratio Indicator -->
       {#if isAlteredScale}
-        <div class="absolute left-2 top-2 bg-[#17171c]/80 backdrop-blur-xs text-[9.5px] font-mono text-amber-300/90 px-2 py-0.5 rounded-md border border-amber-500/30 pointer-events-none shadow-md flex items-center gap-1.5">
+        <div
+          class="pointer-events-none absolute top-2 left-2 flex items-center gap-1.5 rounded-md border border-amber-500/30 bg-[#17171c]/80 px-2 py-0.5 font-mono text-[9.5px] text-amber-300/90 shadow-md backdrop-blur-xs"
+        >
           <span>Skala: X:{zoomX.toFixed(1)}x | Y:{zoomY.toFixed(1)}x</span>
           <span class="text-white/40">• Klik 'Auto' atau Double-Click untuk reset</span>
         </div>

@@ -46,9 +46,7 @@
     selectedMethod === 'CASH' ? Math.max(0, cashTendered - finalAmount) : 0
   );
 
-  let isSufficient = $derived(
-    selectedMethod !== 'CASH' || cashTendered >= finalAmount
-  );
+  let isSufficient = $derived(selectedMethod !== 'CASH' || cashTendered >= finalAmount);
 
   const cashShortcuts = [
     { label: 'Uang Pas', getValue: (tot: number) => tot },
@@ -102,76 +100,86 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 bg-[#17171c]/40 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
-    <div class="bg-white border border-[#d9d9dd] rounded-[22px] max-w-xl w-full p-6 shadow-none flex flex-col max-h-[90vh]">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-[#17171c]/40 p-4 font-sans backdrop-blur-xs"
+  >
+    <div
+      class="flex max-h-[90vh] w-full max-w-xl flex-col rounded-[22px] border border-[#d9d9dd] bg-white p-6 shadow-none"
+    >
       <!-- Header -->
-      <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-4 mb-5">
+      <div class="mb-5 flex items-center justify-between border-b border-[#d9d9dd] pb-4">
         <div>
-          <h2 class="text-xl font-medium text-[#212121] tracking-tight">Pilih Metode Pembayaran</h2>
-          <p class="text-xs text-[#616161] font-mono mt-0.5">Kasir: {activeCashier ? activeCashier.name : 'Tim Kasir Outlet'} • Total {formatCurrency(finalAmount)}</p>
+          <h2 class="text-xl font-medium tracking-tight text-[#212121]">Pilih Metode Pembayaran</h2>
+          <p class="mt-0.5 font-mono text-xs text-[#616161]">
+            Kasir: {activeCashier ? activeCashier.name : 'Tim Kasir Outlet'} • Total {formatCurrency(
+              finalAmount
+            )}
+          </p>
         </div>
         <button
           type="button"
           onclick={onClose}
-          class="text-[#93939f] hover:text-[#212121] p-1 cursor-pointer"
+          class="cursor-pointer p-1 text-[#93939f] hover:text-[#212121]"
         >
-          <X class="w-5 h-5" />
+          <X class="h-5 w-5" />
         </button>
       </div>
 
       <!-- Payment Method Tabs -->
-      <div class="grid grid-cols-3 gap-2.5 mb-5">
+      <div class="mb-5 grid grid-cols-3 gap-2.5">
         <button
           type="button"
           onclick={() => (selectedMethod = 'CASH')}
-          class={`py-3.5 px-3 rounded-[16px] border text-center flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+          class={`flex cursor-pointer flex-col items-center gap-1.5 rounded-[16px] border px-3 py-3.5 text-center transition-all ${
             selectedMethod === 'CASH'
-              ? 'bg-[#17171c] text-white border-[#17171c] font-medium shadow-none'
-              : 'bg-[#eeece7]/40 text-[#616161] border-[#d9d9dd] hover:text-[#212121] hover:bg-[#eeece7]'
+              ? 'border-[#17171c] bg-[#17171c] font-medium text-white shadow-none'
+              : 'border-[#d9d9dd] bg-[#eeece7]/40 text-[#616161] hover:bg-[#eeece7] hover:text-[#212121]'
           }`}
         >
-          <Banknote class="w-5 h-5" />
+          <Banknote class="h-5 w-5" />
           <span class="text-xs">Uang Tunai (Cash)</span>
         </button>
 
         <button
           type="button"
           onclick={() => (selectedMethod = 'QRIS')}
-          class={`py-3.5 px-3 rounded-[16px] border text-center flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+          class={`flex cursor-pointer flex-col items-center gap-1.5 rounded-[16px] border px-3 py-3.5 text-center transition-all ${
             selectedMethod === 'QRIS'
-              ? 'bg-[#17171c] text-white border-[#17171c] font-medium shadow-none'
-              : 'bg-[#eeece7]/40 text-[#616161] border-[#d9d9dd] hover:text-[#212121] hover:bg-[#eeece7]'
+              ? 'border-[#17171c] bg-[#17171c] font-medium text-white shadow-none'
+              : 'border-[#d9d9dd] bg-[#eeece7]/40 text-[#616161] hover:bg-[#eeece7] hover:text-[#212121]'
           }`}
         >
-          <QrCode class="w-5 h-5" />
+          <QrCode class="h-5 w-5" />
           <span class="text-xs">QRIS Dinamis</span>
         </button>
 
         <button
           type="button"
           onclick={() => (selectedMethod = 'EDC')}
-          class={`py-3.5 px-3 rounded-[16px] border text-center flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+          class={`flex cursor-pointer flex-col items-center gap-1.5 rounded-[16px] border px-3 py-3.5 text-center transition-all ${
             selectedMethod === 'EDC'
-              ? 'bg-[#17171c] text-white border-[#17171c] font-medium shadow-none'
-              : 'bg-[#eeece7]/40 text-[#616161] border-[#d9d9dd] hover:text-[#212121] hover:bg-[#eeece7]'
+              ? 'border-[#17171c] bg-[#17171c] font-medium text-white shadow-none'
+              : 'border-[#d9d9dd] bg-[#eeece7]/40 text-[#616161] hover:bg-[#eeece7] hover:text-[#212121]'
           }`}
         >
-          <CreditCard class="w-5 h-5" />
+          <CreditCard class="h-5 w-5" />
           <span class="text-xs">Mesin EDC (Kartu)</span>
         </button>
       </div>
 
       <!-- Payment Body Area -->
-      <div class="flex-1 overflow-y-auto mb-5">
+      <div class="mb-5 flex-1 overflow-y-auto">
         {#if selectedMethod === 'CASH'}
-          <div class="space-y-4 bg-[#eeece7]/30 p-4 rounded-[16px] border border-[#d9d9dd]">
+          <div class="space-y-4 rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-4">
             <!-- Cash Input -->
             <div>
-              <label for="cash-input" class="block text-xs font-mono text-[#616161] mb-1.5">
+              <label for="cash-input" class="mb-1.5 block font-mono text-xs text-[#616161]">
                 Nominal Uang Diterima dari Pelanggan:
               </label>
               <div class="relative">
-                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono text-base font-medium text-[#212121]">
+                <span
+                  class="absolute top-1/2 left-3.5 -translate-y-1/2 font-mono text-base font-medium text-[#212121]"
+                >
                   Rp
                 </span>
                 <input
@@ -179,21 +187,21 @@
                   type="number"
                   bind:value={cashTendered}
                   step="1000"
-                  class="w-full bg-white border border-[#d9d9dd] rounded-[12px] pl-12 pr-4 py-3 text-lg font-mono font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+                  class="w-full rounded-[12px] border border-[#d9d9dd] bg-white py-3 pr-4 pl-12 font-mono text-lg font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
                 />
               </div>
             </div>
 
             <!-- Denomination Shortcuts -->
             <div>
-              <div class="text-[11px] font-mono text-[#75758a] mb-1.5">Pilihan Nominal Cepat:</div>
+              <div class="mb-1.5 font-mono text-[11px] text-[#75758a]">Pilihan Nominal Cepat:</div>
               <div class="flex flex-wrap gap-2">
                 {#each cashShortcuts as cut}
                   {@const val = cut.getValue(finalAmount)}
                   <button
                     type="button"
                     onclick={() => handleQuickCash(val)}
-                    class="px-3.5 py-1.5 bg-white border border-[#d9d9dd] hover:border-[#17171c] rounded-full text-xs font-mono font-medium text-[#212121] cursor-pointer transition-all"
+                    class="cursor-pointer rounded-full border border-[#d9d9dd] bg-white px-3.5 py-1.5 font-mono text-xs font-medium text-[#212121] transition-all hover:border-[#17171c]"
                   >
                     {cut.label}
                   </button>
@@ -202,39 +210,50 @@
             </div>
 
             <!-- Kembalian / Change calculation -->
-            <div class="pt-3 border-t border-[#d9d9dd] flex items-center justify-between">
+            <div class="flex items-center justify-between border-t border-[#d9d9dd] pt-3">
               <span class="text-sm font-medium text-[#616161]">Kembalian Pelanggan:</span>
-              <span class={`font-mono text-xl font-medium ${cashTendered >= finalAmount ? 'text-[#003c33]' : 'text-[#b30000]'}`}>
+              <span
+                class={`font-mono text-xl font-medium ${cashTendered >= finalAmount ? 'text-[#003c33]' : 'text-[#b30000]'}`}
+              >
                 {formatCurrency(changeAmount)}
               </span>
             </div>
 
             {#if !isSufficient}
-              <div class="flex items-center gap-2 text-xs text-[#b30000] font-medium bg-[#ffad9b]/15 p-3 rounded-[12px]">
-                <AlertTriangle class="w-4 h-4 shrink-0" />
-                <span>Uang yang dimasukkan kurang {formatCurrency(finalAmount - cashTendered)}</span>
+              <div
+                class="flex items-center gap-2 rounded-[12px] bg-[#ffad9b]/15 p-3 text-xs font-medium text-[#b30000]"
+              >
+                <AlertTriangle class="h-4 w-4 shrink-0" />
+                <span>Uang yang dimasukkan kurang {formatCurrency(finalAmount - cashTendered)}</span
+                >
               </div>
             {/if}
           </div>
         {:else if selectedMethod === 'QRIS'}
-          <div class="text-center p-6 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] space-y-3">
-            <div class="w-44 h-44 bg-white p-3 border border-[#d9d9dd] rounded-[16px] mx-auto shadow-none flex flex-col items-center justify-center">
+          <div
+            class="space-y-3 rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-6 text-center"
+          >
+            <div
+              class="mx-auto flex h-44 w-44 flex-col items-center justify-center rounded-[16px] border border-[#d9d9dd] bg-white p-3 shadow-none"
+            >
               <!-- QR Simulator -->
-              <QrCode class="w-32 h-32 text-[#212121]" />
-              <span class="text-[10px] font-mono text-[#75758a] mt-1">QRIS NATIONAL STANDARDS</span>
+              <QrCode class="h-32 w-32 text-[#212121]" />
+              <span class="mt-1 font-mono text-[10px] text-[#75758a]">QRIS NATIONAL STANDARDS</span>
             </div>
-            <div class="text-xs text-[#616161] font-mono">
+            <div class="font-mono text-xs text-[#616161]">
               Scan melalui BCA, GoPay, OVO, ShopeePay, atau DANA
             </div>
-            <div class="text-lg font-medium font-mono text-[#17171c]">
+            <div class="font-mono text-lg font-medium text-[#17171c]">
               {formatCurrency(finalAmount)}
             </div>
           </div>
         {:else if selectedMethod === 'EDC' || selectedMethod === 'TRANSFER'}
-          <div class="p-5 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] space-y-3 text-xs">
+          <div class="space-y-3 rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-5 text-xs">
             <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center">
-                <CreditCard class="w-4 h-4" />
+              <div
+                class="flex h-8 w-8 items-center justify-center rounded-xl bg-zinc-900 text-white"
+              >
+                <CreditCard class="h-4 w-4" />
               </div>
               <div>
                 <div class="text-sm font-bold text-[#212121]">Pembayaran Mesin EDC</div>
@@ -242,19 +261,26 @@
               </div>
             </div>
 
-            <div class="p-3.5 bg-white border border-[#d9d9dd] rounded-[12px] space-y-1.5 font-mono">
+            <div
+              class="space-y-1.5 rounded-[12px] border border-[#d9d9dd] bg-white p-3.5 font-mono"
+            >
               <div class="flex justify-between text-[#616161]">
                 <span>Total Tagihan EDC:</span>
-                <span class="text-base font-bold text-[#17171c]">{formatCurrency(finalAmount)}</span>
+                <span class="text-base font-bold text-[#17171c]">{formatCurrency(finalAmount)}</span
+                >
               </div>
               <div class="text-[11px] text-[#75758a]">
                 Gesek, masukkan chip, atau tap kartu pelanggan pada terminal EDC kasir.
               </div>
             </div>
 
-            <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-[11px] flex items-center gap-2">
-              <Check class="w-4 h-4 shrink-0 text-emerald-600" />
-              <span>Pastikan slip transaksi EDC sudah tercetak Approved sebelum menyelesaikan pesanan.</span>
+            <div
+              class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-2.5 text-[11px] text-emerald-800"
+            >
+              <Check class="h-4 w-4 shrink-0 text-emerald-600" />
+              <span
+                >Pastikan slip transaksi EDC sudah tercetak Approved sebelum menyelesaikan pesanan.</span
+              >
             </div>
           </div>
         {/if}
@@ -265,7 +291,7 @@
         <button
           type="button"
           onclick={onClose}
-          class="flex-1 py-3 bg-white hover:bg-[#eeece7]/40 text-[#616161] font-medium text-xs border border-[#d9d9dd] rounded-full cursor-pointer transition-all"
+          class="flex-1 cursor-pointer rounded-full border border-[#d9d9dd] bg-white py-3 text-xs font-medium text-[#616161] transition-all hover:bg-[#eeece7]/40"
         >
           Kembali
         </button>
@@ -273,16 +299,16 @@
           type="button"
           disabled={!isSufficient || isProcessing}
           onclick={handleProcessPayment}
-          class={`flex-2 py-3 text-white font-medium text-xs rounded-full flex items-center justify-center gap-2 cursor-pointer transition-all shadow-none ${
+          class={`flex flex-2 cursor-pointer items-center justify-center gap-2 rounded-full py-3 text-xs font-medium text-white shadow-none transition-all ${
             !isSufficient || isProcessing
-              ? 'bg-[#eeece7] text-[#93939f] cursor-not-allowed'
+              ? 'cursor-not-allowed bg-[#eeece7] text-[#93939f]'
               : 'bg-[#003c33] hover:bg-[#002822]'
           }`}
         >
           {#if isProcessing}
             <span>Memproses...</span>
           {:else}
-            <Check class="w-4 h-4" />
+            <Check class="h-4 w-4" />
             <span>Selesaikan Transaksi &amp; Cetak</span>
           {/if}
         </button>

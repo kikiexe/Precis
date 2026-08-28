@@ -14,7 +14,10 @@
   interface Props {
     tenants: TenantRecord[];
     isLoading: boolean;
-    onUpdateStatus: (tenantId: string, status: 'ACTIVE' | 'SUSPENDED' | 'GRACE_PERIOD' | 'TRIAL') => Promise<void>;
+    onUpdateStatus: (
+      tenantId: string,
+      status: 'ACTIVE' | 'SUSPENDED' | 'GRACE_PERIOD' | 'TRIAL'
+    ) => Promise<void>;
     onExtendSubscription: (tenantId: string, days: number) => Promise<void>;
     onRefresh: () => void;
   }
@@ -38,7 +41,10 @@
         !searchQuery ||
         (t.name && t.name.toLowerCase().includes(q)) ||
         (t.email && t.email.toLowerCase().includes(q)) ||
-        (t.workspaces && t.workspaces.some((w) => w.name.toLowerCase().includes(q) || w.slug.toLowerCase().includes(q)));
+        (t.workspaces &&
+          t.workspaces.some(
+            (w) => w.name.toLowerCase().includes(q) || w.slug.toLowerCase().includes(q)
+          ));
 
       return matchStatus && matchQuery;
     })
@@ -46,7 +52,8 @@
 
   async function handleToggleSuspend(tenant: TenantRecord) {
     const newStatus = tenant.subscription_status === 'SUSPENDED' ? 'ACTIVE' : 'SUSPENDED';
-    const actionLabel = newStatus === 'SUSPENDED' ? 'menonaktifkan (suspend)' : 'mengaktifkan kembali';
+    const actionLabel =
+      newStatus === 'SUSPENDED' ? 'menonaktifkan (suspend)' : 'mengaktifkan kembali';
 
     if (!confirm(`Apakah Anda yakin ingin ${actionLabel} tenant "${tenant.name}"?`)) {
       return;
@@ -108,10 +115,10 @@
 
 <div class="space-y-5 font-sans">
   <!-- Clean Page Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+  <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
-      <h1 class="text-xl font-semibold text-[#17171c] tracking-tight">Direktori Tenant</h1>
-      <p class="text-xs text-[#75758a] mt-0.5">
+      <h1 class="text-xl font-semibold tracking-tight text-[#17171c]">Direktori Tenant</h1>
+      <p class="mt-0.5 text-xs text-[#75758a]">
         Kelola akun pemilik bisnis SaaS, pantau masa aktif langganan, dan atur kuota cabang.
       </p>
     </div>
@@ -120,51 +127,65 @@
       type="button"
       onclick={onRefresh}
       disabled={isLoading}
-      class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-[#f4f4f4] text-[#17171c] text-xs font-medium border border-[#d9d9dd] rounded-lg transition-all cursor-pointer disabled:opacity-50 self-start sm:self-auto shadow-xs"
+      class="inline-flex cursor-pointer items-center gap-1.5 self-start rounded-lg border border-[#d9d9dd] bg-white px-3.5 py-2 text-xs font-medium text-[#17171c] shadow-xs transition-all hover:bg-[#f4f4f4] disabled:opacity-50 sm:self-auto"
     >
-      <RefreshCw class={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+      <RefreshCw class={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
       <span>Segarkan</span>
     </button>
   </div>
 
   <!-- Notification Toast -->
   {#if actionMessage}
-    <div class="p-3.5 bg-[#edfce9] border border-[#bbf7d0] text-[#003c33] text-xs rounded-xl flex items-center justify-between">
+    <div
+      class="flex items-center justify-between rounded-xl border border-[#bbf7d0] bg-[#edfce9] p-3.5 text-xs text-[#003c33]"
+    >
       <div class="flex items-center gap-2">
-        <CheckCircle class="w-4 h-4 shrink-0 text-[#16a34a]" />
+        <CheckCircle class="h-4 w-4 shrink-0 text-[#16a34a]" />
         <span class="font-medium">{actionMessage}</span>
       </div>
-      <button type="button" onclick={() => (actionMessage = null)} class="text-[#003c33] hover:opacity-70">
-        <X class="w-4 h-4" />
+      <button
+        type="button"
+        onclick={() => (actionMessage = null)}
+        class="text-[#003c33] hover:opacity-70"
+      >
+        <X class="h-4 w-4" />
       </button>
     </div>
   {/if}
 
   {#if actionError}
-    <div class="p-3.5 bg-[#ffefef] border border-[#fecaca] text-[#e5484d] text-xs rounded-xl flex items-center justify-between">
+    <div
+      class="flex items-center justify-between rounded-xl border border-[#fecaca] bg-[#ffefef] p-3.5 text-xs text-[#e5484d]"
+    >
       <div class="flex items-center gap-2">
-        <AlertTriangle class="w-4 h-4 shrink-0 text-[#dc2626]" />
+        <AlertTriangle class="h-4 w-4 shrink-0 text-[#dc2626]" />
         <span class="font-medium">{actionError}</span>
       </div>
-      <button type="button" onclick={() => (actionError = null)} class="text-[#e5484d] hover:opacity-70">
-        <X class="w-4 h-4" />
+      <button
+        type="button"
+        onclick={() => (actionError = null)}
+        class="text-[#e5484d] hover:opacity-70"
+      >
+        <X class="h-4 w-4" />
       </button>
     </div>
   {/if}
 
   <!-- Unified Main Container Card -->
-  <div class="bg-white border border-[#d9d9dd] rounded-xl shadow-xs overflow-hidden">
+  <div class="overflow-hidden rounded-xl border border-[#d9d9dd] bg-white shadow-xs">
     <!-- Toolbar: Filter Pills & Search -->
-    <div class="p-3.5 sm:p-4 border-b border-[#e5e5e5] bg-[#fafafa] flex flex-col md:flex-row md:items-center justify-between gap-3">
+    <div
+      class="flex flex-col justify-between gap-3 border-b border-[#e5e5e5] bg-[#fafafa] p-3.5 sm:p-4 md:flex-row md:items-center"
+    >
       <!-- Filter Pills -->
       <div class="flex flex-wrap items-center gap-1">
         <button
           type="button"
           onclick={() => (selectedStatus = 'ALL')}
-          class={`px-3 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
+          class={`cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-all ${
             selectedStatus === 'ALL'
               ? 'bg-[#17171c] text-white'
-              : 'text-[#616161] hover:text-[#17171c] hover:bg-[#eaeaea]'
+              : 'text-[#616161] hover:bg-[#eaeaea] hover:text-[#17171c]'
           }`}
         >
           Semua ({tenants.length})
@@ -173,10 +194,10 @@
         <button
           type="button"
           onclick={() => (selectedStatus = 'ACTIVE')}
-          class={`px-3 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
+          class={`cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-all ${
             selectedStatus === 'ACTIVE'
               ? 'bg-[#17171c] text-white'
-              : 'text-[#616161] hover:text-[#17171c] hover:bg-[#eaeaea]'
+              : 'text-[#616161] hover:bg-[#eaeaea] hover:text-[#17171c]'
           }`}
         >
           Aktif
@@ -185,10 +206,10 @@
         <button
           type="button"
           onclick={() => (selectedStatus = 'GRACE_PERIOD')}
-          class={`px-3 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
+          class={`cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-all ${
             selectedStatus === 'GRACE_PERIOD'
               ? 'bg-[#17171c] text-white'
-              : 'text-[#616161] hover:text-[#17171c] hover:bg-[#eaeaea]'
+              : 'text-[#616161] hover:bg-[#eaeaea] hover:text-[#17171c]'
           }`}
         >
           Grace Period
@@ -197,10 +218,10 @@
         <button
           type="button"
           onclick={() => (selectedStatus = 'SUSPENDED')}
-          class={`px-3 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${
+          class={`cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-all ${
             selectedStatus === 'SUSPENDED'
               ? 'bg-[#17171c] text-white'
-              : 'text-[#616161] hover:text-[#17171c] hover:bg-[#eaeaea]'
+              : 'text-[#616161] hover:bg-[#eaeaea] hover:text-[#17171c]'
           }`}
         >
           Suspended
@@ -209,50 +230,54 @@
 
       <!-- Search Input -->
       <div class="relative w-full md:w-64">
-        <Search class="w-3.5 h-3.5 text-[#93939f] absolute left-3 top-1/2 -translate-y-1/2" />
+        <Search class="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-[#93939f]" />
         <input
           type="text"
           bind:value={searchQuery}
           placeholder="Cari tenant / workspace..."
-          class="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-[#d9d9dd] rounded-lg focus:outline-hidden focus:border-[#17171c] text-[#17171c] transition-all"
+          class="w-full rounded-lg border border-[#d9d9dd] bg-white py-1.5 pr-3 pl-8 text-xs text-[#17171c] transition-all focus:border-[#17171c] focus:outline-hidden"
         />
       </div>
     </div>
 
     <!-- Content State: Loading / Empty / Data -->
     {#if isLoading}
-      <div class="py-16 text-center text-[#93939f] space-y-2">
-        <RefreshCw class="w-5 h-5 animate-spin mx-auto text-[#17171c]" />
+      <div class="space-y-2 py-16 text-center text-[#93939f]">
+        <RefreshCw class="mx-auto h-5 w-5 animate-spin text-[#17171c]" />
         <p class="text-xs">Memuat data direktori tenant...</p>
       </div>
     {:else if filteredTenants.length === 0}
-      <div class="py-16 text-center text-[#93939f] space-y-2">
-        <Building2 class="w-8 h-8 mx-auto text-[#93939f] opacity-40" />
+      <div class="space-y-2 py-16 text-center text-[#93939f]">
+        <Building2 class="mx-auto h-8 w-8 text-[#93939f] opacity-40" />
         <p class="text-xs font-medium text-[#17171c]">Tidak ada data tenant yang cocok</p>
-        <p class="text-[11px] text-[#75758a]">Data tenant terdaftar akan otomatis muncul di sini.</p>
+        <p class="text-[11px] text-[#75758a]">
+          Data tenant terdaftar akan otomatis muncul di sini.
+        </p>
       </div>
     {:else}
       <!-- Desktop Table View -->
-      <div class="hidden md:block overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead class="bg-[#fafafa] border-b border-[#e5e5e5] text-[#75758a] font-medium text-[11px]">
+      <div class="hidden overflow-x-auto md:block">
+        <table class="w-full border-collapse text-left text-xs">
+          <thead
+            class="border-b border-[#e5e5e5] bg-[#fafafa] text-[11px] font-medium text-[#75758a]"
+          >
             <tr>
-              <th class="py-3 px-4">Pemilik Bisnis (Owner)</th>
-              <th class="py-3 px-4">Workspace &amp; Cabang</th>
-              <th class="py-3 px-4 text-center">Status Langganan</th>
-              <th class="py-3 px-4 text-center">Masa Aktif</th>
-              <th class="py-3 px-4 text-center">Kuota Cabang</th>
-              <th class="py-3 px-4 text-right">Aksi</th>
+              <th class="px-4 py-3">Pemilik Bisnis (Owner)</th>
+              <th class="px-4 py-3">Workspace &amp; Cabang</th>
+              <th class="px-4 py-3 text-center">Status Langganan</th>
+              <th class="px-4 py-3 text-center">Masa Aktif</th>
+              <th class="px-4 py-3 text-center">Kuota Cabang</th>
+              <th class="px-4 py-3 text-right">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-[#e5e5e5]">
             {#each filteredTenants as tenant (tenant.id)}
-              <tr class="hover:bg-[#f9fafb] transition-colors">
+              <tr class="transition-colors hover:bg-[#f9fafb]">
                 <!-- Owner Info -->
-                <td class="py-3.5 px-4">
+                <td class="px-4 py-3.5">
                   <div class="font-medium text-[#17171c]">{tenant.name}</div>
-                  <div class="text-[11px] text-[#75758a] font-mono">{tenant.email}</div>
-                  <div class="text-[10px] text-[#93939f] mt-0.5">
+                  <div class="font-mono text-[11px] text-[#75758a]">{tenant.email}</div>
+                  <div class="mt-0.5 text-[10px] text-[#93939f]">
                     Daftar: {new Date(tenant.created_at).toLocaleDateString('id-ID', {
                       day: 'numeric',
                       month: 'short',
@@ -262,47 +287,57 @@
                 </td>
 
                 <!-- Workspaces & Branches -->
-                <td class="py-3.5 px-4">
+                <td class="px-4 py-3.5">
                   {#if tenant.workspaces && tenant.workspaces.length > 0}
                     <div class="space-y-1">
                       {#each tenant.workspaces as ws}
                         <div class="flex items-center gap-1.5">
-                          <Store class="w-3.5 h-3.5 text-[#75758a] shrink-0" />
+                          <Store class="h-3.5 w-3.5 shrink-0 text-[#75758a]" />
                           <span class="font-medium text-[#17171c]">{ws.name}</span>
-                          <span class="text-[10px] px-1.5 py-0.2 bg-[#f1f5ff] text-[#1863dc] font-mono rounded-md">
+                          <span
+                            class="py-0.2 rounded-md bg-[#f1f5ff] px-1.5 font-mono text-[10px] text-[#1863dc]"
+                          >
                             {ws.branches_count} cabang
                           </span>
                         </div>
                       {/each}
                     </div>
                   {:else}
-                    <span class="text-[#93939f] italic text-[11px]">Belum membuat workspace</span>
+                    <span class="text-[11px] text-[#93939f] italic">Belum membuat workspace</span>
                   {/if}
                 </td>
 
                 <!-- Status Badge -->
-                <td class="py-3.5 px-4 text-center">
+                <td class="px-4 py-3.5 text-center">
                   {#if tenant.subscription_status === 'ACTIVE'}
-                    <span class="inline-flex items-center px-2 py-0.5 bg-[#edfce9] text-[#003c33] text-[10px] font-semibold rounded-md">
+                    <span
+                      class="inline-flex items-center rounded-md bg-[#edfce9] px-2 py-0.5 text-[10px] font-semibold text-[#003c33]"
+                    >
                       ACTIVE
                     </span>
                   {:else if tenant.subscription_status === 'GRACE_PERIOD'}
-                    <span class="inline-flex items-center px-2 py-0.5 bg-[#fef3c7] text-[#92400e] text-[10px] font-semibold rounded-md">
+                    <span
+                      class="inline-flex items-center rounded-md bg-[#fef3c7] px-2 py-0.5 text-[10px] font-semibold text-[#92400e]"
+                    >
                       GRACE PERIOD
                     </span>
                   {:else if tenant.subscription_status === 'SUSPENDED'}
-                    <span class="inline-flex items-center px-2 py-0.5 bg-[#fee2e2] text-[#991b1b] text-[10px] font-semibold rounded-md">
+                    <span
+                      class="inline-flex items-center rounded-md bg-[#fee2e2] px-2 py-0.5 text-[10px] font-semibold text-[#991b1b]"
+                    >
                       SUSPENDED
                     </span>
                   {:else}
-                    <span class="inline-flex items-center px-2 py-0.5 bg-[#f1f5ff] text-[#1863dc] text-[10px] font-semibold rounded-md">
+                    <span
+                      class="inline-flex items-center rounded-md bg-[#f1f5ff] px-2 py-0.5 text-[10px] font-semibold text-[#1863dc]"
+                    >
                       TRIAL
                     </span>
                   {/if}
                 </td>
 
                 <!-- Subscription Expiry Info -->
-                <td class="py-3.5 px-4 text-center font-mono">
+                <td class="px-4 py-3.5 text-center font-mono">
                   {#if tenant.subscription_expires_at}
                     <div class="text-xs text-[#17171c]">
                       {new Date(tenant.subscription_expires_at).toLocaleDateString('id-ID', {
@@ -312,30 +347,34 @@
                       })}
                     </div>
                     {#if tenant.days_remaining !== null}
-                      <div class={`text-[10px] font-semibold mt-0.5 ${tenant.days_remaining < 7 ? 'text-[#e5484d]' : 'text-[#16a34a]'}`}>
-                        {tenant.days_remaining > 0 ? `Sisa ${tenant.days_remaining} hari` : 'Kedaluwarsa'}
+                      <div
+                        class={`mt-0.5 text-[10px] font-semibold ${tenant.days_remaining < 7 ? 'text-[#e5484d]' : 'text-[#16a34a]'}`}
+                      >
+                        {tenant.days_remaining > 0
+                          ? `Sisa ${tenant.days_remaining} hari`
+                          : 'Kedaluwarsa'}
                       </div>
                     {/if}
                   {:else}
-                    <span class="text-[#93939f] text-[11px]">Lifetime</span>
+                    <span class="text-[11px] text-[#93939f]">Lifetime</span>
                   {/if}
                 </td>
 
                 <!-- Max Workspaces / Quota -->
-                <td class="py-3.5 px-4 text-center font-mono text-xs text-[#17171c]">
+                <td class="px-4 py-3.5 text-center font-mono text-xs text-[#17171c]">
                   Maks. {tenant.max_workspaces}
                 </td>
 
                 <!-- Action Controls -->
-                <td class="py-3.5 px-4 text-right">
+                <td class="px-4 py-3.5 text-right">
                   <div class="inline-flex items-center gap-1.5">
                     <button
                       type="button"
                       onclick={() => openExtendModal(tenant)}
-                      class="px-2.5 py-1 text-xs font-medium bg-[#17171c] hover:bg-black text-white rounded-md transition-all cursor-pointer flex items-center gap-1"
+                      class="flex cursor-pointer items-center gap-1 rounded-md bg-[#17171c] px-2.5 py-1 text-xs font-medium text-white transition-all hover:bg-black"
                       title="Perpanjang Masa Aktif"
                     >
-                      <PlusCircle class="w-3 h-3" />
+                      <PlusCircle class="h-3 w-3" />
                       <span>Perpanjang</span>
                     </button>
 
@@ -343,10 +382,10 @@
                       type="button"
                       onclick={() => handleToggleSuspend(tenant)}
                       disabled={isSubmittingAction}
-                      class={`px-2.5 py-1 text-xs font-medium rounded-md border transition-all cursor-pointer ${
+                      class={`cursor-pointer rounded-md border px-2.5 py-1 text-xs font-medium transition-all ${
                         tenant.subscription_status === 'SUSPENDED'
                           ? 'border-[#bbf7d0] bg-[#edfce9] text-[#003c33] hover:bg-[#dcfce7]'
-                          : 'border-[#d9d9dd] text-[#616161] hover:bg-[#fee2e2] hover:text-[#991b1b] hover:border-[#fecaca]'
+                          : 'border-[#d9d9dd] text-[#616161] hover:border-[#fecaca] hover:bg-[#fee2e2] hover:text-[#991b1b]'
                       }`}
                     >
                       {tenant.subscription_status === 'SUSPENDED' ? 'Aktifkan' : 'Suspend'}
@@ -360,43 +399,53 @@
       </div>
 
       <!-- Mobile Clean Card View -->
-      <div class="md:hidden divide-y divide-[#e5e5e5]">
+      <div class="divide-y divide-[#e5e5e5] md:hidden">
         {#each filteredTenants as tenant (tenant.id)}
-          <div class="p-4 space-y-3">
+          <div class="space-y-3 p-4">
             <!-- Card Header: Name & Status -->
             <div class="flex items-start justify-between gap-2">
               <div>
-                <div class="font-medium text-sm text-[#17171c]">{tenant.name}</div>
-                <div class="text-xs text-[#75758a] font-mono">{tenant.email}</div>
+                <div class="text-sm font-medium text-[#17171c]">{tenant.name}</div>
+                <div class="font-mono text-xs text-[#75758a]">{tenant.email}</div>
               </div>
 
               {#if tenant.subscription_status === 'ACTIVE'}
-                <span class="inline-flex items-center px-2 py-0.5 bg-[#edfce9] text-[#003c33] text-[10px] font-semibold rounded-md shrink-0">
+                <span
+                  class="inline-flex shrink-0 items-center rounded-md bg-[#edfce9] px-2 py-0.5 text-[10px] font-semibold text-[#003c33]"
+                >
                   ACTIVE
                 </span>
               {:else if tenant.subscription_status === 'GRACE_PERIOD'}
-                <span class="inline-flex items-center px-2 py-0.5 bg-[#fef3c7] text-[#92400e] text-[10px] font-semibold rounded-md shrink-0">
+                <span
+                  class="inline-flex shrink-0 items-center rounded-md bg-[#fef3c7] px-2 py-0.5 text-[10px] font-semibold text-[#92400e]"
+                >
                   GRACE PERIOD
                 </span>
               {:else if tenant.subscription_status === 'SUSPENDED'}
-                <span class="inline-flex items-center px-2 py-0.5 bg-[#fee2e2] text-[#991b1b] text-[10px] font-semibold rounded-md shrink-0">
+                <span
+                  class="inline-flex shrink-0 items-center rounded-md bg-[#fee2e2] px-2 py-0.5 text-[10px] font-semibold text-[#991b1b]"
+                >
                   SUSPENDED
                 </span>
               {:else}
-                <span class="inline-flex items-center px-2 py-0.5 bg-[#f1f5ff] text-[#1863dc] text-[10px] font-semibold rounded-md shrink-0">
+                <span
+                  class="inline-flex shrink-0 items-center rounded-md bg-[#f1f5ff] px-2 py-0.5 text-[10px] font-semibold text-[#1863dc]"
+                >
                   TRIAL
                 </span>
               {/if}
             </div>
 
             <!-- Workspace Details -->
-            <div class="bg-[#fafafa] p-2.5 rounded-lg border border-[#e5e5e5] space-y-1.5">
-              <span class="text-[10px] font-mono uppercase text-[#75758a]">Workspace Bisnis:</span>
+            <div class="space-y-1.5 rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-2.5">
+              <span class="font-mono text-[10px] text-[#75758a] uppercase">Workspace Bisnis:</span>
               {#if tenant.workspaces && tenant.workspaces.length > 0}
                 {#each tenant.workspaces as ws}
                   <div class="flex items-center justify-between text-xs">
                     <span class="font-medium text-[#17171c]">{ws.name}</span>
-                    <span class="text-[10px] px-1.5 py-0.2 bg-[#f1f5ff] text-[#1863dc] font-mono rounded-md">
+                    <span
+                      class="py-0.2 rounded-md bg-[#f1f5ff] px-1.5 font-mono text-[10px] text-[#1863dc]"
+                    >
                       {ws.branches_count} Cabang
                     </span>
                   </div>
@@ -408,12 +457,14 @@
 
             <!-- Expiry & Quota Meta -->
             <div class="grid grid-cols-2 gap-2 text-xs">
-              <div class="p-2 bg-[#fafafa] rounded-lg border border-[#e5e5e5]">
+              <div class="rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-2">
                 <div class="text-[10px] text-[#75758a]">Masa Aktif</div>
-                <div class="font-mono font-medium text-[#17171c] mt-0.5">
+                <div class="mt-0.5 font-mono font-medium text-[#17171c]">
                   {#if tenant.days_remaining !== null}
                     <span class={tenant.days_remaining < 7 ? 'text-[#e5484d]' : 'text-[#16a34a]'}>
-                      {tenant.days_remaining > 0 ? `Sisa ${tenant.days_remaining} hari` : 'Kedaluwarsa'}
+                      {tenant.days_remaining > 0
+                        ? `Sisa ${tenant.days_remaining} hari`
+                        : 'Kedaluwarsa'}
                     </span>
                   {:else}
                     Lifetime
@@ -421,9 +472,9 @@
                 </div>
               </div>
 
-              <div class="p-2 bg-[#fafafa] rounded-lg border border-[#e5e5e5]">
+              <div class="rounded-lg border border-[#e5e5e5] bg-[#fafafa] p-2">
                 <div class="text-[10px] text-[#75758a]">Maksimal Kuota</div>
-                <div class="font-mono font-medium text-[#17171c] mt-0.5">
+                <div class="mt-0.5 font-mono font-medium text-[#17171c]">
                   {tenant.max_workspaces} Workspace
                 </div>
               </div>
@@ -434,9 +485,9 @@
               <button
                 type="button"
                 onclick={() => openExtendModal(tenant)}
-                class="flex-1 py-2 text-xs font-medium bg-[#17171c] text-white rounded-lg flex items-center justify-center gap-1.5"
+                class="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#17171c] py-2 text-xs font-medium text-white"
               >
-                <PlusCircle class="w-3.5 h-3.5" />
+                <PlusCircle class="h-3.5 w-3.5" />
                 <span>Perpanjang</span>
               </button>
 
@@ -444,7 +495,7 @@
                 type="button"
                 onclick={() => handleToggleSuspend(tenant)}
                 disabled={isSubmittingAction}
-                class={`px-4 py-2 text-xs font-medium rounded-lg border transition-all ${
+                class={`rounded-lg border px-4 py-2 text-xs font-medium transition-all ${
                   tenant.subscription_status === 'SUSPENDED'
                     ? 'border-[#bbf7d0] bg-[#edfce9] text-[#003c33]'
                     : 'border-[#d9d9dd] text-[#616161] hover:bg-[#fee2e2] hover:text-[#991b1b]'
@@ -462,21 +513,31 @@
 
 <!-- Modal Perpanjangan Masa Aktif Tenant -->
 {#if extendingTenant}
-  <div class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
-    <div class="bg-white border border-[#d9d9dd] rounded-2xl w-full max-w-md p-6 space-y-4 shadow-xl animate-in fade-in zoom-in-95">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 font-sans backdrop-blur-xs"
+  >
+    <div
+      class="animate-in fade-in zoom-in-95 w-full max-w-md space-y-4 rounded-2xl border border-[#d9d9dd] bg-white p-6 shadow-xl"
+    >
       <div class="flex items-center justify-between border-b border-[#e5e5e5] pb-3">
         <h3 class="text-sm font-semibold text-[#17171c]">Perpanjang Masa Aktif Tenant</h3>
-        <button type="button" onclick={closeExtendModal} class="text-[#93939f] hover:text-[#17171c] cursor-pointer">
-          <X class="w-4 h-4" />
+        <button
+          type="button"
+          onclick={closeExtendModal}
+          class="cursor-pointer text-[#93939f] hover:text-[#17171c]"
+        >
+          <X class="h-4 w-4" />
         </button>
       </div>
 
       <div class="space-y-3 text-xs">
-        <div class="p-3 bg-[#fafafa] rounded-xl border border-[#e5e5e5]">
+        <div class="rounded-xl border border-[#e5e5e5] bg-[#fafafa] p-3">
           <div class="font-medium text-[#17171c]">{extendingTenant.name}</div>
-          <div class="text-[11px] text-[#75758a] font-mono">{extendingTenant.email}</div>
-          <div class="text-[10px] text-[#75758a] font-mono mt-1">
-            Status Saat Ini: <span class="font-semibold text-[#17171c]">{extendingTenant.subscription_status}</span>
+          <div class="font-mono text-[11px] text-[#75758a]">{extendingTenant.email}</div>
+          <div class="mt-1 font-mono text-[10px] text-[#75758a]">
+            Status Saat Ini: <span class="font-semibold text-[#17171c]"
+              >{extendingTenant.subscription_status}</span
+            >
           </div>
         </div>
 
@@ -484,12 +545,14 @@
           <label for="extension-days-input" class="block font-medium text-[#17171c]">
             Durasi Perpanjangan (Hari)
           </label>
-          <div class="grid grid-cols-3 gap-2 mb-2">
+          <div class="mb-2 grid grid-cols-3 gap-2">
             <button
               type="button"
               onclick={() => (extensionDays = 30)}
-              class={`py-1.5 text-xs font-mono font-medium rounded-lg border transition-all cursor-pointer ${
-                extensionDays === 30 ? 'bg-[#17171c] text-white border-[#17171c]' : 'bg-white text-[#17171c] border-[#d9d9dd] hover:bg-[#f4f4f4]'
+              class={`cursor-pointer rounded-lg border py-1.5 font-mono text-xs font-medium transition-all ${
+                extensionDays === 30
+                  ? 'border-[#17171c] bg-[#17171c] text-white'
+                  : 'border-[#d9d9dd] bg-white text-[#17171c] hover:bg-[#f4f4f4]'
               }`}
             >
               +30 Hari
@@ -497,8 +560,10 @@
             <button
               type="button"
               onclick={() => (extensionDays = 90)}
-              class={`py-1.5 text-xs font-mono font-medium rounded-lg border transition-all cursor-pointer ${
-                extensionDays === 90 ? 'bg-[#17171c] text-white border-[#17171c]' : 'bg-white text-[#17171c] border-[#d9d9dd] hover:bg-[#f4f4f4]'
+              class={`cursor-pointer rounded-lg border py-1.5 font-mono text-xs font-medium transition-all ${
+                extensionDays === 90
+                  ? 'border-[#17171c] bg-[#17171c] text-white'
+                  : 'border-[#d9d9dd] bg-white text-[#17171c] hover:bg-[#f4f4f4]'
               }`}
             >
               +90 Hari
@@ -506,8 +571,10 @@
             <button
               type="button"
               onclick={() => (extensionDays = 365)}
-              class={`py-1.5 text-xs font-mono font-medium rounded-lg border transition-all cursor-pointer ${
-                extensionDays === 365 ? 'bg-[#17171c] text-white border-[#17171c]' : 'bg-white text-[#17171c] border-[#d9d9dd] hover:bg-[#f4f4f4]'
+              class={`cursor-pointer rounded-lg border py-1.5 font-mono text-xs font-medium transition-all ${
+                extensionDays === 365
+                  ? 'border-[#17171c] bg-[#17171c] text-white'
+                  : 'border-[#d9d9dd] bg-white text-[#17171c] hover:bg-[#f4f4f4]'
               }`}
             >
               +1 Tahun
@@ -520,16 +587,16 @@
             min="1"
             max="3650"
             bind:value={extensionDays}
-            class="w-full px-3 py-2 bg-white border border-[#d9d9dd] rounded-lg font-mono text-[#17171c] focus:border-[#17171c] focus:outline-hidden"
+            class="w-full rounded-lg border border-[#d9d9dd] bg-white px-3 py-2 font-mono text-[#17171c] focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
       </div>
 
-      <div class="pt-2 flex space-x-2.5">
+      <div class="flex space-x-2.5 pt-2">
         <button
           type="button"
           onclick={closeExtendModal}
-          class="flex-1 py-2 text-xs font-medium border border-[#d9d9dd] rounded-lg text-[#616161] hover:bg-[#f4f4f4] cursor-pointer"
+          class="flex-1 cursor-pointer rounded-lg border border-[#d9d9dd] py-2 text-xs font-medium text-[#616161] hover:bg-[#f4f4f4]"
         >
           Batal
         </button>
@@ -537,7 +604,7 @@
           type="button"
           onclick={handleExtendSubmit}
           disabled={isSubmittingAction}
-          class="flex-1 py-2 text-xs font-medium bg-[#17171c] hover:bg-black text-white rounded-lg transition-all cursor-pointer disabled:opacity-50"
+          class="flex-1 cursor-pointer rounded-lg bg-[#17171c] py-2 text-xs font-medium text-white transition-all hover:bg-black disabled:opacity-50"
         >
           {isSubmittingAction ? 'Menyimpan...' : 'Simpan'}
         </button>

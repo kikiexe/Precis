@@ -25,7 +25,18 @@ class InventoryService {
 
   async updateBranch(
     id: string,
-    data: Partial<Pick<BranchItem, 'name' | 'lat' | 'lng' | 'radius_meters' | 'late_penalty_per_minute' | 'overtime_pay_per_hour' | 'min_overtime_threshold_minutes'>>
+    data: Partial<
+      Pick<
+        BranchItem,
+        | 'name'
+        | 'lat'
+        | 'lng'
+        | 'radius_meters'
+        | 'late_penalty_per_minute'
+        | 'overtime_pay_per_hour'
+        | 'min_overtime_threshold_minutes'
+      >
+    >
   ): Promise<BranchItem> {
     const res = await apiClient.put<BranchItem>(`/branches/${id}`, data);
     if (!res.data) {
@@ -34,7 +45,11 @@ class InventoryService {
     return res.data;
   }
 
-  async createTerminal(branchId: string, terminalName?: string, customToken?: string): Promise<PosTerminalItem> {
+  async createTerminal(
+    branchId: string,
+    terminalName?: string,
+    customToken?: string
+  ): Promise<PosTerminalItem> {
     const res = await apiClient.post<PosTerminalItem>(`/branches/${branchId}/terminals`, {
       terminal_name: terminalName,
       device_token: customToken || undefined,
@@ -45,10 +60,17 @@ class InventoryService {
     return res.data;
   }
 
-  async regenerateTerminalToken(branchId: string, terminalId: string, customToken?: string): Promise<PosTerminalItem> {
-    const res = await apiClient.post<PosTerminalItem>(`/branches/${branchId}/terminals/${terminalId}/regenerate-token`, {
-      device_token: customToken || undefined,
-    });
+  async regenerateTerminalToken(
+    branchId: string,
+    terminalId: string,
+    customToken?: string
+  ): Promise<PosTerminalItem> {
+    const res = await apiClient.post<PosTerminalItem>(
+      `/branches/${branchId}/terminals/${terminalId}/regenerate-token`,
+      {
+        device_token: customToken || undefined,
+      }
+    );
     if (!res.data) {
       throw new Error(res.message || 'Gagal memperbarui token terminal kasir.');
     }
@@ -130,11 +152,56 @@ class InventoryService {
       }
     }
     const defaultMaterials: RawMaterialItem[] = [
-      { id: 'raw-1', name: 'Arabica House Blend Beans', category_id: 'cat-1', category_name: 'Kopi', current_stock: 12.5, min_stock_alert: 5, unit: 'kg', last_adjusted_at: '2026-08-27 10:00' },
-      { id: 'raw-2', name: 'Fresh Milk Pasteurisasi', category_id: 'cat-2', category_name: 'Dairy', current_stock: 24, min_stock_alert: 10, unit: 'liter', last_adjusted_at: '2026-08-27 08:30' },
-      { id: 'raw-3', name: 'Oatmilk Barista Edition', category_id: 'cat-2', category_name: 'Dairy', current_stock: 8, min_stock_alert: 5, unit: 'liter', last_adjusted_at: '2026-08-26 18:00' },
-      { id: 'raw-4', name: 'Syrup Vanilla Artisan', category_id: 'cat-3', category_name: 'Sirup', current_stock: 3.5, min_stock_alert: 2, unit: 'botol', last_adjusted_at: '2026-08-25 14:00' },
-      { id: 'raw-5', name: 'Paper Cup 8oz Hot', category_id: 'cat-4', category_name: 'Packaging', current_stock: 250, min_stock_alert: 100, unit: 'pcs', last_adjusted_at: '2026-08-27 07:00' },
+      {
+        id: 'raw-1',
+        name: 'Arabica House Blend Beans',
+        category_id: 'cat-1',
+        category_name: 'Kopi',
+        current_stock: 12.5,
+        min_stock_alert: 5,
+        unit: 'kg',
+        last_adjusted_at: '2026-08-27 10:00',
+      },
+      {
+        id: 'raw-2',
+        name: 'Fresh Milk Pasteurisasi',
+        category_id: 'cat-2',
+        category_name: 'Dairy',
+        current_stock: 24,
+        min_stock_alert: 10,
+        unit: 'liter',
+        last_adjusted_at: '2026-08-27 08:30',
+      },
+      {
+        id: 'raw-3',
+        name: 'Oatmilk Barista Edition',
+        category_id: 'cat-2',
+        category_name: 'Dairy',
+        current_stock: 8,
+        min_stock_alert: 5,
+        unit: 'liter',
+        last_adjusted_at: '2026-08-26 18:00',
+      },
+      {
+        id: 'raw-4',
+        name: 'Syrup Vanilla Artisan',
+        category_id: 'cat-3',
+        category_name: 'Sirup',
+        current_stock: 3.5,
+        min_stock_alert: 2,
+        unit: 'botol',
+        last_adjusted_at: '2026-08-25 14:00',
+      },
+      {
+        id: 'raw-5',
+        name: 'Paper Cup 8oz Hot',
+        category_id: 'cat-4',
+        category_name: 'Packaging',
+        current_stock: 250,
+        min_stock_alert: 100,
+        unit: 'pcs',
+        last_adjusted_at: '2026-08-27 07:00',
+      },
     ];
     localStorage.setItem(this.getStorageKey('raw_materials'), JSON.stringify(defaultMaterials));
     return defaultMaterials;
@@ -256,7 +323,10 @@ class InventoryService {
   }
 
   // --- SALES ANALYTICS ---
-  async fetchLiveSalesAnalytics(timeframe: TimeframePeriod, branchId?: string): Promise<TimeframeMetricData> {
+  async fetchLiveSalesAnalytics(
+    timeframe: TimeframePeriod,
+    branchId?: string
+  ): Promise<TimeframeMetricData> {
     const params: Record<string, string> = { period: timeframe };
     if (branchId && branchId !== 'ALL') {
       params.branch_id = branchId;
@@ -269,7 +339,16 @@ class InventoryService {
   }
 
   getTimeframeMetrics(timeframe: TimeframePeriod): TimeframeMetricData {
-    const label = timeframe === 'day' ? 'Hari Ini' : timeframe === 'week' ? 'Pekan Ini' : timeframe === 'month' ? 'Bulan Ini' : timeframe === 'year' ? 'Tahun Ini' : 'Sepanjang Waktu';
+    const label =
+      timeframe === 'day'
+        ? 'Hari Ini'
+        : timeframe === 'week'
+          ? 'Pekan Ini'
+          : timeframe === 'month'
+            ? 'Bulan Ini'
+            : timeframe === 'year'
+              ? 'Tahun Ini'
+              : 'Sepanjang Waktu';
 
     return {
       period: timeframe,

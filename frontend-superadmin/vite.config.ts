@@ -4,11 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 
 export default defineConfig({
-  plugins: [
-    svelte(),
-    tailwindcss(),
-    basicSsl(),
-  ],
+  plugins: [svelte(), tailwindcss(), basicSsl()],
   server: {
     port: 5176,
     host: true,

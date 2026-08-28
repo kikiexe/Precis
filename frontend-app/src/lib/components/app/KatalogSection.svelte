@@ -70,7 +70,9 @@
   });
 
   async function handleToggleAvailability(item: ProductMenuItem) {
-    const updated = await inventoryService.updateMenuItem(item.id, { is_available: !item.is_available });
+    const updated = await inventoryService.updateMenuItem(item.id, {
+      is_available: !item.is_available,
+    });
     if (updated) {
       await loadData();
     }
@@ -131,26 +133,28 @@
   ]);
 </script>
 
-<div class="space-y-6 font-sans pb-8">
+<div class="space-y-6 pb-8 font-sans">
   <!-- Top Segmented Navigation & Action Button -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-    <div class="inline-flex items-center gap-1.5 p-1.5 bg-white border border-[#e5e5ea] rounded-2xl shadow-2xs overflow-x-auto no-scrollbar">
+  <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+    <div
+      class="no-scrollbar inline-flex items-center gap-1.5 overflow-x-auto rounded-2xl border border-[#e5e5ea] bg-white p-1.5 shadow-2xs"
+    >
       {#each catalogTabs as tab}
         {@const Icon = tab.icon}
         {@const isActive = activeSubTab === tab.id}
         <button
           type="button"
           onclick={() => (activeSubTab = tab.id)}
-          class={`px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-2 shrink-0 ${
+          class={`flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-xs font-medium transition-all duration-200 ${
             isActive
-              ? 'bg-[#17171c] text-white shadow-xs font-semibold'
-              : 'text-[#686873] hover:text-[#17171c] hover:bg-[#f4f4f6]'
+              ? 'bg-[#17171c] font-semibold text-white shadow-xs'
+              : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
           }`}
         >
-          <Icon class={`w-4 h-4 ${isActive ? 'text-white' : 'text-[#8e8e93]'}`} />
+          <Icon class={`h-4 w-4 ${isActive ? 'text-white' : 'text-[#8e8e93]'}`} />
           <span class="whitespace-nowrap">{tab.label}</span>
           <span
-            class={`px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
+            class={`rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold ${
               isActive ? 'bg-white/20 text-white' : 'bg-[#eeece7] text-[#616161]'
             }`}
           >
@@ -165,34 +169,34 @@
         <button
           type="button"
           onclick={() => (isAddMenuModalOpen = true)}
-          class="w-full sm:w-auto px-5 py-2.5 text-xs font-semibold bg-[#17171c] hover:bg-black text-white rounded-full transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs shrink-0"
+          class="flex w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black sm:w-auto"
         >
-          <Plus class="w-4 h-4" />
+          <Plus class="h-4 w-4" />
           <span>Tambah Menu</span>
         </button>
       {:else if activeSubTab === 'kategori'}
         <button
           type="button"
           onclick={() => (isAddCategoryModalOpen = true)}
-          class="w-full sm:w-auto px-5 py-2.5 text-xs font-semibold bg-[#17171c] hover:bg-black text-white rounded-full transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs shrink-0"
+          class="flex w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black sm:w-auto"
         >
-          <Plus class="w-4 h-4" />
+          <Plus class="h-4 w-4" />
           <span>Tambah Kategori</span>
         </button>
       {:else}
         <button
           type="button"
           onclick={() => (isAddMaterialModalOpen = true)}
-          class="w-full sm:w-auto px-5 py-2.5 text-xs font-semibold bg-[#17171c] hover:bg-black text-white rounded-full transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs shrink-0"
+          class="flex w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black sm:w-auto"
         >
-          <Plus class="w-4 h-4" />
+          <Plus class="h-4 w-4" />
           <span>Tambah Bahan Baku</span>
         </button>
       {/if}
     </div>
   </div>
 
-  <div class="min-w-0 animate-in fade-in duration-200">
+  <div class="animate-in fade-in min-w-0 duration-200">
     {#if activeSubTab === 'menu'}
       <MenuProductTab
         {menuItems}

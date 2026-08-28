@@ -61,8 +61,17 @@
   $effect(() => {
     const update = () => {
       const now = new Date();
-      liveTime = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      todayDateStr = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+      liveTime = now.toLocaleTimeString('id-ID', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+      todayDateStr = now.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
 
       const year = now.getFullYear();
       const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -142,7 +151,8 @@
     myCashAdvances.filter((k) => k.status === 'APPROVED').reduce((s, k) => s + k.amount, 0)
   );
   let estimatedTakeHomePay = $derived(
-    myPayrollSlip?.net_salary || (currentUser.base_salary || 3000000) + totalOvertimePay - totalLatePenalty - totalActiveKasbon
+    myPayrollSlip?.net_salary ||
+      (currentUser.base_salary || 3000000) + totalOvertimePay - totalLatePenalty - totalActiveKasbon
   );
 
   async function handleCheckInvite() {
@@ -158,45 +168,50 @@
   }
 </script>
 
-<div class="space-y-6 max-w-5xl mx-auto font-sans pb-8">
-  <LiveClockCard
-    {currentUser}
-    {hasWorkspace}
-    {liveTime}
-    {todayDateStr}
-  />
+<div class="mx-auto max-w-5xl space-y-6 pb-8 font-sans">
+  <LiveClockCard {currentUser} {hasWorkspace} {liveTime} {todayDateStr} />
 
   {#if !hasWorkspace}
-    <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-6 sm:p-7 space-y-5 shadow-2xs">
+    <div
+      class="space-y-5 rounded-2xl border border-[#e5e5ea] bg-white p-6 shadow-2xs sm:rounded-3xl sm:p-7"
+    >
       <div class="flex items-start justify-between gap-3 border-b border-[#f2f2f4] pb-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-[#f4f4f6] border border-[#e5e5ea] flex items-center justify-center text-[#17171c]">
-            <Mail class="w-5 h-5" />
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
+          >
+            <Mail class="h-5 w-5" />
           </div>
           <div>
             <h2 class="text-base font-bold text-[#17171c]">Belum Ada Outlet &amp; Jadwal Shift</h2>
-            <p class="text-xs text-[#8e8e93]">Akun personal Anda belum terhubung ke workspace bisnis mana pun.</p>
+            <p class="text-xs text-[#8e8e93]">
+              Akun personal Anda belum terhubung ke workspace bisnis mana pun.
+            </p>
           </div>
         </div>
-        <span class="text-xs font-mono px-3 py-1 rounded-full bg-[#f4f4f6] text-[#686873] font-semibold shrink-0">
+        <span
+          class="shrink-0 rounded-full bg-[#f4f4f6] px-3 py-1 font-mono text-xs font-semibold text-[#686873]"
+        >
           Standalone
         </span>
       </div>
 
-      <div class="bg-[#f8f8fa] border border-[#e5e5ea] rounded-2xl p-4 text-xs text-[#686873] space-y-1 leading-relaxed">
+      <div
+        class="space-y-1 rounded-2xl border border-[#e5e5ea] bg-[#f8f8fa] p-4 text-xs leading-relaxed text-[#686873]"
+      >
         <div>Minta pemilik bisnis outlet Anda untuk mengirimkan email undangan ke:</div>
         <div class="font-mono text-xs font-bold text-[#17171c]">{currentUser.email}</div>
       </div>
 
-      <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+      <div class="flex flex-col items-center gap-3 pt-2 sm:flex-row">
         {#if onRefreshSession}
           <button
             type="button"
             onclick={handleCheckInvite}
             disabled={isCheckingInvitation}
-            class="w-full sm:w-auto flex-1 py-3 px-5 border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#17171c] text-xs font-semibold rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+            class="flex w-full flex-1 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#e5e5ea] px-5 py-3 text-xs font-semibold text-[#17171c] transition-all hover:bg-[#f4f4f6] disabled:opacity-50 sm:w-auto"
           >
-            <RefreshCw class={`w-4 h-4 ${isCheckingInvitation ? 'animate-spin' : ''}`} />
+            <RefreshCw class={`h-4 w-4 ${isCheckingInvitation ? 'animate-spin' : ''}`} />
             <span>{isCheckingInvitation ? 'Memeriksa...' : 'Cek Status Undangan'}</span>
           </button>
         {/if}
@@ -205,9 +220,9 @@
           <button
             type="button"
             onclick={onOpenCreateWorkspaceModal}
-            class="w-full sm:w-auto py-3 px-5 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+            class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black sm:w-auto"
           >
-            <Plus class="w-4 h-4" />
+            <Plus class="h-4 w-4" />
             <span>Buat Bisnis Baru</span>
           </button>
         {/if}
@@ -231,11 +246,7 @@
       onNavigateFinance={() => onNavigate('finance')}
     />
 
-    <ShiftRosterPreview
-      {currentUser}
-      {rosterShifts}
-      onNavigateShift={() => onNavigate('shift')}
-    />
+    <ShiftRosterPreview {currentUser} {rosterShifts} onNavigateShift={() => onNavigate('shift')} />
   {/if}
 </div>
 

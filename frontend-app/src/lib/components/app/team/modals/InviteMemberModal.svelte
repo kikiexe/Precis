@@ -29,7 +29,11 @@
 
   $effect(() => {
     if (isOpen) {
-      const defaultRole = roles.find((r) => r.name.toLowerCase().includes('barista') || r.name.toLowerCase().includes('karyawan')) || roles[0];
+      const defaultRole =
+        roles.find(
+          (r) =>
+            r.name.toLowerCase().includes('barista') || r.name.toLowerCase().includes('karyawan')
+        ) || roles[0];
       form = {
         email: '',
         job_title: 'Barista',
@@ -94,13 +98,19 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl w-full max-w-lg p-6 sm:p-7 space-y-5 shadow-xl animate-in fade-in zoom-in-95">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 font-sans backdrop-blur-xs"
+  >
+    <div
+      class="animate-in fade-in zoom-in-95 w-full max-w-lg space-y-5 rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-xl sm:p-7"
+    >
       <!-- Modal Header -->
-      <div class="flex items-center justify-between pb-3 border-b border-[#f2f2f4]">
+      <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-[#f4f4f6] text-[#17171c] flex items-center justify-center border border-[#e5e5ea]">
-            <Mail class="w-5 h-5" />
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
+          >
+            <Mail class="h-5 w-5" />
           </div>
           <div>
             <h3 class="text-base font-bold text-[#17171c]">Undang Karyawan Baru</h3>
@@ -110,53 +120,65 @@
         <button
           type="button"
           onclick={onClose}
-          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all"
+          class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="w-5 h-5" />
+          <X class="h-5 w-5" />
         </button>
       </div>
 
       {#if memberFormError}
-        <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] text-[#991b1b] text-xs rounded-xl font-medium">
+        <div
+          class="rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
+        >
           {memberFormError}
         </div>
       {/if}
 
       {#if memberFormSuccess}
-        <div class="p-3.5 bg-[#ecfdf5] border border-[#a7f3d0] text-[#065f46] text-xs rounded-xl font-medium">
+        <div
+          class="rounded-xl border border-[#a7f3d0] bg-[#ecfdf5] p-3.5 text-xs font-medium text-[#065f46]"
+        >
           {memberFormSuccess}
         </div>
       {/if}
 
       <div class="space-y-4 text-xs">
         <div class="space-y-1.5">
-          <label for="new-member-email" class="font-bold text-[#17171c]">Alamat Email Calon Staf</label>
+          <label for="new-member-email" class="font-bold text-[#17171c]"
+            >Alamat Email Calon Staf</label
+          >
           <input
             id="new-member-email"
             type="email"
             bind:value={form.email}
             placeholder="nama.barista@gmail.com"
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl text-xs text-[#17171c] font-mono placeholder-[#8e8e93] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
 
         <div class="space-y-1.5">
-          <label for="new-member-job-title" class="font-bold text-[#17171c]">Jabatan / Posisi Operasional</label>
+          <label for="new-member-job-title" class="font-bold text-[#17171c]"
+            >Jabatan / Posisi Operasional</label
+          >
           <input
             id="new-member-job-title"
             type="text"
             bind:value={form.job_title}
             placeholder="Contoh: Senior Barista, Head Cook, Kasir Utama"
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl text-xs text-[#17171c] placeholder-[#8e8e93] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
 
         <!-- Role Selector -->
         <div class="space-y-1.5">
-          <label for="new-member-role" class="font-bold text-[#17171c] flex items-center justify-between">
+          <label
+            for="new-member-role"
+            class="flex items-center justify-between font-bold text-[#17171c]"
+          >
             <span>Role (Hak Akses)</span>
             {#if roles.length > 0}
-              <span class="text-[11px] text-[#8e8e93] font-normal">{roles.length} pilihan role</span>
+              <span class="text-[11px] font-normal text-[#8e8e93]">{roles.length} pilihan role</span
+              >
             {/if}
           </label>
           <div class="relative">
@@ -164,7 +186,7 @@
               id="new-member-role"
               value={form.role_id || form.role}
               onchange={(e) => handleRoleChange((e.target as HTMLSelectElement).value)}
-              class="appearance-none w-full border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl px-4 pr-10 py-2.5 bg-[#f8f8fa] hover:bg-white text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden cursor-pointer transition-all shadow-2xs"
+              class="w-full cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 pr-10 text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
             >
               {#if roles.length > 0}
                 {#each roles as role}
@@ -178,28 +200,32 @@
                 <option value="ADMIN">Admin Operasional</option>
               {/if}
             </select>
-            <ChevronDown class="w-4 h-4 text-[#8e8e93] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown
+              class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+            />
           </div>
         </div>
 
         <div class="space-y-1.5">
-          <label for="new-member-salary" class="font-bold text-[#17171c]">Gaji Pokok Bulanan (IDR)</label>
+          <label for="new-member-salary" class="font-bold text-[#17171c]"
+            >Gaji Pokok Bulanan (IDR)</label
+          >
           <input
             id="new-member-salary"
             type="number"
             min="0"
             step="50000"
             bind:value={form.base_salary}
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl text-xs text-[#17171c] font-mono focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
       </div>
 
-      <div class="pt-2 flex items-center gap-3">
+      <div class="flex items-center gap-3 pt-2">
         <button
           type="button"
           onclick={onClose}
-          class="flex-1 py-3 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] rounded-full text-[#686873] cursor-pointer transition-all"
+          class="flex-1 cursor-pointer rounded-full border border-[#e5e5ea] py-3 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
         >
           Batal
         </button>
@@ -207,12 +233,12 @@
           type="button"
           onclick={handleSendInvitationSubmit}
           disabled={isSubmittingMember}
-          class="flex-1 py-3 text-xs font-semibold bg-[#17171c] hover:bg-black text-white rounded-full cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs transition-all"
+          class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
         >
           {#if isSubmittingMember}
             <span>Mengirim Undangan...</span>
           {:else}
-            <Send class="w-4 h-4" />
+            <Send class="h-4 w-4" />
             <span>Kirim Undangan</span>
           {/if}
         </button>

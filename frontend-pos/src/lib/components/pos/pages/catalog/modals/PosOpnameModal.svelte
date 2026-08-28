@@ -5,7 +5,12 @@
   interface Props {
     material: (RawMaterial & { stock_previous_day?: number }) | null;
     onClose: () => void;
-    onSave: (materialId: string, physicalCount: number, reason: StockAdjustmentReason, notes: string) => void;
+    onSave: (
+      materialId: string,
+      physicalCount: number,
+      reason: StockAdjustmentReason,
+      notes: string
+    ) => void;
   }
 
   let { material, onClose, onSave }: Props = $props();
@@ -41,37 +46,55 @@
 </script>
 
 {#if material}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs font-sans select-none">
-    <div class="bg-white border border-zinc-200 rounded-2xl w-full max-w-md p-6 space-y-4 shadow-2xl animate-in zoom-in-95 duration-150">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 font-sans backdrop-blur-xs select-none"
+  >
+    <div
+      class="animate-in zoom-in-95 w-full max-w-md space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xl duration-150"
+    >
       <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-zinc-100 text-zinc-900 flex items-center justify-center border border-zinc-200">
-            <SlidersHorizontal class="w-4 h-4" />
+          <div
+            class="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+          >
+            <SlidersHorizontal class="h-4 w-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-zinc-900">Audit Stock Opname Bar</h3>
-            <p class="text-[11px] text-zinc-500 font-mono">{material.name}</p>
+            <p class="font-mono text-[11px] text-zinc-500">{material.name}</p>
           </div>
         </div>
-        <button type="button" onclick={onClose} class="text-zinc-400 hover:text-zinc-700 cursor-pointer p-1">
-          <X class="w-4 h-4" />
+        <button
+          type="button"
+          onclick={onClose}
+          class="cursor-pointer p-1 text-zinc-400 hover:text-zinc-700"
+        >
+          <X class="h-4 w-4" />
         </button>
       </div>
 
       <div class="space-y-3.5 text-xs">
-        <div class="grid grid-cols-2 gap-3 p-3.5 bg-zinc-50 rounded-xl border border-zinc-200">
+        <div class="grid grid-cols-2 gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-3.5">
           <div>
-            <div class="text-[10px] text-zinc-500 uppercase font-mono">Stok di Sistem</div>
-            <div class="font-bold text-sm font-mono text-zinc-900 mt-0.5">
-              {material.current_stock} {material.unit}
+            <div class="font-mono text-[10px] text-zinc-500 uppercase">Stok di Sistem</div>
+            <div class="mt-0.5 font-mono text-sm font-bold text-zinc-900">
+              {material.current_stock}
+              {material.unit}
             </div>
           </div>
           <div>
-            <div class="text-[10px] text-zinc-500 uppercase font-mono">Selisih Fisik</div>
-            <div class={`font-bold text-sm font-mono mt-0.5 ${
-              variance === 0 ? 'text-emerald-600' : variance < 0 ? 'text-red-600' : 'text-blue-600'
-            }`}>
-              {variance > 0 ? `+${variance}` : variance} {material.unit}
+            <div class="font-mono text-[10px] text-zinc-500 uppercase">Selisih Fisik</div>
+            <div
+              class={`mt-0.5 font-mono text-sm font-bold ${
+                variance === 0
+                  ? 'text-emerald-600'
+                  : variance < 0
+                    ? 'text-red-600'
+                    : 'text-blue-600'
+              }`}
+            >
+              {variance > 0 ? `+${variance}` : variance}
+              {material.unit}
             </div>
           </div>
         </div>
@@ -85,7 +108,7 @@
             type="number"
             bind:value={physicalCountInput}
             step="any"
-            class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl font-mono text-zinc-900 focus:bg-white focus:border-zinc-900 focus:outline-hidden text-center text-lg font-bold"
+            class="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-center font-mono text-lg font-bold text-zinc-900 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
           />
         </div>
 
@@ -96,7 +119,7 @@
           <select
             id="pos-adjustment-reason"
             bind:value={selectedReason}
-            class="w-full px-3.5 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:border-zinc-900 focus:outline-hidden text-xs font-medium cursor-pointer"
+            class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2.5 text-xs font-medium text-zinc-900 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
           >
             <option value="STOCK_TAKE">Opname Rutin / Closing Shift (Stock Take)</option>
             <option value="RESTOCK">Penerimaan Barang Baru / Re-supply (Restock)</option>
@@ -115,37 +138,40 @@
             id="pos-adjustment-notes"
             type="text"
             bind:value={adjustmentNotes}
-            placeholder={selectedReason === 'OTHER' ? 'Tuliskan alasan detail penyesuaian...' : 'Contoh: Susu basi sebelum expired date...'}
-            class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 focus:bg-white focus:border-zinc-900 focus:outline-hidden text-xs placeholder-zinc-400"
+            placeholder={selectedReason === 'OTHER'
+              ? 'Tuliskan alasan detail penyesuaian...'
+              : 'Contoh: Susu basi sebelum expired date...'}
+            class="w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3.5 py-2 text-xs text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
           />
         </div>
 
         {#if errorMessage}
-          <div class="p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2">
-            <AlertTriangle class="w-4 h-4 shrink-0" />
+          <div
+            class="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-2.5 text-xs text-red-700"
+          >
+            <AlertTriangle class="h-4 w-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         {/if}
       </div>
 
-      <div class="pt-2 flex gap-2.5">
+      <div class="flex gap-2.5 pt-2">
         <button
           type="button"
           onclick={onClose}
-          class="flex-1 py-2.5 text-xs font-semibold border border-zinc-200 rounded-xl text-zinc-700 hover:bg-zinc-100 cursor-pointer transition-colors"
+          class="flex-1 cursor-pointer rounded-xl border border-zinc-200 py-2.5 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-100"
         >
           Batal
         </button>
         <button
           type="button"
           onclick={handleSubmit}
-          class="flex-1 py-2.5 text-xs font-semibold bg-zinc-900 hover:bg-black text-white rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-[0.99]"
+          class="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
         >
           <span>Simpan &amp; Catat Audit</span>
-          <ArrowRight class="w-3.5 h-3.5" />
+          <ArrowRight class="h-3.5 w-3.5" />
         </button>
       </div>
     </div>
   </div>
 {/if}
-

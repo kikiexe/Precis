@@ -25,7 +25,9 @@
   });
 
   let materialLogs = $derived(
-    material ? inventoryService.getAdjustmentLogs().filter((l) => l.material_id === material.id) : []
+    material
+      ? inventoryService.getAdjustmentLogs().filter((l) => l.material_id === material.id)
+      : []
   );
 
   let previewNewStock = $derived.by(() => {
@@ -79,37 +81,47 @@
 </script>
 
 {#if material}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 font-sans backdrop-blur-xs"
+  >
+    <div
+      class="animate-in fade-in zoom-in-95 w-full max-w-lg overflow-hidden rounded-3xl border border-[#e5e5ea] bg-white shadow-2xl duration-150"
+    >
       <!-- Modal Header -->
-      <div class="px-6 py-5 border-b border-[#f2f2f4] flex items-center justify-between bg-[#fafafc]">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 rounded-2xl bg-[#f4f4f6] text-[#17171c] flex items-center justify-center border border-[#e5e5ea] shrink-0">
-            <Layers class="w-5 h-5" />
+      <div
+        class="flex items-center justify-between border-b border-[#f2f2f4] bg-[#fafafc] px-6 py-5"
+      >
+        <div class="flex min-w-0 items-center gap-3">
+          <div
+            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
+          >
+            <Layers class="h-5 w-5" />
           </div>
           <div class="min-w-0">
-            <h3 class="text-base font-bold text-[#17171c] tracking-tight truncate">
+            <h3 class="truncate text-base font-bold tracking-tight text-[#17171c]">
               {material.name}
             </h3>
-            <p class="text-xs text-[#8e8e93] font-mono truncate">Penyesuaian Stok &amp; Audit Opname</p>
+            <p class="truncate font-mono text-xs text-[#8e8e93]">
+              Penyesuaian Stok &amp; Audit Opname
+            </p>
           </div>
         </div>
 
         <button
           type="button"
           onclick={onClose}
-          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all shrink-0"
+          class="shrink-0 cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="w-5 h-5" />
+          <X class="h-5 w-5" />
         </button>
       </div>
 
       <!-- Segmented View Selector -->
-      <div class="px-6 pt-3 border-b border-[#f2f2f4] flex gap-4">
+      <div class="flex gap-4 border-b border-[#f2f2f4] px-6 pt-3">
         <button
           type="button"
           onclick={() => (activeView = 'ADJUST')}
-          class={`pb-3 text-xs font-semibold border-b-2 transition-all cursor-pointer ${
+          class={`cursor-pointer border-b-2 pb-3 text-xs font-semibold transition-all ${
             activeView === 'ADJUST'
               ? 'border-[#17171c] text-[#17171c]'
               : 'border-transparent text-[#8e8e93] hover:text-[#17171c]'
@@ -120,43 +132,60 @@
         <button
           type="button"
           onclick={() => (activeView = 'LOGS')}
-          class={`pb-3 text-xs font-semibold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
+          class={`flex cursor-pointer items-center gap-1.5 border-b-2 pb-3 text-xs font-semibold transition-all ${
             activeView === 'LOGS'
               ? 'border-[#17171c] text-[#17171c]'
               : 'border-transparent text-[#8e8e93] hover:text-[#17171c]'
           }`}
         >
-          <History class="w-4 h-4" />
+          <History class="h-4 w-4" />
           <span>Riwayat Audit ({materialLogs.length})</span>
         </button>
       </div>
 
       {#if activeView === 'ADJUST'}
-        <div class="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+        <div class="max-h-[75vh] space-y-5 overflow-y-auto p-6">
           <!-- Current vs Target Preview Card -->
-          <div class="p-4 bg-[#f8f8fa] border border-[#e5e5ea] rounded-2xl flex items-center justify-between shadow-2xs">
+          <div
+            class="flex items-center justify-between rounded-2xl border border-[#e5e5ea] bg-[#f8f8fa] p-4 shadow-2xs"
+          >
             <div>
-              <span class="text-[10px] font-mono uppercase text-[#8e8e93] font-semibold">Stok Sistem</span>
-              <div class="text-xl font-bold font-mono text-[#17171c] mt-0.5">
-                {material.current_stock} <span class="text-xs text-[#8e8e93] font-normal">{material.unit}</span>
+              <span class="font-mono text-[10px] font-semibold text-[#8e8e93] uppercase"
+                >Stok Sistem</span
+              >
+              <div class="mt-0.5 font-mono text-xl font-bold text-[#17171c]">
+                {material.current_stock}
+                <span class="text-xs font-normal text-[#8e8e93]">{material.unit}</span>
               </div>
             </div>
 
-            <ArrowRight class="w-5 h-5 text-[#8e8e93]" />
+            <ArrowRight class="h-5 w-5 text-[#8e8e93]" />
 
             <div class="text-right">
-              <span class="text-[10px] font-mono uppercase text-[#8e8e93] font-semibold">Stok Akhir</span>
-              <div class="text-xl font-bold font-mono text-[#17171c] mt-0.5">
-                {previewNewStock} <span class="text-xs text-[#8e8e93] font-normal">{material.unit}</span>
+              <span class="font-mono text-[10px] font-semibold text-[#8e8e93] uppercase"
+                >Stok Akhir</span
+              >
+              <div class="mt-0.5 font-mono text-xl font-bold text-[#17171c]">
+                {previewNewStock}
+                <span class="text-xs font-normal text-[#8e8e93]">{material.unit}</span>
               </div>
             </div>
 
             <div class="border-l border-[#e5e5ea] pl-4 text-right">
-              <span class="text-[10px] font-mono uppercase text-[#8e8e93] font-semibold">Selisih</span>
-              <div class={`text-sm font-mono font-bold mt-0.5 ${
-                stockDiff > 0 ? 'text-[#059669]' : stockDiff < 0 ? 'text-[#e5484d]' : 'text-[#686873]'
-              }`}>
-                {stockDiff > 0 ? `+${stockDiff}` : stockDiff} {material.unit}
+              <span class="font-mono text-[10px] font-semibold text-[#8e8e93] uppercase"
+                >Selisih</span
+              >
+              <div
+                class={`mt-0.5 font-mono text-sm font-bold ${
+                  stockDiff > 0
+                    ? 'text-[#059669]'
+                    : stockDiff < 0
+                      ? 'text-[#e5484d]'
+                      : 'text-[#686873]'
+                }`}
+              >
+                {stockDiff > 0 ? `+${stockDiff}` : stockDiff}
+                {material.unit}
               </div>
             </div>
           </div>
@@ -164,11 +193,13 @@
           <!-- Mode Selector Tabs -->
           <div class="space-y-1.5">
             <span class="block text-xs font-bold text-[#17171c]">Metode Input</span>
-            <div class="grid grid-cols-2 gap-2 bg-[#f4f4f6] p-1.5 rounded-2xl border border-[#e5e5ea]">
+            <div
+              class="grid grid-cols-2 gap-2 rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] p-1.5"
+            >
               <button
                 type="button"
                 onclick={() => (adjustmentMode = 'PHYSICAL_COUNT')}
-                class={`py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
+                class={`cursor-pointer rounded-xl py-2 text-xs font-semibold transition-all ${
                   adjustmentMode === 'PHYSICAL_COUNT'
                     ? 'bg-white text-[#17171c] shadow-xs'
                     : 'text-[#686873] hover:text-[#17171c]'
@@ -179,7 +210,7 @@
               <button
                 type="button"
                 onclick={() => (adjustmentMode = 'DELTA')}
-                class={`py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer ${
+                class={`cursor-pointer rounded-xl py-2 text-xs font-semibold transition-all ${
                   adjustmentMode === 'DELTA'
                     ? 'bg-white text-[#17171c] shadow-xs'
                     : 'text-[#686873] hover:text-[#17171c]'
@@ -193,9 +224,14 @@
           <!-- Input Fields based on mode -->
           {#if adjustmentMode === 'PHYSICAL_COUNT'}
             <div class="space-y-1.5">
-              <label for="adj-physical-count" class="text-xs font-bold text-[#17171c] flex justify-between">
+              <label
+                for="adj-physical-count"
+                class="flex justify-between text-xs font-bold text-[#17171c]"
+              >
                 <span>Jumlah Fisik Aktual ({material.unit})</span>
-                <span class="text-[11px] text-[#8e8e93] font-normal">Hasil hitung fisik bar/gudang</span>
+                <span class="text-[11px] font-normal text-[#8e8e93]"
+                  >Hasil hitung fisik bar/gudang</span
+                >
               </label>
               <input
                 id="adj-physical-count"
@@ -203,35 +239,37 @@
                 min="0"
                 step="any"
                 bind:value={physicalCountInput}
-                class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] font-mono focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-xs text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
             </div>
           {:else}
             <div class="space-y-1.5">
-              <label for="adj-delta" class="text-xs font-bold text-[#17171c] flex justify-between">
+              <label for="adj-delta" class="flex justify-between text-xs font-bold text-[#17171c]">
                 <span>Perubahan Jumlah (+/-)</span>
-                <span class="text-[11px] text-[#8e8e93] font-normal">Gunakan tanda minus (-) untuk pengurangan</span>
+                <span class="text-[11px] font-normal text-[#8e8e93]"
+                  >Gunakan tanda minus (-) untuk pengurangan</span
+                >
               </label>
               <input
                 id="adj-delta"
                 type="number"
                 step="any"
                 bind:value={deltaInput}
-                class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] font-mono focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-xs text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
             </div>
           {/if}
 
           <!-- Reason Dropdown -->
           <div class="space-y-1.5">
-            <label for="adj-reason" class="text-xs font-bold text-[#17171c] block">
+            <label for="adj-reason" class="block text-xs font-bold text-[#17171c]">
               Alasan Penyesuaian
             </label>
             <div class="relative">
               <select
                 id="adj-reason"
                 bind:value={selectedReason}
-                class="appearance-none w-full border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl px-4 pr-10 py-2.5 bg-[#f8f8fa] hover:bg-white text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden cursor-pointer transition-all shadow-2xs"
+                class="w-full cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 pr-10 text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               >
                 <option value="STOCK_TAKE">Opname Fisik / Rekonsiliasi Shift</option>
                 <option value="DAMAGED">Barang Rusak / Pecah di Bar</option>
@@ -240,13 +278,15 @@
                 <option value="WASTE">Waste / Kalibrasi Mesin Tumpah</option>
                 <option value="OTHER">Alasan Lainnya</option>
               </select>
-              <ChevronDown class="w-4 h-4 text-[#8e8e93] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <ChevronDown
+                class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+              />
             </div>
           </div>
 
           <!-- Notes -->
           <div class="space-y-1.5">
-            <label for="adj-notes" class="text-xs font-bold text-[#17171c] block">
+            <label for="adj-notes" class="block text-xs font-bold text-[#17171c]">
               Catatan Tambahan (Opsional)
             </label>
             <input
@@ -254,7 +294,7 @@
               type="text"
               bind:value={notesInput}
               placeholder="Contoh: Susu tumpah saat kalibrasi mesin steam"
-              class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+              class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-xs text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
             />
           </div>
 
@@ -262,7 +302,7 @@
             <button
               type="button"
               onclick={onClose}
-              class="flex-1 py-3 border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] text-xs font-semibold rounded-full cursor-pointer transition-all"
+              class="flex-1 cursor-pointer rounded-full border border-[#e5e5ea] py-3 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
             >
               Batal
             </button>
@@ -270,41 +310,47 @@
               type="button"
               onclick={handleSubmit}
               disabled={isSubmitting || (adjustmentMode === 'DELTA' && deltaInput === 0)}
-              class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
+              class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
             >
-              <Check class="w-4 h-4" />
+              <Check class="h-4 w-4" />
               <span>Simpan Penyesuaian</span>
             </button>
           </div>
         </div>
       {:else}
         <!-- Audit Logs View -->
-        <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+        <div class="max-h-[75vh] space-y-4 overflow-y-auto p-6">
           {#if materialLogs.length === 0}
-            <div class="py-12 text-center text-[#8e8e93] text-xs">
+            <div class="py-12 text-center text-xs text-[#8e8e93]">
               Belum ada riwayat penyesuaian untuk bahan ini.
             </div>
           {:else}
             <div class="space-y-3">
               {#each materialLogs as log}
-                <div class="p-4 bg-[#f8f8fa] border border-[#e5e5ea] rounded-2xl space-y-2 text-xs">
+                <div class="space-y-2 rounded-2xl border border-[#e5e5ea] bg-[#f8f8fa] p-4 text-xs">
                   <div class="flex items-center justify-between">
                     <span class="font-bold text-[#17171c]">{getReasonLabel(log.reason)}</span>
-                    <span class="text-[11px] font-mono text-[#8e8e93]">{log.created_at}</span>
+                    <span class="font-mono text-[11px] text-[#8e8e93]">{log.created_at}</span>
                   </div>
-                  <div class="flex items-center gap-4 text-xs font-mono">
+                  <div class="flex items-center gap-4 font-mono text-xs">
                     <div>Sebelum: <strong>{log.prev_stock}</strong></div>
                     <div>Sesudah: <strong>{log.new_stock}</strong></div>
                     <div class={log.adjusted_amount > 0 ? 'text-[#059669]' : 'text-[#e5484d]'}>
-                      Selisih: {log.adjusted_amount > 0 ? `+${log.adjusted_amount}` : log.adjusted_amount}
+                      Selisih: {log.adjusted_amount > 0
+                        ? `+${log.adjusted_amount}`
+                        : log.adjusted_amount}
                     </div>
                   </div>
                   {#if log.notes}
-                    <p class="text-[11px] text-[#686873] bg-white p-2 rounded-xl border border-[#e5e5ea]">
+                    <p
+                      class="rounded-xl border border-[#e5e5ea] bg-white p-2 text-[11px] text-[#686873]"
+                    >
                       "{log.notes}"
                     </p>
                   {/if}
-                  <div class="text-[10px] text-[#8e8e93] font-mono">Petugas: {log.performed_by}</div>
+                  <div class="font-mono text-[10px] text-[#8e8e93]">
+                    Petugas: {log.performed_by}
+                  </div>
                 </div>
               {/each}
             </div>
@@ -314,7 +360,7 @@
             <button
               type="button"
               onclick={onClose}
-              class="w-full py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all"
+              class="w-full cursor-pointer rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white transition-all hover:bg-black"
             >
               Tutup
             </button>

@@ -206,7 +206,11 @@
       return;
     }
 
-    if (!window.isSecureContext && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    if (
+      !window.isSecureContext &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
+    ) {
       locateMessage = 'Browser memblokir GPS pada HTTP IP lokal. Gunakan HTTPS atau localhost.';
       setTimeout(() => (locateMessage = null), 5000);
       return;
@@ -277,22 +281,22 @@
     <div class="flex items-center gap-2">
       <!-- Search Input -->
       <div class="relative flex-1">
-        <Search class="w-3.5 h-3.5 text-[#8e8e93] absolute left-3 top-1/2 -translate-y-1/2" />
+        <Search class="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-[#8e8e93]" />
         <input
           type="text"
           bind:value={searchQuery}
           onkeydown={(e) => e.key === 'Enter' && handleSearchLocation()}
           placeholder="Cari jalan, tempat, atau area cabang..."
-          class="w-full pl-9 pr-20 py-2 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs font-medium"
+          class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] py-2 pr-20 pl-9 text-xs font-medium text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
         />
         <button
           type="button"
           onclick={handleSearchLocation}
           disabled={isSearching || !searchQuery.trim()}
-          class="absolute right-1 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-[#17171c] hover:bg-black text-white rounded-lg text-[11px] font-bold transition-all disabled:opacity-40 cursor-pointer flex items-center gap-1"
+          class="absolute top-1/2 right-1 flex -translate-y-1/2 cursor-pointer items-center gap-1 rounded-lg bg-[#17171c] px-2.5 py-1 text-[11px] font-bold text-white transition-all hover:bg-black disabled:opacity-40"
         >
           {#if isSearching}
-            <RefreshCw class="w-3 h-3 animate-spin" />
+            <RefreshCw class="h-3 w-3 animate-spin" />
           {:else}
             <span>Cari</span>
           {/if}
@@ -304,10 +308,10 @@
         <button
           type="button"
           onclick={handleResetToSaved}
-          class="px-2.5 py-2 bg-white hover:bg-[#f8f8fa] border border-[#e5e5ea] rounded-xl text-xs font-semibold text-[#17171c] flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer shrink-0"
+          class="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-white px-2.5 py-2 text-xs font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#f8f8fa]"
           title="Kembalikan pin ke koordinat cabang tersimpan"
         >
-          <RotateCcw class="w-3.5 h-3.5 text-[#059669]" />
+          <RotateCcw class="h-3.5 w-3.5 text-[#059669]" />
           <span class="hidden sm:inline">Titik Tersimpan</span>
         </button>
       {/if}
@@ -317,32 +321,34 @@
         type="button"
         onclick={handleLocateDevice}
         disabled={isLocating}
-        class="p-2 bg-white hover:bg-[#f8f8fa] border border-[#e5e5ea] rounded-xl text-[#2563eb] shadow-2xs transition-all cursor-pointer disabled:opacity-50 shrink-0"
+        class="shrink-0 cursor-pointer rounded-xl border border-[#e5e5ea] bg-white p-2 text-[#2563eb] shadow-2xs transition-all hover:bg-[#f8f8fa] disabled:opacity-50"
         title="Gunakan posisi GPS live perangkat saat ini"
       >
         {#if isLocating}
-          <RefreshCw class="w-4 h-4 animate-spin" />
+          <RefreshCw class="h-4 w-4 animate-spin" />
         {:else}
-          <LocateFixed class="w-4 h-4" />
+          <LocateFixed class="h-4 w-4" />
         {/if}
       </button>
     </div>
 
     <!-- Search Results Dropdown -->
     {#if searchResults.length > 0}
-      <div class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-[#e5e5ea] rounded-2xl shadow-xl z-1000 overflow-hidden divide-y divide-[#f2f2f4] animate-in fade-in">
+      <div
+        class="animate-in fade-in absolute top-full right-0 left-0 z-1000 mt-1.5 divide-y divide-[#f2f2f4] overflow-hidden rounded-2xl border border-[#e5e5ea] bg-white shadow-xl"
+      >
         {#each searchResults as item}
           <button
             type="button"
             onclick={() => selectSearchResult(item)}
-            class="w-full px-3.5 py-2.5 text-left hover:bg-[#f8f8fa] transition-all flex items-start gap-2 cursor-pointer text-xs group"
+            class="group flex w-full cursor-pointer items-start gap-2 px-3.5 py-2.5 text-left text-xs transition-all hover:bg-[#f8f8fa]"
           >
-            <MapPin class="w-3.5 h-3.5 text-[#2563eb] shrink-0 mt-0.5" />
+            <MapPin class="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#2563eb]" />
             <div class="min-w-0">
-              <span class="font-bold text-[#17171c] block truncate group-hover:text-[#2563eb]">
+              <span class="block truncate font-bold text-[#17171c] group-hover:text-[#2563eb]">
                 {item.display_name.split(',')[0]}
               </span>
-              <span class="text-[10.5px] text-[#8e8e93] block truncate">
+              <span class="block truncate text-[10.5px] text-[#8e8e93]">
                 {item.display_name}
               </span>
             </div>
@@ -353,40 +359,46 @@
   </div>
 
   {#if locateMessage}
-    <div class="p-2 bg-[#eff6ff] border border-[#bfdbfe] rounded-xl text-xs text-[#1e40af] font-medium flex items-center gap-1.5 animate-in fade-in">
-      <Navigation class="w-3 h-3 shrink-0 text-[#2563eb]" />
+    <div
+      class="animate-in fade-in flex items-center gap-1.5 rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-2 text-xs font-medium text-[#1e40af]"
+    >
+      <Navigation class="h-3 w-3 shrink-0 text-[#2563eb]" />
       <span>{locateMessage}</span>
     </div>
   {/if}
 
   <!-- Interactive Leaflet Map Viewport (No top badge, super clean) -->
-  <div class="relative w-full h-72 sm:h-80 rounded-2xl border border-[#e5e5ea] overflow-hidden bg-[#f4f4f6]">
-    <div bind:this={mapContainer} class="w-full h-full z-0"></div>
+  <div
+    class="relative h-72 w-full overflow-hidden rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] sm:h-80"
+  >
+    <div bind:this={mapContainer} class="z-0 h-full w-full"></div>
 
     <!-- Zoom Controls (Bottom Right) -->
-    <div class="absolute bottom-2.5 right-2.5 z-500 flex flex-col gap-1">
+    <div class="absolute right-2.5 bottom-2.5 z-500 flex flex-col gap-1">
       <button
         type="button"
         onclick={zoomIn}
-        class="w-7 h-7 bg-white hover:bg-[#f8f8fa] border border-[#e5e5ea] rounded-lg flex items-center justify-center text-[#17171c] shadow-xs transition-all cursor-pointer active:scale-95"
+        class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-[#e5e5ea] bg-white text-[#17171c] shadow-xs transition-all hover:bg-[#f8f8fa] active:scale-95"
         title="Perbesar"
       >
-        <Plus class="w-3.5 h-3.5" />
+        <Plus class="h-3.5 w-3.5" />
       </button>
       <button
         type="button"
         onclick={zoomOut}
-        class="w-7 h-7 bg-white hover:bg-[#f8f8fa] border border-[#e5e5ea] rounded-lg flex items-center justify-center text-[#17171c] shadow-xs transition-all cursor-pointer active:scale-95"
+        class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-[#e5e5ea] bg-white text-[#17171c] shadow-xs transition-all hover:bg-[#f8f8fa] active:scale-95"
         title="Perkecil"
       >
-        <Minus class="w-3.5 h-3.5" />
+        <Minus class="h-3.5 w-3.5" />
       </button>
     </div>
 
     <!-- Compact Floating Coordinates & Geofence HUD (Bottom Left) -->
-    <div class="absolute bottom-2.5 left-2.5 z-500 bg-[#17171c]/90 backdrop-blur-xs text-white rounded-xl px-2.5 py-1.5 shadow-md flex items-center gap-2 text-[11px] font-mono">
+    <div
+      class="absolute bottom-2.5 left-2.5 z-500 flex items-center gap-2 rounded-xl bg-[#17171c]/90 px-2.5 py-1.5 font-mono text-[11px] text-white shadow-md backdrop-blur-xs"
+    >
       <div class="flex items-center gap-1">
-        <MapPin class="w-3 h-3 text-[#60a5fa]" />
+        <MapPin class="h-3 w-3 text-[#60a5fa]" />
         <span>{latitude.toFixed(6)}, {longitude.toFixed(6)}</span>
       </div>
       <span class="text-[#71717a]">|</span>

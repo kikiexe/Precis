@@ -1,9 +1,5 @@
 import { apiClient, getDefaultApiBaseUrl } from './api-client';
-import type {
-  PayrollSlipData,
-  PayrollPreviewData,
-  DisbursePayrollResult,
-} from '../types/app';
+import type { PayrollSlipData, PayrollPreviewData, DisbursePayrollResult } from '../types/app';
 
 export class PayrollService {
   public async getMySlip(
@@ -51,7 +47,10 @@ export class PayrollService {
       branch_id: branchId || undefined,
     };
 
-    const response = await apiClient.post<DisbursePayrollResult>('/admin/payroll/disburse', payload);
+    const response = await apiClient.post<DisbursePayrollResult>(
+      '/admin/payroll/disburse',
+      payload
+    );
     if (response.data) {
       return response.data;
     }

@@ -92,36 +92,43 @@
 
 <div class="space-y-6 font-sans">
   <!-- Action Bar & Overview -->
-  <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+  <div
+    class="flex flex-col justify-between gap-4 rounded-2xl border border-[#e5e5ea] bg-white p-5 shadow-2xs sm:flex-row sm:items-center sm:rounded-3xl sm:p-6"
+  >
     <div class="space-y-1">
       <div class="flex items-center gap-2">
-        <h2 class="text-base sm:text-lg font-bold text-[#17171c]">Role &amp; Hak Akses</h2>
-        <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-semibold bg-[#f4f4f6] text-[#17171c]">
+        <h2 class="text-base font-bold text-[#17171c] sm:text-lg">Role &amp; Hak Akses</h2>
+        <span
+          class="rounded-full bg-[#f4f4f6] px-2.5 py-0.5 font-mono text-[10.5px] font-semibold text-[#17171c]"
+        >
           {roles.length + 1} Role Aktif
         </span>
       </div>
-      <p class="text-xs text-[#8e8e93] max-w-xl">
-        Atur kewenangan fitur untuk staf outlet. Buat role kustom seperti Head Barista atau Akuntan, dan centang fitur yang dapat diakses.
+      <p class="max-w-xl text-xs text-[#8e8e93]">
+        Atur kewenangan fitur untuk staf outlet. Buat role kustom seperti Head Barista atau Akuntan,
+        dan centang fitur yang dapat diakses.
       </p>
     </div>
 
     <div class="flex items-center gap-3">
       <div class="relative flex-1 sm:w-60">
-        <Search class="w-4 h-4 text-[#8e8e93] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <Search
+          class="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+        />
         <input
           type="text"
           bind:value={searchQuery}
           placeholder="Cari role..."
-          class="w-full pl-10 pr-4 py-2 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-full text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+          class="w-full rounded-full border border-[#e5e5ea] bg-[#f8f8fa] py-2 pr-4 pl-10 text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
         />
       </div>
 
       <button
         type="button"
         onclick={handleOpenCreate}
-        class="px-5 py-2.5 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full flex items-center gap-1.5 cursor-pointer shadow-xs transition-all shrink-0"
+        class="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
       >
-        <Plus class="w-4 h-4" />
+        <Plus class="h-4 w-4" />
         <span>Buat Role</span>
       </button>
     </div>
@@ -129,57 +136,70 @@
 
   <!-- Role Cards Responsive Grid (1 col mobile, 2 col tablet, 3 col desktop) -->
   {#if isLoading}
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
       {#each Array(3) as _}
-        <div class="bg-white border border-[#e5e5ea] rounded-2xl p-6 space-y-4 animate-pulse">
-          <div class="h-5 bg-gray-200 rounded-md w-1/2"></div>
-          <div class="h-4 bg-gray-100 rounded-md w-3/4"></div>
-          <div class="h-12 bg-gray-50 rounded-xl"></div>
+        <div class="animate-pulse space-y-4 rounded-2xl border border-[#e5e5ea] bg-white p-6">
+          <div class="h-5 w-1/2 rounded-md bg-gray-200"></div>
+          <div class="h-4 w-3/4 rounded-md bg-gray-100"></div>
+          <div class="h-12 rounded-xl bg-gray-50"></div>
         </div>
       {/each}
     </div>
   {:else if filteredRoles.length === 0 && searchQuery}
-    <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-12 text-center space-y-3 shadow-2xs">
-      <div class="w-12 h-12 rounded-2xl bg-[#f4f4f6] text-[#8e8e93] flex items-center justify-center mx-auto">
-        <Shield class="w-6 h-6" />
+    <div
+      class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-white p-12 text-center shadow-2xs sm:rounded-3xl"
+    >
+      <div
+        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#8e8e93]"
+      >
+        <Shield class="h-6 w-6" />
       </div>
       <div>
         <h3 class="text-sm font-bold text-[#17171c]">Tidak Ada Role Ditemukan</h3>
-        <p class="text-xs text-[#8e8e93] mt-1">
+        <p class="mt-1 text-xs text-[#8e8e93]">
           Tidak ada role yang cocok dengan kata kunci "{searchQuery}".
         </p>
       </div>
     </div>
   {:else}
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
       <!-- Special Protected Owner Card -->
-      <div class="bg-white border-2 border-[#17171c] rounded-2xl p-5 sm:p-6 flex flex-col justify-between shadow-2xs space-y-4">
+      <div
+        class="flex flex-col justify-between space-y-4 rounded-2xl border-2 border-[#17171c] bg-white p-5 shadow-2xs sm:p-6"
+      >
         <div class="space-y-3">
           <div class="flex items-start justify-between gap-2">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-[#17171c] text-white flex items-center justify-center shrink-0">
-                <Lock class="w-4 h-4 text-[#10b981]" />
+              <div
+                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#17171c] text-white"
+              >
+                <Lock class="h-4 w-4 text-[#10b981]" />
               </div>
               <div>
                 <h3 class="text-sm font-bold text-[#17171c]">Owner (Pemilik Usaha)</h3>
-                <span class="text-[10px] font-mono text-[#10b981] font-semibold">Root / Full Access</span>
+                <span class="font-mono text-[10px] font-semibold text-[#10b981]"
+                  >Root / Full Access</span
+                >
               </div>
             </div>
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase bg-[#f4f4f6] text-[#17171c] font-semibold border border-[#e5e5ea]">
+            <span
+              class="rounded-full border border-[#e5e5ea] bg-[#f4f4f6] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#17171c] uppercase"
+            >
               Sistem
             </span>
           </div>
 
-          <p class="text-xs text-[#686873] leading-relaxed">
-            Pemegang akun utama bisnis dengan hak akses tidak terbatas ke seluruh modul, laporan keuangan, dan pengaturan workspace.
+          <p class="text-xs leading-relaxed text-[#686873]">
+            Pemegang akun utama bisnis dengan hak akses tidak terbatas ke seluruh modul, laporan
+            keuangan, dan pengaturan workspace.
           </p>
 
-          <div class="pt-3 border-t border-[#f2f2f4] flex items-center justify-between text-xs">
-            <div class="flex items-center gap-1.5 text-[#17171c] font-semibold text-[11px]">
-              <CheckCircle2 class="w-4 h-4 text-[#10b981]" />
+          <div class="flex items-center justify-between border-t border-[#f2f2f4] pt-3 text-xs">
+            <div class="flex items-center gap-1.5 text-[11px] font-semibold text-[#17171c]">
+              <CheckCircle2 class="h-4 w-4 text-[#10b981]" />
               <span>Semua Izin Aktif (*)</span>
             </div>
-            <span class="text-[10.5px] text-[#8e8e93] font-mono">Role Utama</span>
+            <span class="font-mono text-[10.5px] text-[#8e8e93]">Role Utama</span>
           </div>
         </div>
       </div>
@@ -187,15 +207,19 @@
       <!-- Dynamic Custom & System Roles -->
       {#each filteredRoles as role}
         {@const breakdown = getModuleBreakdown(role.permissions)}
-        <div class="bg-white border border-[#e5e5ea] hover:border-[#17171c]/40 rounded-2xl p-5 sm:p-6 flex flex-col justify-between shadow-2xs hover:shadow-xs transition-all space-y-4">
+        <div
+          class="flex flex-col justify-between space-y-4 rounded-2xl border border-[#e5e5ea] bg-white p-5 shadow-2xs transition-all hover:border-[#17171c]/40 hover:shadow-xs sm:p-6"
+        >
           <!-- Role Header -->
           <div class="space-y-3">
             <div class="flex items-start justify-between gap-2">
               <div class="min-w-0">
-                <h3 class="text-sm font-bold text-[#17171c] truncate">{role.name}</h3>
-                <div class="flex items-center gap-2 mt-1">
-                  <span class="text-[11px] font-mono text-[#8e8e93] flex items-center gap-1 bg-[#f8f8fa] border border-[#e5e5ea] px-2.5 py-0.5 rounded-full">
-                    <Users class="w-3.5 h-3.5" />
+                <h3 class="truncate text-sm font-bold text-[#17171c]">{role.name}</h3>
+                <div class="mt-1 flex items-center gap-2">
+                  <span
+                    class="flex items-center gap-1 rounded-full border border-[#e5e5ea] bg-[#f8f8fa] px-2.5 py-0.5 font-mono text-[11px] text-[#8e8e93]"
+                  >
+                    <Users class="h-3.5 w-3.5" />
                     {role.members_count} Staf
                   </span>
                 </div>
@@ -203,19 +227,21 @@
             </div>
 
             <!-- Description -->
-            <p class="text-xs text-[#686873] leading-relaxed line-clamp-2">
+            <p class="line-clamp-2 text-xs leading-relaxed text-[#686873]">
               {role.description || 'Tidak ada deskripsi tanggung jawab khusus.'}
             </p>
 
             <!-- Module Permission Badges -->
             <div class="space-y-1.5 pt-2">
-              <div class="text-[10.5px] font-mono font-semibold text-[#8e8e93]">
+              <div class="font-mono text-[10.5px] font-semibold text-[#8e8e93]">
                 Hak Akses ({role.permissions.length} Fitur)
               </div>
               <div class="flex flex-wrap gap-1.5">
                 {#if breakdown.length > 0}
                   {#each breakdown as mod}
-                    <span class="px-2.5 py-1 rounded-lg text-[10.5px] font-medium bg-[#f8f8fa] border border-[#ececee] text-[#17171c]">
+                    <span
+                      class="rounded-lg border border-[#ececee] bg-[#f8f8fa] px-2.5 py-1 text-[10.5px] font-medium text-[#17171c]"
+                    >
                       {mod.name} ({mod.count})
                     </span>
                   {/each}
@@ -227,24 +253,24 @@
           </div>
 
           <!-- Actions Footer -->
-          <div class="pt-3 border-t border-[#f2f2f4] flex items-center justify-end">
+          <div class="flex items-center justify-end border-t border-[#f2f2f4] pt-3">
             <div class="flex items-center gap-2">
               <button
                 type="button"
                 onclick={() => handleOpenEdit(role)}
-                class="px-3 py-1.5 text-xs font-semibold bg-[#f8f8fa] hover:bg-[#eeece7] text-[#17171c] border border-[#e5e5ea] rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
+                class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-3 py-1.5 text-xs font-semibold text-[#17171c] transition-all hover:bg-[#eeece7]"
               >
-                <Edit2 class="w-3.5 h-3.5" />
+                <Edit2 class="h-3.5 w-3.5" />
                 <span>Edit</span>
               </button>
 
               <button
                 type="button"
                 onclick={() => handleConfirmDelete(role)}
-                class="p-2 text-[#8e8e93] hover:text-[#e5484d] hover:bg-[#fef2f2] border border-[#e5e5ea] hover:border-[#fecaca] rounded-xl transition-all cursor-pointer"
+                class="cursor-pointer rounded-xl border border-[#e5e5ea] p-2 text-[#8e8e93] transition-all hover:border-[#fecaca] hover:bg-[#fef2f2] hover:text-[#e5484d]"
                 title="Hapus Role"
               >
-                <Trash2 class="w-3.5 h-3.5" />
+                <Trash2 class="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
@@ -267,22 +293,31 @@
 
 <!-- Delete Role Confirmation Modal -->
 {#if roleToDelete}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-xl animate-in fade-in zoom-in-95">
-      <div class="w-12 h-12 rounded-2xl bg-[#fef2f2] text-[#e5484d] flex items-center justify-center mx-auto">
-        <Trash2 class="w-6 h-6" />
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 font-sans backdrop-blur-xs"
+  >
+    <div
+      class="animate-in fade-in zoom-in-95 w-full max-w-sm space-y-4 rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-xl"
+    >
+      <div
+        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fef2f2] text-[#e5484d]"
+      >
+        <Trash2 class="h-6 w-6" />
       </div>
 
-      <div class="text-center space-y-1">
+      <div class="space-y-1 text-center">
         <h3 class="text-base font-bold text-[#17171c]">Hapus Role "{roleToDelete.name}"?</h3>
         <p class="text-xs text-[#8e8e93]">
-          Role ini akan dihapus dari workspace. Pastikan tidak ada staf yang masih menggunakan role ini.
+          Role ini akan dihapus dari workspace. Pastikan tidak ada staf yang masih menggunakan role
+          ini.
         </p>
       </div>
 
       {#if deleteError}
-        <div class="p-3 bg-[#fef2f2] border border-[#fecaca] text-[#991b1b] text-xs rounded-xl flex items-center gap-2">
-          <AlertCircle class="w-4 h-4 shrink-0" />
+        <div
+          class="flex items-center gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3 text-xs text-[#991b1b]"
+        >
+          <AlertCircle class="h-4 w-4 shrink-0" />
           <span>{deleteError}</span>
         </div>
       {/if}
@@ -291,7 +326,7 @@
         <button
           type="button"
           onclick={() => (roleToDelete = null)}
-          class="flex-1 py-2.5 text-xs font-semibold text-[#686873] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all border border-[#e5e5ea]"
+          class="flex-1 cursor-pointer rounded-xl border border-[#e5e5ea] py-2.5 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
         >
           Batal
         </button>
@@ -299,7 +334,7 @@
           type="button"
           disabled={isDeletingRole}
           onclick={executeDeleteRole}
-          class="flex-1 py-2.5 text-xs font-semibold bg-[#e5484d] hover:bg-[#dc2626] text-white rounded-xl cursor-pointer transition-all shadow-xs disabled:opacity-50"
+          class="flex-1 cursor-pointer rounded-xl bg-[#e5484d] py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-[#dc2626] disabled:opacity-50"
         >
           {isDeletingRole ? 'Menghapus...' : 'Hapus'}
         </button>

@@ -2,7 +2,11 @@ import { apiClient } from './api-client';
 import type { LoginResponseData, UserProfile } from '../types/app';
 
 export class AuthService {
-  public async login(email: string, password: string, deviceName?: string): Promise<LoginResponseData> {
+  public async login(
+    email: string,
+    password: string,
+    deviceName?: string
+  ): Promise<LoginResponseData> {
     const payload = {
       email,
       password,
@@ -85,11 +89,15 @@ export class AuthService {
       bank_name: string;
       bank_account_number: string;
       bank_account_holder: string;
-    }>('/auth/bank-account', {
-      bank_name: bankName,
-      bank_account_number: accountNumber,
-      bank_account_holder: accountHolder,
-    }, { skipWorkspace: true });
+    }>(
+      '/auth/bank-account',
+      {
+        bank_name: bankName,
+        bank_account_number: accountNumber,
+        bank_account_holder: accountHolder,
+      },
+      { skipWorkspace: true }
+    );
 
     if (response.data) {
       return response.data;
@@ -141,10 +149,14 @@ export class AuthService {
   }
 
   public async forgotPassword(email: string): Promise<string> {
-    const response = await apiClient.post<{ message: string }>('/auth/forgot-password', { email }, {
-      skipAuth: true,
-      skipWorkspace: true,
-    });
+    const response = await apiClient.post<{ message: string }>(
+      '/auth/forgot-password',
+      { email },
+      {
+        skipAuth: true,
+        skipWorkspace: true,
+      }
+    );
 
     return response.message || 'Tautan pemulihan kata sandi telah dikirim ke email Anda.';
   }
@@ -171,19 +183,27 @@ export class AuthService {
   }
 
   public async verifyEmail(token: string): Promise<string> {
-    const response = await apiClient.post<{ message: string }>('/auth/verify-email', { token }, {
-      skipAuth: true,
-      skipWorkspace: true,
-    });
+    const response = await apiClient.post<{ message: string }>(
+      '/auth/verify-email',
+      { token },
+      {
+        skipAuth: true,
+        skipWorkspace: true,
+      }
+    );
 
     return response.message || 'Alamat email berhasil diverifikasi.';
   }
 
   public async resendVerification(email: string): Promise<string> {
-    const response = await apiClient.post<{ message: string }>('/auth/resend-verification', { email }, {
-      skipAuth: true,
-      skipWorkspace: true,
-    });
+    const response = await apiClient.post<{ message: string }>(
+      '/auth/resend-verification',
+      { email },
+      {
+        skipAuth: true,
+        skipWorkspace: true,
+      }
+    );
 
     return response.message || 'Tautan verifikasi email baru telah dikirimkan ke email Anda.';
   }
