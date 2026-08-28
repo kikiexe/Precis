@@ -7,7 +7,7 @@ const mockItems: CartItem[] = [
     product: {
       id: 'p1',
       name: 'Americano Double Shot',
-      price: 25000,
+      base_price: 25000,
       category_id: 'c1',
       is_active: true,
     },
@@ -19,7 +19,7 @@ const mockItems: CartItem[] = [
     product: {
       id: 'p2',
       name: 'Matcha Latte Oat',
-      price: 35000,
+      base_price: 35000,
       category_id: 'c1',
       is_active: true,
     },

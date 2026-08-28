@@ -16,10 +16,9 @@ describe('PrecisPosDatabase Offline Dexie.js Integration', () => {
     const mockProduct: Product = {
       id: 'prod-latte-01',
       name: 'Caramel Macchiato',
-      price: 38000,
+      base_price: 38000,
       category_id: 'cat-coffee',
       is_active: true,
-      category_name: 'Coffee',
     };
 
     await testDb.products.put(mockProduct);
@@ -27,7 +26,7 @@ describe('PrecisPosDatabase Offline Dexie.js Integration', () => {
 
     expect(retrieved).toBeDefined();
     expect(retrieved?.name).toBe('Caramel Macchiato');
-    expect(retrieved?.price).toBe(38000);
+    expect(retrieved?.base_price).toBe(38000);
   });
 
   it('saves offline order with PENDING sync status', async () => {
