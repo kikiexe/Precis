@@ -14,10 +14,7 @@ export function calculateCartTotals(
   discountPercent = 0,
   discountNominal = 0
 ): CartCalculationResult {
-  const totalAmount = items.reduce(
-    (sum, item) => sum + item.unit_price * item.quantity,
-    0
-  );
+  const totalAmount = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
 
   let discountAmount = 0;
   if (discountPercent > 0) {

@@ -44,13 +44,7 @@ export interface CartItem {
 }
 
 export type PosPage =
-  | 'penjualan'
-  | 'transaksi'
-  | 'shift'
-  | 'settlement'
-  | 'menu'
-  | 'inventori'
-  | 'profil';
+  'penjualan' | 'transaksi' | 'shift' | 'settlement' | 'menu' | 'inventori' | 'profil';
 
 export type PaymentMethod = 'CASH' | 'QRIS' | 'EDC' | 'TRANSFER';
 export type OrderType = 'DINE_IN' | 'TAKE_AWAY' | 'DELIVERY';
@@ -158,12 +152,7 @@ export interface OpenBill {
 }
 
 export type StockAdjustmentReason =
-  | 'STOCK_TAKE'
-  | 'RESTOCK'
-  | 'WASTE'
-  | 'EXPIRED'
-  | 'DAMAGED'
-  | 'OTHER';
+  'STOCK_TAKE' | 'RESTOCK' | 'WASTE' | 'EXPIRED' | 'DAMAGED' | 'OTHER';
 
 export interface ProductRecipeItem {
   raw_material_id: string;
@@ -199,4 +188,3 @@ export interface StockAdjustmentLog {
   adjusted_by: string;
   created_at: string;
 }
-

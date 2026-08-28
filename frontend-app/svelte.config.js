@@ -16,5 +16,5 @@ try {
 }
 
 export default {
-  preprocess: vitePreprocess()
+  preprocess: vitePreprocess(),
 };

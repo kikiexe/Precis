@@ -37,31 +37,45 @@
   }
 </script>
 
-<div class="min-h-screen bg-[#eeece7]/40 flex items-center justify-center p-4 font-sans">
-  <div class="w-full max-w-md bg-white border border-[#d9d9dd] rounded-[22px] shadow-none p-8 sm:p-10">
+<div class="flex min-h-screen items-center justify-center bg-[#eeece7]/40 p-4 font-sans">
+  <div
+    class="w-full max-w-md rounded-[22px] border border-[#d9d9dd] bg-white p-8 shadow-none sm:p-10"
+  >
     <!-- Header -->
-    <div class="flex items-center space-x-3 mb-6">
-      <img src="/logo.png" alt="Précis Logo" class="w-9 h-9 rounded-[10px] object-cover border border-[#d9d9dd]" />
+    <div class="mb-6 flex items-center space-x-3">
+      <img
+        src="/logo.png"
+        alt="Précis Logo"
+        class="h-9 w-9 rounded-[10px] border border-[#d9d9dd] object-cover"
+      />
       <div>
         <div class="flex items-center space-x-2">
-          <span class="font-medium text-lg tracking-tight text-[#212121]">PRÉCIS</span>
-          <span class="text-[10px] px-2 py-0.5 bg-[#17171c] text-white font-mono rounded-full font-medium">Root</span>
+          <span class="text-lg font-medium tracking-tight text-[#212121]">PRÉCIS</span>
+          <span
+            class="rounded-full bg-[#17171c] px-2 py-0.5 font-mono text-[10px] font-medium text-white"
+            >Root</span
+          >
         </div>
         <p class="text-xs text-[#75758a]">Platform Superadmin Portal</p>
       </div>
     </div>
 
     <div class="mb-6">
-      <h1 class="text-base font-medium text-[#212121] tracking-tight">Masuk ke Konsol Superadmin</h1>
-      <p class="text-xs text-[#616161] mt-0.5 font-normal">
-        Area terbatas untuk verifikasi pembayaran manual, pengawasan tenant, dan kontrol platform root.
+      <h1 class="text-base font-medium tracking-tight text-[#212121]">
+        Masuk ke Konsol Superadmin
+      </h1>
+      <p class="mt-0.5 text-xs font-normal text-[#616161]">
+        Area terbatas untuk verifikasi pembayaran manual, pengawasan tenant, dan kontrol platform
+        root.
       </p>
     </div>
 
     <!-- Error Alert -->
     {#if errorMessage}
-      <div class="mb-5 p-3.5 bg-[#ffad9b]/15 border border-[#ffad9b] rounded-xl text-[#b30000] text-xs flex items-start space-x-2">
-        <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
+      <div
+        class="mb-5 flex items-start space-x-2 rounded-xl border border-[#ffad9b] bg-[#ffad9b]/15 p-3.5 text-xs text-[#b30000]"
+      >
+        <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
         <span>{errorMessage}</span>
       </div>
     {/if}
@@ -69,47 +83,47 @@
     <!-- Form -->
     <form onsubmit={handleSubmit} class="space-y-4 text-xs">
       <div>
-        <label for="admin-email" class="block font-medium text-[#212121] text-[11px] mb-1.5">
+        <label for="admin-email" class="mb-1.5 block text-[11px] font-medium text-[#212121]">
           Email Superadmin
         </label>
         <div class="relative">
-          <Mail class="w-4 h-4 text-[#93939f] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Mail class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#93939f]" />
           <input
             id="admin-email"
             type="email"
             bind:value={email}
             required
             placeholder="admin@gmail.com"
-            class="w-full pl-10 pr-3.5 py-2.5 bg-white border border-[#d9d9dd] rounded-xl focus:outline-hidden focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 text-[#212121] font-mono transition-all"
+            class="w-full rounded-xl border border-[#d9d9dd] bg-white py-2.5 pr-3.5 pl-10 font-mono text-[#212121] transition-all focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           />
         </div>
       </div>
 
       <div>
-        <label for="admin-password" class="block font-medium text-[#212121] text-[11px] mb-1.5">
+        <label for="admin-password" class="mb-1.5 block text-[11px] font-medium text-[#212121]">
           Kata Sandi Root
         </label>
         <div class="relative">
-          <Lock class="w-4 h-4 text-[#93939f] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Lock class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#93939f]" />
           <input
             id="admin-password"
             type={showPassword ? 'text' : 'password'}
             bind:value={password}
             required
             placeholder="••••••••••••"
-            class="w-full pl-10 pr-10 py-2.5 bg-white border border-[#d9d9dd] rounded-xl focus:outline-hidden focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 text-[#212121] transition-all"
+            class="w-full rounded-xl border border-[#d9d9dd] bg-white py-2.5 pr-10 pl-10 text-[#212121] transition-all focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           />
           <button
             type="button"
             tabindex="-1"
             onclick={() => (showPassword = !showPassword)}
-            class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#93939f] hover:text-[#212121] transition-colors p-1 cursor-pointer flex items-center justify-center"
+            class="absolute top-1/2 right-3.5 flex -translate-y-1/2 cursor-pointer items-center justify-center p-1 text-[#93939f] transition-colors hover:text-[#212121]"
             aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
           >
             {#if showPassword}
-              <EyeOff class="w-4 h-4" />
+              <EyeOff class="h-4 w-4" />
             {:else}
-              <Eye class="w-4 h-4" />
+              <Eye class="h-4 w-4" />
             {/if}
           </button>
         </div>
@@ -119,13 +133,13 @@
         <button
           type="submit"
           disabled={isSubmitting}
-          class="w-full py-3 bg-[#17171c] hover:bg-[#000000] text-white font-medium text-xs rounded-full transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-none disabled:opacity-50"
+          class="flex w-full cursor-pointer items-center justify-center space-x-2 rounded-full bg-[#17171c] py-3 text-xs font-medium text-white shadow-none transition-all hover:bg-[#000000] disabled:opacity-50"
         >
           {#if isSubmitting}
-            <RefreshCw class="w-4 h-4 animate-spin" />
+            <RefreshCw class="h-4 w-4 animate-spin" />
             <span>Memverifikasi Sesi...</span>
           {:else}
-            <ShieldCheck class="w-4 h-4" />
+            <ShieldCheck class="h-4 w-4" />
             <span>Otorisasi Masuk</span>
           {/if}
         </button>

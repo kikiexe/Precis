@@ -19,15 +19,13 @@
     currentUser: User;
     branches?: BranchItem[];
     selectedBranchId?: string;
-    onNavigate: (domain: 'dashboard' | 'katalog' | 'tim' | 'finance' | 'settings', subTab?: string) => void;
+    onNavigate: (
+      domain: 'dashboard' | 'katalog' | 'tim' | 'finance' | 'settings',
+      subTab?: string
+    ) => void;
   }
 
-  let {
-    currentUser,
-    branches = [],
-    selectedBranchId = 'ALL',
-    onNavigate,
-  }: Props = $props();
+  let { currentUser, branches = [], selectedBranchId = 'ALL', onNavigate }: Props = $props();
 
   let selectedTimeframe = $state<TimeframePeriod>('month');
   let activeInsightTab = $state<'mix' | 'payments' | 'discount'>('mix');
@@ -82,42 +80,46 @@
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-[#17171c]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white';
 </script>
 
-<div class="space-y-6 font-sans pb-8">
+<div class="space-y-6 pb-8 font-sans">
   <!-- Top Operational Banner -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xs">
+  <div
+    class="flex flex-col gap-4 rounded-2xl border border-[#e5e5ea] bg-white p-5 shadow-2xs sm:flex-row sm:items-center sm:justify-between sm:rounded-3xl sm:p-6"
+  >
     <div class="min-w-0 space-y-1">
       <div class="flex items-center gap-2">
-        <span class="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[#f4f4f6] text-[#17171c] font-semibold shrink-0">
+        <span
+          class="shrink-0 rounded-full bg-[#f4f4f6] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#17171c] uppercase"
+        >
           Operasional
         </span>
-        <span class="text-xs text-[#8e8e93] font-medium truncate">
+        <span class="truncate text-xs font-medium text-[#8e8e93]">
           {currentUser.branch_name || (branches.length > 0 ? branches[0].name : 'Outlet Utama')}
         </span>
       </div>
-      <div class="flex items-center gap-2 mt-1">
-        <h1 class="text-lg sm:text-2xl font-bold text-[#17171c] tracking-tight truncate">
+      <div class="mt-1 flex items-center gap-2">
+        <h1 class="truncate text-lg font-bold tracking-tight text-[#17171c] sm:text-2xl">
           Ringkasan Penjualan &amp; Bisnis
         </h1>
-        <span class="w-2 h-2 rounded-full bg-[#10b981] motion-safe:animate-pulse shrink-0"></span>
+        <span class="h-2 w-2 shrink-0 rounded-full bg-[#10b981] motion-safe:animate-pulse"></span>
       </div>
     </div>
 
-    <div class="flex items-center gap-2 shrink-0">
+    <div class="flex shrink-0 items-center gap-2">
       <button
         type="button"
         onclick={() => onNavigate('katalog', 'menu')}
-        class="px-4 py-2 text-xs font-semibold bg-[#17171c] hover:bg-black text-white rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs {focusRing}"
+        class="flex cursor-pointer items-center justify-center gap-1.5 rounded-full bg-[#17171c] px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black {focusRing}"
       >
-        <Package class="w-4 h-4" />
+        <Package class="h-4 w-4" />
         <span>Menu</span>
       </button>
 
       <button
         type="button"
         onclick={() => onNavigate('tim', 'presensi')}
-        class="px-4 py-2 text-xs font-semibold bg-white hover:bg-[#f8f8fa] border border-[#e5e5ea] text-[#17171c] rounded-full transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs {focusRing}"
+        class="flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-[#e5e5ea] bg-white px-4 py-2 text-xs font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#f8f8fa] {focusRing}"
       >
-        <ShieldCheck class="w-4 h-4" />
+        <ShieldCheck class="h-4 w-4" />
         <span>Presensi</span>
       </button>
     </div>
@@ -139,31 +141,43 @@
   />
 
   <!-- Analisis & Rekomendasi Bisnis -->
-  <div class="bg-[#17171c] text-white border border-[#27272a] rounded-2xl sm:rounded-3xl p-5 sm:p-7 space-y-4 shadow-sm">
+  <div
+    class="space-y-4 rounded-2xl border border-[#27272a] bg-[#17171c] p-5 text-white shadow-sm sm:rounded-3xl sm:p-7"
+  >
     <div class="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="w-8 h-8 rounded-xl bg-white/10 text-white flex items-center justify-center shrink-0">
-          <Sparkles class="w-4 h-4 text-[#34d399]" />
+      <div class="flex min-w-0 items-center gap-3">
+        <div
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white"
+        >
+          <Sparkles class="h-4 w-4 text-[#34d399]" />
         </div>
         <div class="min-w-0">
-          <h3 class="text-sm sm:text-base font-bold text-white truncate">Analisis &amp; Rekomendasi Penjualan</h3>
-          <p class="text-xs text-[#a1a1aa] truncate">Insight performa bisnis &amp; tren transaksi</p>
+          <h3 class="truncate text-sm font-bold text-white sm:text-base">
+            Analisis &amp; Rekomendasi Penjualan
+          </h3>
+          <p class="truncate text-xs text-[#a1a1aa]">
+            Insight performa bisnis &amp; tren transaksi
+          </p>
         </div>
       </div>
 
-      <span class="text-[10px] font-mono px-3 py-1 rounded-full bg-white/10 text-[#34d399] font-semibold shrink-0">
+      <span
+        class="shrink-0 rounded-full bg-white/10 px-3 py-1 font-mono text-[10px] font-semibold text-[#34d399]"
+      >
         Insight Pintar
       </span>
     </div>
 
     <div class="space-y-2.5 text-xs">
-      <div class="font-bold text-white text-sm">
+      <div class="text-sm font-bold text-white">
         {businessInsights.title}
       </div>
-      <p class="text-white/80 text-xs leading-relaxed">
+      <p class="text-xs leading-relaxed text-white/80">
         {businessInsights.summary}
       </p>
-      <ul class="space-y-1.5 text-white/70 text-xs list-disc list-inside leading-relaxed pt-2 border-t border-white/10">
+      <ul
+        class="list-inside list-disc space-y-1.5 border-t border-white/10 pt-2 text-xs leading-relaxed text-white/70"
+      >
         {#each businessInsights.recommendations as item}
           <li>{item}</li>
         {/each}
@@ -172,21 +186,23 @@
   </div>
 
   <!-- Deep Dive Analytics Card -->
-  <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-7 space-y-5 shadow-2xs">
-    <div class="flex items-center gap-1.5 bg-[#f4f4f6] p-1.5 rounded-2xl w-full">
+  <div
+    class="space-y-5 rounded-2xl border border-[#e5e5ea] bg-white p-5 shadow-2xs sm:rounded-3xl sm:p-7"
+  >
+    <div class="flex w-full items-center gap-1.5 rounded-2xl bg-[#f4f4f6] p-1.5">
       <button
         type="button"
         title="Komposisi Menu"
         aria-label="Komposisi Menu"
         aria-pressed={activeInsightTab === 'mix'}
         onclick={() => (activeInsightTab = 'mix')}
-        class={`py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${focusRing} ${
+        class={`flex cursor-pointer items-center justify-center gap-2 rounded-xl py-2 text-xs font-semibold transition-all ${focusRing} ${
           activeInsightTab === 'mix'
-            ? 'flex-1 bg-white text-[#17171c] shadow-xs px-3'
-            : 'text-[#686873] hover:text-[#17171c] px-3'
+            ? 'flex-1 bg-white px-3 text-[#17171c] shadow-xs'
+            : 'px-3 text-[#686873] hover:text-[#17171c]'
         }`}
       >
-        <PieChart class="w-4 h-4 shrink-0" />
+        <PieChart class="h-4 w-4 shrink-0" />
         {#if activeInsightTab === 'mix'}
           <span class="whitespace-nowrap">Komposisi Menu</span>
         {/if}
@@ -198,13 +214,13 @@
         aria-label="Saluran Pembayaran"
         aria-pressed={activeInsightTab === 'payments'}
         onclick={() => (activeInsightTab = 'payments')}
-        class={`py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${focusRing} ${
+        class={`flex cursor-pointer items-center justify-center gap-2 rounded-xl py-2 text-xs font-semibold transition-all ${focusRing} ${
           activeInsightTab === 'payments'
-            ? 'flex-1 bg-white text-[#17171c] shadow-xs px-3'
-            : 'text-[#686873] hover:text-[#17171c] px-3'
+            ? 'flex-1 bg-white px-3 text-[#17171c] shadow-xs'
+            : 'px-3 text-[#686873] hover:text-[#17171c]'
         }`}
       >
-        <CreditCard class="w-4 h-4 shrink-0" />
+        <CreditCard class="h-4 w-4 shrink-0" />
         {#if activeInsightTab === 'payments'}
           <span class="whitespace-nowrap">Saluran Pembayaran</span>
         {/if}
@@ -216,13 +232,13 @@
         aria-label="Dampak Diskon"
         aria-pressed={activeInsightTab === 'discount'}
         onclick={() => (activeInsightTab = 'discount')}
-        class={`py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${focusRing} ${
+        class={`flex cursor-pointer items-center justify-center gap-2 rounded-xl py-2 text-xs font-semibold transition-all ${focusRing} ${
           activeInsightTab === 'discount'
-            ? 'flex-1 bg-white text-[#17171c] shadow-xs px-3'
-            : 'text-[#686873] hover:text-[#17171c] px-3'
+            ? 'flex-1 bg-white px-3 text-[#17171c] shadow-xs'
+            : 'px-3 text-[#686873] hover:text-[#17171c]'
         }`}
       >
-        <Percent class="w-4 h-4 shrink-0" />
+        <Percent class="h-4 w-4 shrink-0" />
         {#if activeInsightTab === 'discount'}
           <span class="whitespace-nowrap">Dampak Diskon</span>
         {/if}
@@ -233,11 +249,11 @@
       <div class="space-y-4 pt-1">
         <div class="flex flex-wrap items-center justify-between gap-2">
           <span class="text-xs text-[#8e8e93]">Peringkat volume &amp; omzet produk</span>
-          <div class="flex items-center bg-[#f4f4f6] p-1 rounded-full text-xs font-semibold">
+          <div class="flex items-center rounded-full bg-[#f4f4f6] p-1 text-xs font-semibold">
             <button
               type="button"
               onclick={() => (activeMixSubTab = 'menu')}
-              class={`px-3 py-1 rounded-full transition-all cursor-pointer ${focusRing} ${
+              class={`cursor-pointer rounded-full px-3 py-1 transition-all ${focusRing} ${
                 activeMixSubTab === 'menu' ? 'bg-[#17171c] text-white shadow-2xs' : 'text-[#686873]'
               }`}
             >
@@ -246,8 +262,10 @@
             <button
               type="button"
               onclick={() => (activeMixSubTab = 'kategori')}
-              class={`px-3 py-1 rounded-full transition-all cursor-pointer ${focusRing} ${
-                activeMixSubTab === 'kategori' ? 'bg-[#17171c] text-white shadow-2xs' : 'text-[#686873]'
+              class={`cursor-pointer rounded-full px-3 py-1 transition-all ${focusRing} ${
+                activeMixSubTab === 'kategori'
+                  ? 'bg-[#17171c] text-white shadow-2xs'
+                  : 'text-[#686873]'
               }`}
             >
               Top 5 Kategori
@@ -256,32 +274,38 @@
         </div>
 
         {#if timeframeData.top_products.length === 0}
-          <div class="py-12 text-center text-[#8e8e93] space-y-2">
-            <Package class="w-8 h-8 mx-auto opacity-40" />
+          <div class="space-y-2 py-12 text-center text-[#8e8e93]">
+            <Package class="mx-auto h-8 w-8 opacity-40" />
             <p class="text-xs font-semibold text-[#17171c]">Belum ada data produk terjual</p>
-            <p class="text-[11px] text-[#8e8e93] px-4">Data penjualan produk akan terakumulasi otomatis saat kasir memproses pesanan.</p>
+            <p class="px-4 text-[11px] text-[#8e8e93]">
+              Data penjualan produk akan terakumulasi otomatis saat kasir memproses pesanan.
+            </p>
           </div>
         {:else if activeMixSubTab === 'menu'}
           <div class="space-y-3.5">
             {#each timeframeData.top_products as prod, idx}
               <div class="space-y-1.5">
                 <div class="flex items-center justify-between gap-2 text-xs">
-                  <div class="flex items-center gap-2.5 min-w-0">
-                    <span class="w-5 h-5 rounded-full bg-[#f4f4f6] text-[#17171c] font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border border-[#e5e5ea]">
+                  <div class="flex min-w-0 items-center gap-2.5">
+                    <span
+                      class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#e5e5ea] bg-[#f4f4f6] font-mono text-[10px] font-bold text-[#17171c]"
+                    >
                       {idx + 1}
                     </span>
-                    <span class="font-bold text-[#17171c] truncate">{prod.name}</span>
+                    <span class="truncate font-bold text-[#17171c]">{prod.name}</span>
                   </div>
-                  <div class="flex items-center gap-2.5 font-mono shrink-0">
-                    <span class="text-[#8e8e93] text-xs">{prod.quantity.toLocaleString('id-ID')}x</span>
+                  <div class="flex shrink-0 items-center gap-2.5 font-mono">
+                    <span class="text-xs text-[#8e8e93]"
+                      >{prod.quantity.toLocaleString('id-ID')}x</span
+                    >
                     <span class="font-bold text-[#17171c]">{formatRupiah(prod.total_amount)}</span>
                   </div>
                 </div>
 
-                <div class="w-full bg-[#f4f4f6] h-2 rounded-full overflow-hidden">
+                <div class="h-2 w-full overflow-hidden rounded-full bg-[#f4f4f6]">
                   <div
                     style="width: {prod.share_percent}%"
-                    class="bg-[#17171c] h-full rounded-full transition-all duration-500"
+                    class="h-full rounded-full bg-[#17171c] transition-all duration-500"
                   ></div>
                 </div>
               </div>
@@ -289,12 +313,18 @@
           </div>
         {:else}
           <div class="space-y-4">
-            <div class="w-full h-2.5 rounded-full bg-[#f4f4f6] flex overflow-hidden">
+            <div class="flex h-2.5 w-full overflow-hidden rounded-full bg-[#f4f4f6]">
               {#each timeframeData.category_breakdown as cat, i}
                 <div
                   style="width: {cat.share_percent}%"
                   class={`h-full transition-all duration-500 ${
-                    i === 0 ? 'bg-[#17171c]' : i === 1 ? 'bg-[#059669]' : i === 2 ? 'bg-[#2563eb]' : 'bg-[#8e8e93]'
+                    i === 0
+                      ? 'bg-[#17171c]'
+                      : i === 1
+                        ? 'bg-[#059669]'
+                        : i === 2
+                          ? 'bg-[#2563eb]'
+                          : 'bg-[#8e8e93]'
                   }`}
                   title={`${cat.name}: ${cat.share_percent}%`}
                 ></div>
@@ -305,17 +335,17 @@
               {#each timeframeData.category_breakdown as cat}
                 <div class="space-y-1.5">
                   <div class="flex items-center justify-between gap-2 text-xs">
-                    <span class="font-bold text-[#17171c] truncate">{cat.name}</span>
-                    <div class="flex items-center gap-2.5 font-mono shrink-0">
-                      <span class="text-[#8e8e93] text-xs">{cat.share_percent}%</span>
+                    <span class="truncate font-bold text-[#17171c]">{cat.name}</span>
+                    <div class="flex shrink-0 items-center gap-2.5 font-mono">
+                      <span class="text-xs text-[#8e8e93]">{cat.share_percent}%</span>
                       <span class="font-bold text-[#17171c]">{formatRupiah(cat.total_amount)}</span>
                     </div>
                   </div>
 
-                  <div class="w-full bg-[#f4f4f6] h-1.5 rounded-full overflow-hidden">
+                  <div class="h-1.5 w-full overflow-hidden rounded-full bg-[#f4f4f6]">
                     <div
                       style="width: {cat.share_percent}%"
-                      class="bg-[#2563eb] h-full rounded-full transition-all duration-500"
+                      class="h-full rounded-full bg-[#2563eb] transition-all duration-500"
                     ></div>
                   </div>
                 </div>
@@ -324,28 +354,30 @@
           </div>
         {/if}
 
-        <div class="pt-3 border-t border-[#f2f2f4] text-right">
+        <div class="border-t border-[#f2f2f4] pt-3 text-right">
           <button
             type="button"
             onclick={() => onNavigate('katalog', 'menu')}
-            class="text-xs font-semibold text-[#2563eb] hover:underline cursor-pointer inline-flex items-center gap-1 py-1 {focusRing}"
+            class="inline-flex cursor-pointer items-center gap-1 py-1 text-xs font-semibold text-[#2563eb] hover:underline {focusRing}"
           >
             <span>Buka Katalog Menu Lengkap</span>
-            <ChevronRight class="w-3.5 h-3.5" />
+            <ChevronRight class="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
     {:else if activeInsightTab === 'payments'}
       <div class="space-y-4 pt-1">
         {#if timeframeData.payment_methods.length === 0}
-          <div class="py-12 text-center text-[#8e8e93] space-y-2">
-            <CreditCard class="w-8 h-8 mx-auto opacity-40" />
+          <div class="space-y-2 py-12 text-center text-[#8e8e93]">
+            <CreditCard class="mx-auto h-8 w-8 opacity-40" />
             <p class="text-xs font-semibold text-[#17171c]">Belum ada riwayat pembayaran</p>
-            <p class="text-[11px] text-[#8e8e93] px-4">Metode pembayaran (QRIS, Tunai, EDC) akan otomatis terdata.</p>
+            <p class="px-4 text-[11px] text-[#8e8e93]">
+              Metode pembayaran (QRIS, Tunai, EDC) akan otomatis terdata.
+            </p>
           </div>
         {:else}
           <div class="space-y-2">
-            <div class="w-full h-3 rounded-full bg-[#f4f4f6] flex overflow-hidden">
+            <div class="flex h-3 w-full overflow-hidden rounded-full bg-[#f4f4f6]">
               {#each timeframeData.payment_methods as method, i}
                 <div
                   style="width: {method.percent}%"
@@ -357,34 +389,47 @@
               {/each}
             </div>
 
-            <div class="flex items-center justify-between text-xs font-mono text-[#8e8e93]">
-              <span>Cashless ({timeframeData.payment_methods[0].percent + (timeframeData.payment_methods[2]?.percent || 0)}%)</span>
+            <div class="flex items-center justify-between font-mono text-xs text-[#8e8e93]">
+              <span
+                >Cashless ({timeframeData.payment_methods[0].percent +
+                  (timeframeData.payment_methods[2]?.percent || 0)}%)</span
+              >
               <span>Tunai ({timeframeData.payment_methods[1]?.percent || 0}%)</span>
             </div>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {#each timeframeData.payment_methods as method, i}
-              <div class="p-4 rounded-2xl bg-[#fafafc] border border-[#e5e5ea] flex items-center justify-between gap-3 text-xs shadow-2xs">
-                <div class="flex items-center gap-3 min-w-0">
-                  <div class={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                    i === 0 ? 'bg-[#17171c] text-white' : i === 1 ? 'bg-[#ecfdf5] text-[#059669]' : 'bg-[#eff6ff] text-[#2563eb]'
-                  }`}>
+              <div
+                class="flex items-center justify-between gap-3 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-4 text-xs shadow-2xs"
+              >
+                <div class="flex min-w-0 items-center gap-3">
+                  <div
+                    class={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                      i === 0
+                        ? 'bg-[#17171c] text-white'
+                        : i === 1
+                          ? 'bg-[#ecfdf5] text-[#059669]'
+                          : 'bg-[#eff6ff] text-[#2563eb]'
+                    }`}
+                  >
                     {#if i === 0}
-                      <QrCode class="w-4 h-4" />
+                      <QrCode class="h-4 w-4" />
                     {:else if i === 1}
-                      <Banknote class="w-4 h-4" />
+                      <Banknote class="h-4 w-4" />
                     {:else}
-                      <CreditCard class="w-4 h-4" />
+                      <CreditCard class="h-4 w-4" />
                     {/if}
                   </div>
                   <div class="truncate">
-                    <div class="font-bold text-[#17171c] truncate">{method.method}</div>
-                    <div class="text-[11px] text-[#8e8e93] font-mono">{method.count.toLocaleString('id-ID')} transaksi</div>
+                    <div class="truncate font-bold text-[#17171c]">{method.method}</div>
+                    <div class="font-mono text-[11px] text-[#8e8e93]">
+                      {method.count.toLocaleString('id-ID')} transaksi
+                    </div>
                   </div>
                 </div>
 
-                <div class="text-right font-mono shrink-0">
+                <div class="shrink-0 text-right font-mono">
                   <div class="font-bold text-[#17171c]">{formatRupiah(method.amount)}</div>
                   <div class="text-[10.5px] text-[#8e8e93]">{method.percent}% porsi</div>
                 </div>
@@ -399,39 +444,51 @@
       {@const netPercent = (100 - Number(discountPercent)).toFixed(1)}
 
       <div class="space-y-4 pt-1">
-        <div class="p-5 rounded-2xl bg-[#fafafc] border border-[#e5e5ea] space-y-5 text-xs shadow-2xs">
+        <div
+          class="space-y-5 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-5 text-xs shadow-2xs"
+        >
           <div class="space-y-2">
-            <div class="w-full h-3 rounded-full bg-[#f4f4f6] flex overflow-hidden">
+            <div class="flex h-3 w-full overflow-hidden rounded-full bg-[#f4f4f6]">
               <div
                 style="width: {netPercent}%"
-                class="bg-[#17171c] h-full transition-all duration-500"
+                class="h-full bg-[#17171c] transition-all duration-500"
                 title="Kas Bersih Diterima"
               ></div>
               <div
                 style="width: {discountPercent}%"
-                class="bg-[#e5484d] h-full transition-all duration-500"
+                class="h-full bg-[#e5484d] transition-all duration-500"
                 title="Potongan Diskon"
               ></div>
             </div>
 
-            <div class="flex items-center justify-between text-xs font-mono">
-              <span class="text-[#17171c] font-bold">Kas Bersih: {netPercent}%</span>
-              <span class="text-[#e5484d] font-bold">Diskon: {discountPercent}%</span>
+            <div class="flex items-center justify-between font-mono text-xs">
+              <span class="font-bold text-[#17171c]">Kas Bersih: {netPercent}%</span>
+              <span class="font-bold text-[#e5484d]">Diskon: {discountPercent}%</span>
             </div>
           </div>
 
-          <div class="grid grid-cols-3 gap-3 pt-3 border-t border-[#e5e5ea] font-mono text-center">
+          <div class="grid grid-cols-3 gap-3 border-t border-[#e5e5ea] pt-3 text-center font-mono">
             <div>
-              <span class="text-[10px] text-[#8e8e93] uppercase font-sans font-semibold">Nilai Kotor</span>
-              <div class="font-bold text-[#17171c] text-sm mt-1">{formatRupiah(gross)}</div>
+              <span class="font-sans text-[10px] font-semibold text-[#8e8e93] uppercase"
+                >Nilai Kotor</span
+              >
+              <div class="mt-1 text-sm font-bold text-[#17171c]">{formatRupiah(gross)}</div>
             </div>
             <div>
-              <span class="text-[10px] text-[#e5484d] uppercase font-sans font-semibold">Diskon Promo</span>
-              <div class="font-bold text-[#e5484d] text-sm mt-1">-{formatRupiah(timeframeData.total_discount)}</div>
+              <span class="font-sans text-[10px] font-semibold text-[#e5484d] uppercase"
+                >Diskon Promo</span
+              >
+              <div class="mt-1 text-sm font-bold text-[#e5484d]">
+                -{formatRupiah(timeframeData.total_discount)}
+              </div>
             </div>
             <div>
-              <span class="text-[10px] text-[#059669] uppercase font-sans font-semibold">Kas Bersih (Net)</span>
-              <div class="font-bold text-[#059669] text-sm mt-1">{formatRupiah(timeframeData.total_revenue)}</div>
+              <span class="font-sans text-[10px] font-semibold text-[#059669] uppercase"
+                >Kas Bersih (Net)</span
+              >
+              <div class="mt-1 text-sm font-bold text-[#059669]">
+                {formatRupiah(timeframeData.total_revenue)}
+              </div>
             </div>
           </div>
         </div>

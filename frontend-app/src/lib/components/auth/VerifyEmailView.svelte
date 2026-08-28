@@ -40,50 +40,62 @@
   }
 </script>
 
-<div class="min-h-screen bg-[#fafafc] flex flex-col justify-center items-center p-4 sm:p-6 select-none font-sans">
-  <div class="w-full max-w-md bg-white border border-[#e5e5ea] rounded-3xl p-6 sm:p-8 text-center shadow-sm">
-    <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-[#17171c] text-white font-bold text-lg mb-5 shadow-xs">
+<div
+  class="flex min-h-screen flex-col items-center justify-center bg-[#fafafc] p-4 font-sans select-none sm:p-6"
+>
+  <div
+    class="w-full max-w-md rounded-3xl border border-[#e5e5ea] bg-white p-6 text-center shadow-sm sm:p-8"
+  >
+    <div
+      class="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#17171c] text-lg font-bold text-white shadow-xs"
+    >
       P
     </div>
 
     {#if isLoading}
-      <div class="py-8 space-y-3">
-        <div class="w-8 h-8 border-2 border-[#17171c] border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p class="text-xs font-mono text-[#8e8e93]">Memverifikasi alamat email Anda...</p>
+      <div class="space-y-3 py-8">
+        <div
+          class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#17171c] border-t-transparent"
+        ></div>
+        <p class="font-mono text-xs text-[#8e8e93]">Memverifikasi alamat email Anda...</p>
       </div>
     {:else if successMessage}
-      <div class="w-12 h-12 bg-[#ecfdf5] text-[#059669] rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[#a7f3d0]">
-        <CheckCircle2 class="w-6 h-6" />
+      <div
+        class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
+      >
+        <CheckCircle2 class="h-6 w-6" />
       </div>
-      <h2 class="text-base font-bold text-[#17171c] mb-1.5">Verifikasi Sukses</h2>
-      <p class="text-xs text-[#686873] mb-6 leading-relaxed">{successMessage}</p>
+      <h2 class="mb-1.5 text-base font-bold text-[#17171c]">Verifikasi Sukses</h2>
+      <p class="mb-6 text-xs leading-relaxed text-[#686873]">{successMessage}</p>
       <button
         type="button"
         onclick={onCompleted}
-        class="w-full py-3 px-5 bg-[#17171c] hover:bg-black text-white font-semibold text-xs rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+        class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
       >
         <span>Masuk ke Dashboard</span>
-        <ArrowRight class="w-4 h-4" />
+        <ArrowRight class="h-4 w-4" />
       </button>
     {:else}
-      <div class="w-12 h-12 bg-[#fef2f2] text-[#dc2626] rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[#fecaca]">
-        <AlertCircle class="w-6 h-6" />
+      <div
+        class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#fecaca] bg-[#fef2f2] text-[#dc2626]"
+      >
+        <AlertCircle class="h-6 w-6" />
       </div>
-      <h2 class="text-base font-bold text-[#17171c] mb-1.5">Verifikasi Gagal</h2>
-      <p class="text-xs text-[#686873] mb-6 leading-relaxed">{errorMessage}</p>
+      <h2 class="mb-1.5 text-base font-bold text-[#17171c]">Verifikasi Gagal</h2>
+      <p class="mb-6 text-xs leading-relaxed text-[#686873]">{errorMessage}</p>
       <button
         type="button"
         onclick={onCompleted}
-        class="w-full py-3 px-5 bg-[#17171c] hover:bg-black text-white font-semibold text-xs rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+        class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
       >
         <span>Kembali ke Halaman Login</span>
-        <ArrowRight class="w-4 h-4" />
+        <ArrowRight class="h-4 w-4" />
       </button>
     {/if}
   </div>
 
-  <div class="mt-8 flex items-center gap-2 text-xs text-[#8e8e93] font-mono">
-    <Shield class="w-4 h-4 text-[#8e8e93]" />
+  <div class="mt-8 flex items-center gap-2 font-mono text-xs text-[#8e8e93]">
+    <Shield class="h-4 w-4 text-[#8e8e93]" />
     <span>PRÉCIS Email Verification</span>
   </div>
 </div>

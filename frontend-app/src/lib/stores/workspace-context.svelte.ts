@@ -53,9 +53,7 @@ export class WorkspaceContext {
   subscriptionPlans = $state<SubscriptionPlanItem[]>([]);
   teamMembers = $state<TeamMember[]>([]);
 
-  pendingApprovalsCount = $derived(
-    this.pendingSwaps.length + this.adminPendingKasbons.length
-  );
+  pendingApprovalsCount = $derived(this.pendingSwaps.length + this.adminPendingKasbons.length);
 
   currentWorkspace = $derived(
     this.userWorkspaces.find((w) => w.workspace_id === this.activeWorkspaceId) || null
@@ -157,8 +155,8 @@ export class WorkspaceContext {
       const branchId =
         this.selectedBranchFilter !== 'ALL'
           ? this.selectedBranchFilter
-          : (this.currentUser.branch_id || undefined);
-      
+          : this.currentUser.branch_id || undefined;
+
       const isManagement =
         this.currentUser.role === 'OWNER' ||
         this.currentUser.role === 'ADMIN' ||
@@ -203,9 +201,7 @@ export class WorkspaceContext {
           : Promise.resolve(null),
         billingService.getInvoices().catch(() => []),
         billingService.getPlans().catch(() => []),
-        isManagement
-          ? teamService.getMembers().catch(() => [])
-          : Promise.resolve([]),
+        isManagement ? teamService.getMembers().catch(() => []) : Promise.resolve([]),
       ]);
 
       this.rosterShifts = rosterData;
@@ -233,7 +229,7 @@ export class WorkspaceContext {
           photo_out_url: item.photo_out_url,
           lat_in: item.lat_in || -7.7654,
           lng_in: item.lng_in || 110.4091,
-          status: (item.late_minutes && item.late_minutes > 0) ? 'LATE' : 'ON_TIME',
+          status: item.late_minutes && item.late_minutes > 0 ? 'LATE' : 'ON_TIME',
           late_minutes: item.late_minutes || 0,
           overtime_minutes: item.overtime_minutes || 0,
           created_at: item.created_at || item.clock_in_time,

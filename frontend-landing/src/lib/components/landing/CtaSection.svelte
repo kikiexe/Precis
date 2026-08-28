@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { ArrowRight } from "lucide-svelte";
-  import AnimatedTetrahedron from "./AnimatedTetrahedron.svelte";
+  import { onMount } from 'svelte';
+  import { ArrowRight } from 'lucide-svelte';
+  import AnimatedTetrahedron from './AnimatedTetrahedron.svelte';
 
   let isVisible = $state(false);
   let sectionEl: HTMLElement;
@@ -28,62 +28,70 @@
   }
 </script>
 
-<section bind:this={sectionEl} class="relative py-24 lg:py-32 bg-white overflow-hidden border-t border-[#e0e0e0]">
-  <div class="max-w-[1400px] mx-auto px-6 lg:px-12">
+<section
+  bind:this={sectionEl}
+  class="relative overflow-hidden border-t border-[#e0e0e0] bg-white py-24 lg:py-32"
+>
+  <div class="mx-auto max-w-[1400px] px-6 lg:px-12">
     <!-- Spotlight Box -->
     <div
       role="region"
       aria-label="Call to action box"
       class={`relative border border-[#161616] bg-white transition-all duration-1000 ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
       }`}
       onmousemove={handleMouseMove}
     >
       <!-- Spotlight effect -->
       <div
-        class="absolute inset-0 opacity-15 pointer-events-none transition-opacity duration-300"
+        class="pointer-events-none absolute inset-0 opacity-15 transition-opacity duration-300"
         style={`background: radial-gradient(600px circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(15, 98, 254, 0.2), transparent 40%);`}
       ></div>
 
-      <div class="relative z-10 px-8 lg:px-16 py-16 lg:py-24">
-        <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
+      <div class="relative z-10 px-8 py-16 lg:px-16 lg:py-24">
+        <div class="flex flex-col items-center justify-between gap-12 lg:flex-row">
           <!-- Left content -->
           <div class="flex-1">
-            <h2 class="text-4xl lg:text-7xl font-display tracking-tight mb-8 leading-[0.95] text-[#161616]">
+            <h2
+              class="font-display mb-8 text-4xl leading-[0.95] tracking-tight text-[#161616] lg:text-7xl"
+            >
               Siap merapikan
               <br />
               operasional bisnis Anda?
             </h2>
 
-            <p class="text-xl text-[#525252] mb-12 leading-relaxed max-w-xl">
-              Tinggalkan cara lama yang rentan kecurangan. Coba gratis 1 bulan penuh tanpa komitmen kartu kredit.
+            <p class="mb-12 max-w-xl text-xl leading-relaxed text-[#525252]">
+              Tinggalkan cara lama yang rentan kecurangan. Coba gratis 1 bulan penuh tanpa komitmen
+              kartu kredit.
             </p>
 
-            <div class="flex flex-col sm:flex-row items-start gap-4">
+            <div class="flex flex-col items-start gap-4 sm:flex-row">
               <a
                 href="https://app.precis.com/register"
-                class="bg-[#0f62fe] hover:bg-[#0050e6] text-white px-8 h-14 text-base rounded-full inline-flex items-center justify-center font-medium group transition-colors"
+                class="group inline-flex h-14 items-center justify-center rounded-full bg-[#0f62fe] px-8 text-base font-medium text-white transition-colors hover:bg-[#0050e6]"
               >
                 Mulai Uji Coba 1 Bulan Gratis
-                <ArrowRight class="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </a>
               <a
                 href="#features"
-                class="h-14 px-8 text-base rounded-full border border-[#161616] text-[#161616] hover:bg-[#f4f4f4] inline-flex items-center justify-center font-medium transition-colors"
+                class="inline-flex h-14 items-center justify-center rounded-full border border-[#161616] px-8 text-base font-medium text-[#161616] transition-colors hover:bg-[#f4f4f4]"
               >
                 Pelajari Semua Fitur
               </a>
             </div>
 
-            <p class="text-sm text-[#8c8c8c] mt-8 font-mono">
+            <p class="mt-8 font-mono text-sm text-[#8c8c8c]">
               Tanpa kartu kredit • Setup outlet dalam 5 menit
             </p>
           </div>
 
           <!-- Right animation -->
-          <div class="hidden lg:flex items-center justify-center w-[460px] h-[460px] -mr-12 relative">
-            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div class="w-[740px] h-[740px] flex items-center justify-center shrink-0">
+          <div
+            class="relative -mr-12 hidden h-[460px] w-[460px] items-center justify-center lg:flex"
+          >
+            <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <div class="flex h-[740px] w-[740px] shrink-0 items-center justify-center">
                 <AnimatedTetrahedron />
               </div>
             </div>
@@ -92,8 +100,12 @@
       </div>
 
       <!-- Decorative corners -->
-      <div class="absolute top-0 right-0 w-32 h-32 border-b border-l border-[#e0e0e0] pointer-events-none"></div>
-      <div class="absolute bottom-0 left-0 w-32 h-32 border-t border-r border-[#e0e0e0] pointer-events-none"></div>
+      <div
+        class="pointer-events-none absolute top-0 right-0 h-32 w-32 border-b border-l border-[#e0e0e0]"
+      ></div>
+      <div
+        class="pointer-events-none absolute bottom-0 left-0 h-32 w-32 border-t border-r border-[#e0e0e0]"
+      ></div>
     </div>
   </div>
 </section>

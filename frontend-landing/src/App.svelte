@@ -13,7 +13,7 @@
   import FooterSection from './lib/components/landing/FooterSection.svelte';
 </script>
 
-<main class="relative min-h-screen overflow-x-hidden noise-overlay bg-white text-[#161616]">
+<main class="noise-overlay relative min-h-screen overflow-x-hidden bg-white text-[#161616]">
   <Navigation />
   <HeroSection />
   <FeaturesSection />

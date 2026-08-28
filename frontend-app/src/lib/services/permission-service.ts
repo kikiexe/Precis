@@ -79,9 +79,11 @@ export class PermissionService {
 
     // Kamera dan GPS adalah syarat utama presensi (wajib)
     const requiredGranted = cameraStatus === 'granted' && geoStatus === 'granted';
-    
+
     // allGranted terpenuhi jika required granted dan notif sudah ditentukan (granted/denied/unsupported)
-    const allGranted = requiredGranted && (notifStatus === 'granted' || notifStatus === 'denied' || notifStatus === 'unsupported');
+    const allGranted =
+      requiredGranted &&
+      (notifStatus === 'granted' || notifStatus === 'denied' || notifStatus === 'unsupported');
 
     return {
       camera: cameraStatus,
@@ -106,7 +108,10 @@ export class PermissionService {
       this.setStorageFlag(this.STORAGE_CAMERA, 'granted');
       return 'granted';
     } catch (err: unknown) {
-      if (err instanceof DOMException && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+      if (
+        err instanceof DOMException &&
+        (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')
+      ) {
         this.setStorageFlag(this.STORAGE_CAMERA, 'denied');
         return 'denied';
       }
@@ -145,7 +150,11 @@ export class PermissionService {
    * Minta izin akses Notifikasi (Opsional)
    */
   public async requestNotification(): Promise<PermissionStateStatus> {
-    if (typeof window === 'undefined' || !('Notification' in window) || typeof Notification.requestPermission !== 'function') {
+    if (
+      typeof window === 'undefined' ||
+      !('Notification' in window) ||
+      typeof Notification.requestPermission !== 'function'
+    ) {
       return 'unsupported';
     }
 
@@ -160,8 +169,12 @@ export class PermissionService {
       }
 
       const status: PermissionStateStatus =
-        permissionResult === 'granted' ? 'granted' : permissionResult === 'denied' ? 'denied' : 'prompt';
-      
+        permissionResult === 'granted'
+          ? 'granted'
+          : permissionResult === 'denied'
+            ? 'denied'
+            : 'prompt';
+
       this.setStorageFlag(this.STORAGE_NOTIF, status);
       return status;
     } catch {

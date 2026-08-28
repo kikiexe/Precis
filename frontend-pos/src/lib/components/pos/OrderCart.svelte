@@ -88,21 +88,15 @@
     }
   });
 
-  let subtotal = $derived(
-    items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
-  );
+  let subtotal = $derived(items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0));
 
   let calculatedDiscount = $derived(
-    discountPercent > 0
-      ? Math.round((subtotal * discountPercent) / 100)
-      : discountNominal
+    discountPercent > 0 ? Math.round((subtotal * discountPercent) / 100) : discountNominal
   );
 
   let finalTotal = $derived(Math.max(0, subtotal - calculatedDiscount));
 
-  let totalItemCount = $derived(
-    items.reduce((sum, item) => sum + item.quantity, 0)
-  );
+  let totalItemCount = $derived(items.reduce((sum, item) => sum + item.quantity, 0));
 
   // --- Interactive Swipe Gestures (Left to Delete, Right to +1) ---
   let swipedItemId = $state<string | null>(null);
@@ -188,13 +182,17 @@
   }
 </script>
 
-<aside class="w-72 sm:w-80 md:w-88 lg:w-96 bg-white border-l border-zinc-200 flex flex-col h-full shrink-0 select-none shadow-none font-sans">
+<aside
+  class="flex h-full w-72 shrink-0 flex-col border-l border-zinc-200 bg-white font-sans shadow-none select-none sm:w-80 md:w-88 lg:w-96"
+>
   <!-- Header: Cart Title, Count & Open Bills shortcut -->
-  <div class="px-3.5 py-3 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/70">
+  <div class="flex items-center justify-between border-b border-zinc-200 bg-zinc-50/70 px-3.5 py-3">
     <div class="flex items-center gap-2">
-      <ShoppingCart class="w-4 h-4 text-zinc-900" />
-      <span class="font-semibold text-sm text-zinc-900">Pesanan Baru</span>
-      <span class="text-xs font-mono bg-zinc-200/80 text-zinc-800 px-2 py-0.5 rounded-md font-semibold">
+      <ShoppingCart class="h-4 w-4 text-zinc-900" />
+      <span class="text-sm font-semibold text-zinc-900">Pesanan Baru</span>
+      <span
+        class="rounded-md bg-zinc-200/80 px-2 py-0.5 font-mono text-xs font-semibold text-zinc-800"
+      >
         {totalItemCount}
       </span>
     </div>
@@ -205,16 +203,18 @@
         <button
           type="button"
           onclick={onOpenBillsModal}
-          class={`px-2.5 py-1 text-[11px] font-medium rounded-lg border flex items-center gap-1.5 cursor-pointer transition-all ${
+          class={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-all ${
             openBillsCount > 0
-              ? 'bg-amber-500/10 border-amber-500/30 text-amber-800 hover:bg-amber-500/20'
-              : 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-200/70'
+              ? 'border-amber-500/30 bg-amber-500/10 text-amber-800 hover:bg-amber-500/20'
+              : 'border-zinc-200 bg-zinc-100 text-zinc-600 hover:bg-zinc-200/70'
           }`}
         >
-          <Bookmark class="w-3 h-3" />
+          <Bookmark class="h-3 w-3" />
           <span>Open Bills</span>
           {#if openBillsCount > 0}
-            <span class="w-4 h-4 rounded-full bg-amber-600 text-white font-mono text-[9px] font-bold flex items-center justify-center">
+            <span
+              class="flex h-4 w-4 items-center justify-center rounded-full bg-amber-600 font-mono text-[9px] font-bold text-white"
+            >
               {openBillsCount}
             </span>
           {/if}
@@ -225,9 +225,9 @@
         <button
           type="button"
           onclick={onClearCart}
-          class="text-xs font-medium text-red-600 hover:text-red-700 hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+          class="flex cursor-pointer items-center gap-1 text-xs font-medium text-red-600 transition-colors hover:text-red-700 hover:underline"
         >
-          <Trash2 class="w-3.5 h-3.5" />
+          <Trash2 class="h-3.5 w-3.5" />
           <span>Batal</span>
         </button>
       {/if}
@@ -235,18 +235,18 @@
   </div>
 
   <!-- Order Type (Compact Single-Selection Dropdown) & Customer Name Input -->
-  <div class="p-3 border-b border-zinc-200 bg-white shrink-0 relative">
+  <div class="relative shrink-0 border-b border-zinc-200 bg-white p-3">
     <div class="flex items-center gap-2">
       <!-- Selected Order Type Dropdown -->
       <div class="relative shrink-0">
         <button
           type="button"
           onclick={() => (isOrderTypeMenuOpen = !isOrderTypeMenuOpen)}
-          class="h-9 px-3 bg-zinc-100 hover:bg-zinc-200/70 border border-zinc-200/80 rounded-lg text-xs font-medium text-zinc-800 flex items-center gap-2 cursor-pointer transition-all active:scale-[0.98]"
+          class="flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-zinc-200/80 bg-zinc-100 px-3 text-xs font-medium text-zinc-800 transition-all hover:bg-zinc-200/70 active:scale-[0.98]"
         >
-          <selectedOrderTypeOption.icon class="w-3.5 h-3.5 text-zinc-700" />
+          <selectedOrderTypeOption.icon class="h-3.5 w-3.5 text-zinc-700" />
           <span>{selectedOrderTypeOption.label}</span>
-          <ChevronDown class="w-3.5 h-3.5 text-zinc-400" />
+          <ChevronDown class="h-3.5 w-3.5 text-zinc-400" />
         </button>
 
         {#if isOrderTypeMenuOpen}
@@ -259,7 +259,9 @@
             aria-label="Tutup menu"
           ></button>
 
-          <div class="absolute left-0 top-full mt-1.5 w-36 bg-white border border-zinc-200 rounded-xl shadow-lg z-30 py-1 overflow-hidden">
+          <div
+            class="absolute top-full left-0 z-30 mt-1.5 w-36 overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-lg"
+          >
             {#each orderTypeOptions as opt}
               <button
                 type="button"
@@ -267,18 +269,18 @@
                   onSetOrderType?.(opt.value);
                   isOrderTypeMenuOpen = false;
                 }}
-                class={`w-full px-3 py-2 text-xs flex items-center justify-between text-left transition-colors cursor-pointer ${
+                class={`flex w-full cursor-pointer items-center justify-between px-3 py-2 text-left text-xs transition-colors ${
                   orderType === opt.value
-                    ? 'bg-zinc-900 text-white font-medium'
+                    ? 'bg-zinc-900 font-medium text-white'
                     : 'text-zinc-700 hover:bg-zinc-100'
                 }`}
               >
                 <div class="flex items-center gap-2">
-                  <opt.icon class="w-3.5 h-3.5" />
+                  <opt.icon class="h-3.5 w-3.5" />
                   <span>{opt.label}</span>
                 </div>
                 {#if orderType === opt.value}
-                  <Check class="w-3.5 h-3.5 text-white" />
+                  <Check class="h-3.5 w-3.5 text-white" />
                 {/if}
               </button>
             {/each}
@@ -288,53 +290,61 @@
 
       <!-- Customer Name Input -->
       <div class="relative flex-1">
-        <User class="w-3.5 h-3.5 text-zinc-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+        <User class="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
         <input
           type="text"
           value={customerName}
           oninput={(e) => onSetCustomerName?.((e.target as HTMLInputElement).value)}
           placeholder="Nama Pemesan (Opsional)..."
-          class="w-full h-9 bg-zinc-50 border border-zinc-200/80 rounded-lg pl-8 pr-3 text-xs text-zinc-900 placeholder-zinc-400 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-hidden transition-all"
+          class="h-9 w-full rounded-lg border border-zinc-200/80 bg-zinc-50 pr-3 pl-8 text-xs text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:ring-1 focus:ring-zinc-900 focus:outline-hidden"
         />
       </div>
     </div>
   </div>
 
   <!-- Order Items List: Unified Single Container with Swipe Gestures -->
-  <div class="flex-1 overflow-y-auto p-3 space-y-2">
+  <div class="flex-1 space-y-2 overflow-y-auto p-3">
     {#if items.length === 0}
-      <div class="h-64 flex flex-col items-center justify-center text-center text-zinc-400">
-        <ShoppingCart class="w-9 h-9 mb-2 opacity-30 text-zinc-400" />
+      <div class="flex h-64 flex-col items-center justify-center text-center text-zinc-400">
+        <ShoppingCart class="mb-2 h-9 w-9 text-zinc-400 opacity-30" />
         <p class="text-sm font-medium text-zinc-800">Keranjang masih kosong</p>
-        <p class="text-xs text-zinc-500 mt-0.5">Pilih menu dari katalog di sebelah kiri.</p>
+        <p class="mt-0.5 text-xs text-zinc-500">Pilih menu dari katalog di sebelah kiri.</p>
       </div>
     {:else}
       <!-- Single Unified Container for all items -->
-      <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden divide-y divide-zinc-100 shadow-2xs">
+      <div
+        class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xs"
+      >
         {#each items as item (item.product.id)}
           {@const isItemSwiped = swipedItemId === item.product.id}
           {@const currentOffset = isItemSwiped ? swipeOffset : 0}
 
-          <div class="relative overflow-hidden group select-none bg-white">
+          <div class="group relative overflow-hidden bg-white select-none">
             <!-- Left Swipe Background Action: Delete -->
-            <div class="absolute inset-y-0 right-0 w-18 bg-red-600 flex items-center justify-center">
+            <div
+              class="absolute inset-y-0 right-0 flex w-18 items-center justify-center bg-red-600"
+            >
               <button
                 type="button"
                 onclick={() => {
                   onRemoveItem(item.product.id);
                   resetSwipe();
                 }}
-                class="w-full h-full flex flex-col items-center justify-center text-white text-[10px] font-semibold gap-0.5 cursor-pointer hover:bg-red-700 active:scale-95 transition-all"
+                class="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-0.5 text-[10px] font-semibold text-white transition-all hover:bg-red-700 active:scale-95"
               >
-                <Trash2 class="w-3.5 h-3.5" />
+                <Trash2 class="h-3.5 w-3.5" />
                 <span>Hapus</span>
               </button>
             </div>
 
             <!-- Right Swipe Background Action: +1 Increment -->
-            <div class="absolute inset-y-0 left-0 w-18 bg-emerald-600 flex items-center justify-center">
-              <div class="flex flex-col items-center justify-center text-white text-[10px] font-semibold gap-0.5">
-                <Plus class="w-3.5 h-3.5" />
+            <div
+              class="absolute inset-y-0 left-0 flex w-18 items-center justify-center bg-emerald-600"
+            >
+              <div
+                class="flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold text-white"
+              >
+                <Plus class="h-3.5 w-3.5" />
                 <span>+1 Menu</span>
               </div>
             </div>
@@ -343,7 +353,7 @@
             <div
               role="group"
               aria-label={item.product.name}
-              class="relative bg-white p-3 space-y-1.5 transition-transform duration-100 ease-out"
+              class="relative space-y-1.5 bg-white p-3 transition-transform duration-100 ease-out"
               style="transform: translateX({currentOffset}px);"
               ontouchstart={(e) => handleTouchStart(e, item.product.id)}
               ontouchmove={(e) => handleTouchMove(e, item.product.id)}
@@ -353,38 +363,40 @@
               onpointerup={() => handleTouchEnd(item.product.id)}
             >
               <div class="flex items-start justify-between gap-2">
-                <div class="flex-1 min-w-0">
-                  <div class="font-medium text-xs text-zinc-900 leading-snug line-clamp-2">
+                <div class="min-w-0 flex-1">
+                  <div class="line-clamp-2 text-xs leading-snug font-medium text-zinc-900">
                     {item.product.name}
                   </div>
-                  <div class="font-mono text-[11px] text-zinc-500 mt-0.5">
+                  <div class="mt-0.5 font-mono text-[11px] text-zinc-500">
                     {formatCurrency(item.unit_price)}
                   </div>
                 </div>
 
                 <!-- Quantity Stepper & Row Subtotal -->
-                <div class="flex items-center gap-2 shrink-0">
-                  <div class="flex items-center gap-1 bg-zinc-100 rounded-lg p-0.5 border border-zinc-200/80">
+                <div class="flex shrink-0 items-center gap-2">
+                  <div
+                    class="flex items-center gap-1 rounded-lg border border-zinc-200/80 bg-zinc-100 p-0.5"
+                  >
                     <button
                       type="button"
                       onclick={() => onUpdateQuantity(item.product.id, -1)}
-                      class="w-5.5 h-5.5 rounded-md bg-white hover:bg-zinc-200 text-zinc-800 flex items-center justify-center font-medium text-xs cursor-pointer transition-all active:scale-95 shadow-2xs"
+                      class="flex h-5.5 w-5.5 cursor-pointer items-center justify-center rounded-md bg-white text-xs font-medium text-zinc-800 shadow-2xs transition-all hover:bg-zinc-200 active:scale-95"
                     >
-                      <Minus class="w-2.5 h-2.5" />
+                      <Minus class="h-2.5 w-2.5" />
                     </button>
-                    <span class="font-mono text-xs font-semibold w-5 text-center text-zinc-900">
+                    <span class="w-5 text-center font-mono text-xs font-semibold text-zinc-900">
                       {item.quantity}
                     </span>
                     <button
                       type="button"
                       onclick={() => onUpdateQuantity(item.product.id, 1)}
-                      class="w-5.5 h-5.5 rounded-md bg-zinc-900 hover:bg-black text-white flex items-center justify-center font-medium text-xs cursor-pointer transition-all active:scale-95 shadow-2xs"
+                      class="flex h-5.5 w-5.5 cursor-pointer items-center justify-center rounded-md bg-zinc-900 text-xs font-medium text-white shadow-2xs transition-all hover:bg-black active:scale-95"
                     >
-                      <Plus class="w-2.5 h-2.5" />
+                      <Plus class="h-2.5 w-2.5" />
                     </button>
                   </div>
 
-                  <div class="font-mono text-xs font-semibold text-zinc-900 w-16 text-right">
+                  <div class="w-16 text-right font-mono text-xs font-semibold text-zinc-900">
                     {formatCurrency(item.unit_price * item.quantity)}
                   </div>
                 </div>
@@ -396,8 +408,9 @@
                   type="text"
                   value={item.notes}
                   placeholder="Catatan pesanan..."
-                  oninput={(e) => onUpdateNotes(item.product.id, (e.target as HTMLInputElement).value)}
-                  class="w-full text-[11px] bg-zinc-50 border border-zinc-200/70 rounded-md px-2.5 py-1 text-zinc-900 placeholder-zinc-400 focus:bg-white focus:border-zinc-900 focus:outline-hidden transition-all"
+                  oninput={(e) =>
+                    onUpdateNotes(item.product.id, (e.target as HTMLInputElement).value)}
+                  class="w-full rounded-md border border-zinc-200/70 bg-zinc-50 px-2.5 py-1 text-[11px] text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:outline-hidden"
                 />
               </div>
             </div>
@@ -406,35 +419,37 @@
       </div>
 
       <!-- Quick swipe gesture hint -->
-      <div class="text-[10px] font-mono text-zinc-400 text-center pt-1">
+      <div class="pt-1 text-center font-mono text-[10px] text-zinc-400">
         💡 Geser kiri untuk hapus • Geser kanan untuk +1
       </div>
     {/if}
   </div>
 
   <!-- Bottom Panel: Dynamic Discounts, Summary & Checkout Button -->
-  <div class="border-t border-zinc-200 bg-zinc-50/80 p-3.5 space-y-3 shrink-0">
+  <div class="shrink-0 space-y-3 border-t border-zinc-200 bg-zinc-50/80 p-3.5">
     <!-- Dynamic Discount Input with % / Rp Mode Switch -->
     <div class="space-y-1.5">
       <div class="flex items-center justify-between text-xs">
-        <span class="text-zinc-600 font-medium flex items-center gap-1.5">
-          <Tag class="w-3.5 h-3.5 text-zinc-700" />
+        <span class="flex items-center gap-1.5 font-medium text-zinc-600">
+          <Tag class="h-3.5 w-3.5 text-zinc-700" />
           <span>Diskon Pesanan</span>
         </span>
         {#if calculatedDiscount > 0}
-          <span class="text-red-600 font-mono font-medium text-[11px]">
-            -{formatCurrency(calculatedDiscount)} ({discountMode === 'PERCENT' ? `${discountPercent}%` : 'Rp'})
+          <span class="font-mono text-[11px] font-medium text-red-600">
+            -{formatCurrency(calculatedDiscount)} ({discountMode === 'PERCENT'
+              ? `${discountPercent}%`
+              : 'Rp'})
           </span>
         {/if}
       </div>
 
       <!-- Input Bar with Switcher -->
       <div class="flex items-center gap-1.5">
-        <div class="flex bg-zinc-200/80 p-0.5 rounded-lg border border-zinc-300/70 shrink-0">
+        <div class="flex shrink-0 rounded-lg border border-zinc-300/70 bg-zinc-200/80 p-0.5">
           <button
             type="button"
             onclick={() => handleSwitchDiscountMode('PERCENT')}
-            class={`px-2 py-1 text-[11px] font-mono font-bold rounded-md transition-all cursor-pointer ${
+            class={`cursor-pointer rounded-md px-2 py-1 font-mono text-[11px] font-bold transition-all ${
               discountMode === 'PERCENT'
                 ? 'bg-zinc-900 text-white shadow-xs'
                 : 'text-zinc-600 hover:text-zinc-900'
@@ -445,7 +460,7 @@
           <button
             type="button"
             onclick={() => handleSwitchDiscountMode('NOMINAL')}
-            class={`px-2 py-1 text-[11px] font-mono font-bold rounded-md transition-all cursor-pointer ${
+            class={`cursor-pointer rounded-md px-2 py-1 font-mono text-[11px] font-bold transition-all ${
               discountMode === 'NOMINAL'
                 ? 'bg-zinc-900 text-white shadow-xs'
                 : 'text-zinc-600 hover:text-zinc-900'
@@ -461,14 +476,16 @@
             inputmode="numeric"
             value={discountInputValue}
             oninput={handleDiscountInput}
-            placeholder={discountMode === 'PERCENT' ? 'Ketik diskon persen (misal 15)...' : 'Ketik nominal diskon (misal 10000)...'}
-            class="w-full h-8 bg-white border border-zinc-200 rounded-lg px-2.5 text-xs font-mono text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-hidden transition-all"
+            placeholder={discountMode === 'PERCENT'
+              ? 'Ketik diskon persen (misal 15)...'
+              : 'Ketik nominal diskon (misal 10000)...'}
+            class="h-8 w-full rounded-lg border border-zinc-200 bg-white px-2.5 font-mono text-xs text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-hidden"
           />
           {#if (discountMode === 'PERCENT' && discountPercent > 0) || (discountMode === 'NOMINAL' && discountNominal > 0)}
             <button
               type="button"
               onclick={handleClearDiscount}
-              class="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono text-zinc-400 hover:text-zinc-700 p-0.5 cursor-pointer"
+              class="absolute top-1/2 right-2 -translate-y-1/2 cursor-pointer p-0.5 font-mono text-xs text-zinc-400 hover:text-zinc-700"
             >
               ✕
             </button>
@@ -478,7 +495,7 @@
     </div>
 
     <!-- Pricing Breakdown -->
-    <div class="space-y-1.5 text-xs border-t border-zinc-200 pt-2.5">
+    <div class="space-y-1.5 border-t border-zinc-200 pt-2.5 text-xs">
       <div class="flex justify-between text-zinc-500">
         <span>Subtotal</span>
         <span class="font-mono text-zinc-700">{formatCurrency(subtotal)}</span>
@@ -489,9 +506,11 @@
           <span class="font-mono">-{formatCurrency(calculatedDiscount)}</span>
         </div>
       {/if}
-      <div class="flex justify-between text-base font-semibold text-zinc-900 pt-1.5 border-t border-zinc-200">
+      <div
+        class="flex justify-between border-t border-zinc-200 pt-1.5 text-base font-semibold text-zinc-900"
+      >
         <span>Total Bayar</span>
-        <span class="font-mono text-zinc-900 font-bold">{formatCurrency(finalTotal)}</span>
+        <span class="font-mono font-bold text-zinc-900">{formatCurrency(finalTotal)}</span>
       </div>
     </div>
 
@@ -502,26 +521,26 @@
           type="button"
           disabled={items.length === 0}
           onclick={onSaveOpenBill}
-          class={`py-2.5 px-3 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+          class={`flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-3 py-2.5 text-xs font-semibold transition-all ${
             items.length === 0
-              ? 'bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed'
-              : 'bg-white hover:bg-zinc-100 text-zinc-800 border-zinc-300 shadow-2xs active:scale-[0.99]'
+              ? 'cursor-not-allowed border-zinc-200 bg-zinc-100 text-zinc-400'
+              : 'border-zinc-300 bg-white text-zinc-800 shadow-2xs hover:bg-zinc-100 active:scale-[0.99]'
           }`}
         >
-          <Bookmark class="w-3.5 h-3.5 text-zinc-600" />
+          <Bookmark class="h-3.5 w-3.5 text-zinc-600" />
           <span>Simpan Bill</span>
         </button>
 
         <button
           type="button"
           disabled={items.length === 0}
-          class={`py-2.5 px-3 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+          class={`flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-3 py-2.5 text-xs font-semibold transition-all ${
             items.length === 0
-              ? 'bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed'
-              : 'bg-white hover:bg-zinc-100 text-zinc-800 border-zinc-300 shadow-2xs active:scale-[0.99]'
+              ? 'cursor-not-allowed border-zinc-200 bg-zinc-100 text-zinc-400'
+              : 'border-zinc-300 bg-white text-zinc-800 shadow-2xs hover:bg-zinc-100 active:scale-[0.99]'
           }`}
         >
-          <Printer class="w-3.5 h-3.5 text-zinc-600" />
+          <Printer class="h-3.5 w-3.5 text-zinc-600" />
           <span>Cetak Bill</span>
         </button>
       </div>
@@ -530,13 +549,13 @@
         type="button"
         disabled={items.length === 0}
         onclick={onOpenPaymentModal}
-        class={`w-full py-3.5 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm ${
+        class={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-bold shadow-sm transition-all ${
           items.length === 0
-            ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
-            : 'bg-zinc-900 hover:bg-black text-white active:scale-[0.99]'
+            ? 'cursor-not-allowed bg-zinc-200 text-zinc-400'
+            : 'bg-zinc-900 text-white hover:bg-black active:scale-[0.99]'
         }`}
       >
-        <CreditCard class="w-4 h-4" />
+        <CreditCard class="h-4 w-4" />
         <span>Bayar {formatCurrency(finalTotal)}</span>
       </button>
     </div>

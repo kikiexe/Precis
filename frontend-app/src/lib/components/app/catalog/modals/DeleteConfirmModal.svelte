@@ -29,12 +29,18 @@
 </script>
 
 {#if show}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl w-full max-w-md p-6 sm:p-7 space-y-5 shadow-xl animate-in fade-in zoom-in-95">
-      <div class="flex items-center justify-between pb-3 border-b border-[#f2f2f4]">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 font-sans backdrop-blur-xs"
+  >
+    <div
+      class="animate-in fade-in zoom-in-95 w-full max-w-md space-y-5 rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-xl sm:p-7"
+    >
+      <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-[#fef2f2] text-[#dc2626] flex items-center justify-center border border-[#fecaca]">
-            <AlertTriangle class="w-5 h-5" />
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#fecaca] bg-[#fef2f2] text-[#dc2626]"
+          >
+            <AlertTriangle class="h-5 w-5" />
           </div>
           <div>
             <h3 class="text-base font-bold text-[#17171c]">{title}</h3>
@@ -44,25 +50,29 @@
         <button
           type="button"
           onclick={onClose}
-          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all"
+          class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="w-5 h-5" />
+          <X class="h-5 w-5" />
         </button>
       </div>
 
-      <div class="text-xs text-[#686873] space-y-3">
+      <div class="space-y-3 text-xs text-[#686873]">
         <p class="leading-relaxed">
           {message || `Apakah Anda yakin ingin menghapus "${target?.name || 'item ini'}"?`}
         </p>
 
         {#if target}
-          <div class="p-3.5 rounded-2xl bg-[#f8f8fa] border border-[#ececee] font-bold text-[#17171c]">
+          <div
+            class="rounded-2xl border border-[#ececee] bg-[#f8f8fa] p-3.5 font-bold text-[#17171c]"
+          >
             {target.name}
           </div>
         {/if}
 
         {#if errorMessage}
-          <div class="p-3.5 rounded-2xl bg-[#fef2f2] border border-[#fecaca] text-[#991b1b] text-xs font-medium leading-relaxed">
+          <div
+            class="rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs leading-relaxed font-medium text-[#991b1b]"
+          >
             {errorMessage}
           </div>
         {/if}
@@ -72,7 +82,7 @@
         <button
           type="button"
           onclick={onClose}
-          class="flex-1 py-3 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] rounded-full text-[#686873] cursor-pointer transition-all"
+          class="flex-1 cursor-pointer rounded-full border border-[#e5e5ea] py-3 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
         >
           Batal
         </button>
@@ -80,9 +90,9 @@
           <button
             type="button"
             onclick={onConfirm}
-            class="flex-1 py-3 text-xs font-semibold bg-[#dc2626] hover:bg-[#b91c1c] text-white rounded-full cursor-pointer transition-all shadow-xs flex items-center justify-center gap-2"
+            class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#dc2626] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-[#b91c1c]"
           >
-            <Trash2 class="w-4 h-4" />
+            <Trash2 class="h-4 w-4" />
             <span>Hapus Permanen</span>
           </button>
         {/if}

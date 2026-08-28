@@ -257,11 +257,14 @@ export interface CashAdvance {
   purpose?: string;
   request_date: string;
   status: 'PENDING' | 'APPROVED' | 'DEDUCTED' | 'REJECTED';
-  approved_by?: {
-    id: string;
-    name: string;
-    email: string;
-  } | string | null;
+  approved_by?:
+    | {
+        id: string;
+        name: string;
+        email: string;
+      }
+    | string
+    | null;
   deducted_at_payroll_date?: string | null;
   created_at?: string;
 }
@@ -418,12 +421,7 @@ export interface RawMaterialItem {
 }
 
 export type StockAdjustmentReason =
-  | 'STOCK_TAKE'
-  | 'DAMAGED'
-  | 'EXPIRED'
-  | 'RESTOCK'
-  | 'WASTE'
-  | 'OTHER';
+  'STOCK_TAKE' | 'DAMAGED' | 'EXPIRED' | 'RESTOCK' | 'WASTE' | 'OTHER';
 
 export interface StockAdjustmentLog {
   id: string;
@@ -525,6 +523,3 @@ export interface PublicInvitationDetails {
   expires_at: string;
   user_exists?: boolean;
 }
-
-
-

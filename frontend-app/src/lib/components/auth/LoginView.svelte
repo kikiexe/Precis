@@ -145,49 +145,64 @@
   }
 </script>
 
-<div class="min-h-screen bg-[#fafafc] flex flex-col justify-center items-center p-4 sm:p-6 font-sans select-none">
+<div
+  class="flex min-h-screen flex-col items-center justify-center bg-[#fafafc] p-4 font-sans select-none sm:p-6"
+>
   <!-- Brand Header -->
-  <div class="mb-8 text-center space-y-2">
-    <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white border border-[#e5e5ea] shadow-2xs mb-2">
-      <div class="w-3 h-3 rounded-full bg-[#17171c]"></div>
+  <div class="mb-8 space-y-2 text-center">
+    <div
+      class="mb-2 inline-flex items-center gap-2.5 rounded-2xl border border-[#e5e5ea] bg-white px-4 py-2 shadow-2xs"
+    >
+      <div class="h-3 w-3 rounded-full bg-[#17171c]"></div>
       <span class="text-sm font-bold tracking-tight text-[#17171c]">PRÉCIS</span>
-      <span class="text-[10.5px] font-mono text-[#8e8e93] border-l border-[#e5e5ea] pl-2">Enterprise POS &amp; HR</span>
+      <span class="border-l border-[#e5e5ea] pl-2 font-mono text-[10.5px] text-[#8e8e93]"
+        >Enterprise POS &amp; HR</span
+      >
     </div>
-    <h1 class="text-xl sm:text-2xl font-bold text-[#17171c] tracking-tight">
+    <h1 class="text-xl font-bold tracking-tight text-[#17171c] sm:text-2xl">
       Sistem Operasional Terintegrasi
     </h1>
-    <p class="text-xs text-[#8e8e93] max-w-sm mx-auto">
+    <p class="mx-auto max-w-sm text-xs text-[#8e8e93]">
       Kelola pesanan kasir POS, absensi geofence, katalog inventaris, dan payroll tim
     </p>
   </div>
 
   <!-- Auth Container Card -->
-  <div class="w-full max-w-md bg-white border border-[#e5e5ea] rounded-3xl p-6 sm:p-8 shadow-sm">
+  <div class="w-full max-w-md rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-sm sm:p-8">
     {#if registeredSuccessEmail}
       <!-- Screen: Verifikasi Email Dikirim -->
-      <div class="space-y-5 text-center py-2">
-        <div class="w-12 h-12 bg-[#eff6ff] text-[#2563eb] rounded-2xl flex items-center justify-center mx-auto border border-[#bfdbfe]">
-          <Mail class="w-6 h-6" />
+      <div class="space-y-5 py-2 text-center">
+        <div
+          class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
+        >
+          <Mail class="h-6 w-6" />
         </div>
 
         <div class="space-y-2">
           <h2 class="text-base font-bold text-[#17171c]">Periksa Inbox Email Anda</h2>
-          <p class="text-xs text-[#686873] leading-relaxed">
-            Kami telah mengirimkan tautan verifikasi ke <strong class="text-[#17171c]">{registeredSuccessEmail}</strong>.
+          <p class="text-xs leading-relaxed text-[#686873]">
+            Kami telah mengirimkan tautan verifikasi ke <strong class="text-[#17171c]"
+              >{registeredSuccessEmail}</strong
+            >.
           </p>
           <p class="text-[11px] text-[#8e8e93]">
-            Silakan buka email Anda dan klik tombol verifikasi untuk mengaktifkan akun sebelum masuk.
+            Silakan buka email Anda dan klik tombol verifikasi untuk mengaktifkan akun sebelum
+            masuk.
           </p>
         </div>
 
         {#if successMessage}
-          <div class="p-3.5 bg-[#ecfdf5] border border-[#a7f3d0] text-[#065f46] text-xs font-semibold rounded-2xl">
+          <div
+            class="rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] p-3.5 text-xs font-semibold text-[#065f46]"
+          >
             {successMessage}
           </div>
         {/if}
 
         {#if errorMessage}
-          <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] text-[#991b1b] text-xs font-semibold rounded-2xl">
+          <div
+            class="rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-semibold text-[#991b1b]"
+          >
             {errorMessage}
           </div>
         {/if}
@@ -202,17 +217,17 @@
               errorMessage = null;
               successMessage = null;
             }}
-            class="w-full py-3 px-5 bg-[#17171c] hover:bg-black text-white font-semibold text-xs rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+            class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
           >
             <span>Masuk ke Akun</span>
-            <ArrowRight class="w-4 h-4" />
+            <ArrowRight class="h-4 w-4" />
           </button>
 
           <button
             type="button"
             onclick={handleResendVerification}
             disabled={isResending}
-            class="w-full py-2 text-xs text-[#686873] hover:text-[#17171c] font-semibold transition-colors cursor-pointer disabled:opacity-50"
+            class="w-full cursor-pointer py-2 text-xs font-semibold text-[#686873] transition-colors hover:text-[#17171c] disabled:opacity-50"
           >
             {isResending ? 'Mengirim ulang...' : 'Belum menerima email? Kirim Ulang'}
           </button>
@@ -220,14 +235,16 @@
       </div>
     {:else}
       <!-- Mode Switcher Tabs -->
-      <div class="grid grid-cols-2 gap-1.5 bg-[#f4f4f6] p-1.5 rounded-2xl border border-[#e5e5ea] mb-6">
+      <div
+        class="mb-6 grid grid-cols-2 gap-1.5 rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] p-1.5"
+      >
         <button
           type="button"
           onclick={() => {
             mode = 'login';
             errorMessage = null;
           }}
-          class={`py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer text-center ${
+          class={`cursor-pointer rounded-xl py-2 text-center text-xs font-semibold transition-all ${
             mode === 'login'
               ? 'bg-white text-[#17171c] shadow-xs'
               : 'text-[#8e8e93] hover:text-[#17171c]'
@@ -242,7 +259,7 @@
             mode = 'register';
             errorMessage = null;
           }}
-          class={`py-2 text-xs font-semibold rounded-xl transition-all cursor-pointer text-center ${
+          class={`cursor-pointer rounded-xl py-2 text-center text-xs font-semibold transition-all ${
             mode === 'register'
               ? 'bg-white text-[#17171c] shadow-xs'
               : 'text-[#8e8e93] hover:text-[#17171c]'
@@ -253,14 +270,18 @@
       </div>
 
       {#if errorMessage}
-        <div class="mb-5 p-3.5 bg-[#fef2f2] border border-[#fecaca] rounded-2xl text-xs font-semibold text-[#991b1b] flex items-start gap-2.5">
-          <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
+        <div
+          class="mb-5 flex items-start gap-2.5 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-semibold text-[#991b1b]"
+        >
+          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       {/if}
 
       {#if successMessage}
-        <div class="mb-5 p-3.5 bg-[#ecfdf5] border border-[#a7f3d0] rounded-2xl text-xs font-semibold text-[#065f46] flex items-start gap-2.5">
+        <div
+          class="mb-5 flex items-start gap-2.5 rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] p-3.5 text-xs font-semibold text-[#065f46]"
+        >
           <span>{successMessage}</span>
         </div>
       {/if}
@@ -269,9 +290,7 @@
         <!-- Form Login -->
         <form onsubmit={handleLogin} class="space-y-4 text-xs">
           <div class="space-y-1.5">
-            <label for="login-email" class="block font-bold text-[#17171c]">
-              Email Akun
-            </label>
+            <label for="login-email" class="block font-bold text-[#17171c]"> Email Akun </label>
             <div class="relative">
               <input
                 id="login-email"
@@ -280,9 +299,9 @@
                 placeholder="nama@kedai.com"
                 required
                 disabled={isLoading}
-                class="w-full pl-10 pr-4 py-2.5 text-xs text-[#17171c] placeholder-[#8e8e93] border border-[#e5e5ea] rounded-xl focus:border-[#17171c] focus:outline-hidden bg-[#f8f8fa] hover:bg-white transition-all shadow-2xs"
+                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] py-2.5 pr-4 pl-10 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
-              <Mail class="w-4 h-4 text-[#8e8e93] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Mail class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]" />
             </div>
           </div>
 
@@ -294,7 +313,7 @@
               <button
                 type="button"
                 onclick={() => (isForgotPasswordOpen = true)}
-                class="text-xs text-[#2563eb] hover:underline cursor-pointer font-semibold"
+                class="cursor-pointer text-xs font-semibold text-[#2563eb] hover:underline"
               >
                 Lupa kata sandi?
               </button>
@@ -307,20 +326,20 @@
                 placeholder="••••••••"
                 required
                 disabled={isLoading}
-                class="w-full pl-10 pr-10 py-2.5 text-xs text-[#17171c] placeholder-[#8e8e93] border border-[#e5e5ea] rounded-xl focus:border-[#17171c] focus:outline-hidden bg-[#f8f8fa] hover:bg-white transition-all shadow-2xs"
+                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] py-2.5 pr-10 pl-10 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
-              <Lock class="w-4 h-4 text-[#8e8e93] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Lock class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]" />
               <button
                 type="button"
                 tabindex="-1"
                 onclick={() => (showPassword = !showPassword)}
-                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8e8e93] hover:text-[#17171c] p-1 cursor-pointer flex items-center justify-center"
+                class="absolute top-1/2 right-3.5 flex -translate-y-1/2 cursor-pointer items-center justify-center p-1 text-[#8e8e93] hover:text-[#17171c]"
                 aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
               >
                 {#if showPassword}
-                  <EyeOff class="w-4 h-4" />
+                  <EyeOff class="h-4 w-4" />
                 {:else}
-                  <Eye class="w-4 h-4" />
+                  <Eye class="h-4 w-4" />
                 {/if}
               </button>
             </div>
@@ -329,13 +348,13 @@
           <button
             type="submit"
             disabled={isLoading}
-            class="w-full mt-2 py-3 px-5 bg-[#17171c] hover:bg-black text-white font-semibold text-xs rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-xs"
+            class="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
           >
             {#if isLoading}
               <span>Memvalidasi...</span>
             {:else}
               <span>Masuk ke Portal</span>
-              <ArrowRight class="w-4 h-4" />
+              <ArrowRight class="h-4 w-4" />
             {/if}
           </button>
         </form>
@@ -343,9 +362,7 @@
         <!-- Form Register Akun Baru -->
         <form onsubmit={handleRegister} class="space-y-4 text-xs">
           <div class="space-y-1.5">
-            <label for="reg-name" class="block font-bold text-[#17171c]">
-              Nama Lengkap
-            </label>
+            <label for="reg-name" class="block font-bold text-[#17171c]"> Nama Lengkap </label>
             <div class="relative">
               <input
                 id="reg-name"
@@ -354,16 +371,14 @@
                 placeholder="Contoh: Budi Santoso"
                 required
                 disabled={isLoading}
-                class="w-full pl-10 pr-4 py-2.5 text-xs text-[#17171c] placeholder-[#8e8e93] border border-[#e5e5ea] rounded-xl focus:border-[#17171c] focus:outline-hidden bg-[#f8f8fa] hover:bg-white transition-all shadow-2xs"
+                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] py-2.5 pr-4 pl-10 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
-              <User class="w-4 h-4 text-[#8e8e93] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <User class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]" />
             </div>
           </div>
 
           <div class="space-y-1.5">
-            <label for="reg-email" class="block font-bold text-[#17171c]">
-              Alamat Email
-            </label>
+            <label for="reg-email" class="block font-bold text-[#17171c]"> Alamat Email </label>
             <div class="relative">
               <input
                 id="reg-email"
@@ -372,16 +387,14 @@
                 placeholder="nama@email.com"
                 required
                 disabled={isLoading}
-                class="w-full pl-10 pr-4 py-2.5 text-xs text-[#17171c] placeholder-[#8e8e93] border border-[#e5e5ea] rounded-xl focus:border-[#17171c] focus:outline-hidden bg-[#f8f8fa] hover:bg-white transition-all shadow-2xs"
+                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] py-2.5 pr-4 pl-10 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
-              <Mail class="w-4 h-4 text-[#8e8e93] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Mail class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]" />
             </div>
           </div>
 
           <div class="space-y-1.5">
-            <label for="reg-password" class="block font-bold text-[#17171c]">
-              Kata Sandi
-            </label>
+            <label for="reg-password" class="block font-bold text-[#17171c]"> Kata Sandi </label>
             <div class="relative">
               <input
                 id="reg-password"
@@ -391,39 +404,42 @@
                 required
                 minlength="6"
                 disabled={isLoading}
-                class="w-full pl-10 pr-10 py-2.5 text-xs text-[#17171c] placeholder-[#8e8e93] border border-[#e5e5ea] rounded-xl focus:border-[#17171c] focus:outline-hidden bg-[#f8f8fa] hover:bg-white transition-all shadow-2xs"
+                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] py-2.5 pr-10 pl-10 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
-              <Lock class="w-4 h-4 text-[#8e8e93] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Lock class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]" />
               <button
                 type="button"
                 tabindex="-1"
                 onclick={() => (showPassword = !showPassword)}
-                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8e8e93] hover:text-[#17171c] p-1 cursor-pointer flex items-center justify-center"
+                class="absolute top-1/2 right-3.5 flex -translate-y-1/2 cursor-pointer items-center justify-center p-1 text-[#8e8e93] hover:text-[#17171c]"
                 aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
               >
                 {#if showPassword}
-                  <EyeOff class="w-4 h-4" />
+                  <EyeOff class="h-4 w-4" />
                 {:else}
-                  <Eye class="w-4 h-4" />
+                  <Eye class="h-4 w-4" />
                 {/if}
               </button>
             </div>
           </div>
 
-          <div class="p-3.5 bg-[#f8f8fa] rounded-2xl border border-[#ececee] text-[11px] text-[#686873] leading-relaxed">
-            Akun personal Anda dapat digunakan untuk menerima undangan tim workspace atau membuat bisnis baru.
+          <div
+            class="rounded-2xl border border-[#ececee] bg-[#f8f8fa] p-3.5 text-[11px] leading-relaxed text-[#686873]"
+          >
+            Akun personal Anda dapat digunakan untuk menerima undangan tim workspace atau membuat
+            bisnis baru.
           </div>
 
           <button
             type="submit"
             disabled={isLoading}
-            class="w-full mt-2 py-3 px-5 bg-[#17171c] hover:bg-black text-white font-semibold text-xs rounded-full flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50 shadow-xs"
+            class="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
           >
             {#if isLoading}
               <span>Mendaftarkan Akun...</span>
             {:else}
               <span>Daftar Akun Baru</span>
-              <ArrowRight class="w-4 h-4" />
+              <ArrowRight class="h-4 w-4" />
             {/if}
           </button>
         </form>
@@ -432,17 +448,14 @@
   </div>
 
   <!-- Security Note Footer -->
-  <div class="mt-8 flex items-center gap-2 text-xs text-[#8e8e93] font-mono">
-    <Shield class="w-4 h-4 text-[#8e8e93]" />
+  <div class="mt-8 flex items-center gap-2 font-mono text-xs text-[#8e8e93]">
+    <Shield class="h-4 w-4 text-[#8e8e93]" />
     <span>Terkoneksi Aman via Laravel Sanctum &amp; Multi-Tenant Database</span>
   </div>
 </div>
 
 <!-- Modal Lupa Kata Sandi -->
-<ForgotPasswordModal
-  isOpen={isForgotPasswordOpen}
-  onClose={() => (isForgotPasswordOpen = false)}
-/>
+<ForgotPasswordModal isOpen={isForgotPasswordOpen} onClose={() => (isForgotPasswordOpen = false)} />
 
 <!-- Modal Atur Ulang Kata Sandi -->
 <ResetPasswordModal

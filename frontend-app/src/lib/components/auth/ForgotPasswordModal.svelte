@@ -51,37 +51,47 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans animate-in fade-in duration-200">
-    <div class="w-full max-w-md bg-white border border-[#e5e5ea] rounded-3xl p-6 sm:p-7 relative animate-in zoom-in-95 duration-200 shadow-xl">
+  <div
+    class="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 font-sans backdrop-blur-xs duration-200"
+  >
+    <div
+      class="animate-in zoom-in-95 relative w-full max-w-md rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-xl duration-200 sm:p-7"
+    >
       <button
         type="button"
         onclick={handleClose}
-        class="absolute top-5 right-5 p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl transition-colors cursor-pointer"
+        class="absolute top-5 right-5 cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-colors hover:bg-[#f4f4f6] hover:text-[#17171c]"
         aria-label="Tutup modal"
       >
-        <X class="w-5 h-5" />
+        <X class="h-5 w-5" />
       </button>
 
-      <div class="flex items-center gap-3 mb-5 pb-3 border-b border-[#f2f2f4]">
-        <div class="w-10 h-10 bg-[#eff6ff] text-[#2563eb] rounded-2xl flex items-center justify-center border border-[#bfdbfe]">
-          <Mail class="w-5 h-5" />
+      <div class="mb-5 flex items-center gap-3 border-b border-[#f2f2f4] pb-3">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
+        >
+          <Mail class="h-5 w-5" />
         </div>
         <div>
-          <h3 class="text-base font-bold text-[#17171c] tracking-tight">Pemulihan Kata Sandi</h3>
+          <h3 class="text-base font-bold tracking-tight text-[#17171c]">Pemulihan Kata Sandi</h3>
           <p class="text-xs text-[#8e8e93]">Kirim instruksi reset ke email terdaftar</p>
         </div>
       </div>
 
       {#if errorMessage}
-        <div class="mb-4 p-3.5 bg-[#fef2f2] border border-[#fecaca] rounded-2xl text-xs font-medium text-[#991b1b] flex items-start gap-2.5">
-          <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
+        <div
+          class="mb-4 flex items-start gap-2.5 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
+        >
+          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       {/if}
 
       {#if successMessage}
-        <div class="mb-4 p-4 bg-[#ecfdf5] border border-[#a7f3d0] rounded-2xl text-xs text-[#065f46] flex items-start gap-2.5">
-          <CheckCircle2 class="w-5 h-5 shrink-0 mt-0.5 text-[#059669]" />
+        <div
+          class="mb-4 flex items-start gap-2.5 rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] p-4 text-xs text-[#065f46]"
+        >
+          <CheckCircle2 class="mt-0.5 h-5 w-5 shrink-0 text-[#059669]" />
           <div>
             <div class="font-bold">Permohonan Berhasil Dikirim</div>
             <div class="mt-1 text-xs text-[#065f46]">{successMessage}</div>
@@ -101,7 +111,7 @@
               bind:value={email}
               placeholder="nama@email.com"
               required
-              class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+              class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-xs text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
             />
           </div>
 
@@ -109,20 +119,20 @@
             <button
               type="button"
               onclick={handleClose}
-              class="flex-1 py-3 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] rounded-full cursor-pointer transition-all"
+              class="flex-1 cursor-pointer rounded-full border border-[#e5e5ea] py-3 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={isLoading || !email.trim()}
-              class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50 shadow-xs"
+              class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
             >
               {#if isLoading}
                 <span>Mengirim...</span>
               {:else}
                 <span>Kirim Tautan</span>
-                <ArrowRight class="w-4 h-4" />
+                <ArrowRight class="h-4 w-4" />
               {/if}
             </button>
           </div>
@@ -132,7 +142,7 @@
           <button
             type="button"
             onclick={handleClose}
-            class="w-full py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all shadow-xs"
+            class="w-full cursor-pointer rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
           >
             Tutup
           </button>

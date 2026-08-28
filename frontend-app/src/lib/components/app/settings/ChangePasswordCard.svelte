@@ -40,21 +40,27 @@
   }
 </script>
 
-<div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-7 space-y-6 shadow-2xs font-sans">
+<div
+  class="space-y-6 rounded-2xl border border-[#e5e5ea] bg-white p-5 font-sans shadow-2xs sm:rounded-3xl sm:p-7"
+>
   <div class="border-b border-[#f2f2f4] pb-4">
     <h3 class="text-base font-bold text-[#17171c]">Keamanan &amp; Kata Sandi</h3>
     <p class="text-xs text-[#8e8e93]">Ubah kata sandi akun untuk akses portal aman</p>
   </div>
 
   {#if passwordSuccessMsg}
-    <div class="p-3.5 bg-[#ecfdf5] border border-[#a7f3d0] rounded-2xl text-xs font-semibold text-[#065f46] flex items-center gap-2">
-      <Check class="w-4 h-4 shrink-0" />
+    <div
+      class="flex items-center gap-2 rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] p-3.5 text-xs font-semibold text-[#065f46]"
+    >
+      <Check class="h-4 w-4 shrink-0" />
       <span>{passwordSuccessMsg}</span>
     </div>
   {/if}
 
   {#if passwordErrorMsg}
-    <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] rounded-2xl text-xs font-semibold text-[#991b1b]">
+    <div
+      class="rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-semibold text-[#991b1b]"
+    >
       {passwordErrorMsg}
     </div>
   {/if}
@@ -67,7 +73,7 @@
         type="password"
         bind:value={currentPassword}
         placeholder="••••••••"
-        class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+        class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
       />
     </div>
 
@@ -78,7 +84,7 @@
         type="password"
         bind:value={newPassword}
         placeholder="Minimal 6 karakter"
-        class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+        class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
       />
     </div>
 
@@ -89,18 +95,18 @@
         type="password"
         bind:value={confirmPassword}
         placeholder="Ulangi kata sandi baru"
-        class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+        class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
       />
     </div>
 
-    <div class="pt-4 flex justify-end">
+    <div class="flex justify-end pt-4">
       <button
         type="button"
         onclick={handleSavePassword}
         disabled={isSavingPassword}
-        class="px-6 py-2.5 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all disabled:opacity-50 flex items-center gap-2 shadow-xs"
+        class="flex cursor-pointer items-center gap-2 rounded-full bg-[#17171c] px-6 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
       >
-        <KeyRound class="w-4 h-4" />
+        <KeyRound class="h-4 w-4" />
         <span>{isSavingPassword ? 'Memperbarui...' : 'Perbarui Kata Sandi'}</span>
       </button>
     </div>

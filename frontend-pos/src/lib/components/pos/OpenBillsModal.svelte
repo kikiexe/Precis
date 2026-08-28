@@ -11,13 +11,7 @@
     onDeleteBill: (billId: string) => void;
   }
 
-  let {
-    isOpen = false,
-    openBills = [],
-    onClose,
-    onRestoreBill,
-    onDeleteBill,
-  }: Props = $props();
+  let { isOpen = false, openBills = [], onClose, onRestoreBill, onDeleteBill }: Props = $props();
 
   let activeTab = $state<'open' | 'canceled_bill' | 'canceled_product'>('open');
   let searchQuery = $state('');
@@ -49,24 +43,30 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 font-sans animate-in fade-in duration-150 select-none">
-    <div class="bg-white rounded-2xl border border-zinc-200 shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150">
+  <div
+    class="animate-in fade-in fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 font-sans backdrop-blur-xs duration-150 select-none"
+  >
+    <div
+      class="animate-in zoom-in-95 flex max-h-[85vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl duration-150"
+    >
       <!-- Moka Style Header Bar -->
-      <div class="h-14 px-5 border-b border-zinc-200 flex items-center justify-between bg-zinc-50/80">
+      <div
+        class="flex h-14 items-center justify-between border-b border-zinc-200 bg-zinc-50/80 px-5"
+      >
         <button
           type="button"
           onclick={onClose}
-          class="px-4 py-2 text-xs font-semibold text-zinc-700 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer"
+          class="cursor-pointer rounded-lg border border-zinc-300 bg-white px-4 py-2 text-xs font-semibold text-zinc-700 transition-colors hover:bg-zinc-100"
         >
           Tutup
         </button>
 
-        <h2 class="text-base font-bold text-zinc-900 tracking-tight">Daftar Bill</h2>
+        <h2 class="text-base font-bold tracking-tight text-zinc-900">Daftar Bill</h2>
 
         <button
           type="button"
           onclick={onClose}
-          class="px-4 py-2 text-xs font-semibold text-white bg-zinc-900 hover:bg-black rounded-lg transition-colors cursor-pointer shadow-xs"
+          class="cursor-pointer rounded-lg bg-zinc-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-colors hover:bg-black"
         >
           + Bill Baru
         </button>
@@ -77,7 +77,7 @@
         <button
           type="button"
           onclick={() => (activeTab = 'open')}
-          class={`py-3.5 px-6 text-xs font-bold transition-all border-b-2 cursor-pointer ${
+          class={`cursor-pointer border-b-2 px-6 py-3.5 text-xs font-bold transition-all ${
             activeTab === 'open'
               ? 'border-zinc-900 text-zinc-900'
               : 'border-transparent text-zinc-500 hover:text-zinc-800'
@@ -88,7 +88,7 @@
         <button
           type="button"
           onclick={() => (activeTab = 'canceled_bill')}
-          class={`py-3.5 px-6 text-xs font-bold transition-all border-b-2 cursor-pointer ${
+          class={`cursor-pointer border-b-2 px-6 py-3.5 text-xs font-bold transition-all ${
             activeTab === 'canceled_bill'
               ? 'border-zinc-900 text-zinc-900'
               : 'border-transparent text-zinc-500 hover:text-zinc-800'
@@ -99,7 +99,7 @@
         <button
           type="button"
           onclick={() => (activeTab = 'canceled_product')}
-          class={`py-3.5 px-6 text-xs font-bold transition-all border-b-2 cursor-pointer ${
+          class={`cursor-pointer border-b-2 px-6 py-3.5 text-xs font-bold transition-all ${
             activeTab === 'canceled_product'
               ? 'border-zinc-900 text-zinc-900'
               : 'border-transparent text-zinc-500 hover:text-zinc-800'
@@ -110,15 +110,15 @@
       </div>
 
       <!-- Search Input -->
-      <div class="p-4 border-b border-zinc-100 bg-white">
+      <div class="border-b border-zinc-100 bg-white p-4">
         <div class="relative">
           <input
             type="text"
             bind:value={searchQuery}
             placeholder="Cari Open Bill..."
-            class="w-full h-10 bg-zinc-50 border border-zinc-200 rounded-xl pl-4 pr-10 text-xs text-zinc-900 placeholder-zinc-400 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-hidden transition-all"
+            class="h-10 w-full rounded-xl border border-zinc-200 bg-zinc-50 pr-10 pl-4 text-xs text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:ring-1 focus:ring-zinc-900 focus:outline-hidden"
           />
-          <Search class="w-4 h-4 text-zinc-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+          <Search class="absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
         </div>
       </div>
 
@@ -126,21 +126,25 @@
       <div class="flex-1 overflow-y-auto">
         {#if activeTab === 'open'}
           {#if filteredBills.length === 0}
-            <div class="py-20 flex flex-col items-center justify-center text-center text-zinc-400">
+            <div class="flex flex-col items-center justify-center py-20 text-center text-zinc-400">
               <p class="text-sm font-semibold text-zinc-800">Tidak ada open bill</p>
-              <p class="text-xs text-zinc-500 mt-1">Gunakan tombol "Simpan Bill" di kasir untuk menahan pesanan.</p>
+              <p class="mt-1 text-xs text-zinc-500">
+                Gunakan tombol "Simpan Bill" di kasir untuk menahan pesanan.
+              </p>
             </div>
           {:else}
-            <table class="w-full text-xs text-left border-collapse">
-              <thead class="bg-zinc-100/70 border-b border-zinc-200 text-[11px] font-bold text-zinc-600 uppercase tracking-wider">
+            <table class="w-full border-collapse text-left text-xs">
+              <thead
+                class="border-b border-zinc-200 bg-zinc-100/70 text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
+              >
                 <tr>
-                  <th class="py-3 px-5">Nama Bill</th>
-                  <th class="py-3 px-5">Grup Meja / Tipe</th>
-                  <th class="py-3 px-5">Pelayan / Kasir</th>
-                  <th class="py-3 px-5">Waktu</th>
-                  <th class="py-3 px-5 text-right">Total</th>
-                  <th class="py-3 px-5 text-center">Sync</th>
-                  <th class="py-3 px-5 text-right">Aksi</th>
+                  <th class="px-5 py-3">Nama Bill</th>
+                  <th class="px-5 py-3">Grup Meja / Tipe</th>
+                  <th class="px-5 py-3">Pelayan / Kasir</th>
+                  <th class="px-5 py-3">Waktu</th>
+                  <th class="px-5 py-3 text-right">Total</th>
+                  <th class="px-5 py-3 text-center">Sync</th>
+                  <th class="px-5 py-3 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-zinc-100">
@@ -150,43 +154,51 @@
                       onRestoreBill(bill.id);
                       onClose();
                     }}
-                    class="hover:bg-zinc-100/70 cursor-pointer transition-colors group"
+                    class="group cursor-pointer transition-colors hover:bg-zinc-100/70"
                   >
-                    <td class="py-3.5 px-5 font-semibold text-zinc-900">
+                    <td class="px-5 py-3.5 font-semibold text-zinc-900">
                       <div class="flex items-center gap-2">
                         <span>{bill.customer_name}</span>
-                        <span class="font-mono text-[10px] text-zinc-400">({bill.order_number})</span>
+                        <span class="font-mono text-[10px] text-zinc-400"
+                          >({bill.order_number})</span
+                        >
                       </div>
-                      <div class="text-[11px] text-zinc-500 font-normal mt-0.5 line-clamp-1">
+                      <div class="mt-0.5 line-clamp-1 text-[11px] font-normal text-zinc-500">
                         {bill.items.map((i) => `${i.quantity}x ${i.product.name}`).join(', ')}
                       </div>
                     </td>
-                    <td class="py-3.5 px-5 text-zinc-700">
-                      <span class="px-2 py-0.5 rounded-md text-[10.5px] font-medium bg-zinc-100 text-zinc-800">
-                        {bill.order_type === 'TAKE_AWAY' ? 'Take Away' : bill.order_type === 'DELIVERY' ? 'Delivery' : 'Dine In'}
+                    <td class="px-5 py-3.5 text-zinc-700">
+                      <span
+                        class="rounded-md bg-zinc-100 px-2 py-0.5 text-[10.5px] font-medium text-zinc-800"
+                      >
+                        {bill.order_type === 'TAKE_AWAY'
+                          ? 'Take Away'
+                          : bill.order_type === 'DELIVERY'
+                            ? 'Delivery'
+                            : 'Dine In'}
                       </span>
                     </td>
-                    <td class="py-3.5 px-5 text-zinc-600">Kasir Outlet</td>
-                    <td class="py-3.5 px-5 font-mono text-zinc-500 text-[11px]">
+                    <td class="px-5 py-3.5 text-zinc-600">Kasir Outlet</td>
+                    <td class="px-5 py-3.5 font-mono text-[11px] text-zinc-500">
                       {formatTimeElapsed(bill.saved_at)}
                     </td>
-                    <td class="py-3.5 px-5 font-mono font-bold text-zinc-900 text-right">
+                    <td class="px-5 py-3.5 text-right font-mono font-bold text-zinc-900">
                       {formatCurrency(bill.final_total)}
                     </td>
-                    <td class="py-3.5 px-5 text-center">
-                      <CheckCircle2 class="w-4 h-4 text-emerald-600 inline-block" />
+                    <td class="px-5 py-3.5 text-center">
+                      <CheckCircle2 class="inline-block h-4 w-4 text-emerald-600" />
                     </td>
-                    <td class="py-3.5 px-5 text-right">
+                    <td class="px-5 py-3.5 text-right">
                       <button
                         type="button"
                         onclick={(e) => {
                           e.stopPropagation();
                           onDeleteBill(bill.id);
                         }}
-                        class="p-1.5 text-zinc-400 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors cursor-pointer"
+                        class="cursor-pointer rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Hapus Bill"
                       >
-                        <Trash2 class="w-4 h-4" />
+                        <Trash2 class="h-4 w-4" />
                       </button>
                     </td>
                   </tr>
@@ -195,9 +207,9 @@
             </table>
           {/if}
         {:else}
-          <div class="py-20 flex flex-col items-center justify-center text-center text-zinc-400">
+          <div class="flex flex-col items-center justify-center py-20 text-center text-zinc-400">
             <p class="text-sm font-semibold text-zinc-800">Tidak ada riwayat pembatalan</p>
-            <p class="text-xs text-zinc-500 mt-1">Data pembatalan pesanan akan tercatat di sini.</p>
+            <p class="mt-1 text-xs text-zinc-500">Data pembatalan pesanan akan tercatat di sini.</p>
           </div>
         {/if}
       </div>

@@ -125,7 +125,10 @@ export class ApiClient {
 
   private buildUrl(endpoint: string, params?: RequestOptions['params']): string {
     let cleanBase = (this.baseUrl || getDefaultApiBaseUrl()).replace(/\/+$/, '');
-    if (typeof window !== 'undefined' && (cleanBase.includes('localhost') || cleanBase.includes('127.0.0.1'))) {
+    if (
+      typeof window !== 'undefined' &&
+      (cleanBase.includes('localhost') || cleanBase.includes('127.0.0.1'))
+    ) {
       cleanBase = '/api/v1';
     }
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
@@ -143,8 +146,18 @@ export class ApiClient {
     return url.toString();
   }
 
-  public async request<T = unknown>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
-    const { params, skipAuth = false, skipWorkspace = false, body, headers = {}, ...customInit } = options;
+  public async request<T = unknown>(
+    endpoint: string,
+    options: RequestOptions = {}
+  ): Promise<ApiResponse<T>> {
+    const {
+      params,
+      skipAuth = false,
+      skipWorkspace = false,
+      body,
+      headers = {},
+      ...customInit
+    } = options;
 
     const url = this.buildUrl(endpoint, params);
     const requestHeaders = new Headers(headers);
@@ -206,7 +219,11 @@ export class ApiClient {
       // Extract specific validation message if available
       if (errorData?.errors && typeof errorData.errors === 'object') {
         const errorEntries = Object.values(errorData.errors);
-        if (errorEntries.length > 0 && Array.isArray(errorEntries[0]) && errorEntries[0].length > 0) {
+        if (
+          errorEntries.length > 0 &&
+          Array.isArray(errorEntries[0]) &&
+          errorEntries[0].length > 0
+        ) {
           errorMessage = errorEntries[0][0];
         }
       }
@@ -216,8 +233,13 @@ export class ApiClient {
       }
 
       // Sanitize raw database or SQLSTATE leakages
-      if (errorMessage.includes('SQLSTATE') || errorMessage.includes('syntax error') || errorMessage.includes('Connection refused')) {
-        errorMessage = 'Terjadi kendala pada penyimpanan database. Silakan coba beberapa saat lagi.';
+      if (
+        errorMessage.includes('SQLSTATE') ||
+        errorMessage.includes('syntax error') ||
+        errorMessage.includes('Connection refused')
+      ) {
+        errorMessage =
+          'Terjadi kendala pada penyimpanan database. Silakan coba beberapa saat lagi.';
       }
 
       if (status === 401) {
@@ -234,29 +256,58 @@ export class ApiClient {
     return (responsePayload as ApiResponse<T>) || { message: 'Operasi berhasil.' };
   }
 
-  public get<T = unknown>(endpoint: string, optionsOrParams?: RequestOptions['params'] | Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
+  public get<T = unknown>(
+    endpoint: string,
+    optionsOrParams?: RequestOptions['params'] | Omit<RequestOptions, 'method' | 'body'>
+  ): Promise<ApiResponse<T>> {
     if (optionsOrParams && typeof optionsOrParams === 'object') {
-      if ('params' in optionsOrParams || 'skipAuth' in optionsOrParams || 'skipWorkspace' in optionsOrParams || 'headers' in optionsOrParams) {
-        return this.request<T>(endpoint, { ...(optionsOrParams as Omit<RequestOptions, 'method' | 'body'>), method: 'GET' });
+      if (
+        'params' in optionsOrParams ||
+        'skipAuth' in optionsOrParams ||
+        'skipWorkspace' in optionsOrParams ||
+        'headers' in optionsOrParams
+      ) {
+        return this.request<T>(endpoint, {
+          ...(optionsOrParams as Omit<RequestOptions, 'method' | 'body'>),
+          method: 'GET',
+        });
       }
-      return this.request<T>(endpoint, { params: optionsOrParams as Record<string, string | number | boolean | undefined | null>, method: 'GET' });
+      return this.request<T>(endpoint, {
+        params: optionsOrParams as Record<string, string | number | boolean | undefined | null>,
+        method: 'GET',
+      });
     }
     return this.request<T>(endpoint, { method: 'GET' });
   }
 
-  public post<T = unknown>(endpoint: string, body?: unknown, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
+  public post<T = unknown>(
+    endpoint: string,
+    body?: unknown,
+    options?: Omit<RequestOptions, 'method' | 'body'>
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'POST', body });
   }
 
-  public put<T = unknown>(endpoint: string, body?: unknown, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
+  public put<T = unknown>(
+    endpoint: string,
+    body?: unknown,
+    options?: Omit<RequestOptions, 'method' | 'body'>
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'PUT', body });
   }
 
-  public patch<T = unknown>(endpoint: string, body?: unknown, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
+  public patch<T = unknown>(
+    endpoint: string,
+    body?: unknown,
+    options?: Omit<RequestOptions, 'method' | 'body'>
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'PATCH', body });
   }
 
-  public delete<T = unknown>(endpoint: string, options?: Omit<RequestOptions, 'method'>): Promise<ApiResponse<T>> {
+  public delete<T = unknown>(
+    endpoint: string,
+    options?: Omit<RequestOptions, 'method'>
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' });
   }
 }

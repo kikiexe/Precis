@@ -47,21 +47,23 @@
 
 <div class="space-y-3 font-sans">
   <!-- Excel Toolbar: Search & Action Controls -->
-  <div class="bg-white border border-zinc-200 rounded-xl p-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
-    <div class="flex items-center gap-2 flex-1">
-      <div class="relative flex-1 max-w-md">
-        <Search class="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+  <div
+    class="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-2xs sm:flex-row sm:items-center"
+  >
+    <div class="flex flex-1 items-center gap-2">
+      <div class="relative max-w-md flex-1">
+        <Search class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
         <input
           type="text"
           bind:value={searchQuery}
           placeholder="Cari nama bahan baku, susu, sirup, beans..."
-          class="w-full pl-9 pr-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 placeholder-zinc-400 focus:bg-white focus:border-zinc-900 focus:outline-hidden transition-all"
+          class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2 pr-4 pl-9 text-xs text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:outline-hidden"
         />
         {#if searchQuery}
           <button
             type="button"
             onclick={() => (searchQuery = '')}
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-zinc-400 hover:text-zinc-700 cursor-pointer"
+            class="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer font-mono text-xs text-zinc-400 hover:text-zinc-700"
           >
             ✕
           </button>
@@ -71,7 +73,7 @@
       <!-- Filter Kategori -->
       <select
         bind:value={selectedCategoryFilter}
-        class="h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 cursor-pointer focus:bg-white focus:border-zinc-900 focus:outline-hidden"
+        class="h-9 cursor-pointer rounded-lg border border-zinc-200 bg-zinc-50 px-3 text-xs font-medium text-zinc-700 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
       >
         <option value="ALL">Semua Kategori ({rawMaterials.length})</option>
         {#each categoriesList as cat}
@@ -83,27 +85,29 @@
     <button
       type="button"
       onclick={onOpenAddMaterial}
-      class="px-4 py-2 bg-zinc-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-xs transition-all active:scale-[0.99]"
+      class="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
     >
-      <Plus class="w-3.5 h-3.5" />
+      <Plus class="h-3.5 w-3.5" />
       <span>+ Bahan Baku Baru</span>
     </button>
   </div>
 
   <!-- Excel-like Spreadsheet Table -->
-  <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-2xs">
+  <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xs">
     <div class="overflow-x-auto">
-      <table class="w-full text-xs text-left border-collapse">
-        <thead class="bg-zinc-100/80 border-b border-zinc-200 font-mono text-[11px] font-bold text-zinc-600 uppercase tracking-wider">
+      <table class="w-full border-collapse text-left text-xs">
+        <thead
+          class="border-b border-zinc-200 bg-zinc-100/80 font-mono text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
+        >
           <tr class="divide-x divide-zinc-200/80">
-            <th class="py-3 px-3 w-12 text-center">No.</th>
-            <th class="py-3 px-4">Nama Bahan Baku</th>
-            <th class="py-3 px-4 w-36">Kategori</th>
-            <th class="py-3 px-4 w-32 text-right">Stok Fisik</th>
-            <th class="py-3 px-4 w-32 text-right">Batas Minimum</th>
-            <th class="py-3 px-4 w-32 text-center">Status</th>
-            <th class="py-3 px-4 w-36 text-center">Audit Terakhir</th>
-            <th class="py-3 px-4 w-44 text-right">Aksi</th>
+            <th class="w-12 px-3 py-3 text-center">No.</th>
+            <th class="px-4 py-3">Nama Bahan Baku</th>
+            <th class="w-36 px-4 py-3">Kategori</th>
+            <th class="w-32 px-4 py-3 text-right">Stok Fisik</th>
+            <th class="w-32 px-4 py-3 text-right">Batas Minimum</th>
+            <th class="w-32 px-4 py-3 text-center">Status</th>
+            <th class="w-36 px-4 py-3 text-center">Audit Terakhir</th>
+            <th class="w-44 px-4 py-3 text-right">Aksi</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-zinc-200/70">
@@ -111,56 +115,66 @@
             <tr>
               <td colspan="8" class="py-16 text-center text-zinc-400">
                 <p class="text-sm font-semibold text-zinc-800">Tidak ada data bahan baku</p>
-                <p class="text-xs text-zinc-500 mt-0.5">Coba ubah kata kunci pencarian atau filter kategori.</p>
+                <p class="mt-0.5 text-xs text-zinc-500">
+                  Coba ubah kata kunci pencarian atau filter kategori.
+                </p>
               </td>
             </tr>
           {:else}
             {#each filteredRawMaterials as mat, idx (mat.id)}
               {@const isLow = mat.current_stock <= mat.min_stock_alert}
-              <tr class={`divide-x divide-zinc-200/60 transition-colors hover:bg-zinc-50/80 ${
-                idx % 2 === 1 ? 'bg-zinc-50/30' : 'bg-white'
-              }`}>
+              <tr
+                class={`divide-x divide-zinc-200/60 transition-colors hover:bg-zinc-50/80 ${
+                  idx % 2 === 1 ? 'bg-zinc-50/30' : 'bg-white'
+                }`}
+              >
                 <!-- No -->
-                <td class="py-3 px-3 font-mono text-center text-zinc-400 text-[11px]">
+                <td class="px-3 py-3 text-center font-mono text-[11px] text-zinc-400">
                   {idx + 1}
                 </td>
 
                 <!-- Nama Bahan Baku -->
-                <td class="py-3 px-4 font-semibold text-zinc-900">
+                <td class="px-4 py-3 font-semibold text-zinc-900">
                   <div class="flex items-center gap-2">
                     {#if isLow}
-                      <AlertTriangle class="w-3.5 h-3.5 text-red-500 shrink-0" />
+                      <AlertTriangle class="h-3.5 w-3.5 shrink-0 text-red-500" />
                     {/if}
                     <span>{mat.name}</span>
                   </div>
                 </td>
 
                 <!-- Kategori -->
-                <td class="py-3 px-4">
-                  <span class="inline-block px-2.5 py-0.5 bg-zinc-100 text-zinc-700 rounded-md text-[11px] font-medium border border-zinc-200/60 truncate max-w-[130px]">
+                <td class="px-4 py-3">
+                  <span
+                    class="inline-block max-w-[130px] truncate rounded-md border border-zinc-200/60 bg-zinc-100 px-2.5 py-0.5 text-[11px] font-medium text-zinc-700"
+                  >
                     {mat.category_name || 'Lainnya'}
                   </span>
                 </td>
 
                 <!-- Stok Fisik -->
-                <td class={`py-3 px-4 font-mono font-bold text-right text-xs ${
-                  isLow ? 'text-red-600 bg-red-50/40' : 'text-zinc-900'
-                }`}>
-                  {mat.current_stock} <span class="font-normal text-[10px] text-zinc-500">{mat.unit}</span>
+                <td
+                  class={`px-4 py-3 text-right font-mono text-xs font-bold ${
+                    isLow ? 'bg-red-50/40 text-red-600' : 'text-zinc-900'
+                  }`}
+                >
+                  {mat.current_stock}
+                  <span class="text-[10px] font-normal text-zinc-500">{mat.unit}</span>
                 </td>
 
                 <!-- Batas Minimum -->
-                <td class="py-3 px-4 font-mono text-right text-zinc-600 text-xs">
-                  {mat.min_stock_alert} <span class="font-normal text-[10px] text-zinc-400">{mat.unit}</span>
+                <td class="px-4 py-3 text-right font-mono text-xs text-zinc-600">
+                  {mat.min_stock_alert}
+                  <span class="text-[10px] font-normal text-zinc-400">{mat.unit}</span>
                 </td>
 
                 <!-- Status -->
-                <td class="py-3 px-4 text-center">
-                  <span class={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                    isLow
-                      ? 'bg-red-100 text-red-700'
-                      : 'bg-emerald-100 text-emerald-800'
-                  }`}>
+                <td class="px-4 py-3 text-center">
+                  <span
+                    class={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
+                      isLow ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-800'
+                    }`}
+                  >
                     {#if isLow}
                       <span>Menipis</span>
                     {:else}
@@ -170,39 +184,39 @@
                 </td>
 
                 <!-- Audit Terakhir -->
-                <td class="py-3 px-4 font-mono text-center text-zinc-500 text-[11px]">
+                <td class="px-4 py-3 text-center font-mono text-[11px] text-zinc-500">
                   {mat.last_adjusted_at || '-'}
                 </td>
 
                 <!-- Aksi -->
-                <td class="py-3 px-4 text-right">
+                <td class="px-4 py-3 text-right">
                   <div class="flex items-center justify-end gap-1.5">
                     <button
                       type="button"
                       onclick={() => onOpenOpname(mat)}
-                      class="px-2.5 py-1.5 bg-zinc-900 hover:bg-black text-white text-[11px] font-medium rounded-lg flex items-center gap-1 transition-all cursor-pointer shadow-2xs active:scale-95"
+                      class="flex cursor-pointer items-center gap-1 rounded-lg bg-zinc-900 px-2.5 py-1.5 text-[11px] font-medium text-white shadow-2xs transition-all hover:bg-black active:scale-95"
                       title="Audit Stok Opname"
                     >
-                      <SlidersHorizontal class="w-3 h-3" />
+                      <SlidersHorizontal class="h-3 w-3" />
                       <span>Opname</span>
                     </button>
 
                     <button
                       type="button"
                       onclick={() => onOpenEditMaterial(mat)}
-                      class="p-1.5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 border border-zinc-200 rounded-lg transition-colors cursor-pointer"
+                      class="cursor-pointer rounded-lg border border-zinc-200 p-1.5 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
                       title="Edit Bahan Baku"
                     >
-                      <Edit2 class="w-3.5 h-3.5" />
+                      <Edit2 class="h-3.5 w-3.5" />
                     </button>
 
                     <button
                       type="button"
                       onclick={() => onDeleteMaterial(mat.id)}
-                      class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 border border-zinc-200 rounded-lg transition-colors cursor-pointer"
+                      class="cursor-pointer rounded-lg border border-zinc-200 p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600"
                       title="Hapus Bahan Baku"
                     >
-                      <Trash2 class="w-3.5 h-3.5" />
+                      <Trash2 class="h-3.5 w-3.5" />
                     </button>
                   </div>
                 </td>
@@ -214,11 +228,18 @@
     </div>
 
     <!-- Excel Status Bar / Summary Footer -->
-    <div class="bg-zinc-50 border-t border-zinc-200 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-zinc-600">
+    <div
+      class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-2.5 font-mono text-xs text-zinc-600"
+    >
       <div class="flex items-center gap-4">
-        <span>Total Bahan: <strong class="text-zinc-900">{filteredRawMaterials.length}</strong></span>
+        <span
+          >Total Bahan: <strong class="text-zinc-900">{filteredRawMaterials.length}</strong></span
+        >
         <span>Stok Menipis: <strong class="text-red-600">{lowStockCount}</strong></span>
-        <span>Stok Aman: <strong class="text-emerald-700">{rawMaterials.length - lowStockCount}</strong></span>
+        <span
+          >Stok Aman: <strong class="text-emerald-700">{rawMaterials.length - lowStockCount}</strong
+          ></span
+        >
       </div>
 
       <div class="text-[11px] text-zinc-400">

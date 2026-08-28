@@ -39,7 +39,11 @@
       currentUser.name = profileName.trim();
 
       if (bankAccountNumber.trim()) {
-        await authService.updateBankAccount(bankName, bankAccountNumber.trim(), bankAccountHolder.trim());
+        await authService.updateBankAccount(
+          bankName,
+          bankAccountNumber.trim(),
+          bankAccountHolder.trim()
+        );
         currentUser.bank_name = bankName;
         currentUser.bank_account_number = bankAccountNumber.trim();
         currentUser.bank_account_holder = bankAccountHolder.trim();
@@ -55,26 +59,34 @@
   }
 </script>
 
-<div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-7 space-y-6 shadow-2xs font-sans">
+<div
+  class="space-y-6 rounded-2xl border border-[#e5e5ea] bg-white p-5 font-sans shadow-2xs sm:rounded-3xl sm:p-7"
+>
   <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-4">
     <div class="space-y-1">
       <h3 class="text-base font-bold text-[#17171c]">Data Profil &amp; Rekening Bank</h3>
       <p class="text-xs text-[#8e8e93]">Informasi akun dan rekening tujuan pencairan payroll</p>
     </div>
-    <span class="px-3 py-1 rounded-full bg-[#f4f4f6] text-[#17171c] text-xs font-mono font-semibold uppercase">
+    <span
+      class="rounded-full bg-[#f4f4f6] px-3 py-1 font-mono text-xs font-semibold text-[#17171c] uppercase"
+    >
       {currentUser.role}
     </span>
   </div>
 
   {#if profileSuccessMsg}
-    <div class="p-3.5 bg-[#ecfdf5] border border-[#a7f3d0] rounded-2xl text-xs font-semibold text-[#065f46] flex items-center gap-2">
-      <Check class="w-4 h-4 shrink-0" />
+    <div
+      class="flex items-center gap-2 rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] p-3.5 text-xs font-semibold text-[#065f46]"
+    >
+      <Check class="h-4 w-4 shrink-0" />
       <span>{profileSuccessMsg}</span>
     </div>
   {/if}
 
   {#if profileErrorMsg}
-    <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] rounded-2xl text-xs font-semibold text-[#991b1b]">
+    <div
+      class="rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-semibold text-[#991b1b]"
+    >
       {profileErrorMsg}
     </div>
   {/if}
@@ -86,7 +98,7 @@
         id="prof-name"
         type="text"
         bind:value={profileName}
-        class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+        class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
       />
     </div>
 
@@ -97,14 +109,16 @@
         type="email"
         value={profileEmail}
         disabled
-        class="w-full px-4 py-2.5 bg-[#f4f4f6] border border-[#e5e5ea] rounded-xl text-[#8e8e93] font-mono cursor-not-allowed"
+        class="w-full cursor-not-allowed rounded-xl border border-[#e5e5ea] bg-[#f4f4f6] px-4 py-2.5 font-mono text-[#8e8e93]"
       />
     </div>
 
-    <div class="pt-2 border-t border-[#f2f2f4] space-y-4">
+    <div class="space-y-4 border-t border-[#f2f2f4] pt-2">
       <div class="space-y-1">
-        <h4 class="font-bold text-xs text-[#17171c]">Informasi Rekening Bank Pencairan</h4>
-        <p class="text-[11px] text-[#8e8e93]">Digunakan untuk ekspor transfer payroll massal (BCA/Mandiri)</p>
+        <h4 class="text-xs font-bold text-[#17171c]">Informasi Rekening Bank Pencairan</h4>
+        <p class="text-[11px] text-[#8e8e93]">
+          Digunakan untuk ekspor transfer payroll massal (BCA/Mandiri)
+        </p>
       </div>
 
       <div class="space-y-1.5">
@@ -113,7 +127,7 @@
           <select
             id="prof-bank-name"
             bind:value={bankName}
-            class="appearance-none w-full px-4 pr-10 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] font-mono focus:border-[#17171c] focus:outline-hidden cursor-pointer transition-all shadow-2xs"
+            class="w-full cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 pr-10 font-mono text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           >
             <option value="BCA">Bank Central Asia (BCA)</option>
             <option value="MANDIRI">Bank Mandiri</option>
@@ -122,7 +136,9 @@
             <option value="BSI">Bank Syariah Indonesia (BSI)</option>
             <option value="JAGO">Bank Jago</option>
           </select>
-          <ChevronDown class="w-4 h-4 text-[#8e8e93] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <ChevronDown
+            class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+          />
         </div>
       </div>
 
@@ -133,34 +149,36 @@
           type="text"
           bind:value={bankAccountNumber}
           placeholder="Contoh: 1234567890"
-          class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl font-mono text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+          class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
         />
       </div>
 
       <div class="space-y-1.5">
-        <label for="prof-bank-holder" class="block font-bold text-[#17171c]">Nama Pemilik Rekening</label>
+        <label for="prof-bank-holder" class="block font-bold text-[#17171c]"
+          >Nama Pemilik Rekening</label
+        >
         <input
           id="prof-bank-holder"
           type="text"
           bind:value={bankAccountHolder}
           placeholder="Nama sesuai buku tabungan"
-          class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+          class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
         />
       </div>
     </div>
   </div>
 
-  <div class="pt-2 border-t border-[#f2f2f4] flex justify-end">
+  <div class="flex justify-end border-t border-[#f2f2f4] pt-2">
     <button
       type="button"
       onclick={handleSaveProfile}
       disabled={isSavingProfile}
-      class="px-6 py-2.5 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full cursor-pointer transition-all disabled:opacity-50 flex items-center gap-2 shadow-xs"
+      class="flex cursor-pointer items-center gap-2 rounded-full bg-[#17171c] px-6 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
     >
       {#if isSavingProfile}
         <span>Menyimpan...</span>
       {:else}
-        <Save class="w-4 h-4" />
+        <Save class="h-4 w-4" />
         <span>Simpan Profil</span>
       {/if}
     </button>

@@ -107,18 +107,20 @@
 </script>
 
 {#if isInitializing}
-  <div class="min-h-screen bg-[#eeece7]/40 flex items-center justify-center font-sans">
-    <div class="text-center space-y-3">
-      <div class="w-8 h-8 border-2 border-[#17171c] border-t-transparent rounded-full animate-spin mx-auto"></div>
-      <p class="text-xs font-mono text-[#75758a]">Memvalidasi sesi Précis Superadmin...</p>
+  <div class="flex min-h-screen items-center justify-center bg-[#eeece7]/40 font-sans">
+    <div class="space-y-3 text-center">
+      <div
+        class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#17171c] border-t-transparent"
+      ></div>
+      <p class="font-mono text-xs text-[#75758a]">Memvalidasi sesi Précis Superadmin...</p>
     </div>
   </div>
 {:else if !isAuthenticated}
   <LoginView onLogin={handleLogin} />
 {:else}
-  <div class="min-h-screen bg-[#eeece7]/30 flex flex-col md:flex-row font-sans overflow-hidden">
+  <div class="flex min-h-screen flex-col overflow-hidden bg-[#eeece7]/30 font-sans md:flex-row">
     <!-- Desktop Sidebar -->
-    <div class="hidden md:flex h-screen sticky top-0 shrink-0">
+    <div class="sticky top-0 hidden h-screen shrink-0 md:flex">
       <SuperadminSidebar
         {activeTab}
         {pendingInvoicesCount}
@@ -131,22 +133,28 @@
     </div>
 
     <!-- Mobile Top Bar with Hamburger -->
-    <div class="md:hidden bg-[#17171c] text-white px-4 py-3 flex items-center justify-between border-b border-[#262626] shrink-0">
+    <div
+      class="flex shrink-0 items-center justify-between border-b border-[#262626] bg-[#17171c] px-4 py-3 text-white md:hidden"
+    >
       <div class="flex items-center gap-2.5">
-        <img src="/logo.png" alt="Précis Logo" class="w-7 h-7 rounded-lg object-cover border border-white/20" />
-        <span class="font-medium text-xs tracking-tight uppercase">PRÉCIS Superadmin</span>
+        <img
+          src="/logo.png"
+          alt="Précis Logo"
+          class="h-7 w-7 rounded-lg border border-white/20 object-cover"
+        />
+        <span class="text-xs font-medium tracking-tight uppercase">PRÉCIS Superadmin</span>
       </div>
 
       <button
         type="button"
         onclick={() => (isMobileSidebarOpen = !isMobileSidebarOpen)}
-        class="p-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-white cursor-pointer"
+        class="cursor-pointer rounded-lg bg-white/10 p-1.5 text-white hover:bg-white/15"
         aria-label="Buka Menu Navigasi"
       >
         {#if isMobileSidebarOpen}
-          <X class="w-5 h-5" />
+          <X class="h-5 w-5" />
         {:else}
-          <Menu class="w-5 h-5" />
+          <Menu class="h-5 w-5" />
         {/if}
       </button>
     </div>
@@ -163,7 +171,7 @@
           role="dialog"
           aria-modal="true"
           tabindex="-1"
-          class="w-64 h-full bg-[#17171c]"
+          class="h-full w-64 bg-[#17171c]"
           onclick={(e) => e.stopPropagation()}
           onkeydown={(e) => e.stopPropagation()}
         >
@@ -184,13 +192,9 @@
     {/if}
 
     <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto h-screen p-4 sm:p-6 lg:p-8 space-y-6">
+    <main class="h-screen flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 lg:p-8">
       {#if activeTab === 'metrics'}
-        <MetricsCards
-          {metrics}
-          isLoading={isLoadingData}
-          onRefresh={loadAllDashboardData}
-        />
+        <MetricsCards {metrics} isLoading={isLoadingData} onRefresh={loadAllDashboardData} />
       {:else if activeTab === 'invoices'}
         <InvoiceVerificationHub
           {invoices}

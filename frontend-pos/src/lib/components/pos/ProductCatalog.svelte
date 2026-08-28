@@ -66,7 +66,8 @@
 
   let filteredProducts = $derived(
     products.filter((p) => {
-      const matchCategory = selectedCategoryId === 'cat-all' || p.category_id === selectedCategoryId;
+      const matchCategory =
+        selectedCategoryId === 'cat-all' || p.category_id === selectedCategoryId;
       const matchSearch =
         searchQuery.trim() === '' ||
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -76,23 +77,23 @@
   );
 </script>
 
-<div class="flex-1 flex flex-col h-full bg-[#f4f6f9] overflow-hidden font-sans">
+<div class="flex h-full flex-1 flex-col overflow-hidden bg-[#f4f6f9] font-sans">
   <!-- Search & Category Bar -->
-  <div class="bg-white border-b border-zinc-200 p-3 space-y-2.5 shrink-0 shadow-2xs">
+  <div class="shrink-0 space-y-2.5 border-b border-zinc-200 bg-white p-3 shadow-2xs">
     <!-- Search Box -->
     <div class="relative">
-      <Search class="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+      <Search class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
       <input
         type="text"
         bind:value={searchQuery}
         placeholder="Cari menu minuman, makanan, atau snack..."
-        class="w-full bg-zinc-50 text-zinc-900 pl-10 pr-4 py-2 text-xs rounded-xl border border-zinc-200 placeholder-zinc-400 focus:bg-white focus:border-zinc-900 focus:ring-1 focus:ring-zinc-900 focus:outline-hidden transition-all"
+        class="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2 pr-4 pl-10 text-xs text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:ring-1 focus:ring-zinc-900 focus:outline-hidden"
       />
       {#if searchQuery}
         <button
           type="button"
           onclick={() => (searchQuery = '')}
-          class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-mono text-zinc-400 hover:text-zinc-700 p-1 cursor-pointer"
+          class="absolute top-1/2 right-3.5 -translate-y-1/2 cursor-pointer p-1 font-mono text-xs text-zinc-400 hover:text-zinc-700"
         >
           ✕
         </button>
@@ -100,7 +101,7 @@
     </div>
 
     <!-- Category Tabs (Pills) -->
-    <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+    <div class="no-scrollbar flex gap-1.5 overflow-x-auto pb-0.5">
       {#each categories as category}
         <button
           type="button"
@@ -108,10 +109,10 @@
             onSelectCategory(category.id);
             catalogTab = 'library';
           }}
-          class={`px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all rounded-lg cursor-pointer border ${
+          class={`cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all ${
             selectedCategoryId === category.id && catalogTab === 'library'
-              ? 'bg-zinc-900 text-white border-zinc-900 shadow-xs'
-              : 'bg-zinc-100/90 text-zinc-700 hover:text-zinc-900 border-zinc-200 hover:bg-zinc-200/70'
+              ? 'border-zinc-900 bg-zinc-900 text-white shadow-xs'
+              : 'border-zinc-200 bg-zinc-100/90 text-zinc-700 hover:bg-zinc-200/70 hover:text-zinc-900'
           }`}
         >
           {category.name}
@@ -124,8 +125,8 @@
   <div class="flex-1 overflow-y-auto p-3.5 sm:p-4">
     {#if catalogTab === 'library'}
       {#if filteredProducts.length === 0}
-        <div class="h-64 flex flex-col items-center justify-center text-center text-zinc-400">
-          <Coffee class="w-10 h-10 mb-2 opacity-40 text-zinc-400" />
+        <div class="flex h-64 flex-col items-center justify-center text-center text-zinc-400">
+          <Coffee class="mb-2 h-10 w-10 text-zinc-400 opacity-40" />
           <p class="text-sm font-medium text-zinc-800">Menu tidak ditemukan</p>
           <p class="text-xs text-zinc-500">Coba ubah kata kunci pencarian atau kategori.</p>
         </div>
@@ -138,31 +139,37 @@
             <button
               type="button"
               onclick={() => onAddToCart(product)}
-              class="bg-white border border-zinc-200 hover:border-zinc-900 rounded-xl p-3 text-left flex flex-col justify-between transition-all duration-150 active:scale-[0.98] group cursor-pointer min-h-[135px] relative select-none shadow-2xs hover:shadow-sm"
+              class="group relative flex min-h-[135px] cursor-pointer flex-col justify-between rounded-xl border border-zinc-200 bg-white p-3 text-left shadow-2xs transition-all duration-150 select-none hover:border-zinc-900 hover:shadow-sm active:scale-[0.98]"
             >
               <div class="space-y-1.5">
                 <!-- Abbreviation Badge -->
-                <div class="w-9 h-9 rounded-lg bg-zinc-100 group-hover:bg-zinc-200 text-zinc-900 font-bold text-xs flex items-center justify-center border border-zinc-200 transition-colors">
+                <div
+                  class="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 text-xs font-bold text-zinc-900 transition-colors group-hover:bg-zinc-200"
+                >
                   {abbr}
                 </div>
 
-                <div class="font-semibold text-xs sm:text-[13px] text-zinc-900 group-hover:text-black transition-colors line-clamp-2 leading-snug">
+                <div
+                  class="line-clamp-2 text-xs leading-snug font-semibold text-zinc-900 transition-colors group-hover:text-black sm:text-[13px]"
+                >
                   {product.name}
                 </div>
 
                 {#if product.description}
-                  <div class="text-[10.5px] text-zinc-500 line-clamp-1 leading-tight font-normal">
+                  <div class="line-clamp-1 text-[10.5px] leading-tight font-normal text-zinc-500">
                     {product.description}
                   </div>
                 {/if}
               </div>
 
-              <div class="flex items-center justify-between pt-2 mt-2 border-t border-zinc-100">
-                <span class="font-mono font-bold text-xs sm:text-[13px] text-zinc-900">
+              <div class="mt-2 flex items-center justify-between border-t border-zinc-100 pt-2">
+                <span class="font-mono text-xs font-bold text-zinc-900 sm:text-[13px]">
                   {formatCurrency(product.base_price)}
                 </span>
-                <div class="w-6 h-6 rounded-md bg-zinc-100 group-hover:bg-zinc-900 group-hover:text-white text-zinc-700 flex items-center justify-center transition-colors shrink-0">
-                  <Plus class="w-3.5 h-3.5" />
+                <div
+                  class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-zinc-100 text-zinc-700 transition-colors group-hover:bg-zinc-900 group-hover:text-white"
+                >
+                  <Plus class="h-3.5 w-3.5" />
                 </div>
               </div>
             </button>
@@ -171,9 +178,11 @@
       {/if}
     {:else}
       <!-- Custom Amount Keypad -->
-      <div class="max-w-md mx-auto bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
+      <div
+        class="mx-auto max-w-md space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm"
+      >
         <div>
-          <h3 class="font-bold text-sm text-zinc-900">Input Nominal Manual (Custom Amount)</h3>
+          <h3 class="text-sm font-bold text-zinc-900">Input Nominal Manual (Custom Amount)</h3>
           <p class="text-xs text-zinc-500">Ketik nominal harga untuk item custom tanpa katalog</p>
         </div>
 
@@ -182,11 +191,13 @@
             type="text"
             bind:value={customItemName}
             placeholder="Nama Item (Opsional, e.g. Roti Bakar Custom)..."
-            class="w-full h-9 bg-zinc-50 border border-zinc-200 rounded-lg px-3 text-xs text-zinc-900 placeholder-zinc-400 focus:bg-white focus:border-zinc-900 focus:outline-hidden"
+            class="h-9 w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 text-xs text-zinc-900 placeholder-zinc-400 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
           />
 
           <!-- Display Box -->
-          <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+          <div
+            class="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 p-3"
+          >
             <span class="text-xs font-medium text-zinc-500">Nominal:</span>
             <span class="font-mono text-xl font-bold text-zinc-900">
               Rp {parseInt(customAmount || '0', 10).toLocaleString('id-ID')}
@@ -200,10 +211,10 @@
             <button
               type="button"
               onclick={() => handleKeypadInput(key)}
-              class="h-12 bg-zinc-100 hover:bg-zinc-200/80 active:bg-zinc-300 text-zinc-900 font-mono font-bold text-base rounded-xl transition-all cursor-pointer flex items-center justify-center"
+              class="flex h-12 cursor-pointer items-center justify-center rounded-xl bg-zinc-100 font-mono text-base font-bold text-zinc-900 transition-all hover:bg-zinc-200/80 active:bg-zinc-300"
             >
               {#if key === 'DEL'}
-                <Delete class="w-5 h-5 text-zinc-600" />
+                <Delete class="h-5 w-5 text-zinc-600" />
               {:else}
                 {key}
               {/if}
@@ -215,7 +226,7 @@
           <button
             type="button"
             onclick={() => handleKeypadInput('C')}
-            class="flex-1 py-3 text-xs font-semibold rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 transition-all cursor-pointer"
+            class="flex-1 cursor-pointer rounded-xl bg-zinc-100 py-3 text-xs font-semibold text-zinc-700 transition-all hover:bg-zinc-200"
           >
             Reset
           </button>
@@ -223,13 +234,13 @@
             type="button"
             disabled={parseInt(customAmount || '0', 10) <= 0}
             onclick={handleAddCustomItem}
-            class={`flex-2 py-3 text-xs font-semibold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            class={`flex flex-2 cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-xs font-semibold transition-all ${
               parseInt(customAmount || '0', 10) <= 0
-                ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed'
-                : 'bg-zinc-900 hover:bg-black text-white shadow-xs'
+                ? 'cursor-not-allowed bg-zinc-200 text-zinc-400'
+                : 'bg-zinc-900 text-white shadow-xs hover:bg-black'
             }`}
           >
-            <Plus class="w-4 h-4" />
+            <Plus class="h-4 w-4" />
             <span>Tambah ke Pesanan</span>
           </button>
         </div>
@@ -238,30 +249,32 @@
   </div>
 
   <!-- Bottom Navigation Switcher (Library vs Custom) -->
-  <div class="bg-white border-t border-zinc-200 px-4 py-2 flex items-center justify-center gap-2 shrink-0 shadow-2xs">
+  <div
+    class="flex shrink-0 items-center justify-center gap-2 border-t border-zinc-200 bg-white px-4 py-2 shadow-2xs"
+  >
     <button
       type="button"
       onclick={() => (catalogTab = 'library')}
-      class={`flex-1 max-w-[200px] py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer border ${
+      class={`flex max-w-[200px] flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border py-1.5 text-xs font-semibold transition-all ${
         catalogTab === 'library'
-          ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
-          : 'bg-zinc-100 text-zinc-600 hover:text-zinc-900 border-zinc-200'
+          ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
+          : 'border-zinc-200 bg-zinc-100 text-zinc-600 hover:text-zinc-900'
       }`}
     >
-      <LayoutGrid class="w-3.5 h-3.5" />
+      <LayoutGrid class="h-3.5 w-3.5" />
       <span>Library</span>
     </button>
 
     <button
       type="button"
       onclick={() => (catalogTab = 'custom')}
-      class={`flex-1 max-w-[200px] py-1.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer border ${
+      class={`flex max-w-[200px] flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border py-1.5 text-xs font-semibold transition-all ${
         catalogTab === 'custom'
-          ? 'bg-zinc-900 text-white border-zinc-900 shadow-2xs'
-          : 'bg-zinc-100 text-zinc-600 hover:text-zinc-900 border-zinc-200'
+          ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
+          : 'border-zinc-200 bg-zinc-100 text-zinc-600 hover:text-zinc-900'
       }`}
     >
-      <Calculator class="w-3.5 h-3.5" />
+      <Calculator class="h-3.5 w-3.5" />
       <span>Custom</span>
     </button>
   </div>

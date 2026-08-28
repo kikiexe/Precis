@@ -75,48 +75,56 @@
   });
 </script>
 
-<div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-4 shadow-2xs font-sans">
+<div
+  class="space-y-4 rounded-2xl border border-[#e5e5ea] bg-white p-5 font-sans shadow-2xs sm:rounded-3xl sm:p-6"
+>
   <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
     <div class="flex items-center gap-2.5">
-      <Calendar class="w-4 h-4 text-[#17171c]" />
-      <h3 class="text-sm sm:text-base font-bold text-[#17171c]">Jadwal Kerja 7 Hari ke Depan</h3>
+      <Calendar class="h-4 w-4 text-[#17171c]" />
+      <h3 class="text-sm font-bold text-[#17171c] sm:text-base">Jadwal Kerja 7 Hari ke Depan</h3>
     </div>
     <button
       type="button"
       onclick={onNavigateShift}
-      class="text-xs font-mono font-semibold text-[#2563eb] hover:underline cursor-pointer flex items-center gap-1"
+      class="flex cursor-pointer items-center gap-1 font-mono text-xs font-semibold text-[#2563eb] hover:underline"
     >
       <span>Lihat Roster</span>
-      <ChevronRight class="w-3.5 h-3.5" />
+      <ChevronRight class="h-3.5 w-3.5" />
     </button>
   </div>
 
-  <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
+  <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-4 lg:grid-cols-7">
     {#each next7DaysSchedule as day}
       <div
-        class={`rounded-2xl p-3.5 flex flex-col justify-between border transition-all text-xs space-y-2.5 ${
+        class={`flex flex-col justify-between space-y-2.5 rounded-2xl border p-3.5 text-xs transition-all ${
           day.isToday
-            ? 'bg-[#17171c] text-white border-[#17171c] shadow-xs'
+            ? 'border-[#17171c] bg-[#17171c] text-white shadow-xs'
             : day.isOff
-            ? 'bg-[#fafafc] border-[#e5e5ea] text-[#8e8e93]'
-            : 'bg-white border-[#e5e5ea] hover:border-[#17171c]/40 text-[#17171c] shadow-2xs'
+              ? 'border-[#e5e5ea] bg-[#fafafc] text-[#8e8e93]'
+              : 'border-[#e5e5ea] bg-white text-[#17171c] shadow-2xs hover:border-[#17171c]/40'
         }`}
       >
         <div class="flex items-center justify-between">
-          <span class="font-bold text-xs">{day.dayName}</span>
-          <span class={`font-mono text-[11px] ${day.isToday ? 'text-white/80' : 'text-[#8e8e93]'}`}>{day.dayDate}</span>
+          <span class="text-xs font-bold">{day.dayName}</span>
+          <span class={`font-mono text-[11px] ${day.isToday ? 'text-white/80' : 'text-[#8e8e93]'}`}
+            >{day.dayDate}</span
+          >
         </div>
 
         <div>
           {#if day.isOff}
             <span class="font-mono text-[11px] font-semibold text-[#8e8e93]">Libur / Off</span>
           {:else}
-            <div class="font-bold text-xs truncate">{day.shiftName}</div>
-            <div class={`font-mono text-[10.5px] mt-0.5 ${day.isToday ? 'text-white/80' : 'text-[#686873]'}`}>
+            <div class="truncate text-xs font-bold">{day.shiftName}</div>
+            <div
+              class={`mt-0.5 font-mono text-[10.5px] ${day.isToday ? 'text-white/80' : 'text-[#686873]'}`}
+            >
               {day.clockIn.substring(0, 5)} - {day.clockOut.substring(0, 5)}
             </div>
             {#if day.isSwap}
-              <span class="inline-block mt-1 text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-[#f59e0b]/20 text-[#d97706] font-semibold">
+              <span
+                class="mt-1 inline-block rounded-full bg-[#f59e0b]/20 px-2 py-0.5 font-mono text-[9.5px] font-semibold text-[#d97706]"
+              >
                 Swap
               </span>
             {/if}

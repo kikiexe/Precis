@@ -53,7 +53,13 @@ export class ShiftService {
   public async requestSwap(
     shiftAssignmentId: string,
     targetUserId: string
-  ): Promise<{ id: string; assigned_user_id: string; actual_user_id: string; is_swap: boolean; swap_status: string }> {
+  ): Promise<{
+    id: string;
+    assigned_user_id: string;
+    actual_user_id: string;
+    is_swap: boolean;
+    swap_status: string;
+  }> {
     const payload = {
       shift_assignment_id: shiftAssignmentId,
       target_user_id: targetUserId,
@@ -86,7 +92,9 @@ export class ShiftService {
     return [];
   }
 
-  public async approveSwap(shiftAssignmentId: string): Promise<{ id: string; swap_status: string }> {
+  public async approveSwap(
+    shiftAssignmentId: string
+  ): Promise<{ id: string; swap_status: string }> {
     const response = await apiClient.post<{ id: string; swap_status: string }>(
       `/admin/shifts/swap-requests/${shiftAssignmentId}/approve`
     );

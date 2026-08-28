@@ -81,47 +81,59 @@
 </script>
 
 {#if isOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs font-sans">
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl w-full max-w-lg p-6 sm:p-7 space-y-5 shadow-xl animate-in fade-in zoom-in-95">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 font-sans backdrop-blur-xs"
+  >
+    <div
+      class="animate-in fade-in zoom-in-95 w-full max-w-lg space-y-5 rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-xl sm:p-7"
+    >
       <!-- Modal Header -->
-      <div class="flex items-center justify-between pb-3 border-b border-[#f2f2f4]">
+      <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-[#f4f4f6] text-[#17171c] flex items-center justify-center border border-[#e5e5ea]">
-            <Clock class="w-5 h-5" />
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
+          >
+            <Clock class="h-5 w-5" />
           </div>
           <div>
             <h3 class="text-base font-bold text-[#17171c]">
               {initialAssignmentId ? 'Ubah Penugasan Shift' : 'Penetapan Jadwal Shift'}
             </h3>
             <p class="text-xs text-[#8e8e93]">
-              {initialAssignmentId ? 'Ubah jam kerja atau hapus penugasan shift staf ini' : 'Tetapkan pola jam kerja untuk staf terpilih'}
+              {initialAssignmentId
+                ? 'Ubah jam kerja atau hapus penugasan shift staf ini'
+                : 'Tetapkan pola jam kerja untuk staf terpilih'}
             </p>
           </div>
         </div>
         <button
           type="button"
           onclick={onClose}
-          class="p-2 text-[#8e8e93] hover:text-[#17171c] hover:bg-[#f4f4f6] rounded-xl cursor-pointer transition-all"
+          class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="w-5 h-5" />
+          <X class="h-5 w-5" />
         </button>
       </div>
 
       {#if matrixAssignError}
-        <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] text-[#991b1b] text-xs rounded-xl font-medium">
+        <div
+          class="rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
+        >
           {matrixAssignError}
         </div>
       {/if}
 
       <div class="space-y-4 text-xs">
         <div class="space-y-1.5">
-          <label for="matrix-assign-user" class="font-bold text-[#17171c]">Pilih Karyawan / Staf</label>
+          <label for="matrix-assign-user" class="font-bold text-[#17171c]"
+            >Pilih Karyawan / Staf</label
+          >
           <div class="relative">
             <select
               id="matrix-assign-user"
               bind:value={matrixAssignUserId}
               disabled={Boolean(initialAssignmentId)}
-              class="appearance-none w-full border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl px-4 pr-10 py-2.5 bg-[#f8f8fa] hover:bg-white text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden disabled:bg-[#f5f5f7] disabled:text-[#8e8e93] cursor-pointer transition-all shadow-2xs"
+              class="w-full cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 pr-10 text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden disabled:bg-[#f5f5f7] disabled:text-[#8e8e93]"
             >
               {#each staffMembers as member}
                 <option value={member.user_id || member.id}>
@@ -129,7 +141,9 @@
                 </option>
               {/each}
             </select>
-            <ChevronDown class="w-4 h-4 text-[#8e8e93] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown
+              class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+            />
           </div>
         </div>
 
@@ -140,43 +154,50 @@
             type="date"
             bind:value={matrixAssignDate}
             disabled={Boolean(initialAssignmentId)}
-            class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl text-xs text-[#17171c] font-mono focus:border-[#17171c] focus:outline-hidden disabled:bg-[#f5f5f7] disabled:text-[#8e8e93] transition-all shadow-2xs"
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden disabled:bg-[#f5f5f7] disabled:text-[#8e8e93]"
           />
         </div>
 
         <div class="space-y-1.5">
-          <label for="matrix-assign-template" class="font-bold text-[#17171c]">Template Pola Shift</label>
+          <label for="matrix-assign-template" class="font-bold text-[#17171c]"
+            >Template Pola Shift</label
+          >
           <div class="relative">
             <select
               id="matrix-assign-template"
               bind:value={matrixAssignTemplateId}
-              class="appearance-none w-full border border-[#e5e5ea] hover:border-[#d1d1d6] rounded-xl px-4 pr-10 py-2.5 bg-[#f8f8fa] hover:bg-white text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden cursor-pointer transition-all shadow-2xs"
+              class="w-full cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 pr-10 text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
             >
               {#if shiftTemplates.length === 0}
                 <option value="" disabled>Belum ada template shift</option>
               {:else}
                 {#each shiftTemplates as tpl}
                   <option value={tpl.id}>
-                    {tpl.name} ({tpl.expected_clock_in.substring(0, 5)} - {tpl.expected_clock_out.substring(0, 5)} WIB)
+                    {tpl.name} ({tpl.expected_clock_in.substring(0, 5)} - {tpl.expected_clock_out.substring(
+                      0,
+                      5
+                    )} WIB)
                   </option>
                 {/each}
               {/if}
             </select>
-            <ChevronDown class="w-4 h-4 text-[#8e8e93] absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <ChevronDown
+              class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+            />
           </div>
         </div>
       </div>
 
-      <div class="pt-2 flex items-center gap-3">
+      <div class="flex items-center gap-3 pt-2">
         {#if initialAssignmentId && onDelete}
           <button
             type="button"
             onclick={handleDeleteShift}
             disabled={isDeletingShift || isSubmittingMatrixAssign}
-            class="px-4 py-3 text-xs font-semibold text-[#e5484d] hover:bg-[#fef2f2] border border-[#fecaca] rounded-full cursor-pointer transition-all flex items-center justify-center gap-1.5 shrink-0"
+            class="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-full border border-[#fecaca] px-4 py-3 text-xs font-semibold text-[#e5484d] transition-all hover:bg-[#fef2f2]"
             title="Hapus Penugasan Shift"
           >
-            <Trash2 class="w-4 h-4" />
+            <Trash2 class="h-4 w-4" />
             <span>{isDeletingShift ? 'Menghapus...' : 'Hapus Shift (Off)'}</span>
           </button>
         {/if}
@@ -184,20 +205,24 @@
         <button
           type="button"
           onclick={onClose}
-          class="flex-1 py-3 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] rounded-full text-[#686873] cursor-pointer transition-all text-center"
+          class="flex-1 cursor-pointer rounded-full border border-[#e5e5ea] py-3 text-center text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6]"
         >
           Batal
         </button>
         <button
           type="button"
           onclick={handleConfirmMatrixAssign}
-          disabled={isSubmittingMatrixAssign || isDeletingShift || !matrixAssignTemplateId || !matrixAssignUserId || !matrixAssignDate}
-          class="flex-1 py-3 text-xs font-semibold bg-[#17171c] hover:bg-black text-white rounded-full cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs transition-all text-center"
+          disabled={isSubmittingMatrixAssign ||
+            isDeletingShift ||
+            !matrixAssignTemplateId ||
+            !matrixAssignUserId ||
+            !matrixAssignDate}
+          class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-center text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
         >
           {#if isSubmittingMatrixAssign}
             <span>Menyimpan...</span>
           {:else}
-            <Check class="w-4 h-4" />
+            <Check class="h-4 w-4" />
             <span>{initialAssignmentId ? 'Simpan Perubahan' : 'Simpan Penugasan'}</span>
           {/if}
         </button>

@@ -4,11 +4,13 @@ import App from './App.svelte';
 
 // Aktifkan Eruda Mobile DevTools pada development mode
 if (import.meta.env.DEV) {
-  import('eruda').then((eruda) => {
-    eruda.default.init();
-  }).catch(() => {
-    // abaikan jika gagal memuat eruda
-  });
+  import('eruda')
+    .then((eruda) => {
+      eruda.default.init();
+    })
+    .catch(() => {
+      // abaikan jika gagal memuat eruda
+    });
 }
 
 const target = document.getElementById('app');

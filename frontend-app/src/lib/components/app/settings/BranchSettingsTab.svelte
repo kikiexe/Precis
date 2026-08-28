@@ -68,7 +68,8 @@
         geofenceRadius = active.radius_meters || DEFAULT_GEOFENCE_RADIUS_METERS;
         latePenaltyRate = active.late_penalty_per_minute ?? DEFAULT_LATE_PENALTY_PER_MINUTE_IDR;
         overtimeHourlyRate = active.overtime_pay_per_hour ?? DEFAULT_OVERTIME_PAY_PER_HOUR_IDR;
-        minOvertimeThreshold = active.min_overtime_threshold_minutes ?? DEFAULT_MIN_OVERTIME_THRESHOLD_MINUTES;
+        minOvertimeThreshold =
+          active.min_overtime_threshold_minutes ?? DEFAULT_MIN_OVERTIME_THRESHOLD_MINUTES;
       }
     }
   });
@@ -82,8 +83,13 @@
       return;
     }
 
-    if (!window.isSecureContext && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      branchErrorMsg = 'Browser memblokir GPS via HTTP IP lokal. Gunakan HTTPS, localhost, atau aktifkan flags insecure origin di Chrome.';
+    if (
+      !window.isSecureContext &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
+    ) {
+      branchErrorMsg =
+        'Browser memblokir GPS via HTTP IP lokal. Gunakan HTTPS, localhost, atau aktifkan flags insecure origin di Chrome.';
       setTimeout(() => (branchErrorMsg = null), 6000);
       return;
     }
@@ -236,7 +242,12 @@
 
   async function handleRegenerateToken(terminalId: string) {
     if (!activeBranch) return;
-    if (!confirm('Apakah Anda yakin ingin memperbarui token terminal ini? Tablet kasir yang sedang terhubung perlu memasukkan token baru.')) return;
+    if (
+      !confirm(
+        'Apakah Anda yakin ingin memperbarui token terminal ini? Tablet kasir yang sedang terhubung perlu memasukkan token baru.'
+      )
+    )
+      return;
     try {
       await inventoryService.regenerateTerminalToken(activeBranch.id, terminalId);
       terminalActionMsg = 'Device token baru berhasil diterbitkan.';
@@ -250,7 +261,12 @@
 
   async function handleDeleteTerminal(terminalId: string) {
     if (!activeBranch) return;
-    if (!confirm('Hapus terminal kasir ini? Tablet kasir tidak akan dapat mengakses sistem POS cabang ini.')) return;
+    if (
+      !confirm(
+        'Hapus terminal kasir ini? Tablet kasir tidak akan dapat mengakses sistem POS cabang ini.'
+      )
+    )
+      return;
     try {
       await inventoryService.deleteTerminal(activeBranch.id, terminalId);
       terminalActionMsg = 'Terminal kasir berhasil dihapus.';
@@ -263,24 +279,31 @@
   }
 </script>
 
-<div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-4 sm:p-6 space-y-5 shadow-2xs font-sans">
-  
+<div
+  class="space-y-5 rounded-2xl border border-[#e5e5ea] bg-white p-4 font-sans shadow-2xs sm:rounded-3xl sm:p-6"
+>
   <!-- Header -->
   <div class="border-b border-[#f2f2f4] pb-3">
-    <h3 class="text-sm sm:text-base font-bold text-[#17171c]">Pengaturan Cabang &amp; Presensi</h3>
-    <p class="text-xs text-[#8e8e93] mt-0.5">Lokasi GPS, radius batas selfie, dan parameter gaji lembur</p>
+    <h3 class="text-sm font-bold text-[#17171c] sm:text-base">Pengaturan Cabang &amp; Presensi</h3>
+    <p class="mt-0.5 text-xs text-[#8e8e93]">
+      Lokasi GPS, radius batas selfie, dan parameter gaji lembur
+    </p>
   </div>
 
   {#if branchSuccessMsg}
-    <div class="p-3 bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl text-xs font-semibold text-[#065f46] flex items-center gap-2 animate-in fade-in">
-      <Check class="w-4 h-4 shrink-0 text-[#059669]" />
+    <div
+      class="animate-in fade-in flex items-center gap-2 rounded-xl border border-[#a7f3d0] bg-[#ecfdf5] p-3 text-xs font-semibold text-[#065f46]"
+    >
+      <Check class="h-4 w-4 shrink-0 text-[#059669]" />
       <span>{branchSuccessMsg}</span>
     </div>
   {/if}
 
   {#if branchErrorMsg}
-    <div class="p-3 bg-[#fef2f2] border border-[#fecaca] rounded-xl text-xs font-semibold text-[#991b1b] flex items-center gap-2 animate-in fade-in">
-      <AlertCircle class="w-4 h-4 shrink-0 text-[#dc2626]" />
+    <div
+      class="animate-in fade-in flex items-center gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3 text-xs font-semibold text-[#991b1b]"
+    >
+      <AlertCircle class="h-4 w-4 shrink-0 text-[#dc2626]" />
       <span>{branchErrorMsg}</span>
     </div>
   {/if}
@@ -293,15 +316,15 @@
       type="text"
       bind:value={branchName}
       placeholder="Contoh: Norde Coffee - Seturan"
-      class="w-full px-3.5 py-2 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs font-medium"
+      class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-3.5 py-2 text-xs font-medium text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
     />
   </div>
 
   <!-- Peta Lokasi (Simple & Clean) -->
   <div class="space-y-1.5">
     <div class="flex items-center justify-between">
-      <span class="text-xs font-bold text-[#17171c] flex items-center gap-1.5">
-        <MapPin class="w-3.5 h-3.5 text-[#2563eb]" />
+      <span class="flex items-center gap-1.5 text-xs font-bold text-[#17171c]">
+        <MapPin class="h-3.5 w-3.5 text-[#2563eb]" />
         <span>Titik Koordinat &amp; Geofence</span>
       </span>
       <span class="text-[11px] text-[#8e8e93]">Geser pin hitam ke atap outlet</span>
@@ -323,28 +346,26 @@
   </div>
 
   <!-- Detail Koordinat & Parameter Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-1">
-    
+  <div class="grid grid-cols-1 gap-4 pt-1 text-xs md:grid-cols-2">
     <!-- Kolom Kiri: Angka Koordinat & Slider Radius -->
-    <div class="space-y-3.5 p-3.5 bg-[#fafafc] border border-[#e5e5ea] rounded-2xl">
-      
+    <div class="space-y-3.5 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-3.5">
       <!-- Input Latitude & Longitude -->
       <div class="space-y-1.5">
         <div class="flex items-center justify-between gap-2">
-          <span class="font-bold text-[#17171c] whitespace-nowrap">Koordinat</span>
-          <div class="flex items-center gap-1.5 shrink-0">
+          <span class="font-bold whitespace-nowrap text-[#17171c]">Koordinat</span>
+          <div class="flex shrink-0 items-center gap-1.5">
             <button
               type="button"
               onclick={handleUseCurrentGPS}
               disabled={isDetectingGps}
-              class="px-2.5 py-1 bg-[#eff6ff] hover:bg-[#dbeafe] text-[#1d4ed8] border border-[#bfdbfe] rounded-lg text-[11px] font-bold flex items-center gap-1.5 cursor-pointer transition-all disabled:opacity-50 active:scale-95 shadow-2xs whitespace-nowrap"
+              class="flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#bfdbfe] bg-[#eff6ff] px-2.5 py-1 text-[11px] font-bold whitespace-nowrap text-[#1d4ed8] shadow-2xs transition-all hover:bg-[#dbeafe] active:scale-95 disabled:opacity-50"
               title="Baca sensor GPS perangkat saat ini"
             >
               {#if isDetectingGps}
-                <RefreshCw class="w-3.5 h-3.5 animate-spin text-[#2563eb]" />
+                <RefreshCw class="h-3.5 w-3.5 animate-spin text-[#2563eb]" />
                 <span>Mendeteksi...</span>
               {:else}
-                <LocateFixed class="w-3.5 h-3.5 text-[#2563eb]" />
+                <LocateFixed class="h-3.5 w-3.5 text-[#2563eb]" />
                 <span>Lokasiku</span>
               {/if}
             </button>
@@ -352,44 +373,48 @@
               href={`https://www.google.com/maps?q=${branchLatitude},${branchLongitude}`}
               target="_blank"
               rel="noreferrer"
-              class="px-2.5 py-1 bg-white hover:bg-[#f8f8fa] text-[#4b5563] hover:text-[#111827] border border-[#e5e5ea] rounded-lg text-[11px] font-semibold flex items-center gap-1 transition-all shadow-2xs whitespace-nowrap"
+              class="flex items-center gap-1 rounded-lg border border-[#e5e5ea] bg-white px-2.5 py-1 text-[11px] font-semibold whitespace-nowrap text-[#4b5563] shadow-2xs transition-all hover:bg-[#f8f8fa] hover:text-[#111827]"
               title="Buka titik koordinat pada Google Maps"
             >
               <span>GMaps</span>
-              <ExternalLink class="w-3.5 h-3.5 text-[#6b7280]" />
+              <ExternalLink class="h-3.5 w-3.5 text-[#6b7280]" />
             </a>
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2">
           <div class="space-y-0.5">
-            <span class="text-[10px] text-[#8e8e93] font-mono">Latitude</span>
+            <span class="font-mono text-[10px] text-[#8e8e93]">Latitude</span>
             <input
               id="branch-lat"
               type="number"
               step="any"
               bind:value={branchLatitude}
-              class="w-full px-3 py-1.5 bg-white border border-[#e5e5ea] rounded-lg font-mono text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden font-semibold shadow-2xs"
+              class="w-full rounded-lg border border-[#e5e5ea] bg-white px-3 py-1.5 font-mono text-xs font-semibold text-[#17171c] shadow-2xs focus:border-[#17171c] focus:outline-hidden"
             />
           </div>
           <div class="space-y-0.5">
-            <span class="text-[10px] text-[#8e8e93] font-mono">Longitude</span>
+            <span class="font-mono text-[10px] text-[#8e8e93]">Longitude</span>
             <input
               id="branch-lng"
               type="number"
               step="any"
               bind:value={branchLongitude}
-              class="w-full px-3 py-1.5 bg-white border border-[#e5e5ea] rounded-lg font-mono text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden font-semibold shadow-2xs"
+              class="w-full rounded-lg border border-[#e5e5ea] bg-white px-3 py-1.5 font-mono text-xs font-semibold text-[#17171c] shadow-2xs focus:border-[#17171c] focus:outline-hidden"
             />
           </div>
         </div>
       </div>
 
       <!-- Slider Radius Geofence -->
-      <div class="space-y-1.5 pt-1 border-t border-[#f0f0f3]">
-        <div class="flex justify-between items-center">
-          <label for="branch-radius" class="font-bold text-[#17171c]">Radius Toleransi Presensi</label>
-          <span class="font-mono font-bold text-[#17171c] bg-white border border-[#e5e5ea] px-2.5 py-0.5 rounded-full text-xs shadow-2xs">
+      <div class="space-y-1.5 border-t border-[#f0f0f3] pt-1">
+        <div class="flex items-center justify-between">
+          <label for="branch-radius" class="font-bold text-[#17171c]"
+            >Radius Toleransi Presensi</label
+          >
+          <span
+            class="rounded-full border border-[#e5e5ea] bg-white px-2.5 py-0.5 font-mono text-xs font-bold text-[#17171c] shadow-2xs"
+          >
             {geofenceRadius} Meter
           </span>
         </div>
@@ -400,55 +425,65 @@
           max="300"
           step="10"
           bind:value={geofenceRadius}
-          class="w-full accent-[#17171c] cursor-pointer h-1.5 bg-[#e5e5ea] rounded-lg"
+          class="h-1.5 w-full cursor-pointer rounded-lg bg-[#e5e5ea] accent-[#17171c]"
         />
       </div>
-
     </div>
 
     <!-- Kolom Kanan: Aturan Denda & Lembur -->
-    <div class="space-y-3 p-3.5 bg-[#fafafc] border border-[#e5e5ea] rounded-2xl">
-      <span class="font-bold text-[#17171c] block">Parameter Denda &amp; Lembur</span>
+    <div class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-3.5">
+      <span class="block font-bold text-[#17171c]">Parameter Denda &amp; Lembur</span>
 
       <div class="grid grid-cols-2 gap-2.5">
         <div class="space-y-0.5">
-          <label for="setting-penalty" class="text-[10.5px] text-[#686873] font-medium block">Denda Telat / Menit</label>
+          <label for="setting-penalty" class="block text-[10.5px] font-medium text-[#686873]"
+            >Denda Telat / Menit</label
+          >
           <div class="relative">
-            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-[#8e8e93] text-[10px]">Rp</span>
+            <span
+              class="absolute top-1/2 left-2.5 -translate-y-1/2 font-mono text-[10px] text-[#8e8e93]"
+              >Rp</span
+            >
             <input
               id="setting-penalty"
               type="number"
               bind:value={latePenaltyRate}
-              class="w-full pl-7 pr-2.5 py-1.5 bg-white border border-[#e5e5ea] rounded-lg font-mono text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden font-semibold shadow-2xs"
+              class="w-full rounded-lg border border-[#e5e5ea] bg-white py-1.5 pr-2.5 pl-7 font-mono text-xs font-semibold text-[#17171c] shadow-2xs focus:border-[#17171c] focus:outline-hidden"
             />
           </div>
         </div>
 
         <div class="space-y-0.5">
-          <label for="setting-overtime" class="text-[10.5px] text-[#686873] font-medium block">Upah Lembur / Jam</label>
+          <label for="setting-overtime" class="block text-[10.5px] font-medium text-[#686873]"
+            >Upah Lembur / Jam</label
+          >
           <div class="relative">
-            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 font-mono text-[#8e8e93] text-[10px]">Rp</span>
+            <span
+              class="absolute top-1/2 left-2.5 -translate-y-1/2 font-mono text-[10px] text-[#8e8e93]"
+              >Rp</span
+            >
             <input
               id="setting-overtime"
               type="number"
               bind:value={overtimeHourlyRate}
-              class="w-full pl-7 pr-2.5 py-1.5 bg-white border border-[#e5e5ea] rounded-lg font-mono text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden font-semibold shadow-2xs"
+              class="w-full rounded-lg border border-[#e5e5ea] bg-white py-1.5 pr-2.5 pl-7 font-mono text-xs font-semibold text-[#17171c] shadow-2xs focus:border-[#17171c] focus:outline-hidden"
             />
           </div>
         </div>
       </div>
 
       <div class="space-y-0.5">
-        <label for="setting-threshold" class="text-[10.5px] text-[#686873] font-medium block">Ambang Batas Mulai Lembur (Menit)</label>
+        <label for="setting-threshold" class="block text-[10.5px] font-medium text-[#686873]"
+          >Ambang Batas Mulai Lembur (Menit)</label
+        >
         <input
           id="setting-threshold"
           type="number"
           bind:value={minOvertimeThreshold}
-          class="w-full px-3 py-1.5 bg-white border border-[#e5e5ea] rounded-lg font-mono text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden font-semibold shadow-2xs"
+          class="w-full rounded-lg border border-[#e5e5ea] bg-white px-3 py-1.5 font-mono text-xs font-semibold text-[#17171c] shadow-2xs focus:border-[#17171c] focus:outline-hidden"
         />
       </div>
     </div>
-
   </div>
 
   <!-- Tombol Simpan -->
@@ -457,27 +492,27 @@
       type="button"
       onclick={handleSaveBranch}
       disabled={isSavingBranch || (branches.length === 0 && !selectedBranchId)}
-      class="w-full py-2.5 bg-[#17171c] hover:bg-black text-white font-bold text-xs rounded-full transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-xs"
+      class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-2.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
     >
       {#if isSavingBranch}
-        <RefreshCw class="w-3.5 h-3.5 animate-spin" />
+        <RefreshCw class="h-3.5 w-3.5 animate-spin" />
         <span>Menyimpan...</span>
       {:else}
-        <Save class="w-3.5 h-3.5" />
+        <Save class="h-3.5 w-3.5" />
         <span>Simpan Pengaturan Cabang</span>
       {/if}
     </button>
   </div>
 
   <!-- Card Manajemen Terminal Kasir POS & Token Pairing -->
-  <div class="space-y-4 pt-4 border-t border-[#e5e5ea]">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+  <div class="space-y-4 border-t border-[#e5e5ea] pt-4">
+    <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
       <div>
         <div class="flex items-center gap-2">
-          <Tablet class="w-4 h-4 text-[#17171c]" />
-          <h3 class="font-bold text-sm text-[#17171c]">Terminal Kasir POS &amp; Device Token</h3>
+          <Tablet class="h-4 w-4 text-[#17171c]" />
+          <h3 class="text-sm font-bold text-[#17171c]">Terminal Kasir POS &amp; Device Token</h3>
         </div>
-        <p class="text-xs text-[#8e8e93] mt-0.5">
+        <p class="mt-0.5 text-xs text-[#8e8e93]">
           Gunakan Device Token untuk menghubungkan tablet/perangkat kasir fisik ke cabang ini
         </p>
       </div>
@@ -486,9 +521,9 @@
         <button
           type="button"
           onclick={() => (isShowAddTerminalModal = true)}
-          class="px-3 py-1.5 bg-white hover:bg-[#f8f8fa] text-[#17171c] border border-[#e5e5ea] rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+          class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-white px-3 py-1.5 text-xs font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#f8f8fa]"
         >
-          <Plus class="w-3.5 h-3.5" />
+          <Plus class="h-3.5 w-3.5" />
           <span>Tambah Terminal</span>
         </button>
 
@@ -496,35 +531,41 @@
           href="https://pos.precis.com"
           target="_blank"
           rel="noreferrer"
-          class="px-3 py-1.5 bg-[#17171c] hover:bg-black text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs"
+          class="flex items-center gap-1.5 rounded-xl bg-[#17171c] px-3 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black"
         >
           <span>Buka POS Kiosk</span>
-          <ExternalLink class="w-3 h-3 text-white/80" />
+          <ExternalLink class="h-3 w-3 text-white/80" />
         </a>
       </div>
     </div>
 
     {#if terminalActionMsg}
-      <div class="p-3 bg-[#ecfdf5] border border-[#a7f3d0] rounded-xl text-xs text-[#065f46] font-medium flex items-center gap-2 animate-in fade-in">
-        <Check class="w-4 h-4 text-[#059669]" />
+      <div
+        class="animate-in fade-in flex items-center gap-2 rounded-xl border border-[#a7f3d0] bg-[#ecfdf5] p-3 text-xs font-medium text-[#065f46]"
+      >
+        <Check class="h-4 w-4 text-[#059669]" />
         <span>{terminalActionMsg}</span>
       </div>
     {/if}
 
     <!-- Terminal Items List -->
     {#if activeBranch?.terminals && activeBranch.terminals.length > 0}
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
         {#each activeBranch.terminals as terminal}
-          <div class="bg-[#fafafc] border border-[#e5e5ea] rounded-2xl p-4 space-y-3 shadow-2xs">
+          <div class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-4 shadow-2xs">
             <div class="flex items-start justify-between gap-2">
               <div class="flex items-center gap-2.5">
-                <div class="w-8 h-8 rounded-xl bg-white border border-[#e5e5ea] text-[#17171c] flex items-center justify-center shadow-2xs">
-                  <Tablet class="w-4 h-4" />
+                <div
+                  class="flex h-8 w-8 items-center justify-center rounded-xl border border-[#e5e5ea] bg-white text-[#17171c] shadow-2xs"
+                >
+                  <Tablet class="h-4 w-4" />
                 </div>
                 <div>
-                  <h4 class="font-bold text-xs text-[#17171c]">{terminal.terminal_name}</h4>
-                  <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#059669]">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
+                  <h4 class="text-xs font-bold text-[#17171c]">{terminal.terminal_name}</h4>
+                  <span
+                    class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#059669]"
+                  >
+                    <span class="h-1.5 w-1.5 rounded-full bg-[#10b981]"></span>
                     {terminal.is_active ? 'Siap Pairing / Aktif' : 'Nonaktif'}
                   </span>
                 </div>
@@ -535,43 +576,49 @@
                   type="button"
                   onclick={() => handleRegenerateToken(terminal.id)}
                   title="Terbitkan Token Baru"
-                  class="p-1.5 text-[#8e8e93] hover:text-[#17171c] hover:bg-white rounded-lg border border-transparent hover:border-[#e5e5ea] transition-colors cursor-pointer"
+                  class="cursor-pointer rounded-lg border border-transparent p-1.5 text-[#8e8e93] transition-colors hover:border-[#e5e5ea] hover:bg-white hover:text-[#17171c]"
                 >
-                  <RefreshCw class="w-3.5 h-3.5" />
+                  <RefreshCw class="h-3.5 w-3.5" />
                 </button>
                 <button
                   type="button"
                   onclick={() => handleDeleteTerminal(terminal.id)}
                   title="Hapus Terminal"
-                  class="p-1.5 text-[#8e8e93] hover:text-[#e11d48] hover:bg-[#ffe4e6] rounded-lg transition-colors cursor-pointer"
+                  class="cursor-pointer rounded-lg p-1.5 text-[#8e8e93] transition-colors hover:bg-[#ffe4e6] hover:text-[#e11d48]"
                 >
-                  <Trash2 class="w-3.5 h-3.5" />
+                  <Trash2 class="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
 
             <!-- Token Box -->
             <div class="space-y-1">
-              <span class="text-[10px] text-[#8e8e93] font-medium block">Device Token (Salin ke Kiosk POS):</span>
-              <div class="flex items-center gap-2 p-2 bg-white border border-[#e5e5ea] rounded-xl shadow-2xs">
-                <Key class="w-3.5 h-3.5 text-[#8e8e93] shrink-0" />
-                <code class="font-mono text-xs font-bold text-[#17171c] tracking-wide select-all truncate flex-1">
+              <span class="block text-[10px] font-medium text-[#8e8e93]"
+                >Device Token (Salin ke Kiosk POS):</span
+              >
+              <div
+                class="flex items-center gap-2 rounded-xl border border-[#e5e5ea] bg-white p-2 shadow-2xs"
+              >
+                <Key class="h-3.5 w-3.5 shrink-0 text-[#8e8e93]" />
+                <code
+                  class="flex-1 truncate font-mono text-xs font-bold tracking-wide text-[#17171c] select-all"
+                >
                   {terminal.device_token}
                 </code>
                 <button
                   type="button"
                   onclick={() => handleCopyToken(terminal.id, terminal.device_token)}
-                  class={`px-2.5 py-1 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition-all cursor-pointer ${
+                  class={`flex cursor-pointer items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all ${
                     copiedTokenId === terminal.id
                       ? 'bg-[#059669] text-white shadow-2xs'
-                      : 'bg-[#f0f0f3] hover:bg-[#e5e5ea] text-[#17171c]'
+                      : 'bg-[#f0f0f3] text-[#17171c] hover:bg-[#e5e5ea]'
                   }`}
                 >
                   {#if copiedTokenId === terminal.id}
-                    <Check class="w-3 h-3" />
+                    <Check class="h-3 w-3" />
                     <span>Tersalin</span>
                   {:else}
-                    <Copy class="w-3 h-3" />
+                    <Copy class="h-3 w-3" />
                     <span>Salin</span>
                   {/if}
                 </button>
@@ -581,43 +628,52 @@
         {/each}
       </div>
     {:else}
-      <div class="p-6 bg-[#fafafc] border border-dashed border-[#d2d2d7] rounded-2xl text-center space-y-3">
-        <Tablet class="w-8 h-8 text-[#8e8e93] mx-auto opacity-50" />
+      <div
+        class="space-y-3 rounded-2xl border border-dashed border-[#d2d2d7] bg-[#fafafc] p-6 text-center"
+      >
+        <Tablet class="mx-auto h-8 w-8 text-[#8e8e93] opacity-50" />
         <div>
-          <p class="text-xs font-semibold text-[#17171c]">Belum ada terminal kasir untuk cabang ini</p>
-          <p class="text-[11px] text-[#8e8e93] mt-0.5">Buat terminal kasir pertama untuk mendapatkan Device Token tablet POS.</p>
+          <p class="text-xs font-semibold text-[#17171c]">
+            Belum ada terminal kasir untuk cabang ini
+          </p>
+          <p class="mt-0.5 text-[11px] text-[#8e8e93]">
+            Buat terminal kasir pertama untuk mendapatkan Device Token tablet POS.
+          </p>
         </div>
         <button
           type="button"
           onclick={() => handleCreateTerminal()}
           disabled={isCreatingTerminal}
-          class="px-4 py-2 bg-[#17171c] hover:bg-black text-white text-xs font-bold rounded-xl transition-all cursor-pointer inline-flex items-center gap-2 shadow-2xs"
+          class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#17171c] px-4 py-2 text-xs font-bold text-white shadow-2xs transition-all hover:bg-black"
         >
-          <Plus class="w-3.5 h-3.5" />
+          <Plus class="h-3.5 w-3.5" />
           <span>Buat Terminal Kasir Utama</span>
         </button>
       </div>
     {/if}
   </div>
-
 </div>
 
 <!-- Modal Tambah Terminal Kasir Baru -->
 {#if isShowAddTerminalModal}
-  <div class="fixed inset-0 z-50 bg-[#17171c]/60 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white border border-[#e5e5ea] rounded-3xl p-5 sm:p-6 max-w-sm w-full space-y-4 shadow-xl animate-in zoom-in-95 font-sans">
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-[#17171c]/60 p-4 backdrop-blur-xs"
+  >
+    <div
+      class="animate-in zoom-in-95 w-full max-w-sm space-y-4 rounded-3xl border border-[#e5e5ea] bg-white p-5 font-sans shadow-xl sm:p-6"
+    >
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-[#17171c] text-white flex items-center justify-center">
-          <Tablet class="w-5 h-5" />
+        <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#17171c] text-white">
+          <Tablet class="h-5 w-5" />
         </div>
         <div>
-          <h3 class="font-bold text-sm text-[#17171c]">Tambah Terminal Kasir</h3>
+          <h3 class="text-sm font-bold text-[#17171c]">Tambah Terminal Kasir</h3>
           <p class="text-xs text-[#8e8e93]">Buat token pairing baru untuk tablet kasir</p>
         </div>
       </div>
 
       <div class="space-y-1.5">
-        <label for="new-terminal-name" class="text-xs font-semibold text-[#17171c] block">
+        <label for="new-terminal-name" class="block text-xs font-semibold text-[#17171c]">
           Nama Perangkat / Terminal
         </label>
         <input
@@ -625,12 +681,12 @@
           type="text"
           bind:value={newTerminalName}
           placeholder="e.g. Kasir Utama Lantai 1"
-          class="w-full px-3.5 py-2 bg-[#fafafc] border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] focus:outline-hidden focus:border-[#17171c]"
+          class="w-full rounded-xl border border-[#e5e5ea] bg-[#fafafc] px-3.5 py-2 text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden"
         />
       </div>
 
       <div class="space-y-1.5">
-        <label for="new-terminal-token" class="text-xs font-semibold text-[#17171c] block">
+        <label for="new-terminal-token" class="block text-xs font-semibold text-[#17171c]">
           Kustom Device Token (Mudah Dihafal)
         </label>
         <input
@@ -638,16 +694,18 @@
           type="text"
           bind:value={customDeviceToken}
           placeholder="e.g. KASIR-01 atau SETURAN-BAR"
-          class="w-full px-3.5 py-2 bg-[#fafafc] border border-[#e5e5ea] rounded-xl text-xs font-mono font-bold text-[#17171c] focus:outline-hidden focus:border-[#17171c]"
+          class="w-full rounded-xl border border-[#e5e5ea] bg-[#fafafc] px-3.5 py-2 font-mono text-xs font-bold text-[#17171c] focus:border-[#17171c] focus:outline-hidden"
         />
-        <p class="text-[10px] text-[#8e8e93]">Kosongkan jika ingin token di-generate otomatis oleh sistem.</p>
+        <p class="text-[10px] text-[#8e8e93]">
+          Kosongkan jika ingin token di-generate otomatis oleh sistem.
+        </p>
       </div>
 
       <div class="flex items-center gap-2 pt-2">
         <button
           type="button"
           onclick={() => (isShowAddTerminalModal = false)}
-          class="flex-1 py-2 bg-[#f0f0f3] hover:bg-[#e5e5ea] text-[#17171c] text-xs font-bold rounded-xl transition-all cursor-pointer"
+          class="flex-1 cursor-pointer rounded-xl bg-[#f0f0f3] py-2 text-xs font-bold text-[#17171c] transition-all hover:bg-[#e5e5ea]"
         >
           Batal
         </button>
@@ -655,13 +713,13 @@
           type="button"
           onclick={handleCreateTerminal}
           disabled={isCreatingTerminal}
-          class="flex-1 py-2 bg-[#17171c] hover:bg-black text-white text-xs font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+          class="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-[#17171c] py-2 text-xs font-bold text-white transition-all hover:bg-black disabled:opacity-50"
         >
           {#if isCreatingTerminal}
-            <RefreshCw class="w-3.5 h-3.5 animate-spin" />
+            <RefreshCw class="h-3.5 w-3.5 animate-spin" />
             <span>Membuat...</span>
           {:else}
-            <Plus class="w-3.5 h-3.5" />
+            <Plus class="h-3.5 w-3.5" />
             <span>Buat Token</span>
           {/if}
         </button>

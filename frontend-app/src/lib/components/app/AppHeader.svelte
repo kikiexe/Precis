@@ -30,7 +30,10 @@
       case 'ADMIN':
         return { label: 'Admin', bg: 'bg-[#eff6ff] text-[#2563eb] border border-[#bfdbfe]' };
       case 'MANAGER':
-        return { label: 'Store Manager', bg: 'bg-[#eff6ff] text-[#2563eb] border border-[#bfdbfe]' };
+        return {
+          label: 'Store Manager',
+          bg: 'bg-[#eff6ff] text-[#2563eb] border border-[#bfdbfe]',
+        };
       case 'STAFF':
         return { label: 'Staf Outlet', bg: 'bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]' };
       case 'SUPERADMIN':
@@ -47,29 +50,46 @@
   );
 
   let currentWorkspaceName = $derived(
-    userWorkspaces.find((w) => w.workspace_id === activeWorkspaceId)?.workspace_name || (userWorkspaces.length === 0 ? 'Tanpa Workspace' : currentUser.branch_name || 'Outlet')
+    userWorkspaces.find((w) => w.workspace_id === activeWorkspaceId)?.workspace_name ||
+      (userWorkspaces.length === 0 ? 'Tanpa Workspace' : currentUser.branch_name || 'Outlet')
   );
 </script>
 
-<header class="block lg:hidden bg-white/95 backdrop-blur-md border-b border-[#e5e5ea] px-3.5 sm:px-4 py-2.5 sm:py-3 select-none shrink-0 sticky top-0 z-30 font-sans shadow-2xs">
+<header
+  class="sticky top-0 z-30 block shrink-0 border-b border-[#e5e5ea] bg-white/95 px-3.5 py-2.5 font-sans shadow-2xs backdrop-blur-md select-none sm:px-4 sm:py-3 lg:hidden"
+>
   <div class="flex items-center justify-between gap-2">
     <div class="relative min-w-0 flex-1">
       <button
         type="button"
         onclick={() => (isDropdownOpen = !isDropdownOpen)}
-        class="flex items-center gap-2.5 cursor-pointer text-left group min-w-0 max-w-full"
+        class="group flex max-w-full min-w-0 cursor-pointer items-center gap-2.5 text-left"
       >
-        <img src="/logo.png" alt="Précis Logo" class="w-8 h-8 rounded-xl object-cover border border-[#e5e5ea] shrink-0" />
+        <img
+          src="/logo.png"
+          alt="Précis Logo"
+          class="h-8 w-8 shrink-0 rounded-xl border border-[#e5e5ea] object-cover"
+        />
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-1.5 leading-none">
-            <span class="font-bold text-xs text-[#17171c] tracking-tight truncate max-w-[120px] sm:max-w-xs">{currentUser.name}</span>
-            <ChevronDown class="w-3.5 h-3.5 text-[#8e8e93] group-hover:text-[#17171c] transition-transform shrink-0" />
+            <span
+              class="max-w-[120px] truncate text-xs font-bold tracking-tight text-[#17171c] sm:max-w-xs"
+              >{currentUser.name}</span
+            >
+            <ChevronDown
+              class="h-3.5 w-3.5 shrink-0 text-[#8e8e93] transition-transform group-hover:text-[#17171c]"
+            />
           </div>
-          <div class="flex items-center gap-1.5 mt-1 min-w-0">
-            <span class={`text-[9px] font-mono px-2 py-0.5 rounded-full font-semibold whitespace-nowrap shrink-0 ${badge.bg}`}>
+          <div class="mt-1 flex min-w-0 items-center gap-1.5">
+            <span
+              class={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[9px] font-semibold whitespace-nowrap ${badge.bg}`}
+            >
               {badge.label}
             </span>
-            <span class="text-[11px] text-[#8e8e93] font-normal truncate max-w-[110px] sm:max-w-44 shrink">&bull; {currentWorkspaceName}</span>
+            <span
+              class="max-w-[110px] shrink truncate text-[11px] font-normal text-[#8e8e93] sm:max-w-44"
+              >&bull; {currentWorkspaceName}</span
+            >
           </div>
         </div>
       </button>
@@ -78,21 +98,25 @@
         <!-- Backdrop click-outside overlay -->
         <button
           type="button"
-          class="fixed inset-0 z-40 bg-black/10 backdrop-blur-[1px] cursor-default"
+          class="fixed inset-0 z-40 cursor-default bg-black/10 backdrop-blur-[1px]"
           onclick={() => (isDropdownOpen = false)}
           aria-label="Tutup Pilihan Workspace"
         ></button>
 
-        <div class="absolute left-0 top-14 w-[calc(100vw-32px)] max-w-xs bg-white border border-[#e5e5ea] rounded-3xl p-3 z-50 animate-in fade-in zoom-in-95 font-sans shadow-xl">
-          <div class="flex items-center justify-between text-xs font-bold text-[#8e8e93] px-3 py-2 border-b border-[#f2f2f4] mb-1">
+        <div
+          class="animate-in fade-in zoom-in-95 absolute top-14 left-0 z-50 w-[calc(100vw-32px)] max-w-xs rounded-3xl border border-[#e5e5ea] bg-white p-3 font-sans shadow-xl"
+        >
+          <div
+            class="mb-1 flex items-center justify-between border-b border-[#f2f2f4] px-3 py-2 text-xs font-bold text-[#8e8e93]"
+          >
             <div class="flex items-center gap-2">
-              <Building2 class="w-4 h-4 text-[#1863dc]" />
+              <Building2 class="h-4 w-4 text-[#1863dc]" />
               <span>Ganti Workspace Bisnis</span>
             </div>
           </div>
 
           {#if userWorkspaces.length > 0}
-            <div class="space-y-1 max-h-48 overflow-y-auto py-1">
+            <div class="max-h-48 space-y-1 overflow-y-auto py-1">
               {#each userWorkspaces as ws (ws.workspace_id)}
                 <button
                   type="button"
@@ -100,21 +124,23 @@
                     isDropdownOpen = false;
                     if (onSwitchWorkspace) onSwitchWorkspace(ws);
                   }}
-                  class={`w-full text-left px-3.5 py-2 rounded-2xl text-xs flex items-center justify-between transition-all cursor-pointer ${
+                  class={`flex w-full cursor-pointer items-center justify-between rounded-2xl px-3.5 py-2 text-left text-xs transition-all ${
                     ws.workspace_id === activeWorkspaceId
                       ? 'bg-[#f4f4f6] font-bold text-[#17171c]'
-                      : 'hover:bg-[#fafafc] text-[#686873] hover:text-[#17171c]'
+                      : 'text-[#686873] hover:bg-[#fafafc] hover:text-[#17171c]'
                   }`}
                 >
                   <div class="min-w-0 pr-2">
                     <div class="truncate font-semibold">{ws.workspace_name}</div>
                   </div>
-                  <div class="flex items-center gap-2 shrink-0">
-                    <span class={`text-[9.5px] font-mono px-2 py-0.5 rounded-full whitespace-nowrap ${getRoleBadge(ws.role).bg}`}>
+                  <div class="flex shrink-0 items-center gap-2">
+                    <span
+                      class={`rounded-full px-2 py-0.5 font-mono text-[9.5px] whitespace-nowrap ${getRoleBadge(ws.role).bg}`}
+                    >
                       {ws.role}
                     </span>
                     {#if ws.workspace_id === activeWorkspaceId}
-                      <Check class="w-4 h-4 text-[#17171c]" />
+                      <Check class="h-4 w-4 text-[#17171c]" />
                     {/if}
                   </div>
                 </button>
@@ -123,32 +149,32 @@
           {/if}
 
           {#if onOpenCreateWorkspaceModal && (currentUser.role === 'OWNER' || currentUser.role === 'SUPERADMIN')}
-            <div class="border-t border-[#f2f2f4] mt-2 pt-1.5">
+            <div class="mt-2 border-t border-[#f2f2f4] pt-1.5">
               <button
                 type="button"
                 onclick={() => {
                   isDropdownOpen = false;
                   onOpenCreateWorkspaceModal();
                 }}
-                class="w-full text-left px-3.5 py-2 rounded-xl text-xs text-[#2563eb] hover:bg-[#eff6ff] flex items-center gap-2 transition-all cursor-pointer font-semibold"
+                class="flex w-full cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-left text-xs font-semibold text-[#2563eb] transition-all hover:bg-[#eff6ff]"
               >
-                <Plus class="w-4 h-4" />
+                <Plus class="h-4 w-4" />
                 <span>Buat Workspace Bisnis Baru</span>
               </button>
             </div>
           {/if}
 
           {#if onLogout}
-            <div class="border-t border-[#f2f2f4] mt-1 pt-1.5">
+            <div class="mt-1 border-t border-[#f2f2f4] pt-1.5">
               <button
                 type="button"
                 onclick={() => {
                   isDropdownOpen = false;
                   onLogout();
                 }}
-                class="w-full text-left px-3.5 py-2 rounded-xl text-xs text-[#e5484d] hover:bg-[#fdf2f2] flex items-center gap-2 transition-all cursor-pointer font-semibold"
+                class="flex w-full cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-left text-xs font-semibold text-[#e5484d] transition-all hover:bg-[#fdf2f2]"
               >
-                <LogOut class="w-4 h-4" />
+                <LogOut class="h-4 w-4" />
                 <span>Keluar Akun</span>
               </button>
             </div>
@@ -158,8 +184,11 @@
     </div>
 
     <!-- Right: App Name Identifier -->
-    <div class="text-right shrink-0">
-      <span class="text-[9.5px] sm:text-[10px] font-mono tracking-widest uppercase text-[#8e8e93] font-semibold">PRÉCIS APP</span>
+    <div class="shrink-0 text-right">
+      <span
+        class="font-mono text-[9.5px] font-semibold tracking-widest text-[#8e8e93] uppercase sm:text-[10px]"
+        >PRÉCIS APP</span
+      >
     </div>
   </div>
 </header>

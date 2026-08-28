@@ -2,7 +2,10 @@ import { apiClient } from './api-client';
 import type { UserWorkspace } from '../types/app';
 
 export class WorkspaceService {
-  public async createWorkspace(name: string, branchName?: string): Promise<{
+  public async createWorkspace(
+    name: string,
+    branchName?: string
+  ): Promise<{
     workspace: { id: string; name: string; slug: string };
     workspaces: UserWorkspace[];
   }> {

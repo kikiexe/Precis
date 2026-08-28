@@ -104,32 +104,42 @@
   }
 </script>
 
-<div class="min-h-screen bg-[#fafafc] flex flex-col justify-center items-center p-4 sm:p-6 font-sans select-none">
+<div
+  class="flex min-h-screen flex-col items-center justify-center bg-[#fafafc] p-4 font-sans select-none sm:p-6"
+>
   <!-- Brand Header -->
-  <div class="mb-8 text-center space-y-2">
-    <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white border border-[#e5e5ea] shadow-2xs mb-2">
-      <div class="w-3 h-3 rounded-full bg-[#17171c]"></div>
+  <div class="mb-8 space-y-2 text-center">
+    <div
+      class="mb-2 inline-flex items-center gap-2.5 rounded-2xl border border-[#e5e5ea] bg-white px-4 py-2 shadow-2xs"
+    >
+      <div class="h-3 w-3 rounded-full bg-[#17171c]"></div>
       <span class="text-sm font-bold tracking-tight text-[#17171c]">PRÉCIS</span>
-      <span class="text-[10.5px] font-mono text-[#8e8e93] border-l border-[#e5e5ea] pl-2">Enterprise POS &amp; HR</span>
+      <span class="border-l border-[#e5e5ea] pl-2 font-mono text-[10.5px] text-[#8e8e93]"
+        >Enterprise POS &amp; HR</span
+      >
     </div>
-    <h1 class="text-xl sm:text-2xl font-bold text-[#17171c] tracking-tight">
+    <h1 class="text-xl font-bold tracking-tight text-[#17171c] sm:text-2xl">
       Undangan Bergabung Tim
     </h1>
-    <p class="text-xs text-[#8e8e93] max-w-sm mx-auto">
+    <p class="mx-auto max-w-sm text-xs text-[#8e8e93]">
       Konfirmasi akses ke sistem operasional outlet dan absensi tim
     </p>
   </div>
 
-  <div class="w-full max-w-md bg-white border border-[#e5e5ea] rounded-3xl p-6 sm:p-8 shadow-sm">
+  <div class="w-full max-w-md rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-sm sm:p-8">
     {#if isLoading}
-      <div class="py-12 text-center space-y-3">
-        <div class="w-8 h-8 border-2 border-[#17171c] border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p class="text-xs font-mono text-[#8e8e93]">Memeriksa validitas token undangan...</p>
+      <div class="space-y-3 py-12 text-center">
+        <div
+          class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#17171c] border-t-transparent"
+        ></div>
+        <p class="font-mono text-xs text-[#8e8e93]">Memeriksa validitas token undangan...</p>
       </div>
     {:else if errorMessage && !invitation}
-      <div class="space-y-4 text-center py-4">
-        <div class="w-12 h-12 bg-[#fef2f2] text-[#dc2626] rounded-2xl flex items-center justify-center mx-auto border border-[#fecaca]">
-          <AlertCircle class="w-6 h-6" />
+      <div class="space-y-4 py-4 text-center">
+        <div
+          class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#fecaca] bg-[#fef2f2] text-[#dc2626]"
+        >
+          <AlertCircle class="h-6 w-6" />
         </div>
         <div class="space-y-1">
           <h2 class="text-base font-bold text-[#17171c]">Undangan Tidak Valid</h2>
@@ -138,15 +148,17 @@
         <button
           type="button"
           onclick={onRejected}
-          class="w-full py-3 bg-[#17171c] hover:bg-black text-white font-semibold text-xs rounded-full transition-all cursor-pointer shadow-xs"
+          class="w-full cursor-pointer rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
         >
           Kembali ke Halaman Login
         </button>
       </div>
     {:else if successMessage}
-      <div class="space-y-4 text-center py-4">
-        <div class="w-12 h-12 bg-[#ecfdf5] text-[#059669] rounded-2xl flex items-center justify-center mx-auto border border-[#a7f3d0]">
-          <CheckCircle2 class="w-6 h-6" />
+      <div class="space-y-4 py-4 text-center">
+        <div
+          class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
+        >
+          <CheckCircle2 class="h-6 w-6" />
         </div>
         <div class="space-y-1">
           <h2 class="text-base font-bold text-[#17171c]">Selamat Bergabung!</h2>
@@ -156,32 +168,40 @@
     {:else if invitation}
       <div class="space-y-5">
         <!-- Info Workspace & Role Card -->
-        <div class="p-4 bg-[#f8f8fa] border border-[#e5e5ea] rounded-2xl space-y-3 shadow-2xs">
+        <div class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-[#f8f8fa] p-4 shadow-2xs">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-[#17171c] text-white flex items-center justify-center font-bold text-sm">
-              <Building2 class="w-5 h-5" />
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#17171c] text-sm font-bold text-white"
+            >
+              <Building2 class="h-5 w-5" />
             </div>
             <div>
-              <span class="text-[10px] font-mono uppercase text-[#8e8e93] font-semibold">Workspace Tujuan</span>
+              <span class="font-mono text-[10px] font-semibold text-[#8e8e93] uppercase"
+                >Workspace Tujuan</span
+              >
               <h3 class="text-sm font-bold text-[#17171c]">{invitation.workspace_name}</h3>
             </div>
           </div>
 
-          <div class="pt-2 border-t border-[#ececee] grid grid-cols-2 gap-2 text-xs">
+          <div class="grid grid-cols-2 gap-2 border-t border-[#ececee] pt-2 text-xs">
             <div>
               <span class="text-[10.5px] text-[#8e8e93]">Peran Akses:</span>
               <div class="font-bold text-[#17171c]">{invitation.role}</div>
             </div>
             <div>
               <span class="text-[10.5px] text-[#8e8e93]">Penempatan:</span>
-              <div class="font-bold text-[#17171c]">{invitation.branch_name || 'Seluruh Outlet'}</div>
+              <div class="font-bold text-[#17171c]">
+                {invitation.branch_name || 'Seluruh Outlet'}
+              </div>
             </div>
           </div>
         </div>
 
         {#if errorMessage}
-          <div class="p-3.5 bg-[#fef2f2] border border-[#fecaca] text-[#991b1b] text-xs font-semibold rounded-2xl flex items-start gap-2">
-            <AlertCircle class="w-4 h-4 shrink-0 mt-0.5" />
+          <div
+            class="flex items-start gap-2 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-semibold text-[#991b1b]"
+          >
+            <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         {/if}
@@ -189,8 +209,11 @@
         {#if invitation.user_exists}
           <!-- User Sudah Punya Akun -->
           <div class="space-y-4 text-xs">
-            <div class="p-3.5 bg-[#eff6ff] rounded-2xl border border-[#bfdbfe] text-xs text-[#1e40af] leading-relaxed">
-              Email Anda <strong>{invitation.email}</strong> telah terdaftar. Tekan tombol di bawah untuk langsung menerima peran.
+            <div
+              class="rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] p-3.5 text-xs leading-relaxed text-[#1e40af]"
+            >
+              Email Anda <strong>{invitation.email}</strong> telah terdaftar. Tekan tombol di bawah untuk
+              langsung menerima peran.
             </div>
 
             <div class="flex items-center gap-3 pt-2">
@@ -198,7 +221,7 @@
                 type="button"
                 onclick={handleReject}
                 disabled={isSubmitting}
-                class="flex-1 py-3 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] rounded-full cursor-pointer transition-all disabled:opacity-50"
+                class="flex-1 cursor-pointer rounded-full border border-[#e5e5ea] py-3 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6] disabled:opacity-50"
               >
                 Tolak
               </button>
@@ -206,13 +229,13 @@
                 type="button"
                 onclick={() => handleAccept()}
                 disabled={isSubmitting}
-                class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50 shadow-xs"
+                class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
               >
                 {#if isSubmitting}
                   <span>Memproses...</span>
                 {:else}
                   <span>Terima &amp; Gabung</span>
-                  <ArrowRight class="w-4 h-4" />
+                  <ArrowRight class="h-4 w-4" />
                 {/if}
               </button>
             </div>
@@ -220,7 +243,9 @@
         {:else}
           <!-- User Belum Punya Akun, Form Registrasi Sekaligus -->
           <form onsubmit={handleAccept} class="space-y-4 text-xs">
-            <div class="p-3 bg-[#f8f8fa] rounded-2xl border border-[#ececee] text-[11px] text-[#686873]">
+            <div
+              class="rounded-2xl border border-[#ececee] bg-[#f8f8fa] p-3 text-[11px] text-[#686873]"
+            >
               Lengkapi nama dan buat kata sandi baru untuk akun Anda ({invitation.email}):
             </div>
 
@@ -232,12 +257,14 @@
                 bind:value={newName}
                 placeholder="Contoh: Budi Santoso"
                 required
-                class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-xs text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
             </div>
 
             <div class="space-y-1.5">
-              <label for="inv-password" class="block font-bold text-[#17171c]">Kata Sandi Baru</label>
+              <label for="inv-password" class="block font-bold text-[#17171c]"
+                >Kata Sandi Baru</label
+              >
               <input
                 id="inv-password"
                 type="password"
@@ -245,7 +272,7 @@
                 placeholder="Minimal 6 karakter"
                 required
                 minlength="6"
-                class="w-full px-4 py-2.5 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden transition-all shadow-2xs"
+                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 text-xs text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
             </div>
 
@@ -254,20 +281,20 @@
                 type="button"
                 onclick={handleReject}
                 disabled={isSubmitting}
-                class="flex-1 py-3 text-xs font-semibold border border-[#e5e5ea] hover:bg-[#f4f4f6] text-[#686873] rounded-full cursor-pointer transition-all disabled:opacity-50"
+                class="flex-1 cursor-pointer rounded-full border border-[#e5e5ea] py-3 text-xs font-semibold text-[#686873] transition-all hover:bg-[#f4f4f6] disabled:opacity-50"
               >
                 Tolak
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting || !newName.trim() || !newPassword}
-                class="flex-1 py-3 bg-[#17171c] hover:bg-black text-white text-xs font-semibold rounded-full flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50 shadow-xs"
+                class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
               >
                 {#if isSubmitting}
                   <span>Membuat Akun...</span>
                 {:else}
                   <span>Buat Akun &amp; Gabung</span>
-                  <ArrowRight class="w-4 h-4" />
+                  <ArrowRight class="h-4 w-4" />
                 {/if}
               </button>
             </div>
@@ -277,8 +304,8 @@
     {/if}
   </div>
 
-  <div class="mt-8 flex items-center gap-2 text-xs text-[#8e8e93] font-mono">
-    <Shield class="w-4 h-4 text-[#8e8e93]" />
+  <div class="mt-8 flex items-center gap-2 font-mono text-xs text-[#8e8e93]">
+    <Shield class="h-4 w-4 text-[#8e8e93]" />
     <span>PRÉCIS Secure Team Invitation</span>
   </div>
 </div>

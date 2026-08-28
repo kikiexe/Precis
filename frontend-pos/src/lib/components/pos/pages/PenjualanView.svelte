@@ -54,15 +54,9 @@
   }: Props = $props();
 </script>
 
-<div class="flex-1 flex flex-col md:flex-row h-full overflow-hidden font-sans">
+<div class="flex h-full flex-1 flex-col overflow-hidden font-sans md:flex-row">
   <!-- Left Side: Product Catalog Component -->
-  <ProductCatalog
-    {categories}
-    {products}
-    {selectedCategoryId}
-    {onSelectCategory}
-    {onAddToCart}
-  />
+  <ProductCatalog {categories} {products} {selectedCategoryId} {onSelectCategory} {onAddToCart} />
 
   <!-- Right Side: Order Cart Panel -->
   <OrderCart

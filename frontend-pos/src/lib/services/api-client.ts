@@ -84,7 +84,10 @@ export class PosApiClient {
 
   private buildUrl(endpoint: string, params?: RequestOptions['params']): string {
     let cleanBase = (this.baseUrl || getDefaultPosApiBaseUrl()).replace(/\/+$/, '');
-    if (typeof window !== 'undefined' && (cleanBase.includes('localhost') || cleanBase.includes('127.0.0.1'))) {
+    if (
+      typeof window !== 'undefined' &&
+      (cleanBase.includes('localhost') || cleanBase.includes('127.0.0.1'))
+    ) {
       cleanBase = '/api/v1';
     }
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
@@ -102,7 +105,10 @@ export class PosApiClient {
     return url.toString();
   }
 
-  public async request<T = unknown>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+  public async request<T = unknown>(
+    endpoint: string,
+    options: RequestOptions = {}
+  ): Promise<ApiResponse<T>> {
     const { params, skipDeviceToken = false, body, headers = {}, ...customInit } = options;
 
     const url = this.buildUrl(endpoint, params);
@@ -132,7 +138,11 @@ export class PosApiClient {
         body: formattedBody,
       });
     } catch (networkError) {
-      throw new PosApiError(0, 'Koneksi jaringan gagal. Transaksi offline tetap dapat diproses secara lokal.', null);
+      throw new PosApiError(
+        0,
+        'Koneksi jaringan gagal. Transaksi offline tetap dapat diproses secara lokal.',
+        null
+      );
     }
 
     let responsePayload: ApiResponse<T> | ApiErrorPayload | null = null;
@@ -154,7 +164,11 @@ export class PosApiClient {
       // Extract specific validation message if available
       if (errorData?.errors && typeof errorData.errors === 'object') {
         const errorEntries = Object.values(errorData.errors);
-        if (errorEntries.length > 0 && Array.isArray(errorEntries[0]) && errorEntries[0].length > 0) {
+        if (
+          errorEntries.length > 0 &&
+          Array.isArray(errorEntries[0]) &&
+          errorEntries[0].length > 0
+        ) {
           errorMessage = errorEntries[0][0];
         }
       }
@@ -164,8 +178,13 @@ export class PosApiClient {
       }
 
       // Sanitize raw database or SQLSTATE leakages
-      if (errorMessage.includes('SQLSTATE') || errorMessage.includes('syntax error') || errorMessage.includes('Connection refused')) {
-        errorMessage = 'Terjadi kendala pada penyimpanan database server. Silakan coba beberapa saat lagi.';
+      if (
+        errorMessage.includes('SQLSTATE') ||
+        errorMessage.includes('syntax error') ||
+        errorMessage.includes('Connection refused')
+      ) {
+        errorMessage =
+          'Terjadi kendala pada penyimpanan database server. Silakan coba beberapa saat lagi.';
       }
 
       if (status === 401 || status === 403) {
@@ -180,23 +199,41 @@ export class PosApiClient {
     return (responsePayload as ApiResponse<T>) || { message: 'Operasi POS berhasil.' };
   }
 
-  public get<T = unknown>(endpoint: string, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
+  public get<T = unknown>(
+    endpoint: string,
+    options?: Omit<RequestOptions, 'method' | 'body'>
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  public post<T = unknown>(endpoint: string, body?: unknown, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
+  public post<T = unknown>(
+    endpoint: string,
+    body?: unknown,
+    options?: Omit<RequestOptions, 'method' | 'body'>
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'POST', body });
   }
 
-  public put<T = unknown>(endpoint: string, body?: unknown, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
+  public put<T = unknown>(
+    endpoint: string,
+    body?: unknown,
+    options?: Omit<RequestOptions, 'method' | 'body'>
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'PUT', body });
   }
 
-  public patch<T = unknown>(endpoint: string, body?: unknown, options?: Omit<RequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> {
+  public patch<T = unknown>(
+    endpoint: string,
+    body?: unknown,
+    options?: Omit<RequestOptions, 'method' | 'body'>
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'PATCH', body });
   }
 
-  public delete<T = unknown>(endpoint: string, options?: Omit<RequestOptions, 'method'>): Promise<ApiResponse<T>> {
+  public delete<T = unknown>(
+    endpoint: string,
+    options?: Omit<RequestOptions, 'method'>
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' });
   }
 }

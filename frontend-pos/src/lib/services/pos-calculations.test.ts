@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  calculateCartTotals,
-  calculateCashChange,
-  calculateStockUsed,
-} from './pos-calculations';
+import { calculateCartTotals, calculateCashChange, calculateStockUsed } from './pos-calculations';
 import type { CartItem } from '../types/pos';
 
 const mockItems: CartItem[] = [

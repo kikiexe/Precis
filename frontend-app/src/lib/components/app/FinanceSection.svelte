@@ -29,7 +29,12 @@
 
   interface Props {
     currentUser: User;
-    workspace?: { workspace_id?: string; workspace_name?: string; id?: string; name?: string } | null;
+    workspace?: {
+      workspace_id?: string;
+      workspace_name?: string;
+      id?: string;
+      name?: string;
+    } | null;
     branches?: BranchItem[];
     initialSubTab?: string;
     cashAdvances?: CashAdvance[];
@@ -38,7 +43,11 @@
     onRequestKasbon: (amount: number, purpose?: string) => Promise<void> | void;
     onFilterPayrollPeriod?: (periodStart: string, periodEnd: string) => Promise<void> | void;
     onDisbursePayroll?: (periodStart: string, periodEnd: string) => Promise<void>;
-    onExportCsv?: (periodStart: string, periodEnd: string, format: 'BCA' | 'MANDIRI') => Promise<void>;
+    onExportCsv?: (
+      periodStart: string,
+      periodEnd: string,
+      format: 'BCA' | 'MANDIRI'
+    ) => Promise<void>;
   }
 
   let {
@@ -87,17 +96,17 @@
 
   let canViewPayroll = $derived(
     currentUser.role === 'OWNER' ||
-    currentUser.role === 'ADMIN' ||
-    Boolean(
-      currentUser.permissions?.includes('payroll.view') ||
-      currentUser.permissions?.includes('payroll.disburse')
-    )
+      currentUser.role === 'ADMIN' ||
+      Boolean(
+        currentUser.permissions?.includes('payroll.view') ||
+        currentUser.permissions?.includes('payroll.disburse')
+      )
   );
 
   let canDisbursePayroll = $derived(
     currentUser.role === 'OWNER' ||
-    currentUser.role === 'ADMIN' ||
-    Boolean(currentUser.permissions?.includes('payroll.disburse'))
+      currentUser.role === 'ADMIN' ||
+      Boolean(currentUser.permissions?.includes('payroll.disburse'))
   );
 
   let financeTabs = $derived(
@@ -106,9 +115,7 @@
           { id: 'payroll' as const, label: 'Payroll Karyawan', icon: FileText },
           { id: 'laporan' as const, label: 'Audit & Opname', icon: BarChart3 },
         ]
-      : [
-          { id: 'laporan' as const, label: 'Audit & Opname', icon: BarChart3 },
-        ]
+      : [{ id: 'laporan' as const, label: 'Audit & Opname', icon: BarChart3 }]
   );
 
   $effect(() => {
@@ -128,7 +135,8 @@
         if (selectedBranchFilter === 'ALL') return true;
         return (
           item.branch_id === selectedBranchFilter ||
-          (item.branch_name && item.branch_name.toLowerCase().includes(selectedBranchFilter.toLowerCase()))
+          (item.branch_name &&
+            item.branch_name.toLowerCase().includes(selectedBranchFilter.toLowerCase()))
         );
       })
       .reduce((sum, item) => sum + item.net_salary, 0)
@@ -141,63 +149,70 @@
     try {
       await onDisbursePayroll(payrollPreview.period_start, payrollPreview.period_end);
       isConfirmDisburseOpen = false;
-      successNotification = 'Penggajian periode ini berhasil dicairkan! Status kasbon telah dilunasi dan slip gaji resmi telah diterbitkan.';
+      successNotification =
+        'Penggajian periode ini berhasil dicairkan! Status kasbon telah dilunasi dan slip gaji resmi telah diterbitkan.';
     } catch (err: unknown) {
       errorNotification = err instanceof Error ? err.message : 'Gagal memproses pencairan payroll.';
     }
   }
 </script>
 
-<div class="space-y-6 font-sans pb-8">
+<div class="space-y-6 pb-8 font-sans">
   {#if successNotification}
-    <div class="p-4 bg-[#ecfdf5] border border-[#a7f3d0] rounded-2xl text-xs text-[#065f46] flex items-center justify-between gap-3 shadow-2xs animate-in fade-in">
+    <div
+      class="animate-in fade-in flex items-center justify-between gap-3 rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] p-4 text-xs text-[#065f46] shadow-2xs"
+    >
       <div class="flex items-center gap-2.5">
-        <CheckCircle2 class="w-4 h-4 text-[#059669] shrink-0" />
+        <CheckCircle2 class="h-4 w-4 shrink-0 text-[#059669]" />
         <span class="font-medium">{successNotification}</span>
       </div>
       <button
         type="button"
         onclick={() => (successNotification = null)}
-        class="p-1 hover:bg-[#d1fae5] rounded-lg transition-all cursor-pointer text-[#059669]"
+        class="cursor-pointer rounded-lg p-1 text-[#059669] transition-all hover:bg-[#d1fae5]"
       >
-        <X class="w-3.5 h-3.5" />
+        <X class="h-3.5 w-3.5" />
       </button>
     </div>
   {/if}
 
   {#if errorNotification}
-    <div class="p-4 bg-[#fef2f2] border border-[#fecaca] rounded-2xl text-xs text-[#991b1b] flex items-center justify-between gap-3 shadow-2xs animate-in fade-in">
+    <div
+      class="animate-in fade-in flex items-center justify-between gap-3 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-4 text-xs text-[#991b1b] shadow-2xs"
+    >
       <div class="flex items-center gap-2.5">
-        <AlertCircle class="w-4 h-4 text-[#e5484d] shrink-0" />
+        <AlertCircle class="h-4 w-4 shrink-0 text-[#e5484d]" />
         <span class="font-medium">{errorNotification}</span>
       </div>
       <button
         type="button"
         onclick={() => (errorNotification = null)}
-        class="p-1 hover:bg-[#fee2e2] rounded-lg transition-all cursor-pointer text-[#e5484d]"
+        class="cursor-pointer rounded-lg p-1 text-[#e5484d] transition-all hover:bg-[#fee2e2]"
       >
-        <X class="w-3.5 h-3.5" />
+        <X class="h-3.5 w-3.5" />
       </button>
     </div>
   {/if}
 
   <!-- Segmented Navigation for Admin/Owner/Manager -->
   {#if currentUser.role !== 'STAFF'}
-    <div class="flex items-center justify-between gap-4 overflow-x-auto no-scrollbar py-1">
-      <div class="inline-flex items-center gap-1.5 p-1.5 bg-white border border-[#e5e5ea] rounded-2xl shadow-2xs">
+    <div class="no-scrollbar flex items-center justify-between gap-4 overflow-x-auto py-1">
+      <div
+        class="inline-flex items-center gap-1.5 rounded-2xl border border-[#e5e5ea] bg-white p-1.5 shadow-2xs"
+      >
         {#each financeTabs as tab}
           {@const Icon = tab.icon}
           {@const isActive = activeSubTab === tab.id}
           <button
             type="button"
             onclick={() => (activeSubTab = tab.id)}
-            class={`px-4 py-2 rounded-xl text-xs font-medium transition-all duration-200 cursor-pointer flex items-center gap-2 shrink-0 ${
+            class={`flex shrink-0 cursor-pointer items-center gap-2 rounded-xl px-4 py-2 text-xs font-medium transition-all duration-200 ${
               isActive
-                ? 'bg-[#17171c] text-white shadow-xs font-semibold'
-                : 'text-[#686873] hover:text-[#17171c] hover:bg-[#f4f4f6]'
+                ? 'bg-[#17171c] font-semibold text-white shadow-xs'
+                : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
             }`}
           >
-            <Icon class={`w-4 h-4 ${isActive ? 'text-white' : 'text-[#8e8e93]'}`} />
+            <Icon class={`h-4 w-4 ${isActive ? 'text-white' : 'text-[#8e8e93]'}`} />
             <span class="whitespace-nowrap">{tab.label}</span>
           </button>
         {/each}
@@ -205,7 +220,7 @@
     </div>
   {/if}
 
-  <div class="min-w-0 animate-in fade-in duration-200">
+  <div class="animate-in fade-in min-w-0 duration-200">
     {#if activeSubTab === 'payroll'}
       <AdminPayrollView
         {branches}
@@ -223,8 +238,13 @@
       />
     {:else if activeSubTab === 'laporan'}
       {@const adjustmentLogs = inventoryService.getAdjustmentLogs()}
-      {@const damagedLogs = adjustmentLogs.filter((l) => l.reason === 'DAMAGED' || l.reason === 'EXPIRED' || l.reason === 'WASTE')}
-      {@const totalWasteCost = damagedLogs.reduce((sum, l) => sum + Math.abs(l.adjusted_amount * 20000), 0)}
+      {@const damagedLogs = adjustmentLogs.filter(
+        (l) => l.reason === 'DAMAGED' || l.reason === 'EXPIRED' || l.reason === 'WASTE'
+      )}
+      {@const totalWasteCost = damagedLogs.reduce(
+        (sum, l) => sum + Math.abs(l.adjusted_amount * 20000),
+        0
+      )}
       {@const paymentMethods = liveAnalytics?.payment_methods || []}
       {@const totalRevenue = liveAnalytics?.total_revenue || 0}
       {@const totalOrders = liveAnalytics?.total_orders || 0}
@@ -233,20 +253,18 @@
 
       <div class="space-y-6">
         <!-- Controls & Filters Toolbar -->
-        <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
+        <div
+          class="flex flex-col justify-between gap-4 rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs sm:flex-row sm:items-center sm:rounded-3xl sm:p-5"
+        >
           <!-- Timeframe Selector -->
-          <div class="flex items-center gap-1 bg-[#f4f4f6] p-1 rounded-full overflow-x-auto no-scrollbar">
-            {#each [
-              { label: 'Hari', value: 'day' as const },
-              { label: 'Pekan', value: 'week' as const },
-              { label: 'Bulan', value: 'month' as const },
-              { label: 'Tahun', value: 'year' as const },
-              { label: 'Semua', value: 'all' as const },
-            ] as tf}
+          <div
+            class="no-scrollbar flex items-center gap-1 overflow-x-auto rounded-full bg-[#f4f4f6] p-1"
+          >
+            {#each [{ label: 'Hari', value: 'day' as const }, { label: 'Pekan', value: 'week' as const }, { label: 'Bulan', value: 'month' as const }, { label: 'Tahun', value: 'year' as const }, { label: 'Semua', value: 'all' as const }] as tf}
               <button
                 type="button"
                 onclick={() => (selectedAnalyticsTimeframe = tf.value)}
-                class={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                class={`cursor-pointer rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
                   selectedAnalyticsTimeframe === tf.value
                     ? 'bg-[#17171c] text-white shadow-xs'
                     : 'text-[#686873] hover:text-[#17171c]'
@@ -260,12 +278,14 @@
           <!-- Branch / Workspace Filter Dropdown -->
           {#if branches.length > 0}
             <div class="flex items-center gap-2">
-              <span class="text-xs text-[#8e8e93] font-medium hidden sm:inline">Outlet:</span>
+              <span class="hidden text-xs font-medium text-[#8e8e93] sm:inline">Outlet:</span>
               <select
                 bind:value={selectedBranchFilter}
-                class="px-3.5 py-2 bg-[#f8f8fa] hover:bg-white border border-[#e5e5ea] rounded-xl text-xs font-medium text-[#17171c] focus:outline-hidden focus:border-[#17171c] cursor-pointer shadow-2xs transition-all"
+                class="cursor-pointer rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-3.5 py-2 text-xs font-medium text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               >
-                <option value="ALL">{workspace?.workspace_name || workspace?.name || 'Semua Outlet'}</option>
+                <option value="ALL"
+                  >{workspace?.workspace_name || workspace?.name || 'Semua Outlet'}</option
+                >
                 {#each branches as b}
                   {#if b.name !== (workspace?.workspace_name || workspace?.name)}
                     <option value={b.id}>{b.name}</option>
@@ -277,108 +297,137 @@
         </div>
 
         <!-- Summary KPI Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div class="bg-white border border-[#e5e5ea] rounded-2xl p-4 sm:p-5 space-y-1 shadow-2xs">
-            <span class="text-[11px] font-mono uppercase text-[#8e8e93] font-semibold">Omzet Bersih</span>
-            <div class="text-lg sm:text-xl font-bold font-mono text-[#17171c] tracking-tight">
+        <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          <div class="space-y-1 rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs sm:p-5">
+            <span class="font-mono text-[11px] font-semibold text-[#8e8e93] uppercase"
+              >Omzet Bersih</span
+            >
+            <div class="font-mono text-lg font-bold tracking-tight text-[#17171c] sm:text-xl">
               {formatRupiah(totalRevenue)}
             </div>
-            <div class="text-[10.5px] text-[#059669] font-medium flex items-center gap-1">
-              <TrendingUp class="w-3 h-3" />
+            <div class="flex items-center gap-1 text-[10.5px] font-medium text-[#059669]">
+              <TrendingUp class="h-3 w-3" />
               <span>{liveAnalytics?.growth_label || 'vs periode lalu'}</span>
             </div>
           </div>
 
-          <div class="bg-white border border-[#e5e5ea] rounded-2xl p-4 sm:p-5 space-y-1 shadow-2xs">
-            <span class="text-[11px] font-mono uppercase text-[#8e8e93] font-semibold">Total Transaksi</span>
-            <div class="text-lg sm:text-xl font-bold font-mono text-[#17171c] tracking-tight">
+          <div class="space-y-1 rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs sm:p-5">
+            <span class="font-mono text-[11px] font-semibold text-[#8e8e93] uppercase"
+              >Total Transaksi</span
+            >
+            <div class="font-mono text-lg font-bold tracking-tight text-[#17171c] sm:text-xl">
               {totalOrders.toLocaleString('id-ID')}
             </div>
             <span class="text-[10.5px] text-[#8e8e93]">Pesanan kasir selesai</span>
           </div>
 
-          <div class="bg-white border border-[#e5e5ea] rounded-2xl p-4 sm:p-5 space-y-1 shadow-2xs">
-            <span class="text-[11px] font-mono uppercase text-[#8e8e93] font-semibold">Potongan Diskon</span>
-            <div class="text-lg sm:text-xl font-bold font-mono text-[#e5484d] tracking-tight">
+          <div class="space-y-1 rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs sm:p-5">
+            <span class="font-mono text-[11px] font-semibold text-[#8e8e93] uppercase"
+              >Potongan Diskon</span
+            >
+            <div class="font-mono text-lg font-bold tracking-tight text-[#e5484d] sm:text-xl">
               -{formatRupiah(totalDiscount)}
             </div>
             <span class="text-[10.5px] text-[#8e8e93]">Promosi &amp; voucher</span>
           </div>
 
-          <div class="bg-white border border-[#e5e5ea] rounded-2xl p-4 sm:p-5 space-y-1 shadow-2xs">
-            <span class="text-[11px] font-mono uppercase text-[#8e8e93] font-semibold">Rata-rata Tiket (AOV)</span>
-            <div class="text-lg sm:text-xl font-bold font-mono text-[#17171c] tracking-tight">
+          <div class="space-y-1 rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs sm:p-5">
+            <span class="font-mono text-[11px] font-semibold text-[#8e8e93] uppercase"
+              >Rata-rata Tiket (AOV)</span
+            >
+            <div class="font-mono text-lg font-bold tracking-tight text-[#17171c] sm:text-xl">
               {formatRupiah(aov)}
             </div>
             <span class="text-[10.5px] text-[#8e8e93]">Per transaksi pesanan</span>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div class="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
           <!-- Card: Komposisi Metode Pembayaran -->
-          <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-5 shadow-2xs">
+          <div
+            class="space-y-5 rounded-2xl border border-[#e5e5ea] bg-white p-5 shadow-2xs sm:rounded-3xl sm:p-6"
+          >
             <div class="flex items-start justify-between gap-2">
               <div>
                 <h3 class="text-base font-bold text-[#17171c]">Komposisi Metode Pembayaran</h3>
                 <p class="text-xs text-[#8e8e93]">Distribusi omzet per saluran bayar kasir</p>
               </div>
-              <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-semibold bg-[#f4f4f6] text-[#17171c]">
+              <span
+                class="rounded-full bg-[#f4f4f6] px-2.5 py-0.5 font-mono text-[10.5px] font-semibold text-[#17171c]"
+              >
                 {paymentMethods.length} Saluran
               </span>
             </div>
 
             {#if isAnalyticsLoading}
-              <div class="py-12 flex flex-col items-center justify-center space-y-3">
-                <div class="w-6 h-6 border-2 border-[#17171c] border-t-transparent rounded-full animate-spin"></div>
+              <div class="flex flex-col items-center justify-center space-y-3 py-12">
+                <div
+                  class="h-6 w-6 animate-spin rounded-full border-2 border-[#17171c] border-t-transparent"
+                ></div>
                 <span class="text-xs text-[#8e8e93]">Memuat data saluran bayar...</span>
               </div>
             {:else if paymentMethods.length === 0}
-              <div class="py-8 text-center text-[#8e8e93] space-y-1">
-                <Wallet class="w-6 h-6 mx-auto opacity-40" />
+              <div class="space-y-1 py-8 text-center text-[#8e8e93]">
+                <Wallet class="mx-auto h-6 w-6 opacity-40" />
                 <p class="text-xs font-semibold text-[#17171c]">Belum ada transaksi pembayaran</p>
-                <p class="text-[11px] text-[#8e8e93]">Data akan muncul saat kasir memproses pesanan di periode ini.</p>
+                <p class="text-[11px] text-[#8e8e93]">
+                  Data akan muncul saat kasir memproses pesanan di periode ini.
+                </p>
               </div>
             {:else}
               <div class="space-y-4">
                 {#each paymentMethods as method}
                   {@const isQris = method.method.toLowerCase().includes('qris')}
-                  {@const isCash = method.method.toLowerCase().includes('tunai') || method.method.toLowerCase().includes('cash')}
-                  {@const isCard = method.method.toLowerCase().includes('kartu') || method.method.toLowerCase().includes('edc') || method.method.toLowerCase().includes('debit')}
-                  <div class="space-y-2 p-3.5 bg-[#fbfbfa] border border-[#ececee] rounded-2xl">
+                  {@const isCash =
+                    method.method.toLowerCase().includes('tunai') ||
+                    method.method.toLowerCase().includes('cash')}
+                  {@const isCard =
+                    method.method.toLowerCase().includes('kartu') ||
+                    method.method.toLowerCase().includes('edc') ||
+                    method.method.toLowerCase().includes('debit')}
+                  <div class="space-y-2 rounded-2xl border border-[#ececee] bg-[#fbfbfa] p-3.5">
                     <div class="flex items-center justify-between text-xs">
-                      <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="w-7 h-7 rounded-lg bg-white border border-[#e5e5ea] flex items-center justify-center shrink-0">
+                      <div class="flex min-w-0 items-center gap-2.5">
+                        <div
+                          class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#e5e5ea] bg-white"
+                        >
                           {#if isQris}
-                            <QrCode class="w-4 h-4 text-[#17171c]" />
+                            <QrCode class="h-4 w-4 text-[#17171c]" />
                           {:else if isCash}
-                            <Coins class="w-4 h-4 text-[#059669]" />
+                            <Coins class="h-4 w-4 text-[#059669]" />
                           {:else if isCard}
-                            <CreditCard class="w-4 h-4 text-[#2563eb]" />
+                            <CreditCard class="h-4 w-4 text-[#2563eb]" />
                           {:else}
-                            <Wallet class="w-4 h-4 text-[#7c3aed]" />
+                            <Wallet class="h-4 w-4 text-[#7c3aed]" />
                           {/if}
                         </div>
                         <div class="min-w-0">
-                          <div class="font-bold text-[#17171c] truncate">{method.method}</div>
-                          <div class="text-[10.5px] font-mono text-[#8e8e93]">{method.count} Transaksi</div>
+                          <div class="truncate font-bold text-[#17171c]">{method.method}</div>
+                          <div class="font-mono text-[10.5px] text-[#8e8e93]">
+                            {method.count} Transaksi
+                          </div>
                         </div>
                       </div>
-                      <div class="text-right shrink-0">
-                        <div class="font-bold font-mono text-[#17171c]">{formatRupiah(method.amount)}</div>
-                        <div class="text-[10.5px] font-mono font-semibold text-[#059669]">{method.percent}%</div>
+                      <div class="shrink-0 text-right">
+                        <div class="font-mono font-bold text-[#17171c]">
+                          {formatRupiah(method.amount)}
+                        </div>
+                        <div class="font-mono text-[10.5px] font-semibold text-[#059669]">
+                          {method.percent}%
+                        </div>
                       </div>
                     </div>
                     <!-- Visual Progress Bar -->
-                    <div class="w-full bg-[#e5e5ea] h-2 rounded-full overflow-hidden">
+                    <div class="h-2 w-full overflow-hidden rounded-full bg-[#e5e5ea]">
                       <div
                         class={`h-full rounded-full transition-all duration-500 ${
                           isQris
                             ? 'bg-[#17171c]'
                             : isCash
-                            ? 'bg-[#059669]'
-                            : isCard
-                            ? 'bg-[#2563eb]'
-                            : 'bg-[#7c3aed]'
+                              ? 'bg-[#059669]'
+                              : isCard
+                                ? 'bg-[#2563eb]'
+                                : 'bg-[#7c3aed]'
                         }`}
                         style={`width: ${Math.max(method.percent, 2)}%`}
                       ></div>
@@ -390,48 +439,72 @@
           </div>
 
           <!-- Card: Audit Selisih Opname & Waste -->
-          <div class="bg-white border border-[#e5e5ea] rounded-2xl sm:rounded-3xl p-5 sm:p-6 space-y-5 shadow-2xs">
+          <div
+            class="space-y-5 rounded-2xl border border-[#e5e5ea] bg-white p-5 shadow-2xs sm:rounded-3xl sm:p-6"
+          >
             <div class="flex items-start justify-between gap-2">
               <div>
                 <h3 class="text-base font-bold text-[#17171c]">Audit Selisih Opname &amp; Waste</h3>
-                <p class="text-xs text-[#8e8e93]">Rekonsiliasi pemakaian bahan baku bar vs hitung fisik closing</p>
+                <p class="text-xs text-[#8e8e93]">
+                  Rekonsiliasi pemakaian bahan baku bar vs hitung fisik closing
+                </p>
               </div>
-              <span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-mono font-semibold bg-[#f4f4f6] text-[#17171c]">
+              <span
+                class="rounded-full bg-[#f4f4f6] px-2.5 py-0.5 font-mono text-[10.5px] font-semibold text-[#17171c]"
+              >
                 {damagedLogs.length} Insiden Waste
               </span>
             </div>
 
-            <div class="p-4 bg-[#fbfbfa] border border-[#ececee] rounded-2xl flex items-center justify-between">
+            <div
+              class="flex items-center justify-between rounded-2xl border border-[#ececee] bg-[#fbfbfa] p-4"
+            >
               <div>
-                <span class="text-[10.5px] font-mono uppercase text-[#8e8e93] font-semibold">Estimasi Biaya Waste/Rusak</span>
-                <div class="text-xl font-bold font-mono text-[#e5484d] mt-0.5">{formatRupiah(totalWasteCost)}</div>
+                <span class="font-mono text-[10.5px] font-semibold text-[#8e8e93] uppercase"
+                  >Estimasi Biaya Waste/Rusak</span
+                >
+                <div class="mt-0.5 font-mono text-xl font-bold text-[#e5484d]">
+                  {formatRupiah(totalWasteCost)}
+                </div>
               </div>
-              <span class="px-3 py-1 rounded-full bg-[#fef2f2] text-[#e5484d] text-[11px] font-mono font-semibold border border-[#fecaca]">
+              <span
+                class="rounded-full border border-[#fecaca] bg-[#fef2f2] px-3 py-1 font-mono text-[11px] font-semibold text-[#e5484d]"
+              >
                 {damagedLogs.length} Insiden
               </span>
             </div>
 
             <!-- Recent Adjustment Activity -->
             <div class="space-y-2.5">
-              <span class="text-[11px] font-mono uppercase text-[#8e8e93] font-semibold">Riwayat Opname Terakhir</span>
+              <span class="font-mono text-[11px] font-semibold text-[#8e8e93] uppercase"
+                >Riwayat Opname Terakhir</span
+              >
               {#if adjustmentLogs.length === 0}
-                <div class="py-6 text-center text-[#8e8e93] space-y-1">
-                  <FileText class="w-6 h-6 mx-auto opacity-40" />
+                <div class="space-y-1 py-6 text-center text-[#8e8e93]">
+                  <FileText class="mx-auto h-6 w-6 opacity-40" />
                   <p class="text-xs font-semibold text-[#17171c]">Belum ada riwayat stock opname</p>
                 </div>
               {:else}
-                <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+                <div class="max-h-56 space-y-2 overflow-y-auto pr-1">
                   {#each adjustmentLogs.slice(0, 4) as log}
-                    <div class="p-3 bg-[#f8f8fa] border border-[#e5e5ea] rounded-xl flex items-center justify-between text-xs gap-3">
+                    <div
+                      class="flex items-center justify-between gap-3 rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] p-3 text-xs"
+                    >
                       <div class="min-w-0">
-                        <div class="font-bold text-[#17171c] truncate">{log.material_name}</div>
-                        <div class="text-[10.5px] text-[#8e8e93] truncate">{log.notes || 'Penyesuaian stok reguler'} &bull; {log.performed_by}</div>
+                        <div class="truncate font-bold text-[#17171c]">{log.material_name}</div>
+                        <div class="truncate text-[10.5px] text-[#8e8e93]">
+                          {log.notes || 'Penyesuaian stok reguler'} &bull; {log.performed_by}
+                        </div>
                       </div>
-                      <div class="text-right shrink-0">
-                        <span class={`font-mono font-bold ${log.adjusted_amount < 0 ? 'text-[#e5484d]' : 'text-[#059669]'}`}>
-                          {log.adjusted_amount > 0 ? `+${log.adjusted_amount}` : log.adjusted_amount}
+                      <div class="shrink-0 text-right">
+                        <span
+                          class={`font-mono font-bold ${log.adjusted_amount < 0 ? 'text-[#e5484d]' : 'text-[#059669]'}`}
+                        >
+                          {log.adjusted_amount > 0
+                            ? `+${log.adjusted_amount}`
+                            : log.adjusted_amount}
                         </span>
-                        <div class="text-[10px] text-[#8e8e93] font-mono">{log.created_at}</div>
+                        <div class="font-mono text-[10px] text-[#8e8e93]">{log.created_at}</div>
                       </div>
                     </div>
                   {/each}

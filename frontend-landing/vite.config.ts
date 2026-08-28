@@ -4,10 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [
-    svelte(),
-    tailwindcss(),
-  ],
+  plugins: [svelte(), tailwindcss()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

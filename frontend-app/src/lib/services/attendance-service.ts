@@ -18,7 +18,10 @@ export class AttendanceService {
       size_bytes: sizeBytes,
     };
 
-    const response = await apiClient.post<PresignUploadResponseData>('/media/presign-upload', payload);
+    const response = await apiClient.post<PresignUploadResponseData>(
+      '/media/presign-upload',
+      payload
+    );
     if (response.data) {
       return response.data;
     }
@@ -90,15 +93,15 @@ export class AttendanceService {
     throw new Error(response.message || 'Gagal mencatat presensi keluar.');
   }
 
-  public async getWallOfFaces(
-    branchId?: string,
-    date?: string
-  ): Promise<WallOfFacesItem[]> {
+  public async getWallOfFaces(branchId?: string, date?: string): Promise<WallOfFacesItem[]> {
     const params: Record<string, string> = {};
     if (branchId) params.branch_id = branchId;
     if (date) params.date = date;
 
-    const response = await apiClient.get<WallOfFacesItem[]>('/admin/attendances/wall-of-faces', params);
+    const response = await apiClient.get<WallOfFacesItem[]>(
+      '/admin/attendances/wall-of-faces',
+      params
+    );
     if (response.data && Array.isArray(response.data)) {
       return response.data;
     }
