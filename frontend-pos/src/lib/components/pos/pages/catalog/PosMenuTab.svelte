@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Search, Plus } from 'lucide-svelte';
+  import { Search, Plus, CheckCircle2, XCircle } from 'lucide-svelte';
   import type { Category, Product } from '../../../../types/pos';
   import { formatRupiah } from '../../../../utils/formatters';
 
@@ -30,86 +30,159 @@
       return matchCat && matchSearch;
     })
   );
+
+  let activeCount = $derived(products.filter((p) => p.is_active).length);
 </script>
 
-<div class="space-y-4 font-sans">
-  <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-    <div class="relative flex-1">
-      <Search class="w-4 h-4 text-[#75758a] absolute left-3.5 top-1/2 -translate-y-1/2" />
-      <input
-        type="text"
-        bind:value={searchQuery}
-        placeholder="Cari produk &amp; minuman di kasir..."
-        class="w-full pl-10 pr-4 py-2 bg-white border border-[#d9d9dd] rounded-full text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden"
-      />
-    </div>
-
-    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
-      <button
-        type="button"
-        onclick={() => (selectedCategory = 'cat-all')}
-        class={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer shrink-0 ${
-          selectedCategory === 'cat-all'
-            ? 'bg-[#17171c] text-white'
-            : 'bg-white border border-[#d9d9dd] text-[#616161] hover:text-[#17171c]'
-        }`}
-      >
-        Semua Kategori
-      </button>
-      {#each categories as cat}
-        <button
-          type="button"
-          onclick={() => (selectedCategory = cat.id)}
-          class={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer shrink-0 ${
-            selectedCategory === cat.id
-              ? 'bg-[#17171c] text-white'
-              : 'bg-white border border-[#d9d9dd] text-[#616161] hover:text-[#17171c]'
-          }`}
-        >
-          {cat.name}
-        </button>
-      {/each}
-
-      <button
-        type="button"
-        onclick={onOpenAddModal}
-        class="px-4 py-1.5 bg-[#17171c] hover:bg-black text-white rounded-full text-xs font-medium flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs"
-      >
-        <Plus class="w-3.5 h-3.5" />
-        <span>Tambah Menu</span>
-      </button>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-    {#each filteredProducts as product}
-      <div class="bg-white border border-[#d9d9dd] rounded-2xl p-4 flex flex-col justify-between space-y-3 hover:border-[#17171c] transition-all">
-        <div class="space-y-1">
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-mono text-[#75758a] uppercase">{product.category_id.replace('cat-', '')}</span>
-            <span class={`w-2 h-2 rounded-full ${product.is_active ? 'bg-[#00875a]' : 'bg-[#e5484d]'}`}></span>
-          </div>
-          <h4 class="font-medium text-xs text-[#17171c] line-clamp-2">{product.name}</h4>
-          {#if product.description}
-            <p class="text-[10px] text-[#75758a] line-clamp-1">{product.description}</p>
-          {/if}
-        </div>
-
-        <div class="pt-2 border-t border-[#f2f2f2] flex items-center justify-between gap-2">
-          <span class="font-mono font-bold text-xs text-[#17171c]">{formatRupiah(product.base_price)}</span>
+<div class="space-y-3 font-sans">
+  <!-- Excel Toolbar: Search, Category Filter, and Add Button -->
+  <div class="bg-white border border-zinc-200 rounded-xl p-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
+    <div class="flex items-center gap-2 flex-1">
+      <div class="relative flex-1 max-w-md">
+        <Search class="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          bind:value={searchQuery}
+          placeholder="Cari nama produk, minuman, atau makanan..."
+          class="w-full pl-9 pr-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 placeholder-zinc-400 focus:bg-white focus:border-zinc-900 focus:outline-hidden transition-all"
+        />
+        {#if searchQuery}
           <button
             type="button"
-            onclick={() => onToggleProductActive(product.id)}
-            class={`px-2.5 py-1 rounded-lg text-[10px] font-medium transition-colors cursor-pointer ${
-              product.is_active
-                ? 'bg-[#fee2e2] text-[#991b1b] hover:bg-[#fecaca]'
-                : 'bg-[#dcfce7] text-[#14532d] hover:bg-[#bbf7d0]'
-            }`}
+            onclick={() => (searchQuery = '')}
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-zinc-400 hover:text-zinc-700 cursor-pointer"
           >
-            {product.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+            ✕
           </button>
-        </div>
+        {/if}
       </div>
-    {/each}
+
+      <!-- Category Filter Dropdown -->
+      <select
+        bind:value={selectedCategory}
+        class="h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 cursor-pointer focus:bg-white focus:border-zinc-900 focus:outline-hidden"
+      >
+        <option value="cat-all">Semua Kategori ({products.length})</option>
+        {#each categories as cat}
+          <option value={cat.id}>{cat.name}</option>
+        {/each}
+      </select>
+    </div>
+
+    <button
+      type="button"
+      onclick={onOpenAddModal}
+      class="px-4 py-2 bg-zinc-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-xs transition-all active:scale-[0.99]"
+    >
+      <Plus class="w-3.5 h-3.5" />
+      <span>+ Tambah Menu Baru</span>
+    </button>
+  </div>
+
+  <!-- Excel-like Spreadsheet Table -->
+  <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-2xs">
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs text-left border-collapse">
+        <thead class="bg-zinc-100/80 border-b border-zinc-200 font-mono text-[11px] font-bold text-zinc-600 uppercase tracking-wider">
+          <tr class="divide-x divide-zinc-200/80">
+            <th class="py-3 px-3 w-12 text-center">No.</th>
+            <th class="py-3 px-4">Nama Produk / Menu</th>
+            <th class="py-3 px-4 w-40">Kategori</th>
+            <th class="py-3 px-4 w-36 text-right">Harga Jual</th>
+            <th class="py-3 px-4 w-32 text-center">Status</th>
+            <th class="py-3 px-4 w-36 text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-200/70">
+          {#if filteredProducts.length === 0}
+            <tr>
+              <td colspan="6" class="py-16 text-center text-zinc-400">
+                <p class="text-sm font-semibold text-zinc-800">Tidak ada data produk</p>
+                <p class="text-xs text-zinc-500 mt-0.5">Coba ubah kata kunci pencarian atau kategori.</p>
+              </td>
+            </tr>
+          {:else}
+            {#each filteredProducts as product, idx (product.id)}
+              {@const catName = categories.find((c) => c.id === product.category_id)?.name || product.category_id.replace('cat-', '')}
+              <tr class={`divide-x divide-zinc-200/60 transition-colors hover:bg-zinc-50/80 ${
+                idx % 2 === 1 ? 'bg-zinc-50/30' : 'bg-white'
+              }`}>
+                <!-- No -->
+                <td class="py-3 px-3 font-mono text-center text-zinc-400 text-[11px]">
+                  {idx + 1}
+                </td>
+
+                <!-- Nama Produk & Deskripsi -->
+                <td class="py-3 px-4 font-semibold text-zinc-900">
+                  <div>{product.name}</div>
+                  {#if product.description}
+                    <div class="text-[11px] text-zinc-500 font-normal mt-0.5 line-clamp-1">
+                      {product.description}
+                    </div>
+                  {/if}
+                </td>
+
+                <!-- Kategori -->
+                <td class="py-3 px-4">
+                  <span class="inline-block px-2.5 py-0.5 bg-zinc-100 text-zinc-700 rounded-md text-[11px] font-medium border border-zinc-200/60 truncate max-w-[140px]">
+                    {catName}
+                  </span>
+                </td>
+
+                <!-- Harga Jual -->
+                <td class="py-3 px-4 font-mono font-bold text-right text-xs text-zinc-900">
+                  {formatRupiah(product.base_price)}
+                </td>
+
+                <!-- Status Penjualan -->
+                <td class="py-3 px-4 text-center">
+                  <span class={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                    product.is_active
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-zinc-200 text-zinc-600'
+                  }`}>
+                    {#if product.is_active}
+                      <CheckCircle2 class="w-3 h-3 text-emerald-600" />
+                      <span>Aktif</span>
+                    {:else}
+                      <XCircle class="w-3 h-3 text-zinc-500" />
+                      <span>Nonaktif</span>
+                    {/if}
+                  </span>
+                </td>
+
+                <!-- Aksi -->
+                <td class="py-3 px-4 text-right">
+                  <button
+                    type="button"
+                    onclick={() => onToggleProductActive(product.id)}
+                    class={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer ${
+                      product.is_active
+                        ? 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200'
+                        : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'
+                    }`}
+                  >
+                    {product.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                  </button>
+                </td>
+              </tr>
+            {/each}
+          {/if}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Excel Status Bar / Summary Footer -->
+    <div class="bg-zinc-50 border-t border-zinc-200 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-zinc-600">
+      <div class="flex items-center gap-4">
+        <span>Total Menu: <strong class="text-zinc-900">{filteredProducts.length}</strong></span>
+        <span>Menu Aktif: <strong class="text-emerald-700">{activeCount}</strong></span>
+        <span>Menu Nonaktif: <strong class="text-zinc-500">{products.length - activeCount}</strong></span>
+      </div>
+
+      <div class="text-[11px] text-zinc-400">
+        Menu nonaktif tidak akan muncul di katalog pemesanan kasir
+      </div>
+    </div>
   </div>
 </div>

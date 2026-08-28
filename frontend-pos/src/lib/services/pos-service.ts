@@ -9,6 +9,7 @@ import type {
   OpenSessionResponse,
   CloseSessionResponse,
   MasterUnlockResult,
+  OfflineOrder,
 } from '../types/pos';
 
 export class PosService {
@@ -64,6 +65,19 @@ export class PosService {
       categoriesCount: categories.length,
       productsCount: products.length,
     };
+  }
+
+  public async syncRecentOrdersToLocalDb(): Promise<{ ordersCount: number }> {
+    try {
+      const response = await posApiClient.get<OfflineOrder[]>('/pos/orders');
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        await db.orders.bulkPut(response.data);
+        return { ordersCount: response.data.length };
+      }
+    } catch {
+      // offline fallback
+    }
+    return { ordersCount: 0 };
   }
 
   public async openSession(

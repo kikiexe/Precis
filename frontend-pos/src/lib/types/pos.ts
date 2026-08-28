@@ -43,7 +43,16 @@ export interface CartItem {
   notes: string;
 }
 
-export type PaymentMethod = 'CASH' | 'QRIS' | 'TRANSFER';
+export type PosPage =
+  | 'penjualan'
+  | 'transaksi'
+  | 'shift'
+  | 'settlement'
+  | 'menu'
+  | 'inventori'
+  | 'profil';
+
+export type PaymentMethod = 'CASH' | 'QRIS' | 'EDC' | 'TRANSFER';
 export type OrderType = 'DINE_IN' | 'TAKE_AWAY' | 'DELIVERY';
 
 export interface PosSession {
@@ -62,8 +71,13 @@ export interface PosSession {
   closed_at?: string;
   total_cash_sales: number;
   total_qris_sales: number;
+  total_edc_sales?: number;
   total_transfer_sales: number;
   order_count: number;
+  is_settled?: boolean;
+  settled_at?: string;
+  settled_by?: string;
+  settlement_notes?: string;
 }
 
 export interface OpenSessionResponse {
@@ -129,22 +143,60 @@ export interface CashierUser {
   avatar_url?: string;
 }
 
+export interface OpenBill {
+  id: string;
+  order_number: string;
+  order_type: OrderType;
+  customer_name: string;
+  items: CartItem[];
+  discount_percent: number;
+  discount_nominal: number;
+  subtotal: number;
+  final_total: number;
+  saved_at: string;
+  notes?: string;
+}
+
 export type StockAdjustmentReason =
   | 'STOCK_TAKE'
-  | 'DAMAGED'
-  | 'EXPIRED'
   | 'RESTOCK'
   | 'WASTE'
+  | 'EXPIRED'
+  | 'DAMAGED'
   | 'OTHER';
+
+export interface ProductRecipeItem {
+  raw_material_id: string;
+  raw_material_name: string;
+  quantity: number;
+  unit: string;
+}
 
 export interface RawMaterial {
   id: string;
   name: string;
   category_id: string;
   category_name?: string;
+  stock_previous_day?: number;
+  stock_in_today?: number;
+  stock_used_today?: number;
   current_stock: number;
   min_stock_alert: number;
   unit: string;
+  cost_per_unit?: number;
   last_adjusted_at?: string;
+}
+
+export interface StockAdjustmentLog {
+  id: string;
+  raw_material_id: string;
+  raw_material_name: string;
+  previous_stock: number;
+  new_stock: number;
+  variance: number;
+  reason: StockAdjustmentReason;
+  notes?: string;
+  adjusted_by: string;
+  created_at: string;
 }
 

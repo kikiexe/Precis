@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Search, Plus, Edit2, SlidersHorizontal, Trash2 } from 'lucide-svelte';
+  import { Search, Plus, Edit2, SlidersHorizontal, Trash2, AlertTriangle } from 'lucide-svelte';
   import type { RawMaterial } from '../../../../types/pos';
 
   interface Props {
@@ -19,107 +19,211 @@
   }: Props = $props();
 
   let searchQuery = $state('');
+  let selectedCategoryFilter = $state('ALL');
+
+  let categoriesList = $derived(
+    Array.from(new Set(rawMaterials.map((m) => m.category_name || 'Lainnya')))
+  );
 
   let filteredRawMaterials = $derived(
     rawMaterials.filter((m) => {
-      return (
+      const matchSearch =
         searchQuery.trim() === '' ||
         m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (m.category_name && m.category_name.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
+        (m.category_name && m.category_name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchCat =
+        selectedCategoryFilter === 'ALL' ||
+        (m.category_name || 'Lainnya') === selectedCategoryFilter;
+
+      return matchSearch && matchCat;
     })
+  );
+
+  let lowStockCount = $derived(
+    rawMaterials.filter((m) => m.current_stock <= m.min_stock_alert).length
   );
 </script>
 
-<div class="space-y-4 font-sans">
-  <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-    <div class="relative flex-1">
-      <Search class="w-4 h-4 text-[#75758a] absolute left-3.5 top-1/2 -translate-y-1/2" />
-      <input
-        type="text"
-        bind:value={searchQuery}
-        placeholder="Cari bahan baku, susu, sirup, biji kopi..."
-        class="w-full pl-10 pr-4 py-2 bg-white border border-[#d9d9dd] rounded-full text-xs text-[#17171c] focus:border-[#17171c] focus:outline-hidden"
-      />
+<div class="space-y-3 font-sans">
+  <!-- Excel Toolbar: Search & Action Controls -->
+  <div class="bg-white border border-zinc-200 rounded-xl p-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
+    <div class="flex items-center gap-2 flex-1">
+      <div class="relative flex-1 max-w-md">
+        <Search class="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          bind:value={searchQuery}
+          placeholder="Cari nama bahan baku, susu, sirup, beans..."
+          class="w-full pl-9 pr-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-xs text-zinc-900 placeholder-zinc-400 focus:bg-white focus:border-zinc-900 focus:outline-hidden transition-all"
+        />
+        {#if searchQuery}
+          <button
+            type="button"
+            onclick={() => (searchQuery = '')}
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono text-zinc-400 hover:text-zinc-700 cursor-pointer"
+          >
+            ✕
+          </button>
+        {/if}
+      </div>
+
+      <!-- Filter Kategori -->
+      <select
+        bind:value={selectedCategoryFilter}
+        class="h-9 px-3 bg-zinc-50 border border-zinc-200 rounded-lg text-xs font-medium text-zinc-700 cursor-pointer focus:bg-white focus:border-zinc-900 focus:outline-hidden"
+      >
+        <option value="ALL">Semua Kategori ({rawMaterials.length})</option>
+        {#each categoriesList as cat}
+          <option value={cat}>{cat}</option>
+        {/each}
+      </select>
     </div>
 
     <button
       type="button"
       onclick={onOpenAddMaterial}
-      class="px-4 py-2 bg-[#17171c] hover:bg-black text-white rounded-full text-xs font-medium flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-xs"
+      class="px-4 py-2 bg-zinc-900 hover:bg-black text-white rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 shrink-0 cursor-pointer shadow-xs transition-all active:scale-[0.99]"
     >
       <Plus class="w-3.5 h-3.5" />
       <span>+ Bahan Baku Baru</span>
     </button>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-    {#each filteredRawMaterials as mat}
-      {@const isLow = mat.current_stock <= mat.min_stock_alert}
-      <div class={`bg-white border rounded-2xl p-4 flex flex-col justify-between space-y-3 transition-all ${
-        isLow ? 'border-[#e5484d]/40 ring-1 ring-[#e5484d]/20' : 'border-[#d9d9dd] hover:border-[#17171c]'
-      }`}>
-        <div class="space-y-1">
-          <div class="flex items-center justify-between gap-2">
-            <span class="text-[10px] font-mono text-[#75758a] uppercase truncate">{mat.category_name || 'Bahan Baku'}</span>
-            <span class={`text-[9px] font-mono font-medium px-2 py-0.5 rounded-full shrink-0 ${
-              isLow ? 'bg-[#ffefef] text-[#e5484d]' : 'bg-[#edfce9] text-[#003c33]'
-            }`}>
-              {isLow ? `Menipis (< ${mat.min_stock_alert})` : 'Stok Aman'}
-            </span>
-          </div>
+  <!-- Excel-like Spreadsheet Table -->
+  <div class="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-2xs">
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs text-left border-collapse">
+        <thead class="bg-zinc-100/80 border-b border-zinc-200 font-mono text-[11px] font-bold text-zinc-600 uppercase tracking-wider">
+          <tr class="divide-x divide-zinc-200/80">
+            <th class="py-3 px-3 w-12 text-center">No.</th>
+            <th class="py-3 px-4">Nama Bahan Baku</th>
+            <th class="py-3 px-4 w-36">Kategori</th>
+            <th class="py-3 px-4 w-32 text-right">Stok Fisik</th>
+            <th class="py-3 px-4 w-32 text-right">Batas Minimum</th>
+            <th class="py-3 px-4 w-32 text-center">Status</th>
+            <th class="py-3 px-4 w-36 text-center">Audit Terakhir</th>
+            <th class="py-3 px-4 w-44 text-right">Aksi</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-zinc-200/70">
+          {#if filteredRawMaterials.length === 0}
+            <tr>
+              <td colspan="8" class="py-16 text-center text-zinc-400">
+                <p class="text-sm font-semibold text-zinc-800">Tidak ada data bahan baku</p>
+                <p class="text-xs text-zinc-500 mt-0.5">Coba ubah kata kunci pencarian atau filter kategori.</p>
+              </td>
+            </tr>
+          {:else}
+            {#each filteredRawMaterials as mat, idx (mat.id)}
+              {@const isLow = mat.current_stock <= mat.min_stock_alert}
+              <tr class={`divide-x divide-zinc-200/60 transition-colors hover:bg-zinc-50/80 ${
+                idx % 2 === 1 ? 'bg-zinc-50/30' : 'bg-white'
+              }`}>
+                <!-- No -->
+                <td class="py-3 px-3 font-mono text-center text-zinc-400 text-[11px]">
+                  {idx + 1}
+                </td>
 
-          <h3 class="text-sm font-medium text-[#212121] tracking-tight">{mat.name}</h3>
-          <div class="text-[10px] text-[#75758a] font-mono">
-            Audit: {mat.last_adjusted_at || '-'}
-          </div>
-        </div>
+                <!-- Nama Bahan Baku -->
+                <td class="py-3 px-4 font-semibold text-zinc-900">
+                  <div class="flex items-center gap-2">
+                    {#if isLow}
+                      <AlertTriangle class="w-3.5 h-3.5 text-red-500 shrink-0" />
+                    {/if}
+                    <span>{mat.name}</span>
+                  </div>
+                </td>
 
-        <div class="grid grid-cols-2 gap-2 py-2 px-2.5 bg-[#fbfbfb] border border-[#d9d9dd]/60 rounded-xl text-center">
-          <div>
-            <div class="text-[9px] text-[#75758a] uppercase font-mono">Stok Fisik</div>
-            <div class={`text-xs sm:text-sm font-medium font-mono mt-0.5 ${isLow ? 'text-[#e5484d]' : 'text-[#17171c]'}`}>
-              {mat.current_stock} <span class="text-[10px] font-normal text-[#75758a]">{mat.unit}</span>
-            </div>
-          </div>
+                <!-- Kategori -->
+                <td class="py-3 px-4">
+                  <span class="inline-block px-2.5 py-0.5 bg-zinc-100 text-zinc-700 rounded-md text-[11px] font-medium border border-zinc-200/60 truncate max-w-[130px]">
+                    {mat.category_name || 'Lainnya'}
+                  </span>
+                </td>
 
-          <div>
-            <div class="text-[9px] text-[#75758a] uppercase font-mono">Batas Minimum</div>
-            <div class="text-xs font-medium font-mono text-[#75758a] mt-0.5">
-              {mat.min_stock_alert} <span class="text-[10px] font-normal">{mat.unit}</span>
-            </div>
-          </div>
-        </div>
+                <!-- Stok Fisik -->
+                <td class={`py-3 px-4 font-mono font-bold text-right text-xs ${
+                  isLow ? 'text-red-600 bg-red-50/40' : 'text-zinc-900'
+                }`}>
+                  {mat.current_stock} <span class="font-normal text-[10px] text-zinc-500">{mat.unit}</span>
+                </td>
 
-        <div class="pt-1 flex items-center gap-2">
-          <button
-            type="button"
-            onclick={() => onOpenOpname(mat)}
-            class="flex-1 py-2 text-xs font-medium bg-[#17171c] hover:bg-black text-white rounded-xl transition-all cursor-pointer text-center flex items-center justify-center gap-1"
-          >
-            <SlidersHorizontal class="w-3.5 h-3.5" />
-            <span>Audit Opname</span>
-          </button>
+                <!-- Batas Minimum -->
+                <td class="py-3 px-4 font-mono text-right text-zinc-600 text-xs">
+                  {mat.min_stock_alert} <span class="font-normal text-[10px] text-zinc-400">{mat.unit}</span>
+                </td>
 
-          <button
-            type="button"
-            onclick={() => onOpenEditMaterial(mat)}
-            class="p-2 text-[#75758a] hover:text-[#17171c] hover:bg-[#eeece7] border border-[#d9d9dd] rounded-xl transition-all cursor-pointer shrink-0"
-            title="Edit Bahan"
-          >
-            <Edit2 class="w-3.5 h-3.5" />
-          </button>
+                <!-- Status -->
+                <td class="py-3 px-4 text-center">
+                  <span class={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                    isLow
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-emerald-100 text-emerald-800'
+                  }`}>
+                    {#if isLow}
+                      <span>Menipis</span>
+                    {:else}
+                      <span>Aman</span>
+                    {/if}
+                  </span>
+                </td>
 
-          <button
-            type="button"
-            onclick={() => onDeleteMaterial(mat.id)}
-            class="p-2 text-[#93939f] hover:text-[#e5484d] hover:bg-[#ffefef] border border-[#d9d9dd] rounded-xl transition-all cursor-pointer shrink-0"
-            title="Hapus Bahan"
-          >
-            <Trash2 class="w-3.5 h-3.5" />
-          </button>
-        </div>
+                <!-- Audit Terakhir -->
+                <td class="py-3 px-4 font-mono text-center text-zinc-500 text-[11px]">
+                  {mat.last_adjusted_at || '-'}
+                </td>
+
+                <!-- Aksi -->
+                <td class="py-3 px-4 text-right">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <button
+                      type="button"
+                      onclick={() => onOpenOpname(mat)}
+                      class="px-2.5 py-1.5 bg-zinc-900 hover:bg-black text-white text-[11px] font-medium rounded-lg flex items-center gap-1 transition-all cursor-pointer shadow-2xs active:scale-95"
+                      title="Audit Stok Opname"
+                    >
+                      <SlidersHorizontal class="w-3 h-3" />
+                      <span>Opname</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onclick={() => onOpenEditMaterial(mat)}
+                      class="p-1.5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 border border-zinc-200 rounded-lg transition-colors cursor-pointer"
+                      title="Edit Bahan Baku"
+                    >
+                      <Edit2 class="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onclick={() => onDeleteMaterial(mat.id)}
+                      class="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 border border-zinc-200 rounded-lg transition-colors cursor-pointer"
+                      title="Hapus Bahan Baku"
+                    >
+                      <Trash2 class="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            {/each}
+          {/if}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Excel Status Bar / Summary Footer -->
+    <div class="bg-zinc-50 border-t border-zinc-200 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-zinc-600">
+      <div class="flex items-center gap-4">
+        <span>Total Bahan: <strong class="text-zinc-900">{filteredRawMaterials.length}</strong></span>
+        <span>Stok Menipis: <strong class="text-red-600">{lowStockCount}</strong></span>
+        <span>Stok Aman: <strong class="text-emerald-700">{rawMaterials.length - lowStockCount}</strong></span>
       </div>
-    {/each}
+
+      <div class="text-[11px] text-zinc-400">
+        Klik tombol "Opname" untuk rekonsiliasi selisih fisik laci/bar
+      </div>
+    </div>
   </div>
 </div>

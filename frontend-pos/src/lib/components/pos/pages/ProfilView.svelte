@@ -1,5 +1,13 @@
 <script lang="ts">
-  import { UserCircle, Store, Database, Lock } from 'lucide-svelte';
+  import {
+    Lock,
+    QrCode,
+    HardDrive,
+    ShoppingBag,
+    Check,
+    RefreshCw,
+    ShieldCheck,
+  } from 'lucide-svelte';
   import type { CashierUser } from '../../../types/pos';
 
   interface Props {
@@ -19,115 +27,445 @@
     onOpenMasterLockModal,
     onClearLocalCache,
   }: Props = $props();
+
+  // Active Settings Sub-Tab
+  let activeSettingsTab = $state<'pesanan' | 'pembayaran' | 'penyimpanan'>('pesanan');
+
+  // Sub-Tab 1: Pesanan & Notifikasi State
+  let autoAcceptOnline = $state(true);
+  let enableSound = $state(true);
+  let autoPrintReceipt = $state(true);
+  let receiptPaperSize = $state<'58mm' | '80mm'>('58mm');
+  let receiptFooterMessage = $state('Terima kasih atas kunjungan Anda!');
+
+  // Sub-Tab 2: Pembayaran & QRIS State
+  let enableCashPayment = $state(true);
+  let enableQrisPayment = $state(true);
+  let enableTransferPayment = $state(true);
+  let bankAccountNumber = $state('BCA 8901238910 - PT PRECIS KREATIF');
+  let qrisMerchantName = $state('PRECIS COFFEE OUTLET SETURAN');
+  let paymentSaveMsg = $state<string | null>(null);
+
+  // Sub-Tab 3: Sync & Storage State
+  let isSyncingNow = $state(false);
+  let syncSuccessMsg = $state<string | null>(null);
+
+  function handleSavePaymentSettings() {
+    paymentSaveMsg = 'Pengaturan metode pembayaran berhasil disimpan.';
+    setTimeout(() => (paymentSaveMsg = null), 3000);
+  }
+
+  function handleTriggerSync() {
+    isSyncingNow = true;
+    syncSuccessMsg = null;
+    setTimeout(() => {
+      isSyncingNow = false;
+      syncSuccessMsg = 'Semua data transaksi kasir berhasil disinkronkan ke server cloud.';
+      setTimeout(() => (syncSuccessMsg = null), 4000);
+    }, 1200);
+  }
 </script>
 
-<div class="flex-1 bg-[#eeece7]/30 p-4 sm:p-6 md:p-8 overflow-y-auto space-y-6 font-sans">
-  <div>
-    <h2 class="text-xl font-medium text-[#212121] tracking-tight">Profil Kasir &amp; Status Terminal Kiosk</h2>
-    <p class="text-xs text-[#616161] font-normal mt-0.5">Identitas outlet, status sinkronisasi, dan penyimpanan IndexedDB lokal</p>
+<div class="flex-1 flex flex-col md:flex-row h-full bg-[#f4f6f9] overflow-hidden font-sans select-none">
+  <!-- Left Side: Profile & Settings Navigation Menu -->
+  <div class="w-72 md:w-80 bg-white border-r border-zinc-200 flex flex-col h-full shrink-0">
+    <!-- User Profile Header -->
+    <div class="p-5 border-b border-zinc-200 flex items-center gap-3.5 bg-zinc-50/50">
+      <div class="w-12 h-12 rounded-2xl bg-zinc-900 text-white font-bold text-lg flex items-center justify-center shadow-xs shrink-0">
+        {activeCashier?.name ? activeCashier.name.charAt(0).toUpperCase() : 'P'}
+      </div>
+      <div class="min-w-0">
+        <h2 class="font-bold text-sm text-zinc-900 truncate">Précis Coffee Kiosk</h2>
+        <p class="text-[11px] text-zinc-500 truncate">
+          {activeCashier?.name ? `Petugas: ${activeCashier.name}` : 'Terminal Outlet #01'}
+        </p>
+        <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+          TERHUBUNG OUTLET
+        </span>
+      </div>
+    </div>
+
+    <!-- Navigation Sub-Menu Items -->
+    <div class="p-3 space-y-3 overflow-y-auto flex-1 text-xs">
+      <div>
+        <div class="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+          Operasional &amp; Struk
+        </div>
+        <div class="mt-1 space-y-1">
+          <button
+            type="button"
+            onclick={() => (activeSettingsTab = 'pesanan')}
+            class={`w-full px-3.5 py-2.5 rounded-xl font-semibold flex items-center justify-between transition-all cursor-pointer ${
+              activeSettingsTab === 'pesanan'
+                ? 'bg-zinc-900 text-white shadow-2xs'
+                : 'text-zinc-700 hover:bg-zinc-100'
+            }`}
+          >
+            <div class="flex items-center gap-2.5">
+              <ShoppingBag class="w-4 h-4" />
+              <span>Pesanan &amp; Struk</span>
+            </div>
+            {#if activeSettingsTab === 'pesanan'}
+              <span class="w-2 h-2 rounded-full bg-white"></span>
+            {/if}
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+          Metode Pembayaran
+        </div>
+        <div class="mt-1 space-y-1">
+          <button
+            type="button"
+            onclick={() => (activeSettingsTab = 'pembayaran')}
+            class={`w-full px-3.5 py-2.5 rounded-xl font-semibold flex items-center justify-between transition-all cursor-pointer ${
+              activeSettingsTab === 'pembayaran'
+                ? 'bg-zinc-900 text-white shadow-2xs'
+                : 'text-zinc-700 hover:bg-zinc-100'
+            }`}
+          >
+            <div class="flex items-center gap-2.5">
+              <QrCode class="w-4 h-4" />
+              <span>Pembayaran &amp; QRIS</span>
+            </div>
+            {#if activeSettingsTab === 'pembayaran'}
+              <span class="w-2 h-2 rounded-full bg-white"></span>
+            {/if}
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <div class="px-3 py-1.5 text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+          Penyimpanan &amp; Keamanan
+        </div>
+        <div class="mt-1 space-y-1">
+          <button
+            type="button"
+            onclick={() => (activeSettingsTab = 'penyimpanan')}
+            class={`w-full px-3.5 py-2.5 rounded-xl font-semibold flex items-center justify-between transition-all cursor-pointer ${
+              activeSettingsTab === 'penyimpanan'
+                ? 'bg-zinc-900 text-white shadow-2xs'
+                : 'text-zinc-700 hover:bg-zinc-100'
+            }`}
+          >
+            <div class="flex items-center gap-2.5">
+              <HardDrive class="w-4 h-4" />
+              <span>Penyimpanan Offline</span>
+            </div>
+            {#if activeSettingsTab === 'penyimpanan'}
+              <span class="w-2 h-2 rounded-full bg-white"></span>
+            {/if}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <!-- Active Cashier Profile Card -->
-    <div class="bg-white border border-[#d9d9dd] rounded-[22px] p-6 shadow-none space-y-4">
-      <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
-        <div class="flex items-center gap-2">
-          <UserCircle class="w-4 h-4 text-[#1863dc]" />
-          <h3 class="font-medium text-sm text-[#212121]">Operator Terminal Outlet</h3>
-        </div>
-        <span class="text-[10px] font-mono px-2.5 py-0.5 bg-[#edfce9] text-[#003c33] rounded-full font-medium">
-          Multi-Operator
-        </span>
-      </div>
+  <!-- Right Side: Active Settings Content -->
+  <div class="flex-1 bg-[#f4f6f9] p-6 sm:p-8 overflow-y-auto">
+    <div class="max-w-2xl mx-auto space-y-6">
+      
+      <!-- SUB-TAB 1: PESANAN & STRUK -->
+      {#if activeSettingsTab === 'pesanan'}
+        <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-2xs space-y-5">
+          <div class="border-b border-zinc-100 pb-3">
+            <h3 class="text-base font-bold text-zinc-900">Pengaturan Pesanan &amp; Struk Kasir</h3>
+            <p class="text-xs text-zinc-500 mt-0.5">Konfigurasi otomatisasi transaksi dan cetak nota kasir</p>
+          </div>
 
-      <div class="flex items-center gap-4">
-        <div class="w-14 h-14 rounded-[16px] bg-[#17171c] text-white flex items-center justify-center font-medium text-xl shadow-none">
-          {activeCashier?.name ? activeCashier.name.charAt(0) : 'T'}
-        </div>
-        <div>
-          <div class="font-medium text-base text-[#212121]">{activeCashier?.name || 'Tim Operasional Bar & Kasir'}</div>
-          <div class="text-xs font-mono text-[#75758a] mt-0.5">Mode: Multi-Barista Shift</div>
-          <div class="text-[11px] text-[#93939f] font-normal">Terminal kasir siap transaksi bersama</div>
-        </div>
-      </div>
-    </div>
+          <div class="space-y-4">
+            <!-- Toggle: Auto Accept -->
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs font-bold text-zinc-900">Penerimaan Pesanan Otomatis</div>
+                <div class="text-[11px] text-zinc-500 mt-0.5">Langsung proses pesanan masuk tanpa konfirmasi manual</div>
+              </div>
+              <button
+                type="button"
+                aria-label="Toggle auto accept"
+                onclick={() => (autoAcceptOnline = !autoAcceptOnline)}
+                class={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                  autoAcceptOnline ? 'bg-zinc-900' : 'bg-zinc-300'
+                }`}
+              >
+                <div
+                  class={`w-5 h-5 rounded-full bg-white transition-transform transform shadow-xs absolute top-0.5 ${
+                    autoAcceptOnline ? 'translate-x-5.5' : 'translate-x-0.5'
+                  }`}
+                ></div>
+              </button>
+            </div>
 
-    <!-- Outlet & Device Token Info Card -->
-    <div class="bg-white border border-[#d9d9dd] rounded-[22px] p-6 shadow-none space-y-4">
-      <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
-        <div class="flex items-center gap-2">
-          <Store class="w-4 h-4 text-[#1863dc]" />
-          <h3 class="font-medium text-sm text-[#212121]">Identitas Outlet &amp; Token</h3>
-        </div>
-        <span class="text-[10px] font-mono px-2.5 py-0.5 bg-[#f1f5ff] text-[#1863dc] rounded-full font-medium">
-          TERPAIRING
-        </span>
-      </div>
+            <!-- Toggle: Sound -->
+            <div class="flex items-center justify-between pt-3 border-t border-zinc-100">
+              <div>
+                <div class="text-xs font-bold text-zinc-900">Bunyi Notifikasi Transaksi</div>
+                <div class="text-[11px] text-zinc-500 mt-0.5">Mainkan audio saat transaksi berhasil dibayar</div>
+              </div>
+              <button
+                type="button"
+                aria-label="Toggle sound"
+                onclick={() => (enableSound = !enableSound)}
+                class={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                  enableSound ? 'bg-zinc-900' : 'bg-zinc-300'
+                }`}
+              >
+                <div
+                  class={`w-5 h-5 rounded-full bg-white transition-transform transform shadow-xs absolute top-0.5 ${
+                    enableSound ? 'translate-x-5.5' : 'translate-x-0.5'
+                  }`}
+                ></div>
+              </button>
+            </div>
 
-      <div class="space-y-2.5 text-xs font-mono">
-        <div class="flex justify-between text-[#616161]">
-          <span>Nama Outlet:</span>
-          <span class="font-medium text-[#212121]">Outlet Sleman #01</span>
-        </div>
-        <div class="flex justify-between text-[#616161]">
-          <span>Device Token ID:</span>
-          <span class="text-[#1863dc]">dev-tok-sleman-01-a89b</span>
-        </div>
-        <div class="flex justify-between text-[#616161]">
-          <span>Workspace Tenant:</span>
-          <span class="text-[#212121]">Amore Group (Multi-Outlet)</span>
-        </div>
-      </div>
+            <!-- Toggle: Auto Print Receipt -->
+            <div class="flex items-center justify-between pt-3 border-t border-zinc-100">
+              <div>
+                <div class="text-xs font-bold text-zinc-900">Cetak Struk Otomatis</div>
+                <div class="text-[11px] text-zinc-500 mt-0.5">Kirim perintah ke printer thermal setelah pembayaran selesai</div>
+              </div>
+              <button
+                type="button"
+                aria-label="Toggle auto print receipt"
+                onclick={() => (autoPrintReceipt = !autoPrintReceipt)}
+                class={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                  autoPrintReceipt ? 'bg-zinc-900' : 'bg-zinc-300'
+                }`}
+              >
+                <div
+                  class={`w-5 h-5 rounded-full bg-white transition-transform transform shadow-xs absolute top-0.5 ${
+                    autoPrintReceipt ? 'translate-x-5.5' : 'translate-x-0.5'
+                  }`}
+                ></div>
+              </button>
+            </div>
 
-      <div class="pt-3 border-t border-[#d9d9dd]">
-        <button
-          type="button"
-          onclick={onOpenMasterLockModal}
-          class="w-full py-2.5 bg-[#eeece7]/40 hover:bg-[#eeece7] text-[#212121] border border-[#d9d9dd] rounded-full text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-none"
-        >
-          <Lock class="w-3.5 h-3.5 text-[#1863dc]" />
-          <span>Buka Pengaturan Master Owner</span>
-        </button>
-      </div>
-    </div>
+            <!-- Paper Size Selection -->
+            <div class="pt-3 border-t border-zinc-100 space-y-2">
+              <div class="text-xs font-bold text-zinc-900 block">Ukuran Kertas Printer Thermal</div>
+              <div class="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onclick={() => (receiptPaperSize = '58mm')}
+                  class={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                    receiptPaperSize === '58mm'
+                      ? 'border-zinc-900 bg-zinc-50 shadow-2xs'
+                      : 'border-zinc-200 bg-white hover:bg-zinc-50'
+                  }`}
+                >
+                  <div class="text-xs font-bold text-zinc-900">58mm (Standar Kiosk)</div>
+                  <div class="text-[10px] text-zinc-500 mt-0.5">Lebar 32 karakter per baris</div>
+                </button>
 
-    <!-- Database Offline Storage (Dexie.js) Card -->
-    <div class="bg-white border border-[#d9d9dd] rounded-[22px] p-6 shadow-none space-y-4 md:col-span-2">
-      <div class="flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
-        <div class="flex items-center gap-2">
-          <Database class="w-4 h-4 text-[#003c33]" />
-          <h3 class="font-medium text-sm text-[#212121]">Mesin Penyimpanan Offline (Dexie.js IndexedDB)</h3>
+                <button
+                  type="button"
+                  onclick={() => (receiptPaperSize = '80mm')}
+                  class={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                    receiptPaperSize === '80mm'
+                      ? 'border-zinc-900 bg-zinc-50 shadow-2xs'
+                      : 'border-zinc-200 bg-white hover:bg-zinc-50'
+                  }`}
+                >
+                  <div class="text-xs font-bold text-zinc-900">80mm (Printer Desktop)</div>
+                  <div class="text-[10px] text-zinc-500 mt-0.5">Lebar 48 karakter per baris</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Footer Note -->
+            <div class="pt-3 border-t border-zinc-100 space-y-1.5">
+              <label for="receipt-footer" class="text-xs font-bold text-zinc-900 block">Pesan Kaki Struk (Footer Nota)</label>
+              <input
+                id="receipt-footer"
+                type="text"
+                bind:value={receiptFooterMessage}
+                class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:border-zinc-900 focus:outline-hidden font-medium"
+              />
+            </div>
+          </div>
         </div>
-        <span class="text-[10px] font-mono px-2.5 py-0.5 bg-[#edfce9] text-[#003c33] rounded-full font-medium">STATUS: HEALTHY</span>
-      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-        <div class="p-4 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px]">
-          <div class="text-[11px] text-[#75758a]">Total Menu Tersimpan</div>
-          <div class="text-lg font-medium font-mono text-[#212121] mt-1">{totalProductsCount} Produk</div>
+      <!-- SUB-TAB 2: PEMBAYARAN & QRIS -->
+      {:else if activeSettingsTab === 'pembayaran'}
+        <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-2xs space-y-5">
+          <div class="border-b border-zinc-100 pb-3">
+            <h3 class="text-base font-bold text-zinc-900">Konfigurasi Metode Pembayaran &amp; QRIS</h3>
+            <p class="text-xs text-zinc-500 mt-0.5">Atur channel penerimaan uang tunai, QRIS, dan transfer bank kasir</p>
+          </div>
+
+          {#if paymentSaveMsg}
+            <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold flex items-center gap-2">
+              <Check class="w-4 h-4 shrink-0" />
+              <span>{paymentSaveMsg}</span>
+            </div>
+          {/if}
+
+          <div class="space-y-4">
+            <!-- Channel Toggles -->
+            <div class="space-y-3">
+              <div class="text-xs font-bold text-zinc-900 block">Metode Pembayaran Aktif di Kasir</div>
+              
+              <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-semibold text-zinc-900">Pembayaran Tunai (Cash)</div>
+                  <div class="text-[10px] text-zinc-500">Menerima uang tunai dan menghitung kembalian laci</div>
+                </div>
+                <input
+                  type="checkbox"
+                  bind:checked={enableCashPayment}
+                  class="w-4 h-4 accent-zinc-900 cursor-pointer"
+                />
+              </div>
+
+              <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-semibold text-zinc-900">QRIS Dinamis &amp; Statis</div>
+                  <div class="text-[10px] text-zinc-500">Scan QRIS langsung dari layar tablet atau kertas kasir</div>
+                </div>
+                <input
+                  type="checkbox"
+                  bind:checked={enableQrisPayment}
+                  class="w-4 h-4 accent-zinc-900 cursor-pointer"
+                />
+              </div>
+
+              <div class="p-3 bg-zinc-50 border border-zinc-200 rounded-xl flex items-center justify-between">
+                <div>
+                  <div class="text-xs font-semibold text-zinc-900">Mesin EDC (Kartu Debit &amp; Kredit)</div>
+                  <div class="text-[10px] text-zinc-500">Penerimaan pembayaran via mesin terminal EDC kasir</div>
+                </div>
+                <input
+                  type="checkbox"
+                  bind:checked={enableTransferPayment}
+                  class="w-4 h-4 accent-zinc-900 cursor-pointer"
+                />
+              </div>
+            </div>
+
+            <!-- QRIS Merchant Info -->
+            <div class="pt-3 border-t border-zinc-100 space-y-1.5">
+              <label for="qris-name" class="text-xs font-bold text-zinc-900 block">Nama Merchant QRIS Outlet</label>
+              <input
+                id="qris-name"
+                type="text"
+                bind:value={qrisMerchantName}
+                class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:border-zinc-900 focus:outline-hidden font-medium"
+              />
+            </div>
+
+            <!-- Bank Account Info -->
+            <div class="pt-1 space-y-1.5">
+              <label for="bank-account" class="text-xs font-bold text-zinc-900 block">Rekening Bank Tujuan Setoran</label>
+              <input
+                id="bank-account"
+                type="text"
+                bind:value={bankAccountNumber}
+                class="w-full px-3.5 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:bg-white focus:border-zinc-900 focus:outline-hidden font-mono font-bold"
+              />
+            </div>
+
+            <div class="pt-2">
+              <button
+                type="button"
+                onclick={handleSavePaymentSettings}
+                class="px-4 py-2.5 bg-zinc-900 hover:bg-black text-white text-xs font-semibold rounded-xl cursor-pointer shadow-2xs transition-all active:scale-[0.99]"
+              >
+                Simpan Pengaturan Pembayaran
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="p-4 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px]">
-          <div class="text-[11px] text-[#75758a]">Riwayat Struk di Database</div>
-          <div class="text-lg font-medium font-mono text-[#212121] mt-1">{totalOrdersCount} Transaksi</div>
-        </div>
+      <!-- SUB-TAB 3: PENYIMPANAN OFFLINE & KEAMANAN -->
+      {:else if activeSettingsTab === 'penyimpanan'}
+        <div class="space-y-5">
+          <!-- Card: Offline Data Status -->
+          <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-2xs space-y-5">
+            <div class="border-b border-zinc-100 pb-3">
+              <h3 class="text-base font-bold text-zinc-900">Penyimpanan Offline Lokal Terminal</h3>
+              <p class="text-xs text-zinc-500 mt-0.5">Semua data transaksi dan menu tersimpan aman di perangkat tablet kasir</p>
+            </div>
 
-        <div class="p-4 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px]">
-          <div class="text-[11px] text-[#75758a]">Karyawan Terdaftar di Kasir</div>
-          <div class="text-lg font-medium font-mono text-[#212121] mt-1">{cashiers.length} Akun Kasir</div>
-        </div>
-      </div>
+            {#if syncSuccessMsg}
+              <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-semibold flex items-center gap-2">
+                <Check class="w-4 h-4 shrink-0 text-emerald-600" />
+                <span>{syncSuccessMsg}</span>
+              </div>
+            {/if}
 
-      <div class="pt-3 border-t border-[#d9d9dd] flex items-center justify-between text-xs">
-        <span class="text-[#75758a]">Sinkronisasi otomatis berjalan tiap kali koneksi internet tersedia.</span>
-        <button
-          type="button"
-          onclick={onClearLocalCache}
-          class="px-3.5 py-1 bg-white hover:bg-[#ffad9b]/15 text-[#b30000] text-xs font-mono border border-[#d9d9dd] rounded-full cursor-pointer transition-all"
-        >
-          Reset Master Seed Data
-        </button>
-      </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono">
+              <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                <div class="text-[11px] font-sans text-zinc-500">Riwayat Transaksi</div>
+                <div class="text-base font-bold text-zinc-900 mt-1">{totalOrdersCount} Struk</div>
+              </div>
+
+              <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                <div class="text-[11px] font-sans text-zinc-500">Menu Jualan</div>
+                <div class="text-base font-bold text-zinc-900 mt-1">{totalProductsCount} Produk</div>
+              </div>
+
+              <div class="p-3.5 bg-zinc-50 border border-zinc-200 rounded-xl">
+                <div class="text-[11px] font-sans text-zinc-500">Staf Operator</div>
+                <div class="text-base font-bold text-zinc-900 mt-1">{cashiers.length} Kasir</div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-zinc-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs">
+              <span class="text-zinc-500 text-[11px]">
+                Sinkronisasi otomatis berjalan di latar belakang saat terminal online.
+              </span>
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  onclick={handleTriggerSync}
+                  disabled={isSyncingNow}
+                  class="px-3.5 py-2 bg-zinc-900 hover:bg-black text-white text-xs font-semibold rounded-xl cursor-pointer shadow-2xs transition-all flex items-center justify-center gap-1.5 disabled:opacity-50"
+                >
+                  <RefreshCw class={`w-3.5 h-3.5 ${isSyncingNow ? 'animate-spin' : ''}`} />
+                  <span>{isSyncingNow ? 'Sinkronisasi...' : 'Sinkronkan Sekarang'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onclick={onClearLocalCache}
+                  class="px-3.5 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-semibold rounded-xl cursor-pointer transition-colors"
+                >
+                  Muat Ulang Data Standar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card: Master Lock Security -->
+          <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-2xs space-y-4">
+            <div class="flex items-center gap-3 border-b border-zinc-100 pb-3">
+              <div class="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center">
+                <Lock class="w-4 h-4" />
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-zinc-900">Master Lock &amp; Otorisasi Owner</h3>
+                <p class="text-[11px] text-zinc-500">Proteksi PIN khusus untuk diskon besar, void pesanan, dan buka laci</p>
+              </div>
+            </div>
+
+            <p class="text-xs text-zinc-600 leading-relaxed">
+              Fitur proteksi Master Lock memastikan bahwa kasir staf tidak dapat membatalkan pesanan atau memberikan diskon tanpa otorisasi PIN Owner.
+            </p>
+
+            <button
+              type="button"
+              onclick={onOpenMasterLockModal}
+              class="w-full py-2.5 bg-zinc-900 hover:bg-black text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-all active:scale-[0.99]"
+            >
+              <ShieldCheck class="w-4 h-4" />
+              <span>Buka Pengaturan Master Owner</span>
+            </button>
+          </div>
+        </div>
+      {/if}
     </div>
   </div>
 </div>

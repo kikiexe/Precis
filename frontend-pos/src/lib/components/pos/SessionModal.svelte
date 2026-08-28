@@ -239,7 +239,7 @@
               <span class="font-mono font-medium text-[#003c33]">+{formatCurrency(activeSession.total_cash_sales)}</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-[#616161]">Penjualan Non-Tunai (QRIS/Transfer):</span>
+              <span class="text-[#616161]">Penjualan Non-Tunai (QRIS / EDC):</span>
               <span class="font-mono font-medium text-[#1863dc]">+{formatCurrency(activeSession.total_qris_sales + activeSession.total_transfer_sales)}</span>
             </div>
             <div class="pt-2 border-t border-[#d9d9dd] flex justify-between font-medium">

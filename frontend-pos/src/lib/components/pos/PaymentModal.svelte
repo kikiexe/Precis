@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Banknote, QrCode, ArrowRightLeft, X, Check, AlertTriangle } from 'lucide-svelte';
+  import { Banknote, QrCode, CreditCard, X, Check, AlertTriangle } from 'lucide-svelte';
   import type { PaymentMethod, CartItem, OfflineOrder, CashierUser } from '../../types/pos';
   import { formatCurrency } from '../../services/printer-service';
 
@@ -149,15 +149,15 @@
 
         <button
           type="button"
-          onclick={() => (selectedMethod = 'TRANSFER')}
+          onclick={() => (selectedMethod = 'EDC')}
           class={`py-3.5 px-3 rounded-[16px] border text-center flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
-            selectedMethod === 'TRANSFER'
+            selectedMethod === 'EDC'
               ? 'bg-[#17171c] text-white border-[#17171c] font-medium shadow-none'
               : 'bg-[#eeece7]/40 text-[#616161] border-[#d9d9dd] hover:text-[#212121] hover:bg-[#eeece7]'
           }`}
         >
-          <ArrowRightLeft class="w-5 h-5" />
-          <span class="text-xs">Transfer Bank</span>
+          <CreditCard class="w-5 h-5" />
+          <span class="text-xs">Mesin EDC (Kartu)</span>
         </button>
       </div>
 
@@ -230,16 +230,31 @@
               {formatCurrency(finalAmount)}
             </div>
           </div>
-        {:else if selectedMethod === 'TRANSFER'}
-          <div class="p-4 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] space-y-2.5 text-xs font-mono">
-            <div class="text-sm font-medium text-[#212121]">Rekening Outlet:</div>
-            <div class="p-3 bg-white border border-[#d9d9dd] rounded-[12px] space-y-1">
-              <div class="text-[#75758a]">Bank Central Asia (BCA)</div>
-              <div class="text-base font-medium text-[#212121]">8412-9900-1122</div>
-              <div class="text-[#93939f]">a.n. Précis Coffee Sleman</div>
+        {:else if selectedMethod === 'EDC' || selectedMethod === 'TRANSFER'}
+          <div class="p-5 bg-[#eeece7]/30 border border-[#d9d9dd] rounded-[16px] space-y-3 text-xs">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center">
+                <CreditCard class="w-4 h-4" />
+              </div>
+              <div>
+                <div class="text-sm font-bold text-[#212121]">Pembayaran Mesin EDC</div>
+                <div class="text-[11px] text-[#75758a]">Debit / Kartu Kredit / Contactless Tap</div>
+              </div>
             </div>
-            <div class="text-[#616161]">
-              Pastikan pelanggan menunjukkan bukti transfer sukses sebelum menyelesaikan transaksi.
+
+            <div class="p-3.5 bg-white border border-[#d9d9dd] rounded-[12px] space-y-1.5 font-mono">
+              <div class="flex justify-between text-[#616161]">
+                <span>Total Tagihan EDC:</span>
+                <span class="text-base font-bold text-[#17171c]">{formatCurrency(finalAmount)}</span>
+              </div>
+              <div class="text-[11px] text-[#75758a]">
+                Gesek, masukkan chip, atau tap kartu pelanggan pada terminal EDC kasir.
+              </div>
+            </div>
+
+            <div class="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-[11px] flex items-center gap-2">
+              <Check class="w-4 h-4 shrink-0 text-emerald-600" />
+              <span>Pastikan slip transaksi EDC sudah tercetak Approved sebelum menyelesaikan pesanan.</span>
             </div>
           </div>
         {/if}
