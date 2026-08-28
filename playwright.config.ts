@@ -6,9 +6,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: 'list',
   use: {
-    baseURL: 'http://localhost:5174',
+    baseURL: 'https://localhost:5175',
+    ignoreHTTPSErrors: true,
     trace: 'on-first-retry',
   },
   projects: [
@@ -18,8 +19,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm --filter @precis/pos dev --port 5174',
-    url: 'http://localhost:5174',
+    command: 'pnpm --filter @precis/pos dev',
+    url: 'https://localhost:5175',
+    ignoreHTTPSErrors: true,
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },

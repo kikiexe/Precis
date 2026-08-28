@@ -59,10 +59,7 @@ describe('PrecisPosDatabase Offline Dexie.js Integration', () => {
 
     await testDb.orders.add(mockOrder);
 
-    const pendingOrders = await testDb.orders
-      .where('sync_status')
-      .equals('PENDING')
-      .toArray();
+    const pendingOrders = await testDb.orders.where('sync_status').equals('PENDING').toArray();
 
     expect(pendingOrders.length).toBe(1);
     expect(pendingOrders[0].order_number).toBe('ORD-892101');
