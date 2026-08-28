@@ -2,6 +2,7 @@
   "name": "precis-monorepo",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
   "packageManager": "pnpm@11.18.0",
   "scripts": {
     "dev": "pnpm --filter @precis/landing dev",
@@ -16,11 +17,26 @@
     "superadmin": "pnpm --filter @precis/superadmin dev",
     "build": "pnpm -r build",
     "check": "pnpm -r check",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "test:all": "vitest run && (cd backend && php artisan test)"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "eslint": "^10.9.1",
+    "eslint-plugin-svelte": "^3.23.0",
+    "fake-indexeddb": "^6.2.5",
+    "prettier": "^3.9.6",
+    "prettier-plugin-svelte": "^4.1.1",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "svelte-eslint-parser": "^1.8.1",
+    "typescript-eslint": "^8.68.0",
     "vitest": "^4.1.11"
   }
 }
