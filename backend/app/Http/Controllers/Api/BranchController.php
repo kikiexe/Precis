@@ -143,13 +143,16 @@ class BranchController
 
         $validated = $request->validate([
             'terminal_name' => 'nullable|string|max:100',
+            'device_token' => 'nullable|string|min:3|max:100',
         ]);
 
         $name = ! empty($validated['terminal_name'])
             ? trim($validated['terminal_name'])
             : 'Terminal Kasir #' . (\App\Models\PosTerminal::withoutGlobalScopes()->where('branch_id', $branch->id)->count() + 1);
 
-        $rawToken = 'pos-' . \Illuminate\Support\Str::slug($branch->name) . '-' . \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6));
+        $rawToken = ! empty($validated['device_token'])
+            ? trim($validated['device_token'])
+            : 'pos-' . \Illuminate\Support\Str::slug($branch->name) . '-' . \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6));
 
         $terminal = \App\Models\PosTerminal::create([
             'workspace_id' => $workspaceId,
@@ -173,11 +176,15 @@ class BranchController
     }
 
     /**
-     * Regenerate device token for an existing POS terminal.
+     * Regenerate or set custom device token for an existing POS terminal.
      */
     public function regenerateTerminalToken(Request $request, string $branchId, string $terminalId): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+
+        $validated = $request->validate([
+            'device_token' => 'nullable|string|min:3|max:100',
+        ]);
 
         $terminal = \App\Models\PosTerminal::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
@@ -187,7 +194,10 @@ class BranchController
 
         $branch = Branch::withoutGlobalScopes()->find($branchId);
         $branchSlug = $branch ? \Illuminate\Support\Str::slug($branch->name) : 'outlet';
-        $rawToken = 'pos-' . $branchSlug . '-' . \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6));
+        
+        $rawToken = ! empty($validated['device_token'])
+            ? trim($validated['device_token'])
+            : 'pos-' . $branchSlug . '-' . \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6));
 
         $terminal->update([
             'device_token' => $rawToken,
