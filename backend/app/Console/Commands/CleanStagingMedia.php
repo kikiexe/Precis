@@ -38,6 +38,7 @@ class CleanStagingMedia extends Command
                 }
             }
         } catch (Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal membaca atau membersihkan direktori staging: ' . $e->getMessage());
             $this->warn('Gagal membaca direktori staging: ' . $e->getMessage());
         }
 

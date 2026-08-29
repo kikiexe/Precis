@@ -109,8 +109,12 @@ class MediaStorageService
             if (Storage::disk($disk)->exists($path)) {
                 Storage::disk($disk)->move($path, $permanentKey);
             }
-        } catch (Throwable) {
-            // abaikan kegagalan I/O saat simulasi mock URL pada testing
+        } catch (Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Gagal memindahkan berkas media dari staging ke permanent storage: ' . $e->getMessage(), [
+                'path' => $path,
+                'permanent_key' => $permanentKey,
+                'disk' => $disk,
+            ]);
         }
 
         if ($useR2 && config('filesystems.disks.r2.url')) {
