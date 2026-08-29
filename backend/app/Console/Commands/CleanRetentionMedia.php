@@ -37,8 +37,9 @@ class CleanRetentionMedia extends Command
                     $deletedCount++;
                 }
             }
-        } catch (Throwable) {
-            $this->warn('Gagal membaca direktori permanent.');
+        } catch (Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal membaca atau membersihkan direktori permanent: ' . $e->getMessage());
+            $this->warn('Gagal membaca direktori permanent: ' . $e->getMessage());
         }
 
         $this->info("Pembersihan retensi selesai. Total file dihapus: {$deletedCount}");
