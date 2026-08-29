@@ -24,6 +24,7 @@
     DEFAULT_OVERTIME_PAY_PER_HOUR_IDR,
     DEFAULT_MIN_OVERTIME_THRESHOLD_MINUTES,
   } from '../../../constants/defaults';
+  import { normalizeMediaUrl } from '@precis/shared-utils/formatters';
 
   interface Props {
     branches: BranchItem[];
@@ -613,7 +614,7 @@
             class="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] p-1.5 shadow-2xs"
           >
             <img
-              src={branchQrisUrl}
+              src={normalizeMediaUrl(branchQrisUrl)}
               alt="Preview QRIS Toko"
               class="h-full w-full object-contain"
             />

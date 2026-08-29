@@ -43,3 +43,15 @@ export function formatDateTimeIndo(dateStr?: string | null): string {
     return dateStr;
   }
 }
+
+/**
+ * menormalkan URL gambar media lokal agar menggunakan path relatif
+ * untuk mencegah Mixed Content warning (HTTP vs HTTPS di browser)
+ */
+export function normalizeMediaUrl(url?: string | null): string {
+  if (!url) return '';
+  if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+  // ubah http://127.0.0.1:8000/storage/... atau http://localhost:8000/storage/... menjadi /storage/...
+  return url.replace(/^https?:\/\/(?:127\.0\.0\.1|localhost):8000(\/.*)$/, '$1');
+}
+
