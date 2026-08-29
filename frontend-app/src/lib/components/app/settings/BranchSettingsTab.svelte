@@ -12,6 +12,8 @@
     Copy,
     Plus,
     Trash2,
+    QrCode,
+    Upload,
   } from 'lucide-svelte';
   import type { BranchItem } from '../../../types/app';
   import { inventoryService } from '../../../services/inventory-service';
@@ -40,9 +42,13 @@
   let latePenaltyRate = $state(DEFAULT_LATE_PENALTY_PER_MINUTE_IDR);
   let overtimeHourlyRate = $state(DEFAULT_OVERTIME_PAY_PER_HOUR_IDR);
   let minOvertimeThreshold = $state(DEFAULT_MIN_OVERTIME_THRESHOLD_MINUTES);
+  let branchQrisUrl = $state<string | null>(null);
 
   let isDetectingGps = $state(false);
   let isSavingBranch = $state(false);
+  let isUploadingQris = $state(false);
+  let isDraggingQris = $state(false);
+  let fileInputRef = $state<HTMLInputElement | null>(null);
   let branchSuccessMsg = $state<string | null>(null);
   let branchErrorMsg = $state<string | null>(null);
 
@@ -70,6 +76,7 @@
         overtimeHourlyRate = active.overtime_pay_per_hour ?? DEFAULT_OVERTIME_PAY_PER_HOUR_IDR;
         minOvertimeThreshold =
           active.min_overtime_threshold_minutes ?? DEFAULT_MIN_OVERTIME_THRESHOLD_MINUTES;
+        branchQrisUrl = active.qris_image_url || null;
       }
     }
   });
@@ -185,6 +192,7 @@
         lat: latNum,
         lng: lngNum,
         radius_meters: Number(geofenceRadius) || DEFAULT_GEOFENCE_RADIUS_METERS,
+        qris_image_url: branchQrisUrl,
         late_penalty_per_minute: Number(latePenaltyRate) || 0,
         overtime_pay_per_hour: Number(overtimeHourlyRate) || 0,
         min_overtime_threshold_minutes: Number(minOvertimeThreshold) || 0,
@@ -201,6 +209,94 @@
       branchErrorMsg = e instanceof Error ? e.message : 'Gagal menyimpan pengaturan cabang.';
     } finally {
       isSavingBranch = false;
+    }
+  }
+
+  async function handleQrisFileSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+      await processQrisUpload(file);
+    }
+    if (target) target.value = '';
+  }
+
+  async function handleQrisDrop(event: DragEvent) {
+    event.preventDefault();
+    isDraggingQris = false;
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      await processQrisUpload(file);
+    }
+  }
+
+  async function processQrisUpload(file: File) {
+    const targetId = selectedBranchId || (branches.length > 0 ? branches[0].id : '');
+    if (!targetId) {
+      branchErrorMsg = 'Pilih cabang terlebih dahulu.';
+      setTimeout(() => (branchErrorMsg = null), 4000);
+      return;
+    }
+
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedMimeTypes.includes(file.type)) {
+      branchErrorMsg = 'Format berkas QRIS harus PNG, JPG, atau WebP.';
+      setTimeout(() => (branchErrorMsg = null), 4000);
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      branchErrorMsg = 'Ukuran berkas QRIS tidak boleh melebihi 2MB.';
+      setTimeout(() => (branchErrorMsg = null), 4000);
+      return;
+    }
+
+    isUploadingQris = true;
+    branchErrorMsg = null;
+    branchSuccessMsg = null;
+
+    try {
+      const publicUrl = await inventoryService.uploadQrisImage(file);
+      branchQrisUrl = publicUrl;
+      await inventoryService.updateBranch(targetId, {
+        qris_image_url: publicUrl,
+      });
+      branchSuccessMsg = 'Gambar QRIS toko berhasil disimpan.';
+      onBranchUpdated?.();
+      setTimeout(() => (branchSuccessMsg = null), 4000);
+    } catch (err: unknown) {
+      branchErrorMsg = err instanceof Error ? err.message : 'Gagal mengunggah gambar QRIS.';
+      setTimeout(() => (branchErrorMsg = null), 4000);
+    } finally {
+      isUploadingQris = false;
+    }
+  }
+
+  async function handleDeleteQris() {
+    const targetId = selectedBranchId || (branches.length > 0 ? branches[0].id : '');
+    if (!targetId) return;
+
+    if (!confirm('Apakah Anda yakin ingin menghapus foto barcode QRIS cabang ini?')) {
+      return;
+    }
+
+    isUploadingQris = true;
+    branchErrorMsg = null;
+    branchSuccessMsg = null;
+
+    try {
+      await inventoryService.updateBranch(targetId, {
+        qris_image_url: null,
+      });
+      branchQrisUrl = null;
+      branchSuccessMsg = 'Gambar QRIS toko berhasil dihapus.';
+      onBranchUpdated?.();
+      setTimeout(() => (branchSuccessMsg = null), 4000);
+    } catch (err: unknown) {
+      branchErrorMsg = err instanceof Error ? err.message : 'Gagal menghapus gambar QRIS.';
+      setTimeout(() => (branchErrorMsg = null), 4000);
+    } finally {
+      isUploadingQris = false;
     }
   }
 
@@ -484,6 +580,132 @@
         />
       </div>
     </div>
+  </div>
+
+  <!-- Card Barcode QRIS Statis Toko (Pembayaran POS) -->
+  <div class="space-y-3.5 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-4 shadow-2xs">
+    <div class="flex flex-col justify-between gap-1 sm:flex-row sm:items-center">
+      <div class="flex items-center gap-2">
+        <QrCode class="h-4 w-4 text-[#17171c]" />
+        <h4 class="text-xs font-bold text-[#17171c]">Stiker QRIS Statis Toko</h4>
+      </div>
+      <span class="text-[11px] text-[#8e8e93]">
+        Ditampilkan di tablet POS saat pelanggan memilih pembayaran QRIS
+      </span>
+    </div>
+
+    <!-- Hidden file input -->
+    <input
+      type="file"
+      accept="image/png,image/jpeg,image/webp"
+      class="hidden"
+      bind:this={fileInputRef}
+      onchange={handleQrisFileSelected}
+    />
+
+    {#if branchQrisUrl}
+      <!-- Preview Box -->
+      <div
+        class="flex flex-col items-center gap-4 rounded-xl border border-[#e5e5ea] bg-white p-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="flex items-center gap-3.5">
+          <div
+            class="relative flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] p-1.5 shadow-2xs"
+          >
+            <img
+              src={branchQrisUrl}
+              alt="Preview QRIS Toko"
+              class="h-full w-full object-contain"
+            />
+          </div>
+          <div class="space-y-1 text-xs">
+            <div
+              class="inline-flex items-center gap-1 rounded-md bg-[#ecfdf5] px-2 py-0.5 text-[10px] font-bold text-[#059669]"
+            >
+              <Check class="h-3 w-3" />
+              <span>QRIS Toko Aktif</span>
+            </div>
+            <p class="text-[11px] text-[#686873]">
+              Barcode siap dipindai pelanggan di kasir tablet POS.
+            </p>
+            <p class="font-mono text-[10px] text-[#8e8e93]">
+              Format: PNG / JPG / WebP (Maks 2MB)
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            onclick={() => fileInputRef?.click()}
+            disabled={isUploadingQris}
+            class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-white px-3 py-1.5 text-xs font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#f8f8fa] disabled:opacity-50"
+          >
+            {#if isUploadingQris}
+              <RefreshCw class="h-3.5 w-3.5 animate-spin" />
+              <span>Mengunggah...</span>
+            {:else}
+              <Upload class="h-3.5 w-3.5" />
+              <span>Ganti Foto</span>
+            {/if}
+          </button>
+
+          <button
+            type="button"
+            onclick={handleDeleteQris}
+            disabled={isUploadingQris}
+            class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#fecaca] bg-[#fef2f2] px-3 py-1.5 text-xs font-semibold text-[#dc2626] shadow-2xs transition-all hover:bg-[#fee2e2] disabled:opacity-50"
+            title="Hapus barcode QRIS cabang ini"
+          >
+            <Trash2 class="h-3.5 w-3.5" />
+            <span>Hapus</span>
+          </button>
+        </div>
+      </div>
+    {:else}
+      <!-- Drag and drop area -->
+      <div
+        role="button"
+        tabindex="0"
+        onclick={() => fileInputRef?.click()}
+        onkeydown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fileInputRef?.click();
+          }
+        }}
+        ondragover={(e) => {
+          e.preventDefault();
+          isDraggingQris = true;
+        }}
+        ondragleave={() => (isDraggingQris = false)}
+        ondrop={handleQrisDrop}
+        class={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed p-6 text-center transition-all ${
+          isDraggingQris
+            ? 'border-[#17171c] bg-[#f0f0f3]'
+            : 'border-[#d2d2d7] bg-white hover:border-[#17171c] hover:bg-[#fafafc]'
+        }`}
+      >
+        {#if isUploadingQris}
+          <RefreshCw class="h-8 w-8 animate-spin text-[#17171c]" />
+          <p class="text-xs font-bold text-[#17171c]">Mengunggah foto QRIS ke storage...</p>
+        {:else}
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-[#f0f0f3] text-[#17171c]"
+          >
+            <Upload class="h-5 w-5" />
+          </div>
+          <div>
+            <p class="text-xs font-bold text-[#17171c]">
+              Klik atau tarik foto stiker QRIS toko ke sini
+            </p>
+            <p class="mt-0.5 text-[11px] text-[#8e8e93]">
+              Format PNG, JPG, atau WebP (Maksimal 2MB)
+            </p>
+          </div>
+        {/if}
+      </div>
+    {/if}
   </div>
 
   <!-- Tombol Simpan -->

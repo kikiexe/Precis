@@ -65,6 +65,41 @@ describe('PrecisPosDatabase Offline Dexie.js Integration', () => {
     expect(pendingOrders[0].payment_method).toBe('EDC');
   });
 
+  it('saves offline order with QRIS payment method', async () => {
+    const qrisOrder: OfflineOrder = {
+      client_order_id: 'ord-uuid-qris-002',
+      order_number: 'ORD-892102',
+      workspace_id: 'ws-test',
+      branch_id: 'branch-test',
+      pos_session_id: 'sess-001',
+      cashier_user_id: 'user-001',
+      cashier_name: 'Barista Budi',
+      order_type: 'TAKE_AWAY',
+      total_amount: 35000,
+      discount_amount: 0,
+      final_amount: 35000,
+      payment_method: 'QRIS',
+      items: [
+        {
+          product_id: 'prod-latte-01',
+          product_name: 'Caramel Macchiato',
+          quantity: 1,
+          unit_price: 35000,
+          subtotal: 35000,
+        },
+      ],
+      created_at: new Date().toISOString(),
+      sync_status: 'PENDING',
+    };
+
+    await testDb.orders.add(qrisOrder);
+    const saved = await testDb.orders.get('ord-uuid-qris-002');
+
+    expect(saved).toBeDefined();
+    expect(saved?.payment_method).toBe('QRIS');
+    expect(saved?.final_amount).toBe(35000);
+  });
+
   it('manages pos session lifecycle accurately offline', async () => {
     const session: PosSession = {
       id: 'sess-active-01',

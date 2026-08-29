@@ -504,6 +504,7 @@ export interface BranchItem {
   lat: number;
   lng: number;
   radius_meters: number;
+  qris_image_url?: string | null;
   late_penalty_per_minute: number;
   overtime_pay_per_hour: number;
   min_overtime_threshold_minutes: number;

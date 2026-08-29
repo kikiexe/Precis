@@ -9,6 +9,7 @@ import type {
   TimeframeMetricData,
   BranchItem,
   PosTerminalItem,
+  PresignUploadResponseData,
 } from '../types/app';
 
 class InventoryService {
@@ -32,6 +33,7 @@ class InventoryService {
         | 'lat'
         | 'lng'
         | 'radius_meters'
+        | 'qris_image_url'
         | 'late_penalty_per_minute'
         | 'overtime_pay_per_hour'
         | 'min_overtime_threshold_minutes'
@@ -43,6 +45,44 @@ class InventoryService {
       throw new Error(res.message || 'Gagal memperbarui data cabang.');
     }
     return res.data;
+  }
+
+  async uploadQrisImage(file: File): Promise<string> {
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedMimeTypes.includes(file.type)) {
+      throw new Error('Format gambar QRIS harus berupa PNG, JPG, atau WebP.');
+    }
+
+    const maxSizeBytes = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSizeBytes) {
+      throw new Error('Ukuran berkas QRIS tidak boleh melebihi 2MB.');
+    }
+
+    const presignRes = await apiClient.post<PresignUploadResponseData>('/media/presign-upload', {
+      filename: file.name,
+      mime_type: file.type === 'image/png' ? 'image/webp' : file.type,
+      size_bytes: file.size,
+    });
+
+    if (!presignRes.data || !presignRes.data.upload_url) {
+      throw new Error(presignRes.message || 'Gagal mendapatkan izin unggah gambar QRIS.');
+    }
+
+    const { upload_url, public_url } = presignRes.data;
+
+    const uploadRes = await fetch(upload_url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
+
+    if (!uploadRes.ok) {
+      throw new Error(`Gagal mengunggah gambar QRIS ke storage: HTTP ${uploadRes.status}`);
+    }
+
+    return public_url;
   }
 
   async createTerminal(
