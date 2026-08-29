@@ -18,9 +18,9 @@
   <div class="flex items-center justify-between gap-3 border-b border-[#f2f2f4] pb-4">
     <div class="flex min-w-0 flex-1 items-center gap-3">
       <div
-        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
+        class="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
       >
-        <Clock class="h-5 w-5" />
+        <Clock class="size-5" />
       </div>
       <div class="min-w-0">
         <h3 class="truncate text-sm font-bold text-[#17171c] sm:text-base">
@@ -40,21 +40,21 @@
         <span
           class="inline-flex items-center gap-1.5 rounded-full border border-[#fecaca] bg-[#fef2f2] px-3 py-1 font-mono text-xs font-semibold text-[#e5484d]"
         >
-          <AlertCircle class="h-3.5 w-3.5" />
+          <AlertCircle class="size-3.5" />
           <span>Belum Hadir</span>
         </span>
       {:else if !todayAttendance.clock_out_time}
         <span
           class="inline-flex items-center gap-1.5 rounded-full border border-[#bfdbfe] bg-[#eff6ff] px-3 py-1 font-mono text-xs font-semibold text-[#2563eb]"
         >
-          <CheckCircle2 class="h-3.5 w-3.5" />
+          <CheckCircle2 class="size-3.5" />
           <span>Sedang Bekerja</span>
         </span>
       {:else}
         <span
           class="inline-flex items-center gap-1.5 rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-3 py-1 font-mono text-xs font-semibold text-[#059669]"
         >
-          <CheckCircle2 class="h-3.5 w-3.5" />
+          <CheckCircle2 class="size-3.5" />
           <span>Selesai</span>
         </span>
       {/if}
@@ -84,23 +84,23 @@
       <button
         type="button"
         onclick={onNavigatePresensi}
-        class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#17171c] py-3.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
+        class="active:scale-0.99 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#17171c] py-3.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
       >
-        <Camera class="h-4 w-4" />
+        <Camera class="size-4" />
         <span>Buka Kamera Presensi Masuk</span>
-        <ArrowRight class="h-4 w-4" />
+        <ArrowRight class="size-4" />
       </button>
     </div>
   {:else if !todayAttendance.clock_out_time}
     <div class="space-y-3.5">
       <div class="flex items-center gap-3.5 rounded-2xl border border-[#e5e5ea] bg-[#f8f8fa] p-3.5">
         <div
-          class="aspect-[3/4] w-12 shrink-0 overflow-hidden rounded-xl border border-[#e5e5ea] bg-[#17171c]"
+          class="aspect-3/4 w-12 shrink-0 overflow-hidden rounded-xl border border-[#e5e5ea] bg-[#17171c]"
         >
           <img
             src={todayAttendance.photo_in_url}
             alt="Selfie Presensi Masuk"
-            class="h-full w-full object-cover"
+            class="size-full object-cover"
           />
         </div>
         <div class="min-w-0 flex-1 space-y-0.5 text-xs">
@@ -119,16 +119,16 @@
       <button
         type="button"
         onclick={onNavigatePresensi}
-        class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#17171c] py-3.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
+        class="active:scale-0.99 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#17171c] py-3.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
       >
-        <Camera class="h-4 w-4" />
+        <Camera class="size-4" />
         <span>Buka Kamera Presensi Pulang</span>
-        <ArrowRight class="h-4 w-4" />
+        <ArrowRight class="size-4" />
       </button>
     </div>
   {:else}
     <div class="flex items-center gap-3 rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] p-4">
-      <CheckCircle2 class="h-5 w-5 shrink-0 text-[#059669]" />
+      <CheckCircle2 class="size-5 shrink-0 text-[#059669]" />
       <div class="space-y-0.5 text-xs text-[#065f46]">
         <div class="font-bold">Presensi Hari Ini Lengkap</div>
         <div class="font-mono text-[11px] text-[#047857]">

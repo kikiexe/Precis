@@ -118,7 +118,7 @@
             placeholder="Cari Open Bill..."
             class="h-10 w-full rounded-xl border border-zinc-200 bg-zinc-50 pr-10 pl-4 text-xs text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:ring-1 focus:ring-zinc-900 focus:outline-hidden"
           />
-          <Search class="absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <Search class="absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-zinc-400" />
         </div>
       </div>
 
@@ -186,7 +186,7 @@
                       {formatCurrency(bill.final_total)}
                     </td>
                     <td class="px-5 py-3.5 text-center">
-                      <CheckCircle2 class="inline-block h-4 w-4 text-emerald-600" />
+                      <CheckCircle2 class="inline-block size-4 text-emerald-600" />
                     </td>
                     <td class="px-5 py-3.5 text-right">
                       <button
@@ -198,7 +198,7 @@
                         class="cursor-pointer rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600"
                         title="Hapus Bill"
                       >
-                        <Trash2 class="h-4 w-4" />
+                        <Trash2 class="size-4" />
                       </button>
                     </td>
                   </tr>

@@ -38,7 +38,7 @@
       disabled={isLoading}
       class="inline-flex cursor-pointer items-center space-x-1.5 self-start rounded-full border border-[#d9d9dd] bg-[#eeece7]/40 px-4 py-2 text-xs font-medium text-[#212121] transition-all hover:bg-[#eeece7] disabled:opacity-50 sm:self-auto"
     >
-      <RefreshCw class={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+      <RefreshCw class={`size-3.5 ${isLoading ? 'animate-spin' : ''}`} />
       <span>Segarkan Data</span>
     </button>
   </div>
@@ -48,14 +48,14 @@
     <div
       class="rounded-[22px] border border-[#d9d9dd] bg-white p-12 text-center text-xs text-[#75758a] shadow-none"
     >
-      <RefreshCw class="mx-auto mb-2 h-6 w-6 animate-spin text-[#1863dc]" />
+      <RefreshCw class="mx-auto mb-2 size-6 animate-spin text-[#1863dc]" />
       <span>Memuat data paket langganan...</span>
     </div>
   {:else if plans.length === 0}
     <div
       class="rounded-[22px] border border-[#d9d9dd] bg-white p-12 text-center text-xs text-[#93939f] shadow-none"
     >
-      <Layers class="mx-auto mb-2 h-6 w-6 text-[#93939f] opacity-50" />
+      <Layers class="mx-auto mb-2 size-6 text-[#93939f] opacity-50" />
       <span>Belum ada paket langganan yang dikonfigurasi.</span>
     </div>
   {:else}
@@ -107,25 +107,25 @@
               <!-- Features List -->
               <div class="mt-6 space-y-2.5 text-xs text-[#616161]">
                 <div class="flex items-center space-x-2 font-medium text-[#212121]">
-                  <Store class="h-4 w-4 shrink-0 text-[#1863dc]" />
+                  <Store class="size-4 shrink-0 text-[#1863dc]" />
                   <span
                     >Maksimal <strong class="font-medium">{plan.max_workspaces} Outlet</strong> Cabang</span
                   >
                 </div>
                 <div class="flex items-center space-x-2">
-                  <Check class="h-3.5 w-3.5 shrink-0 text-[#003c33]" />
+                  <Check class="size-3.5 shrink-0 text-[#003c33]" />
                   <span>Presensi Selfie WebP &amp; GPS Watermark</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <Check class="h-3.5 w-3.5 shrink-0 text-[#003c33]" />
+                  <Check class="size-3.5 shrink-0 text-[#003c33]" />
                   <span>Feed Audit Wall of Faces</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <Check class="h-3.5 w-3.5 shrink-0 text-[#003c33]" />
+                  <Check class="size-3.5 shrink-0 text-[#003c33]" />
                   <span>POS Kiosk Offline-First (Dexie.js)</span>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <Check class="h-3.5 w-3.5 shrink-0 text-[#003c33]" />
+                  <Check class="size-3.5 shrink-0 text-[#003c33]" />
                   <span>Kalkulasi Payroll &amp; Ekspor Transfer Bank</span>
                 </div>
               </div>

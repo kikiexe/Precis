@@ -34,9 +34,9 @@
       <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
+            class="flex size-10 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
           >
-            <DollarSign class="h-5 w-5" />
+            <DollarSign class="size-5" />
           </div>
           <div>
             <h3 class="text-base font-bold text-[#17171c]">Konfirmasi Pencairan Payroll</h3>
@@ -49,7 +49,7 @@
           disabled={isSubmitting}
           class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c] disabled:opacity-50"
         >
-          <X class="h-5 w-5" />
+          <X class="size-5" />
         </button>
       </div>
 
@@ -83,10 +83,10 @@
           class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#059669] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-[#047857] disabled:opacity-50"
         >
           {#if isSubmitting}
-            <Loader2 class="h-4 w-4 animate-spin" />
+            <Loader2 class="size-4 animate-spin" />
             <span>Memproses...</span>
           {:else}
-            <Check class="h-4 w-4" />
+            <Check class="size-4" />
             <span>Konfirmasi &amp; Cairkan</span>
           {/if}
         </button>

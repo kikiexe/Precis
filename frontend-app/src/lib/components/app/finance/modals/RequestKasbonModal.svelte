@@ -52,9 +52,9 @@
       <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
+            class="flex size-10 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
           >
-            <Wallet class="h-5 w-5" />
+            <Wallet class="size-5" />
           </div>
           <div>
             <h3 class="text-base font-bold text-[#17171c]">Ajukan Kasbon Karyawan</h3>
@@ -68,7 +68,7 @@
           onclick={onClose}
           class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="h-5 w-5" />
+          <X class="size-5" />
         </button>
       </div>
 
@@ -125,7 +125,7 @@
           {#if isSubmittingKasbon}
             <span>Mengirim...</span>
           {:else}
-            <Send class="h-4 w-4" />
+            <Send class="size-4" />
             <span>Kirim Pengajuan</span>
           {/if}
         </button>

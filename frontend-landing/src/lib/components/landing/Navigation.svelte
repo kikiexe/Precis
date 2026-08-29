@@ -23,7 +23,7 @@
 
 <header
   class={`fixed z-50 transition-all duration-500 ${
-    isScrolled ? 'top-4 right-4 left-4' : 'top-0 right-0 left-0'
+    isScrolled ? 'inset-x-4 top-4' : 'inset-x-0 top-0'
   }`}
 >
   <nav
@@ -43,7 +43,7 @@
         <img
           src="/logo.png"
           alt="Précis Logo"
-          class="h-7 w-7 rounded-xl border border-[#e0e0e0] object-cover"
+          class="size-7 rounded-xl border border-[#e0e0e0] object-cover"
         />
         <span
           class={`font-display font-bold tracking-tight text-[#161616] transition-all duration-500 group-hover:text-[#0f62fe] ${
@@ -97,9 +97,9 @@
         aria-label="Toggle menu"
       >
         {#if isMobileMenuOpen}
-          <X class="h-6 w-6" />
+          <X class="size-6" />
         {:else}
-          <Menu class="h-6 w-6" />
+          <Menu class="size-6" />
         {/if}
       </button>
     </div>
@@ -125,7 +125,7 @@
           class="rounded-full p-2 text-[#161616] transition-colors hover:bg-[#f4f4f4]"
           aria-label="Tutup menu navigasi"
         >
-          <X class="h-6 w-6" />
+          <X class="size-6" />
         </button>
       </div>
 

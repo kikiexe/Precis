@@ -45,7 +45,7 @@
     <!-- Search Input -->
     <div class="relative w-full shrink-0 lg:w-72 xl:w-80">
       <Search
-        class="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+        class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#8e8e93]"
       />
       <input
         type="text"
@@ -60,7 +60,7 @@
           class="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer rounded-full p-0.5 text-[#8e8e93] hover:text-[#17171c]"
           title="Hapus pencarian"
         >
-          <X class="h-3.5 w-3.5" />
+          <X class="size-3.5" />
         </button>
       {/if}
     </div>
@@ -139,7 +139,7 @@
                 class="shrink-0 cursor-pointer rounded-xl p-2 text-[#8e8e93] opacity-80 transition-all group-hover:opacity-100 hover:bg-[#fef2f2] hover:text-[#dc2626]"
                 title="Hapus Menu"
               >
-                <Trash2 class="h-4 w-4" />
+                <Trash2 class="size-4" />
               </button>
             </div>
 

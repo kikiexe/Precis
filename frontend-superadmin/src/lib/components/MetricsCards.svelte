@@ -61,7 +61,7 @@
         disabled={isLoading}
         class="inline-flex cursor-pointer items-center space-x-1.5 rounded-full border border-[#d9d9dd] bg-[#eeece7]/40 px-4 py-2 text-xs font-medium text-[#212121] transition-all hover:bg-[#eeece7] disabled:opacity-50"
       >
-        <RefreshCw class={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+        <RefreshCw class={`size-3.5 ${isLoading ? 'animate-spin' : ''}`} />
         <span>Segarkan Data</span>
       </button>
     </div>
@@ -79,9 +79,9 @@
             >Monthly Recurring</span
           >
           <div
-            class="flex h-8 w-8 items-center justify-center rounded-full bg-[#eeece7] text-[#17171c]"
+            class="flex size-8 items-center justify-center rounded-full bg-[#eeece7] text-[#17171c]"
           >
-            <TrendingUp class="h-4 w-4" />
+            <TrendingUp class="size-4" />
           </div>
         </div>
         <div class="mt-3">
@@ -106,9 +106,9 @@
             >Total Gross Revenue</span
           >
           <div
-            class="flex h-8 w-8 items-center justify-center rounded-full bg-[#edfce9] text-[#003c33]"
+            class="flex size-8 items-center justify-center rounded-full bg-[#edfce9] text-[#003c33]"
           >
-            <DollarSign class="h-4 w-4" />
+            <DollarSign class="size-4" />
           </div>
         </div>
         <div class="mt-3">
@@ -131,9 +131,9 @@
             >Pemilik Tenant Aktif</span
           >
           <div
-            class="flex h-8 w-8 items-center justify-center rounded-full bg-[#f1f5ff] text-[#1863dc]"
+            class="flex size-8 items-center justify-center rounded-full bg-[#f1f5ff] text-[#1863dc]"
           >
-            <Users class="h-4 w-4" />
+            <Users class="size-4" />
           </div>
         </div>
         <div class="mt-3">
@@ -157,9 +157,9 @@
             >Outlet &amp; Verifikasi</span
           >
           <div
-            class="flex h-8 w-8 items-center justify-center rounded-full bg-[#eeece7] text-[#212121]"
+            class="flex size-8 items-center justify-center rounded-full bg-[#eeece7] text-[#212121]"
           >
-            <Store class="h-4 w-4" />
+            <Store class="size-4" />
           </div>
         </div>
         <div class="mt-3">
@@ -175,7 +175,7 @@
               </span>
             {:else}
               <span class="flex items-center gap-1 font-medium text-[#003c33]">
-                <CheckCircle2 class="h-3 w-3 text-[#003c33]" /> Antrean Bersih
+                <CheckCircle2 class="size-3 text-[#003c33]" /> Antrean Bersih
               </span>
             {/if}
           </div>
@@ -200,7 +200,7 @@
               </p>
             </div>
             <div class="flex items-center space-x-1.5 text-xs text-[#75758a]">
-              <Users class="h-3.5 w-3.5" />
+              <Users class="size-3.5" />
               <span class="font-mono font-medium text-[#212121]"
                 >{metrics.tenants.total} Total Tenant</span
               >
@@ -212,7 +212,7 @@
             <div class="rounded-2xl border border-[#edfce9] bg-[#edfce9]/50 p-3.5">
               <div class="flex items-center justify-between text-xs font-medium text-[#003c33]">
                 <span>ACTIVE</span>
-                <ShieldCheck class="h-3.5 w-3.5" />
+                <ShieldCheck class="size-3.5" />
               </div>
               <div class="mt-1 font-mono text-xl font-bold text-[#003c33]">
                 {metrics.tenants.active}
@@ -224,7 +224,7 @@
             <div class="rounded-2xl border border-[#d9d9dd] bg-[#eeece7]/50 p-3.5">
               <div class="flex items-center justify-between text-xs font-medium text-[#212121]">
                 <span>GRACE PERIOD</span>
-                <Clock class="h-3.5 w-3.5 text-[#ff7759]" />
+                <Clock class="size-3.5 text-[#ff7759]" />
               </div>
               <div class="mt-1 font-mono text-xl font-bold text-[#212121]">
                 {metrics.tenants.grace_period}
@@ -236,7 +236,7 @@
             <div class="rounded-2xl border border-[#ffefef] bg-[#ffefef]/50 p-3.5">
               <div class="flex items-center justify-between text-xs font-medium text-[#e5484d]">
                 <span>SUSPENDED</span>
-                <AlertTriangle class="h-3.5 w-3.5" />
+                <AlertTriangle class="size-3.5" />
               </div>
               <div class="mt-1 font-mono text-xl font-bold text-[#e5484d]">
                 {metrics.tenants.suspended}
@@ -248,7 +248,7 @@
             <div class="rounded-2xl border border-[#f1f5ff] bg-[#f1f5ff]/50 p-3.5">
               <div class="flex items-center justify-between text-xs font-medium text-[#1863dc]">
                 <span>TRIAL</span>
-                <Clock class="h-3.5 w-3.5" />
+                <Clock class="size-3.5" />
               </div>
               <div class="mt-1 font-mono text-xl font-bold text-[#1863dc]">
                 {metrics.tenants.trial}
@@ -283,7 +283,7 @@
               class="flex items-center justify-between rounded-xl border border-[#d9d9dd]/60 bg-[#eeece7]/30 p-2.5 text-xs"
             >
               <div class="flex items-center space-x-2.5">
-                <Server class="h-4 w-4 text-[#17171c]" />
+                <Server class="size-4 text-[#17171c]" />
                 <span class="font-medium text-[#212121]">Laravel Octane + FrankenPHP</span>
               </div>
               <span
@@ -296,7 +296,7 @@
               class="flex items-center justify-between rounded-xl border border-[#d9d9dd]/60 bg-[#eeece7]/30 p-2.5 text-xs"
             >
               <div class="flex items-center space-x-2.5">
-                <Database class="h-4 w-4 text-[#1863dc]" />
+                <Database class="size-4 text-[#1863dc]" />
                 <span class="font-medium text-[#212121]">Multi-Tenant Database</span>
               </div>
               <span
@@ -309,7 +309,7 @@
               class="flex items-center justify-between rounded-xl border border-[#d9d9dd]/60 bg-[#eeece7]/30 p-2.5 text-xs"
             >
               <div class="flex items-center space-x-2.5">
-                <Zap class="h-4 w-4 text-[#ff7759]" />
+                <Zap class="size-4 text-[#ff7759]" />
                 <span class="font-medium text-[#212121]">POS Dexie.js Offline Sync</span>
               </div>
               <span

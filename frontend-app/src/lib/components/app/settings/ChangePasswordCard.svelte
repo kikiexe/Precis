@@ -52,7 +52,7 @@
     <div
       class="flex items-center gap-2 rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] p-3.5 text-xs font-semibold text-[#065f46]"
     >
-      <Check class="h-4 w-4 shrink-0" />
+      <Check class="size-4 shrink-0" />
       <span>{passwordSuccessMsg}</span>
     </div>
   {/if}
@@ -106,7 +106,7 @@
         disabled={isSavingPassword}
         class="flex cursor-pointer items-center gap-2 rounded-full bg-[#17171c] px-6 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
       >
-        <KeyRound class="h-4 w-4" />
+        <KeyRound class="size-4" />
         <span>{isSavingPassword ? 'Memperbarui...' : 'Perbarui Kata Sandi'}</span>
       </button>
     </div>

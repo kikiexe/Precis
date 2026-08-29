@@ -29,8 +29,8 @@ export class PermissionService {
     }
 
     let cameraStatus: PermissionStateStatus = 'prompt';
-    let geoStatus: PermissionStateStatus = 'prompt';
-    let notifStatus: PermissionStateStatus = 'prompt';
+    let geoStatus: PermissionStateStatus;
+    let notifStatus: PermissionStateStatus;
 
     // 1. Cek Geolocation
     if ('geolocation' in navigator) {

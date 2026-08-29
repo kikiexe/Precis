@@ -151,7 +151,7 @@
               : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
           }`}
         >
-          <Icon class={`h-4 w-4 ${isActive ? 'text-white' : 'text-[#8e8e93]'}`} />
+          <Icon class={`size-4 ${isActive ? 'text-white' : 'text-[#8e8e93]'}`} />
           <span class="whitespace-nowrap">{tab.label}</span>
           <span
             class={`rounded-full px-2 py-0.5 font-mono text-[10px] font-semibold ${
@@ -171,7 +171,7 @@
           onclick={() => (isAddMenuModalOpen = true)}
           class="flex w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black sm:w-auto"
         >
-          <Plus class="h-4 w-4" />
+          <Plus class="size-4" />
           <span>Tambah Menu</span>
         </button>
       {:else if activeSubTab === 'kategori'}
@@ -180,7 +180,7 @@
           onclick={() => (isAddCategoryModalOpen = true)}
           class="flex w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black sm:w-auto"
         >
-          <Plus class="h-4 w-4" />
+          <Plus class="size-4" />
           <span>Tambah Kategori</span>
         </button>
       {:else}
@@ -189,7 +189,7 @@
           onclick={() => (isAddMaterialModalOpen = true)}
           class="flex w-full shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black sm:w-auto"
         >
-          <Plus class="h-4 w-4" />
+          <Plus class="size-4" />
           <span>Tambah Bahan Baku</span>
         </button>
       {/if}

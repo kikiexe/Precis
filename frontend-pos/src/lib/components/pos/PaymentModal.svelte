@@ -135,7 +135,7 @@
           onclick={onClose}
           class="cursor-pointer p-1 text-[#93939f] hover:text-[#212121]"
         >
-          <X class="h-5 w-5" />
+          <X class="size-5" />
         </button>
       </div>
 
@@ -144,39 +144,39 @@
         <button
           type="button"
           onclick={() => (selectedMethod = 'CASH')}
-          class={`flex cursor-pointer flex-col items-center gap-1.5 rounded-[16px] border px-3 py-3.5 text-center transition-all ${
+          class={`flex cursor-pointer flex-col items-center gap-1.5 rounded-2xl border px-3 py-3.5 text-center transition-all ${
             selectedMethod === 'CASH'
               ? 'border-[#17171c] bg-[#17171c] font-medium text-white shadow-none'
               : 'border-[#d9d9dd] bg-[#eeece7]/40 text-[#616161] hover:bg-[#eeece7] hover:text-[#212121]'
           }`}
         >
-          <Banknote class="h-5 w-5" />
+          <Banknote class="size-5" />
           <span class="text-xs">Uang Tunai (Cash)</span>
         </button>
 
         <button
           type="button"
           onclick={() => (selectedMethod = 'QRIS')}
-          class={`flex cursor-pointer flex-col items-center gap-1.5 rounded-[16px] border px-3 py-3.5 text-center transition-all ${
+          class={`flex cursor-pointer flex-col items-center gap-1.5 rounded-2xl border px-3 py-3.5 text-center transition-all ${
             selectedMethod === 'QRIS'
               ? 'border-[#17171c] bg-[#17171c] font-medium text-white shadow-none'
               : 'border-[#d9d9dd] bg-[#eeece7]/40 text-[#616161] hover:bg-[#eeece7] hover:text-[#212121]'
           }`}
         >
-          <QrCode class="h-5 w-5" />
+          <QrCode class="size-5" />
           <span class="text-xs">QRIS Toko</span>
         </button>
 
         <button
           type="button"
           onclick={() => (selectedMethod = 'EDC')}
-          class={`flex cursor-pointer flex-col items-center gap-1.5 rounded-[16px] border px-3 py-3.5 text-center transition-all ${
+          class={`flex cursor-pointer flex-col items-center gap-1.5 rounded-2xl border px-3 py-3.5 text-center transition-all ${
             selectedMethod === 'EDC'
               ? 'border-[#17171c] bg-[#17171c] font-medium text-white shadow-none'
               : 'border-[#d9d9dd] bg-[#eeece7]/40 text-[#616161] hover:bg-[#eeece7] hover:text-[#212121]'
           }`}
         >
-          <CreditCard class="h-5 w-5" />
+          <CreditCard class="size-5" />
           <span class="text-xs">Mesin EDC (Kartu)</span>
         </button>
       </div>
@@ -184,7 +184,7 @@
       <!-- Payment Body Area -->
       <div class="mb-5 flex-1 overflow-y-auto">
         {#if selectedMethod === 'CASH'}
-          <div class="space-y-4 rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-4">
+          <div class="space-y-4 rounded-2xl border border-[#d9d9dd] bg-[#eeece7]/30 p-4">
             <!-- Cash Input -->
             <div>
               <label for="cash-input" class="mb-1.5 block font-mono text-xs text-[#616161]">
@@ -201,7 +201,7 @@
                   type="number"
                   bind:value={cashTendered}
                   step="1000"
-                  class="w-full rounded-[12px] border border-[#d9d9dd] bg-white py-3 pr-4 pl-12 font-mono text-lg font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+                  class="w-full rounded-xl border border-[#d9d9dd] bg-white py-3 pr-4 pl-12 font-mono text-lg font-medium text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
                 />
               </div>
             </div>
@@ -235,9 +235,9 @@
 
             {#if !isSufficient}
               <div
-                class="flex items-center gap-2 rounded-[12px] bg-[#ffad9b]/15 p-3 text-xs font-medium text-[#b30000]"
+                class="flex items-center gap-2 rounded-xl bg-[#ffad9b]/15 p-3 text-xs font-medium text-[#b30000]"
               >
-                <AlertTriangle class="h-4 w-4 shrink-0" />
+                <AlertTriangle class="size-4 shrink-0" />
                 <span>Uang yang dimasukkan kurang {formatCurrency(finalAmount - cashTendered)}</span
                 >
               </div>
@@ -270,12 +270,12 @@
           {:else}
             <!-- QRIS Belum Diunggah Fallback -->
             <div
-              class="space-y-4 rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-6 text-center"
+              class="space-y-4 rounded-2xl border border-[#d9d9dd] bg-[#eeece7]/30 p-6 text-center"
             >
               <div
-                class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-600"
+                class="mx-auto flex size-16 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-600"
               >
-                <QrCode class="h-8 w-8 opacity-70" />
+                <QrCode class="size-8 opacity-70" />
               </div>
 
               <div class="space-y-1">
@@ -289,7 +289,7 @@
                 class="rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-left text-xs text-amber-900"
               >
                 <div class="flex items-start gap-2">
-                  <AlertTriangle class="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                  <AlertTriangle class="mt-0.5 size-4 shrink-0 text-amber-600" />
                   <span>
                     Jika memiliki stiker QRIS fisik di meja kasir, minta pelanggan memindai stiker tersebut dengan nominal <strong>{formatCurrency(finalAmount)}</strong>, lalu klik konfirmasi di bawah.
                   </span>
@@ -305,12 +305,12 @@
             </div>
           {/if}
         {:else if selectedMethod === 'EDC' || selectedMethod === 'TRANSFER'}
-          <div class="space-y-3 rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-5 text-xs">
+          <div class="space-y-3 rounded-2xl border border-[#d9d9dd] bg-[#eeece7]/30 p-5 text-xs">
             <div class="flex items-center gap-2.5">
               <div
-                class="flex h-8 w-8 items-center justify-center rounded-xl bg-zinc-900 text-white"
+                class="flex size-8 items-center justify-center rounded-xl bg-zinc-900 text-white"
               >
-                <CreditCard class="h-4 w-4" />
+                <CreditCard class="size-4" />
               </div>
               <div>
                 <div class="text-sm font-bold text-[#212121]">Pembayaran Mesin EDC</div>
@@ -319,7 +319,7 @@
             </div>
 
             <div
-              class="space-y-1.5 rounded-[12px] border border-[#d9d9dd] bg-white p-3.5 font-mono"
+              class="space-y-1.5 rounded-xl border border-[#d9d9dd] bg-white p-3.5 font-mono"
             >
               <div class="flex justify-between text-[#616161]">
                 <span>Total Tagihan EDC:</span>
@@ -334,7 +334,7 @@
             <div
               class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-2.5 text-[11px] text-emerald-800"
             >
-              <Check class="h-4 w-4 shrink-0 text-emerald-600" />
+              <Check class="size-4 shrink-0 text-emerald-600" />
               <span
                 >Pastikan slip transaksi EDC sudah tercetak Approved sebelum menyelesaikan pesanan.</span
               >
@@ -365,7 +365,7 @@
           {#if isProcessing}
             <span>Memproses...</span>
           {:else}
-            <Check class="h-4 w-4" />
+            <Check class="size-4" />
             {#if selectedMethod === 'QRIS'}
               <span>Konfirmasi Pembayaran QRIS Diterima</span>
             {:else}

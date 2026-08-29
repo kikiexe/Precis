@@ -55,7 +55,7 @@
   bind:this={sectionEl}
   class="relative overflow-hidden border-t border-[#e0e0e0] bg-white py-24 lg:py-32"
 >
-  <div class="mx-auto max-w-[1400px] px-6 lg:px-12">
+  <div class="mx-auto max-w-350 px-6 lg:px-12">
     <div class="grid gap-16 lg:grid-cols-2 lg:gap-24">
       <!-- Left: Content -->
       <div
@@ -67,7 +67,7 @@
           <span class="h-px w-8 bg-[#0f62fe]"></span>
           Keamanan &amp; Integritas
         </span>
-        <h2 class="font-display mb-8 text-4xl tracking-tight text-[#161616] lg:text-6xl">
+        <h2 class="mb-8 font-display text-4xl tracking-tight text-[#161616] lg:text-6xl">
           Keamanan data adalah
           <br />
           prioritas mutlak.
@@ -103,9 +103,9 @@
           >
             <div class="flex items-start gap-4">
               <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center border border-[#e0e0e0] bg-white transition-colors duration-300 group-hover:bg-[#0f62fe] group-hover:text-white"
+                class="flex size-10 shrink-0 items-center justify-center border border-[#e0e0e0] bg-white transition-colors duration-300 group-hover:bg-[#0f62fe] group-hover:text-white"
               >
-                <feature.icon class="h-5 w-5 text-[#0f62fe] group-hover:text-white" />
+                <feature.icon class="size-5 text-[#0f62fe] group-hover:text-white" />
               </div>
               <div>
                 <h3

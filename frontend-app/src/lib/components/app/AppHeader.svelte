@@ -68,16 +68,16 @@
         <img
           src="/logo.png"
           alt="Précis Logo"
-          class="h-8 w-8 shrink-0 rounded-xl border border-[#e5e5ea] object-cover"
+          class="size-8 shrink-0 rounded-xl border border-[#e5e5ea] object-cover"
         />
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-1.5 leading-none">
             <span
-              class="max-w-[120px] truncate text-xs font-bold tracking-tight text-[#17171c] sm:max-w-xs"
+              class="max-w-30 truncate text-xs font-bold tracking-tight text-[#17171c] sm:max-w-xs"
               >{currentUser.name}</span
             >
             <ChevronDown
-              class="h-3.5 w-3.5 shrink-0 text-[#8e8e93] transition-transform group-hover:text-[#17171c]"
+              class="size-3.5 shrink-0 text-[#8e8e93] transition-transform group-hover:text-[#17171c]"
             />
           </div>
           <div class="mt-1 flex min-w-0 items-center gap-1.5">
@@ -110,7 +110,7 @@
             class="mb-1 flex items-center justify-between border-b border-[#f2f2f4] px-3 py-2 text-xs font-bold text-[#8e8e93]"
           >
             <div class="flex items-center gap-2">
-              <Building2 class="h-4 w-4 text-[#1863dc]" />
+              <Building2 class="size-4 text-[#1863dc]" />
               <span>Ganti Workspace Bisnis</span>
             </div>
           </div>
@@ -140,7 +140,7 @@
                       {ws.role}
                     </span>
                     {#if ws.workspace_id === activeWorkspaceId}
-                      <Check class="h-4 w-4 text-[#17171c]" />
+                      <Check class="size-4 text-[#17171c]" />
                     {/if}
                   </div>
                 </button>
@@ -158,7 +158,7 @@
                 }}
                 class="flex w-full cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-left text-xs font-semibold text-[#2563eb] transition-all hover:bg-[#eff6ff]"
               >
-                <Plus class="h-4 w-4" />
+                <Plus class="size-4" />
                 <span>Buat Workspace Bisnis Baru</span>
               </button>
             </div>
@@ -174,7 +174,7 @@
                 }}
                 class="flex w-full cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-left text-xs font-semibold text-[#e5484d] transition-all hover:bg-[#fdf2f2]"
               >
-                <LogOut class="h-4 w-4" />
+                <LogOut class="size-4" />
                 <span>Keluar Akun</span>
               </button>
             </div>

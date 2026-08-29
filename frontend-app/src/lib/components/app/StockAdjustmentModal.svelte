@@ -93,9 +93,9 @@
       >
         <div class="flex min-w-0 items-center gap-3">
           <div
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
+            class="flex size-10 shrink-0 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
           >
-            <Layers class="h-5 w-5" />
+            <Layers class="size-5" />
           </div>
           <div class="min-w-0">
             <h3 class="truncate text-base font-bold tracking-tight text-[#17171c]">
@@ -112,7 +112,7 @@
           onclick={onClose}
           class="shrink-0 cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="h-5 w-5" />
+          <X class="size-5" />
         </button>
       </div>
 
@@ -138,7 +138,7 @@
               : 'border-transparent text-[#8e8e93] hover:text-[#17171c]'
           }`}
         >
-          <History class="h-4 w-4" />
+          <History class="size-4" />
           <span>Riwayat Audit ({materialLogs.length})</span>
         </button>
       </div>
@@ -159,7 +159,7 @@
               </div>
             </div>
 
-            <ArrowRight class="h-5 w-5 text-[#8e8e93]" />
+            <ArrowRight class="size-5 text-[#8e8e93]" />
 
             <div class="text-right">
               <span class="font-mono text-[10px] font-semibold text-[#8e8e93] uppercase"
@@ -279,7 +279,7 @@
                 <option value="OTHER">Alasan Lainnya</option>
               </select>
               <ChevronDown
-                class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+                class="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-[#8e8e93]"
               />
             </div>
           </div>
@@ -312,7 +312,7 @@
               disabled={isSubmitting || (adjustmentMode === 'DELTA' && deltaInput === 0)}
               class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
             >
-              <Check class="h-4 w-4" />
+              <Check class="size-4" />
               <span>Simpan Penyesuaian</span>
             </button>
           </div>

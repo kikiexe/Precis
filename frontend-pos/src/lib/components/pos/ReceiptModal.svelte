@@ -36,9 +36,9 @@
       <!-- Success Header -->
       <div class="border-b border-[#d9d9dd] pb-4 text-center">
         <div
-          class="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-[#edfce9] text-[#003c33]"
+          class="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-[#edfce9] text-[#003c33]"
         >
-          <CheckCircle2 class="h-6 w-6" />
+          <CheckCircle2 class="size-6" />
         </div>
         <h2 class="text-lg font-medium tracking-tight text-[#212121]">Transaksi Berhasil!</h2>
         <p class="mt-0.5 font-mono text-xs text-[#75758a]">Nomor: {order.order_number}</p>
@@ -46,10 +46,10 @@
 
       <!-- Thermal Paper Receipt Preview -->
       <div
-        class="my-4 flex-1 overflow-y-auto rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-3.5 font-mono text-[11px] leading-relaxed"
+        class="my-4 flex-1 overflow-y-auto rounded-2xl border border-[#d9d9dd] bg-[#eeece7]/30 p-3.5 font-mono text-[11px] leading-relaxed"
       >
         <div
-          class="rounded-[12px] border border-[#d9d9dd] bg-white p-4 font-mono text-xs whitespace-pre text-[#212121] shadow-none"
+          class="rounded-xl border border-[#d9d9dd] bg-white p-4 font-mono text-xs whitespace-pre text-[#212121] shadow-none"
         >
           {receiptText}
         </div>
@@ -66,10 +66,10 @@
           {#if isPrinting}
             <span>Mengirim ke Printer ESC/POS...</span>
           {:else if printSuccess}
-            <Check class="h-4 w-4 text-[#003c33]" />
+            <Check class="size-4 text-[#003c33]" />
             <span>Struk Berhasil Dicetak</span>
           {:else}
-            <Printer class="h-4 w-4 text-[#1863dc]" />
+            <Printer class="size-4 text-[#1863dc]" />
             <span>Cetak Struk Thermal (Bluetooth / USB)</span>
           {/if}
         </button>
@@ -80,7 +80,7 @@
           class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-medium text-white shadow-none transition-all hover:bg-[#000000]"
         >
           <span>Transaksi Baru</span>
-          <ArrowRight class="h-4 w-4" />
+          <ArrowRight class="size-4" />
         </button>
       </div>
     </div>

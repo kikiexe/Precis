@@ -257,7 +257,7 @@
 
         <!-- Search Input -->
         <div class="relative pt-0.5">
-          <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+          <Search class="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-zinc-400" />
           <input
             type="text"
             bind:value={searchQuery}
@@ -279,7 +279,7 @@
       <div class="flex-1 divide-y divide-zinc-100 overflow-y-auto">
         {#if filteredOrders.length === 0}
           <div class="flex flex-col items-center justify-center py-16 text-center text-zinc-400">
-            <Receipt class="mb-2 h-9 w-9 text-zinc-400 opacity-30" />
+            <Receipt class="mb-2 size-9 text-zinc-400 opacity-30" />
             <p class="text-sm font-semibold text-zinc-800">Tidak ada transaksi</p>
             <p class="mt-0.5 text-xs text-zinc-500">
               Transaksi yang telah dibayar akan muncul di sini.
@@ -299,11 +299,11 @@
               }`}
             >
               <div
-                class={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${
+                class={`flex size-9 shrink-0 items-center justify-center rounded-lg ${
                   isSelected ? 'bg-zinc-800 text-white' : 'bg-zinc-100 text-zinc-600'
                 }`}
               >
-                <PayIcon class="h-4.5 w-4.5" />
+                <PayIcon class="size-4.5" />
               </div>
 
               <div class="min-w-0 flex-1">
@@ -341,25 +341,25 @@
             <button
               type="button"
               onclick={() => onPrintOrder(selectedOrder!)}
-              class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50 active:scale-[0.99]"
+              class="active:scale-0.99 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50"
             >
-              <Printer class="h-4 w-4 text-zinc-900" />
+              <Printer class="size-4 text-zinc-900" />
               <span>Cetak Struk</span>
             </button>
 
             <button
               type="button"
-              class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50 active:scale-[0.99]"
+              class="active:scale-0.99 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50"
             >
-              <Send class="h-4 w-4 text-zinc-600" />
+              <Send class="size-4 text-zinc-600" />
               <span>Kirim Struk</span>
             </button>
 
             <button
               type="button"
-              class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50 active:scale-[0.99]"
+              class="active:scale-0.99 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50"
             >
-              <RotateCcw class="h-4 w-4 text-zinc-600" />
+              <RotateCcw class="size-4 text-zinc-600" />
               <span>Pilih Refund</span>
             </button>
           </div>
@@ -375,7 +375,7 @@
             <div class="space-y-3 text-xs">
               <div class="flex items-center justify-between">
                 <span class="flex items-center gap-2 text-zinc-500">
-                  <CreditCard class="h-4 w-4 text-zinc-400" />
+                  <CreditCard class="size-4 text-zinc-400" />
                   <span>Metode Pembayaran</span>
                 </span>
                 <span class="rounded-md bg-zinc-100 px-2.5 py-1 font-bold text-zinc-900">
@@ -387,7 +387,7 @@
 
               <div class="flex items-center justify-between">
                 <span class="flex items-center gap-2 text-zinc-500">
-                  <Receipt class="h-4 w-4 text-zinc-400" />
+                  <Receipt class="size-4 text-zinc-400" />
                   <span>Nomor Struk</span>
                 </span>
                 <span class="font-mono font-bold text-zinc-900">
@@ -397,7 +397,7 @@
 
               <div class="flex items-center justify-between">
                 <span class="flex items-center gap-2 text-zinc-500">
-                  <Clock class="h-4 w-4 text-zinc-400" />
+                  <Clock class="size-4 text-zinc-400" />
                   <span>Waktu Pembelian</span>
                 </span>
                 <span class="font-medium text-zinc-800">
@@ -478,7 +478,7 @@
         </div>
       {:else}
         <div class="flex h-full flex-col items-center justify-center text-center text-zinc-400">
-          <Receipt class="mb-3 h-12 w-12 text-zinc-400 opacity-30" />
+          <Receipt class="mb-3 size-12 text-zinc-400 opacity-30" />
           <p class="text-base font-semibold text-zinc-800">Pilih Transaksi</p>
           <p class="mt-1 text-xs text-zinc-500">
             Klik salah satu transaksi dari daftar di sebelah kiri untuk melihat detail struk.

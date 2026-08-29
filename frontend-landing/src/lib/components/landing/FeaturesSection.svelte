@@ -91,7 +91,7 @@
             <div class="grid flex-1 items-center gap-8 lg:grid-cols-2">
               <div>
                 <h3
-                  class="font-display mb-4 text-3xl text-[#161616] transition-transform duration-500 group-hover:translate-x-2 lg:text-4xl"
+                  class="mb-4 font-display text-3xl text-[#161616] transition-transform duration-500 group-hover:translate-x-2 lg:text-4xl"
                 >
                   {feature.title}
                 </h3>
@@ -104,7 +104,7 @@
               <div class="flex justify-center lg:justify-end">
                 <div class="h-40 w-48 text-[#0f62fe]">
                   {#if feature.visual === 'deploy'}
-                    <svg viewBox="0 0 200 160" class="h-full w-full">
+                    <svg viewBox="0 0 200 160" class="size-full">
                       <defs>
                         <clipPath id="deployClip">
                           <rect x="30" y="20" width="140" height="120" rx="4" />
@@ -158,7 +158,7 @@
                       </circle>
                     </svg>
                   {:else if feature.visual === 'ai'}
-                    <svg viewBox="0 0 200 160" class="h-full w-full">
+                    <svg viewBox="0 0 200 160" class="size-full">
                       <circle cx="100" cy="80" r="12" fill="currentColor">
                         <animate
                           attributeName="r"
@@ -228,7 +228,7 @@
                       </circle>
                     </svg>
                   {:else if feature.visual === 'collab'}
-                    <svg viewBox="0 0 200 160" class="h-full w-full">
+                    <svg viewBox="0 0 200 160" class="size-full">
                       <!-- User A -->
                       <g>
                         <rect
@@ -330,7 +330,7 @@
                       </g>
                     </svg>
                   {:else if feature.visual === 'security'}
-                    <svg viewBox="0 0 200 160" class="h-full w-full">
+                    <svg viewBox="0 0 200 160" class="size-full">
                       <!-- Shield -->
                       <path
                         d="M 100 20 L 150 40 L 150 90 Q 150 130 100 145 Q 50 130 50 90 L 50 40 Z"

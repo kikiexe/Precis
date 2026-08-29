@@ -28,7 +28,7 @@
       <button
         type="button"
         onclick={onOpenSessionModal}
-        class={`flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold shadow-2xs transition-all active:scale-[0.99] ${
+        class={`active:scale-0.99 flex cursor-pointer items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold shadow-2xs transition-all ${
           activeSession && activeSession.status === 'OPEN'
             ? 'bg-red-600 text-white hover:bg-red-700'
             : 'bg-zinc-900 text-white hover:bg-black'
@@ -51,9 +51,9 @@
         <div class="flex items-center justify-between border-b border-zinc-100 pb-4">
           <div class="flex items-center gap-3">
             <div
-              class="flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-900 text-white shadow-xs"
+              class="flex size-12 items-center justify-center rounded-2xl bg-zinc-900 text-white shadow-xs"
             >
-              <Monitor class="h-6 w-6" />
+              <Monitor class="size-6" />
             </div>
             <div>
               <div class="flex items-center gap-2">
@@ -82,7 +82,7 @@
           class="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 p-4"
         >
           <div class="flex items-center gap-2">
-            <Banknote class="h-4 w-4 text-zinc-600" />
+            <Banknote class="size-4 text-zinc-600" />
             <span class="text-xs font-bold text-zinc-700">Saldo Tunai Awal (Modal Laci Kasir)</span>
           </div>
           <span class="font-mono text-sm font-bold text-zinc-900">
@@ -137,7 +137,7 @@
                 class="flex shrink-0 cursor-pointer items-center gap-1 rounded-xl border border-zinc-200 bg-white px-3.5 py-2 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-100"
               >
                 <span>Lihat Tab Settlement</span>
-                <ArrowRight class="h-3.5 w-3.5" />
+                <ArrowRight class="size-3.5" />
               </button>
             {/if}
           </div>
@@ -158,7 +158,7 @@
           </div>
         {:else}
           <div class="space-y-2 py-12 text-center text-zinc-400">
-            <Clock class="mx-auto h-10 w-10 text-zinc-400 opacity-30" />
+            <Clock class="mx-auto size-10 text-zinc-400 opacity-30" />
             <p class="text-sm font-semibold text-zinc-800">Kasir Sedang Tidak Aktif</p>
             <p class="text-xs text-zinc-500">
               Buka shift baru untuk mulai menerima transaksi di meja kasir.

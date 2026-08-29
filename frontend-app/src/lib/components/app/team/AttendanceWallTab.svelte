@@ -49,12 +49,12 @@
         class="inline-flex items-center gap-3 rounded-full border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2 font-mono text-xs"
       >
         <div class="flex items-center gap-1.5 font-semibold text-[#059669]">
-          <span class="h-2 w-2 rounded-full bg-[#059669]"></span>
+          <span class="size-2 rounded-full bg-[#059669]"></span>
           <span>Tepat Waktu: {onTimeCount}</span>
         </div>
         <span class="text-[#d1d1d6]">&bull;</span>
         <div class="flex items-center gap-1.5 font-semibold text-[#e5484d]">
-          <span class="h-2 w-2 rounded-full bg-[#e5484d]"></span>
+          <span class="size-2 rounded-full bg-[#e5484d]"></span>
           <span>Terlambat: {lateCount}</span>
         </div>
       </div>
@@ -67,9 +67,9 @@
       class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-white p-12 text-center shadow-2xs sm:rounded-3xl"
     >
       <div
-        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#8e8e93]"
+        class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#8e8e93]"
       >
-        <Camera class="h-6 w-6" />
+        <Camera class="size-6" />
       </div>
       <div>
         <h3 class="text-sm font-bold text-[#17171c]">Belum Ada Presensi Hari Ini</h3>
@@ -87,16 +87,16 @@
           class="group block w-full cursor-pointer overflow-hidden rounded-2xl border border-[#e5e5ea] bg-white text-left shadow-2xs transition-all hover:border-[#17171c]/40 hover:shadow-md focus:outline-hidden"
         >
           <!-- 3:4 Aspect Ratio Photo Container with Clean Floating Pill -->
-          <div class="relative aspect-[3/4] overflow-hidden bg-[#f4f4f6]">
+          <div class="relative aspect-3/4 overflow-hidden bg-[#f4f4f6]">
             {#if att.photo_in_url || att.avatar_url}
               <img
                 src={att.photo_in_url || att.avatar_url}
                 alt={att.user_name}
-                class="h-full w-full object-cover transition-all duration-300 group-hover:scale-105"
+                class="size-full object-cover transition-all duration-300 group-hover:scale-105"
               />
             {:else}
               <div
-                class="flex h-full w-full items-center justify-center font-mono text-xs text-[#8e8e93]"
+                class="flex size-full items-center justify-center font-mono text-xs text-[#8e8e93]"
               >
                 Tanpa Foto
               </div>
@@ -126,7 +126,7 @@
               <span
                 class="flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-[#17171c] shadow-xs backdrop-blur-xs"
               >
-                <Eye class="h-3.5 w-3.5" />
+                <Eye class="size-3.5" />
                 <span>Lihat Detail</span>
               </span>
             </div>

@@ -48,7 +48,7 @@
       <img
         src="/logo.png"
         alt="Précis Logo"
-        class="h-8 w-8 shrink-0 rounded-[10px] border border-white/20 object-cover"
+        class="size-8 shrink-0 rounded-[10px] border border-white/20 object-cover"
       />
       {#if !isCollapsed}
         <div class="truncate">
@@ -79,7 +79,7 @@
           } ${isCollapsed ? 'justify-center px-0' : ''}`}
         >
           <Icon
-            class={`h-4 w-4 shrink-0 ${activeTab === item.id ? 'text-[#edfce9]' : 'text-[#93939f]'}`}
+            class={`size-4 shrink-0 ${activeTab === item.id ? 'text-[#edfce9]' : 'text-[#93939f]'}`}
           />
           {#if !isCollapsed}
             <span class="flex-1 truncate text-left">{item.label}</span>
@@ -102,7 +102,7 @@
       <div
         class="flex items-center gap-2 truncate rounded-[12px] border border-white/5 bg-white/5 px-3 py-2 font-mono text-[11px] text-[#93939f]"
       >
-        <Shield class="h-3.5 w-3.5 shrink-0 text-[#edfce9]" />
+        <Shield class="size-3.5 shrink-0 text-[#edfce9]" />
         <span class="truncate">{currentUser?.email || 'admin@gmail.com'}</span>
       </div>
     {/if}
@@ -115,7 +115,7 @@
         isCollapsed ? 'justify-center px-0' : ''
       }`}
     >
-      <LogOut class="h-4 w-4 shrink-0" />
+      <LogOut class="size-4 shrink-0" />
       {#if !isCollapsed}
         <span class="truncate">Keluar</span>
       {/if}
@@ -128,10 +128,10 @@
       aria-label="Toggle Sidebar"
     >
       {#if isCollapsed}
-        <ChevronRight class="h-4 w-4" />
+        <ChevronRight class="size-4" />
       {:else}
         <div class="flex items-center gap-1.5 font-mono text-[11px]">
-          <ChevronLeft class="h-3.5 w-3.5" />
+          <ChevronLeft class="size-3.5" />
           <span>Sembunyikan</span>
         </div>
       {/if}

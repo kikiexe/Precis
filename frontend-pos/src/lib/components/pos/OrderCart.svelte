@@ -188,7 +188,7 @@
   <!-- Header: Cart Title, Count & Open Bills shortcut -->
   <div class="flex items-center justify-between border-b border-zinc-200 bg-zinc-50/70 px-3.5 py-3">
     <div class="flex items-center gap-2">
-      <ShoppingCart class="h-4 w-4 text-zinc-900" />
+      <ShoppingCart class="size-4 text-zinc-900" />
       <span class="text-sm font-semibold text-zinc-900">Pesanan Baru</span>
       <span
         class="rounded-md bg-zinc-200/80 px-2 py-0.5 font-mono text-xs font-semibold text-zinc-800"
@@ -209,11 +209,11 @@
               : 'border-zinc-200 bg-zinc-100 text-zinc-600 hover:bg-zinc-200/70'
           }`}
         >
-          <Bookmark class="h-3 w-3" />
+          <Bookmark class="size-3" />
           <span>Open Bills</span>
           {#if openBillsCount > 0}
             <span
-              class="flex h-4 w-4 items-center justify-center rounded-full bg-amber-600 font-mono text-[9px] font-bold text-white"
+              class="flex size-4 items-center justify-center rounded-full bg-amber-600 font-mono text-[9px] font-bold text-white"
             >
               {openBillsCount}
             </span>
@@ -227,7 +227,7 @@
           onclick={onClearCart}
           class="flex cursor-pointer items-center gap-1 text-xs font-medium text-red-600 transition-colors hover:text-red-700 hover:underline"
         >
-          <Trash2 class="h-3.5 w-3.5" />
+          <Trash2 class="size-3.5" />
           <span>Batal</span>
         </button>
       {/if}
@@ -242,11 +242,11 @@
         <button
           type="button"
           onclick={() => (isOrderTypeMenuOpen = !isOrderTypeMenuOpen)}
-          class="flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-zinc-200/80 bg-zinc-100 px-3 text-xs font-medium text-zinc-800 transition-all hover:bg-zinc-200/70 active:scale-[0.98]"
+          class="active:scale-0.98 flex h-9 cursor-pointer items-center gap-2 rounded-lg border border-zinc-200/80 bg-zinc-100 px-3 text-xs font-medium text-zinc-800 transition-all hover:bg-zinc-200/70"
         >
-          <selectedOrderTypeOption.icon class="h-3.5 w-3.5 text-zinc-700" />
+          <selectedOrderTypeOption.icon class="size-3.5 text-zinc-700" />
           <span>{selectedOrderTypeOption.label}</span>
-          <ChevronDown class="h-3.5 w-3.5 text-zinc-400" />
+          <ChevronDown class="size-3.5 text-zinc-400" />
         </button>
 
         {#if isOrderTypeMenuOpen}
@@ -276,11 +276,11 @@
                 }`}
               >
                 <div class="flex items-center gap-2">
-                  <opt.icon class="h-3.5 w-3.5" />
+                  <opt.icon class="size-3.5" />
                   <span>{opt.label}</span>
                 </div>
                 {#if orderType === opt.value}
-                  <Check class="h-3.5 w-3.5 text-white" />
+                  <Check class="size-3.5 text-white" />
                 {/if}
               </button>
             {/each}
@@ -290,7 +290,7 @@
 
       <!-- Customer Name Input -->
       <div class="relative flex-1">
-        <User class="absolute top-1/2 left-2.5 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+        <User class="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-zinc-400" />
         <input
           type="text"
           value={customerName}
@@ -306,7 +306,7 @@
   <div class="flex-1 space-y-2 overflow-y-auto p-3">
     {#if items.length === 0}
       <div class="flex h-64 flex-col items-center justify-center text-center text-zinc-400">
-        <ShoppingCart class="mb-2 h-9 w-9 text-zinc-400 opacity-30" />
+        <ShoppingCart class="mb-2 size-9 text-zinc-400 opacity-30" />
         <p class="text-sm font-medium text-zinc-800">Keranjang masih kosong</p>
         <p class="mt-0.5 text-xs text-zinc-500">Pilih menu dari katalog di sebelah kiri.</p>
       </div>
@@ -330,9 +330,9 @@
                   onRemoveItem(item.product.id);
                   resetSwipe();
                 }}
-                class="flex h-full w-full cursor-pointer flex-col items-center justify-center gap-0.5 text-[10px] font-semibold text-white transition-all hover:bg-red-700 active:scale-95"
+                class="flex size-full cursor-pointer flex-col items-center justify-center gap-0.5 text-[10px] font-semibold text-white transition-all hover:bg-red-700 active:scale-95"
               >
-                <Trash2 class="h-3.5 w-3.5" />
+                <Trash2 class="size-3.5" />
                 <span>Hapus</span>
               </button>
             </div>
@@ -344,7 +344,7 @@
               <div
                 class="flex flex-col items-center justify-center gap-0.5 text-[10px] font-semibold text-white"
               >
-                <Plus class="h-3.5 w-3.5" />
+                <Plus class="size-3.5" />
                 <span>+1 Menu</span>
               </div>
             </div>
@@ -380,9 +380,9 @@
                     <button
                       type="button"
                       onclick={() => onUpdateQuantity(item.product.id, -1)}
-                      class="flex h-5.5 w-5.5 cursor-pointer items-center justify-center rounded-md bg-white text-xs font-medium text-zinc-800 shadow-2xs transition-all hover:bg-zinc-200 active:scale-95"
+                      class="flex size-5.5 cursor-pointer items-center justify-center rounded-md bg-white text-xs font-medium text-zinc-800 shadow-2xs transition-all hover:bg-zinc-200 active:scale-95"
                     >
-                      <Minus class="h-2.5 w-2.5" />
+                      <Minus class="size-2.5" />
                     </button>
                     <span class="w-5 text-center font-mono text-xs font-semibold text-zinc-900">
                       {item.quantity}
@@ -390,9 +390,9 @@
                     <button
                       type="button"
                       onclick={() => onUpdateQuantity(item.product.id, 1)}
-                      class="flex h-5.5 w-5.5 cursor-pointer items-center justify-center rounded-md bg-zinc-900 text-xs font-medium text-white shadow-2xs transition-all hover:bg-black active:scale-95"
+                      class="flex size-5.5 cursor-pointer items-center justify-center rounded-md bg-zinc-900 text-xs font-medium text-white shadow-2xs transition-all hover:bg-black active:scale-95"
                     >
-                      <Plus class="h-2.5 w-2.5" />
+                      <Plus class="size-2.5" />
                     </button>
                   </div>
 
@@ -431,7 +431,7 @@
     <div class="space-y-1.5">
       <div class="flex items-center justify-between text-xs">
         <span class="flex items-center gap-1.5 font-medium text-zinc-600">
-          <Tag class="h-3.5 w-3.5 text-zinc-700" />
+          <Tag class="size-3.5 text-zinc-700" />
           <span>Diskon Pesanan</span>
         </span>
         {#if calculatedDiscount > 0}
@@ -524,10 +524,10 @@
           class={`flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-3 py-2.5 text-xs font-semibold transition-all ${
             items.length === 0
               ? 'cursor-not-allowed border-zinc-200 bg-zinc-100 text-zinc-400'
-              : 'border-zinc-300 bg-white text-zinc-800 shadow-2xs hover:bg-zinc-100 active:scale-[0.99]'
+              : 'active:scale-0.99 border-zinc-300 bg-white text-zinc-800 shadow-2xs hover:bg-zinc-100'
           }`}
         >
-          <Bookmark class="h-3.5 w-3.5 text-zinc-600" />
+          <Bookmark class="size-3.5 text-zinc-600" />
           <span>Simpan Bill</span>
         </button>
 
@@ -537,10 +537,10 @@
           class={`flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-3 py-2.5 text-xs font-semibold transition-all ${
             items.length === 0
               ? 'cursor-not-allowed border-zinc-200 bg-zinc-100 text-zinc-400'
-              : 'border-zinc-300 bg-white text-zinc-800 shadow-2xs hover:bg-zinc-100 active:scale-[0.99]'
+              : 'active:scale-0.99 border-zinc-300 bg-white text-zinc-800 shadow-2xs hover:bg-zinc-100'
           }`}
         >
-          <Printer class="h-3.5 w-3.5 text-zinc-600" />
+          <Printer class="size-3.5 text-zinc-600" />
           <span>Cetak Bill</span>
         </button>
       </div>
@@ -552,10 +552,10 @@
         class={`flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-bold shadow-sm transition-all ${
           items.length === 0
             ? 'cursor-not-allowed bg-zinc-200 text-zinc-400'
-            : 'bg-zinc-900 text-white hover:bg-black active:scale-[0.99]'
+            : 'active:scale-0.99 bg-zinc-900 text-white hover:bg-black'
         }`}
       >
-        <CreditCard class="h-4 w-4" />
+        <CreditCard class="size-4" />
         <span>Bayar {formatCurrency(finalTotal)}</span>
       </button>
     </div>

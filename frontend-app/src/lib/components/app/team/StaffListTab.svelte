@@ -180,7 +180,7 @@
           onclick={onOpenAddModal}
           class="flex shrink-0 cursor-pointer items-center justify-center gap-2 self-stretch rounded-full bg-[#17171c] px-5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black md:self-auto"
         >
-          <Mail class="h-4 w-4" />
+          <Mail class="size-4" />
           <span>+ Undang Karyawan</span>
         </button>
       {/if}
@@ -191,7 +191,7 @@
   <div class="flex items-center justify-between gap-3">
     <div class="relative max-w-md flex-1">
       <Search
-        class="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+        class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#8e8e93]"
       />
       <input
         type="text"
@@ -212,9 +212,9 @@
       class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-white p-12 text-center shadow-2xs sm:rounded-3xl"
     >
       <div
-        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#8e8e93]"
+        class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#8e8e93]"
       >
-        <Users class="h-6 w-6" />
+        <Users class="size-6" />
       </div>
       <div>
         <h3 class="text-sm font-bold text-[#17171c]">Tidak Ada Karyawan Ditemukan</h3>
@@ -230,7 +230,7 @@
           onclick={onOpenAddModal}
           class="inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#17171c] px-4 py-2 text-xs font-semibold text-white shadow-xs"
         >
-          <Mail class="h-3.5 w-3.5" />
+          <Mail class="size-3.5" />
           <span>Kirim Undangan Staf</span>
         </button>
       {/if}
@@ -246,7 +246,7 @@
             <div class="flex items-start justify-between gap-2.5">
               <div class="flex min-w-0 items-center gap-3">
                 <div
-                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-sm font-bold text-[#17171c]"
+                  class="flex size-11 shrink-0 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-sm font-bold text-[#17171c]"
                 >
                   {member.name.charAt(0).toUpperCase()}
                 </div>
@@ -275,7 +275,7 @@
             <div class="space-y-1 text-xs text-[#8e8e93]">
               <div class="truncate font-mono text-[11px] text-[#686873]">{member.email}</div>
               <div class="flex items-center gap-1 text-[11.5px] text-[#8e8e93]">
-                <Building2 class="h-3.5 w-3.5 shrink-0 text-[#8e8e93]" />
+                <Building2 class="size-3.5 shrink-0 text-[#8e8e93]" />
                 <span class="truncate">{member.branch_name || 'Outlet Utama'}</span>
               </div>
             </div>
@@ -299,7 +299,7 @@
                 onclick={() => onOpenEditModal(member)}
                 class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-3 py-1.5 text-xs font-medium text-[#17171c] transition-all hover:bg-[#eeece7]"
               >
-                <Edit2 class="h-3.5 w-3.5 text-[#686873]" />
+                <Edit2 class="size-3.5 text-[#686873]" />
                 <span>Edit</span>
               </button>
 
@@ -310,7 +310,7 @@
                   class="shrink-0 cursor-pointer rounded-xl border border-[#e5e5ea] p-2 text-[#8e8e93] transition-all hover:border-[#fecaca] hover:bg-[#fef2f2] hover:text-[#e5484d]"
                   title="Hapus Karyawan"
                 >
-                  <Trash2 class="h-3.5 w-3.5" />
+                  <Trash2 class="size-3.5" />
                 </button>
               {/if}
             </div>
@@ -327,7 +327,7 @@
         <h3
           class="flex items-center gap-2 text-xs font-bold tracking-wider text-[#8e8e93] uppercase"
         >
-          <Clock class="h-3.5 w-3.5 text-[#d97706]" />
+          <Clock class="size-3.5 text-[#d97706]" />
           <span>Undangan Menunggu Konfirmasi ({pendingInvitations.length})</span>
         </h3>
         <button
@@ -335,7 +335,7 @@
           onclick={loadPendingInvitations}
           class="flex cursor-pointer items-center gap-1 text-xs text-[#686873] hover:text-[#17171c]"
         >
-          <RotateCw class={`h-3 w-3 ${isLoadingInvitations ? 'animate-spin' : ''}`} />
+          <RotateCw class={`size-3 ${isLoadingInvitations ? 'animate-spin' : ''}`} />
           <span>Segarkan</span>
         </button>
       </div>
@@ -376,7 +376,7 @@
                 onclick={() => handleResendInvitation(inv.id)}
                 class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-3 py-1.5 text-xs font-medium text-[#17171c] transition-all hover:bg-[#eeece7]"
               >
-                <Send class="h-3 w-3 text-[#1863dc]" />
+                <Send class="size-3 text-[#1863dc]" />
                 <span>Kirim Ulang</span>
               </button>
 
@@ -386,7 +386,7 @@
                 class="shrink-0 cursor-pointer rounded-xl border border-[#e5e5ea] p-1.5 text-[#8e8e93] transition-all hover:bg-[#fef2f2] hover:text-[#e5484d]"
                 title="Batalkan Undangan"
               >
-                <XCircle class="h-4 w-4" />
+                <XCircle class="size-4" />
               </button>
             </div>
           </div>

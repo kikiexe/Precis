@@ -47,12 +47,12 @@
       <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#17171c] text-white"
+            class="flex size-10 items-center justify-center rounded-2xl bg-[#17171c] text-white"
           >
             {#if isOnboarding}
-              <Sparkles class="h-5 w-5 text-[#34d399]" />
+              <Sparkles class="size-5 text-[#34d399]" />
             {:else}
-              <Building2 class="h-5 w-5" />
+              <Building2 class="size-5" />
             {/if}
           </div>
           <div>
@@ -72,7 +72,7 @@
             onclick={onClose}
             class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
           >
-            <X class="h-5 w-5" />
+            <X class="size-5" />
           </button>
         {/if}
       </div>
@@ -136,9 +136,9 @@
             <span>Membuat Workspace...</span>
           {:else if isOnboarding}
             <span>Mulai Gunakan Précis</span>
-            <ArrowRight class="h-4 w-4" />
+            <ArrowRight class="size-4" />
           {:else}
-            <Plus class="h-4 w-4" />
+            <Plus class="size-4" />
             <span>Buat Workspace</span>
           {/if}
         </button>

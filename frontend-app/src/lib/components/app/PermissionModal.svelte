@@ -81,9 +81,9 @@
       <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-1">
         <div class="flex items-center gap-2.5">
           <div
-            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
+            class="flex size-8 shrink-0 items-center justify-center rounded-xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
           >
-            <ShieldCheck class="h-4 w-4" />
+            <ShieldCheck class="size-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-[#17171c]">Izin Akses Presensi</h3>
@@ -97,7 +97,7 @@
           class="cursor-pointer rounded-full p-1.5 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
           title="Tutup"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 
@@ -115,7 +115,7 @@
         >
           <div class="flex min-w-0 items-center gap-2.5">
             <div
-              class={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${
+              class={`flex size-8 shrink-0 items-center justify-center rounded-xl ${
                 permissions.camera === 'granted'
                   ? 'bg-[#dcfce7] text-[#16a34a]'
                   : permissions.camera === 'denied'
@@ -123,7 +123,7 @@
                     : 'bg-[#f0f0f3] text-[#17171c]'
               }`}
             >
-              <Camera class="h-3.5 w-3.5" />
+              <Camera class="size-3.5" />
             </div>
             <div class="min-w-0">
               <div class="flex items-center gap-1.5">
@@ -144,7 +144,7 @@
               <span
                 class="inline-flex items-center gap-1 rounded-full bg-[#dcfce7] px-2.5 py-1 text-[11px] font-bold text-[#15803d]"
               >
-                <Check class="h-3 w-3" />
+                <Check class="size-3" />
                 <span>Aktif</span>
               </span>
             {:else if permissions.camera === 'denied'}
@@ -154,7 +154,7 @@
                 class="inline-flex cursor-pointer items-center gap-1 rounded-full bg-[#fee2e2] px-2.5 py-1 text-[10.5px] font-bold text-[#b91c1c] transition-all hover:bg-[#fecaca]"
                 title="Klik untuk mencoba lagi atau buka pengaturan browser"
               >
-                <AlertCircle class="h-3 w-3" />
+                <AlertCircle class="size-3" />
                 <span>Ditolak</span>
               </button>
             {:else}
@@ -165,11 +165,11 @@
                 class="flex cursor-pointer items-center gap-1 rounded-full bg-[#17171c] px-3 py-1 text-[11px] font-bold text-white transition-all hover:bg-black disabled:opacity-50"
               >
                 {#if requestingKey === 'camera'}
-                  <RefreshCw class="h-2.5 w-2.5 animate-spin" />
+                  <RefreshCw class="size-2.5 animate-spin" />
                   <span>...</span>
                 {:else}
                   <span>Izinkan</span>
-                  <ChevronRight class="h-2.5 w-2.5" />
+                  <ChevronRight class="size-2.5" />
                 {/if}
               </button>
             {/if}
@@ -188,7 +188,7 @@
         >
           <div class="flex min-w-0 items-center gap-2.5">
             <div
-              class={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${
+              class={`flex size-8 shrink-0 items-center justify-center rounded-xl ${
                 permissions.geolocation === 'granted'
                   ? 'bg-[#dcfce7] text-[#16a34a]'
                   : permissions.geolocation === 'denied'
@@ -196,7 +196,7 @@
                     : 'bg-[#f0f0f3] text-[#17171c]'
               }`}
             >
-              <MapPin class="h-3.5 w-3.5" />
+              <MapPin class="size-3.5" />
             </div>
             <div class="min-w-0">
               <div class="flex items-center gap-1.5">
@@ -217,7 +217,7 @@
               <span
                 class="inline-flex items-center gap-1 rounded-full bg-[#dcfce7] px-2.5 py-1 text-[11px] font-bold text-[#15803d]"
               >
-                <Check class="h-3 w-3" />
+                <Check class="size-3" />
                 <span>Aktif</span>
               </span>
             {:else if permissions.geolocation === 'denied'}
@@ -227,7 +227,7 @@
                 class="inline-flex cursor-pointer items-center gap-1 rounded-full bg-[#fee2e2] px-2.5 py-1 text-[10.5px] font-bold text-[#b91c1c] transition-all hover:bg-[#fecaca]"
                 title="Klik untuk mencoba lagi atau buka pengaturan browser"
               >
-                <AlertCircle class="h-3 w-3" />
+                <AlertCircle class="size-3" />
                 <span>Ditolak</span>
               </button>
             {:else}
@@ -238,11 +238,11 @@
                 class="flex cursor-pointer items-center gap-1 rounded-full bg-[#17171c] px-3 py-1 text-[11px] font-bold text-white transition-all hover:bg-black disabled:opacity-50"
               >
                 {#if requestingKey === 'geolocation'}
-                  <RefreshCw class="h-2.5 w-2.5 animate-spin" />
+                  <RefreshCw class="size-2.5 animate-spin" />
                   <span>...</span>
                 {:else}
                   <span>Izinkan</span>
-                  <ChevronRight class="h-2.5 w-2.5" />
+                  <ChevronRight class="size-2.5" />
                 {/if}
               </button>
             {/if}
@@ -261,7 +261,7 @@
         >
           <div class="flex min-w-0 items-center gap-2.5">
             <div
-              class={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${
+              class={`flex size-8 shrink-0 items-center justify-center rounded-xl ${
                 permissions.notification === 'granted'
                   ? 'bg-[#dcfce7] text-[#16a34a]'
                   : permissions.notification === 'denied'
@@ -269,7 +269,7 @@
                     : 'bg-[#f0f0f3] text-[#17171c]'
               }`}
             >
-              <Bell class="h-3.5 w-3.5" />
+              <Bell class="size-3.5" />
             </div>
             <div class="min-w-0">
               <div class="flex items-center gap-1.5">
@@ -290,7 +290,7 @@
               <span
                 class="inline-flex items-center gap-1 rounded-full bg-[#dcfce7] px-2.5 py-1 text-[11px] font-bold text-[#15803d]"
               >
-                <Check class="h-3 w-3" />
+                <Check class="size-3" />
                 <span>Aktif</span>
               </span>
             {:else if permissions.notification === 'denied'}
@@ -313,7 +313,7 @@
                 class="flex cursor-pointer items-center gap-1 rounded-full bg-[#f4f4f6] px-3 py-1 text-[11px] font-bold text-[#17171c] transition-all hover:bg-[#e5e5ea] disabled:opacity-50"
               >
                 {#if requestingKey === 'notification'}
-                  <RefreshCw class="h-2.5 w-2.5 animate-spin" />
+                  <RefreshCw class="size-2.5 animate-spin" />
                   <span>...</span>
                 {:else}
                   <span>Izinkan</span>
@@ -340,7 +340,7 @@
             onclick={handleDismiss}
             class="flex cursor-pointer items-center gap-1.5 rounded-full bg-[#15803d] px-5 py-2 text-xs font-bold text-white shadow-2xs transition-all hover:bg-[#166534]"
           >
-            <Check class="h-3.5 w-3.5" />
+            <Check class="size-3.5" />
             <span>Izin Siap &bull; Lanjutkan</span>
           </button>
         {:else}

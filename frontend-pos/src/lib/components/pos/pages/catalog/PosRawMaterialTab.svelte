@@ -52,7 +52,7 @@
   >
     <div class="flex flex-1 items-center gap-2">
       <div class="relative max-w-md flex-1">
-        <Search class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+        <Search class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
         <input
           type="text"
           bind:value={searchQuery}
@@ -85,9 +85,9 @@
     <button
       type="button"
       onclick={onOpenAddMaterial}
-      class="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
+      class="active:scale-0.99 flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
     >
-      <Plus class="h-3.5 w-3.5" />
+      <Plus class="size-3.5" />
       <span>+ Bahan Baku Baru</span>
     </button>
   </div>
@@ -100,7 +100,7 @@
           class="border-b border-zinc-200 bg-zinc-100/80 font-mono text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
         >
           <tr class="divide-x divide-zinc-200/80">
-            <th class="w-12 px-3 py-3 text-center">No.</th>
+            <th class="w-12 p-3 text-center">No.</th>
             <th class="px-4 py-3">Nama Bahan Baku</th>
             <th class="w-36 px-4 py-3">Kategori</th>
             <th class="w-32 px-4 py-3 text-right">Stok Fisik</th>
@@ -129,7 +129,7 @@
                 }`}
               >
                 <!-- No -->
-                <td class="px-3 py-3 text-center font-mono text-[11px] text-zinc-400">
+                <td class="p-3 text-center font-mono text-[11px] text-zinc-400">
                   {idx + 1}
                 </td>
 
@@ -137,7 +137,7 @@
                 <td class="px-4 py-3 font-semibold text-zinc-900">
                   <div class="flex items-center gap-2">
                     {#if isLow}
-                      <AlertTriangle class="h-3.5 w-3.5 shrink-0 text-red-500" />
+                      <AlertTriangle class="size-3.5 shrink-0 text-red-500" />
                     {/if}
                     <span>{mat.name}</span>
                   </div>
@@ -197,7 +197,7 @@
                       class="flex cursor-pointer items-center gap-1 rounded-lg bg-zinc-900 px-2.5 py-1.5 text-[11px] font-medium text-white shadow-2xs transition-all hover:bg-black active:scale-95"
                       title="Audit Stok Opname"
                     >
-                      <SlidersHorizontal class="h-3 w-3" />
+                      <SlidersHorizontal class="size-3" />
                       <span>Opname</span>
                     </button>
 
@@ -207,7 +207,7 @@
                       class="cursor-pointer rounded-lg border border-zinc-200 p-1.5 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
                       title="Edit Bahan Baku"
                     >
-                      <Edit2 class="h-3.5 w-3.5" />
+                      <Edit2 class="size-3.5" />
                     </button>
 
                     <button
@@ -216,7 +216,7 @@
                       class="cursor-pointer rounded-lg border border-zinc-200 p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600"
                       title="Hapus Bahan Baku"
                     >
-                      <Trash2 class="h-3.5 w-3.5" />
+                      <Trash2 class="size-3.5" />
                     </button>
                   </div>
                 </td>

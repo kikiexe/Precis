@@ -37,7 +37,7 @@
       onclick={onOpenKasbonModal}
       class="flex shrink-0 cursor-pointer items-center gap-2 self-start rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black sm:self-auto"
     >
-      <Plus class="h-4 w-4" />
+      <Plus class="size-4" />
       <span>Ajukan Kasbon</span>
     </button>
   </div>
@@ -123,7 +123,7 @@
             class="cursor-pointer rounded-xl border border-[#e5e5ea] p-2 text-[#686873] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
             title="Cetak Slip Gaji"
           >
-            <Printer class="h-4 w-4" />
+            <Printer class="size-4" />
           </button>
         </div>
 

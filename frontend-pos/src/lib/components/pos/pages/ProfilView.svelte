@@ -74,7 +74,7 @@
     <!-- User Profile Header -->
     <div class="flex items-center gap-3.5 border-b border-zinc-200 bg-zinc-50/50 p-5">
       <div
-        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 text-lg font-bold text-white shadow-xs"
+        class="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-zinc-900 text-lg font-bold text-white shadow-xs"
       >
         {activeCashier?.name ? activeCashier.name.charAt(0).toUpperCase() : 'P'}
       </div>
@@ -108,11 +108,11 @@
             }`}
           >
             <div class="flex items-center gap-2.5">
-              <ShoppingBag class="h-4 w-4" />
+              <ShoppingBag class="size-4" />
               <span>Pesanan &amp; Struk</span>
             </div>
             {#if activeSettingsTab === 'pesanan'}
-              <span class="h-2 w-2 rounded-full bg-white"></span>
+              <span class="size-2 rounded-full bg-white"></span>
             {/if}
           </button>
         </div>
@@ -133,11 +133,11 @@
             }`}
           >
             <div class="flex items-center gap-2.5">
-              <QrCode class="h-4 w-4" />
+              <QrCode class="size-4" />
               <span>Pembayaran &amp; QRIS</span>
             </div>
             {#if activeSettingsTab === 'pembayaran'}
-              <span class="h-2 w-2 rounded-full bg-white"></span>
+              <span class="size-2 rounded-full bg-white"></span>
             {/if}
           </button>
         </div>
@@ -158,11 +158,11 @@
             }`}
           >
             <div class="flex items-center gap-2.5">
-              <HardDrive class="h-4 w-4" />
+              <HardDrive class="size-4" />
               <span>Penyimpanan Offline</span>
             </div>
             {#if activeSettingsTab === 'penyimpanan'}
-              <span class="h-2 w-2 rounded-full bg-white"></span>
+              <span class="size-2 rounded-full bg-white"></span>
             {/if}
           </button>
         </div>
@@ -201,7 +201,7 @@
                 }`}
               >
                 <div
-                  class={`absolute top-0.5 h-5 w-5 transform rounded-full bg-white shadow-xs transition-transform ${
+                  class={`absolute top-0.5 size-5 transform rounded-full bg-white shadow-xs transition-transform ${
                     autoAcceptOnline ? 'translate-x-5.5' : 'translate-x-0.5'
                   }`}
                 ></div>
@@ -225,7 +225,7 @@
                 }`}
               >
                 <div
-                  class={`absolute top-0.5 h-5 w-5 transform rounded-full bg-white shadow-xs transition-transform ${
+                  class={`absolute top-0.5 size-5 transform rounded-full bg-white shadow-xs transition-transform ${
                     enableSound ? 'translate-x-5.5' : 'translate-x-0.5'
                   }`}
                 ></div>
@@ -249,7 +249,7 @@
                 }`}
               >
                 <div
-                  class={`absolute top-0.5 h-5 w-5 transform rounded-full bg-white shadow-xs transition-transform ${
+                  class={`absolute top-0.5 size-5 transform rounded-full bg-white shadow-xs transition-transform ${
                     autoPrintReceipt ? 'translate-x-5.5' : 'translate-x-0.5'
                   }`}
                 ></div>
@@ -319,7 +319,7 @@
             <div
               class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-semibold text-emerald-800"
             >
-              <Check class="h-4 w-4 shrink-0" />
+              <Check class="size-4 shrink-0" />
               <span>{paymentSaveMsg}</span>
             </div>
           {/if}
@@ -343,7 +343,7 @@
                 <input
                   type="checkbox"
                   bind:checked={enableCashPayment}
-                  class="h-4 w-4 cursor-pointer accent-zinc-900"
+                  class="size-4 cursor-pointer accent-zinc-900"
                 />
               </div>
 
@@ -359,7 +359,7 @@
                 <input
                   type="checkbox"
                   bind:checked={enableQrisPayment}
-                  class="h-4 w-4 cursor-pointer accent-zinc-900"
+                  class="size-4 cursor-pointer accent-zinc-900"
                 />
               </div>
 
@@ -377,7 +377,7 @@
                 <input
                   type="checkbox"
                   bind:checked={enableTransferPayment}
-                  class="h-4 w-4 cursor-pointer accent-zinc-900"
+                  class="size-4 cursor-pointer accent-zinc-900"
                 />
               </div>
             </div>
@@ -412,7 +412,7 @@
               <button
                 type="button"
                 onclick={handleSavePaymentSettings}
-                class="cursor-pointer rounded-xl bg-zinc-900 px-4 py-2.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black active:scale-[0.99]"
+                class="active:scale-0.99 cursor-pointer rounded-xl bg-zinc-900 px-4 py-2.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black"
               >
                 Simpan Pengaturan Pembayaran
               </button>
@@ -436,7 +436,7 @@
               <div
                 class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-semibold text-emerald-800"
               >
-                <Check class="h-4 w-4 shrink-0 text-emerald-600" />
+                <Check class="size-4 shrink-0 text-emerald-600" />
                 <span>{syncSuccessMsg}</span>
               </div>
             {/if}
@@ -473,7 +473,7 @@
                   disabled={isSyncingNow}
                   class="flex cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black disabled:opacity-50"
                 >
-                  <RefreshCw class={`h-3.5 w-3.5 ${isSyncingNow ? 'animate-spin' : ''}`} />
+                  <RefreshCw class={`size-3.5 ${isSyncingNow ? 'animate-spin' : ''}`} />
                   <span>{isSyncingNow ? 'Sinkronisasi...' : 'Sinkronkan Sekarang'}</span>
                 </button>
 
@@ -492,9 +492,9 @@
           <div class="space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xs">
             <div class="flex items-center gap-3 border-b border-zinc-100 pb-3">
               <div
-                class="flex h-8 w-8 items-center justify-center rounded-xl bg-zinc-900 text-white"
+                class="flex size-8 items-center justify-center rounded-xl bg-zinc-900 text-white"
               >
-                <Lock class="h-4 w-4" />
+                <Lock class="size-4" />
               </div>
               <div>
                 <h3 class="text-sm font-bold text-zinc-900">Master Lock &amp; Otorisasi Owner</h3>
@@ -512,9 +512,9 @@
             <button
               type="button"
               onclick={onOpenMasterLockModal}
-              class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-zinc-900 py-2.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
+              class="active:scale-0.99 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-zinc-900 py-2.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-black"
             >
-              <ShieldCheck class="h-4 w-4" />
+              <ShieldCheck class="size-4" />
               <span>Buka Pengaturan Master Owner</span>
             </button>
           </div>

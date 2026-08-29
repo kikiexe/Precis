@@ -34,7 +34,7 @@
   bind:this={sectionEl}
   class="relative overflow-hidden border-t border-[#e0e0e0] bg-[#f4f4f4] py-24 lg:py-32"
 >
-  <div class="mx-auto max-w-[1400px] px-6 lg:px-12">
+  <div class="mx-auto max-w-350 px-6 lg:px-12">
     <!-- Header -->
     <div
       class={`mx-auto mb-16 max-w-3xl text-center transition-all duration-700 lg:mb-24 ${
@@ -46,7 +46,7 @@
         Kompatibilitas
         <span class="h-px w-8 bg-[#0f62fe]"></span>
       </span>
-      <h2 class="font-display mb-6 text-4xl tracking-tight text-[#161616] lg:text-6xl">
+      <h2 class="mb-6 font-display text-4xl tracking-tight text-[#161616] lg:text-6xl">
         Kompatibel dengan hardware
         <br />
         yang sudah Anda miliki.
@@ -61,7 +61,7 @@
   <!-- Full-width marquees -->
   <div class="mb-6 w-full">
     <div class="marquee flex gap-6">
-      {#each Array(2) as _, setIndex}
+      {#each Array(2) as _, _setIndex}
         <div class="flex shrink-0 gap-6">
           {#each integrations as item}
             <div
@@ -82,7 +82,7 @@
 
   <div class="w-full">
     <div class="marquee-reverse flex gap-6">
-      {#each Array(2) as _, setIndex}
+      {#each Array(2) as _, _setIndex}
         <div class="flex shrink-0 gap-6">
           {#each [...integrations].reverse() as item}
             <div

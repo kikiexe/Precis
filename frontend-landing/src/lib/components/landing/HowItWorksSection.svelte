@@ -70,7 +70,7 @@
   class="relative overflow-hidden bg-[#161616] py-16 text-white sm:py-24 lg:py-32"
 >
   <!-- Diagonal lines pattern -->
-  <div class="pointer-events-none absolute inset-0 opacity-[0.03]">
+  <div class="opacity-0.03 pointer-events-none absolute inset-0">
     <div
       class="absolute inset-0"
       style="background-image: repeating-linear-gradient(-45deg, transparent, transparent 40px, currentColor 40px, currentColor 41px);"
@@ -110,12 +110,12 @@
             }`}
           >
             <div class="flex items-start gap-4 sm:gap-6">
-              <span class="font-display shrink-0 text-2xl text-white/30 sm:text-3xl"
+              <span class="shrink-0 font-display text-2xl text-white/30 sm:text-3xl"
                 >{step.number}</span
               >
               <div class="min-w-0 flex-1">
                 <h3
-                  class="font-display mb-2 text-xl transition-transform duration-300 group-hover:translate-x-1 sm:mb-3 sm:text-2xl sm:group-hover:translate-x-2 lg:text-3xl"
+                  class="mb-2 font-display text-xl transition-transform duration-300 group-hover:translate-x-1 sm:mb-3 sm:text-2xl sm:group-hover:translate-x-2 lg:text-3xl"
                 >
                   {step.title}
                 </h3>
@@ -145,9 +145,9 @@
             class="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-6 sm:py-4"
           >
             <div class="flex gap-1.5 sm:gap-2">
-              <div class="h-2.5 w-2.5 rounded-full bg-white/20 sm:h-3 sm:w-3"></div>
-              <div class="h-2.5 w-2.5 rounded-full bg-white/20 sm:h-3 sm:w-3"></div>
-              <div class="h-2.5 w-2.5 rounded-full bg-white/20 sm:h-3 sm:w-3"></div>
+              <div class="size-2.5 rounded-full bg-white/20 sm:size-3"></div>
+              <div class="size-2.5 rounded-full bg-white/20 sm:size-3"></div>
+              <div class="size-2.5 rounded-full bg-white/20 sm:size-3"></div>
             </div>
             <span class="font-mono text-[11px] text-white/40 sm:text-xs"
               >monitor-operasional.live</span
@@ -192,7 +192,7 @@
           <div
             class="flex items-center gap-2 border-t border-white/10 px-4 py-3 sm:gap-3 sm:px-6 sm:py-4"
           >
-            <span class="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#24a148]"></span>
+            <span class="size-2 shrink-0 animate-pulse rounded-full bg-[#24a148]"></span>
             <span class="font-mono text-[11px] text-white/40 sm:text-xs"
               >Status: Sistem Berjalan Normal</span
             >

@@ -112,7 +112,7 @@
     <div
       class="mb-2 inline-flex items-center gap-2.5 rounded-2xl border border-[#e5e5ea] bg-white px-4 py-2 shadow-2xs"
     >
-      <div class="h-3 w-3 rounded-full bg-[#17171c]"></div>
+      <div class="size-3 rounded-full bg-[#17171c]"></div>
       <span class="text-sm font-bold tracking-tight text-[#17171c]">PRÉCIS</span>
       <span class="border-l border-[#e5e5ea] pl-2 font-mono text-[10.5px] text-[#8e8e93]"
         >Enterprise POS &amp; HR</span
@@ -130,16 +130,16 @@
     {#if isLoading}
       <div class="space-y-3 py-12 text-center">
         <div
-          class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#17171c] border-t-transparent"
+          class="mx-auto size-8 animate-spin rounded-full border-2 border-[#17171c] border-t-transparent"
         ></div>
         <p class="font-mono text-xs text-[#8e8e93]">Memeriksa validitas token undangan...</p>
       </div>
     {:else if errorMessage && !invitation}
       <div class="space-y-4 py-4 text-center">
         <div
-          class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#fecaca] bg-[#fef2f2] text-[#dc2626]"
+          class="mx-auto flex size-12 items-center justify-center rounded-2xl border border-[#fecaca] bg-[#fef2f2] text-[#dc2626]"
         >
-          <AlertCircle class="h-6 w-6" />
+          <AlertCircle class="size-6" />
         </div>
         <div class="space-y-1">
           <h2 class="text-base font-bold text-[#17171c]">Undangan Tidak Valid</h2>
@@ -156,9 +156,9 @@
     {:else if successMessage}
       <div class="space-y-4 py-4 text-center">
         <div
-          class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
+          class="mx-auto flex size-12 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
         >
-          <CheckCircle2 class="h-6 w-6" />
+          <CheckCircle2 class="size-6" />
         </div>
         <div class="space-y-1">
           <h2 class="text-base font-bold text-[#17171c]">Selamat Bergabung!</h2>
@@ -171,9 +171,9 @@
         <div class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-[#f8f8fa] p-4 shadow-2xs">
           <div class="flex items-center gap-3">
             <div
-              class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#17171c] text-sm font-bold text-white"
+              class="flex size-10 items-center justify-center rounded-xl bg-[#17171c] text-sm font-bold text-white"
             >
-              <Building2 class="h-5 w-5" />
+              <Building2 class="size-5" />
             </div>
             <div>
               <span class="font-mono text-[10px] font-semibold text-[#8e8e93] uppercase"
@@ -201,7 +201,7 @@
           <div
             class="flex items-start gap-2 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-semibold text-[#991b1b]"
           >
-            <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+            <AlertCircle class="mt-0.5 size-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         {/if}
@@ -235,7 +235,7 @@
                   <span>Memproses...</span>
                 {:else}
                   <span>Terima &amp; Gabung</span>
-                  <ArrowRight class="h-4 w-4" />
+                  <ArrowRight class="size-4" />
                 {/if}
               </button>
             </div>
@@ -294,7 +294,7 @@
                   <span>Membuat Akun...</span>
                 {:else}
                   <span>Buat Akun &amp; Gabung</span>
-                  <ArrowRight class="h-4 w-4" />
+                  <ArrowRight class="size-4" />
                 {/if}
               </button>
             </div>
@@ -305,7 +305,7 @@
   </div>
 
   <div class="mt-8 flex items-center gap-2 font-mono text-xs text-[#8e8e93]">
-    <Shield class="h-4 w-4 text-[#8e8e93]" />
+    <Shield class="size-4 text-[#8e8e93]" />
     <span>PRÉCIS Secure Team Invitation</span>
   </div>
 </div>

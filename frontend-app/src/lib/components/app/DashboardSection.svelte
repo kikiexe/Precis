@@ -100,7 +100,7 @@
         <h1 class="truncate text-lg font-bold tracking-tight text-[#17171c] sm:text-2xl">
           Ringkasan Penjualan &amp; Bisnis
         </h1>
-        <span class="h-2 w-2 shrink-0 rounded-full bg-[#10b981] motion-safe:animate-pulse"></span>
+        <span class="size-2 shrink-0 rounded-full bg-[#10b981] motion-safe:animate-pulse"></span>
       </div>
     </div>
 
@@ -110,7 +110,7 @@
         onclick={() => onNavigate('katalog', 'menu')}
         class="flex cursor-pointer items-center justify-center gap-1.5 rounded-full bg-[#17171c] px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black {focusRing}"
       >
-        <Package class="h-4 w-4" />
+        <Package class="size-4" />
         <span>Menu</span>
       </button>
 
@@ -119,7 +119,7 @@
         onclick={() => onNavigate('tim', 'presensi')}
         class="flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-[#e5e5ea] bg-white px-4 py-2 text-xs font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#f8f8fa] {focusRing}"
       >
-        <ShieldCheck class="h-4 w-4" />
+        <ShieldCheck class="size-4" />
         <span>Presensi</span>
       </button>
     </div>
@@ -147,9 +147,9 @@
     <div class="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
       <div class="flex min-w-0 items-center gap-3">
         <div
-          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white"
+          class="flex size-8 shrink-0 items-center justify-center rounded-xl bg-white/10 text-white"
         >
-          <Sparkles class="h-4 w-4 text-[#34d399]" />
+          <Sparkles class="size-4 text-[#34d399]" />
         </div>
         <div class="min-w-0">
           <h3 class="truncate text-sm font-bold text-white sm:text-base">
@@ -202,7 +202,7 @@
             : 'px-3 text-[#686873] hover:text-[#17171c]'
         }`}
       >
-        <PieChart class="h-4 w-4 shrink-0" />
+        <PieChart class="size-4 shrink-0" />
         {#if activeInsightTab === 'mix'}
           <span class="whitespace-nowrap">Komposisi Menu</span>
         {/if}
@@ -220,7 +220,7 @@
             : 'px-3 text-[#686873] hover:text-[#17171c]'
         }`}
       >
-        <CreditCard class="h-4 w-4 shrink-0" />
+        <CreditCard class="size-4 shrink-0" />
         {#if activeInsightTab === 'payments'}
           <span class="whitespace-nowrap">Saluran Pembayaran</span>
         {/if}
@@ -238,7 +238,7 @@
             : 'px-3 text-[#686873] hover:text-[#17171c]'
         }`}
       >
-        <Percent class="h-4 w-4 shrink-0" />
+        <Percent class="size-4 shrink-0" />
         {#if activeInsightTab === 'discount'}
           <span class="whitespace-nowrap">Dampak Diskon</span>
         {/if}
@@ -275,7 +275,7 @@
 
         {#if timeframeData.top_products.length === 0}
           <div class="space-y-2 py-12 text-center text-[#8e8e93]">
-            <Package class="mx-auto h-8 w-8 opacity-40" />
+            <Package class="mx-auto size-8 opacity-40" />
             <p class="text-xs font-semibold text-[#17171c]">Belum ada data produk terjual</p>
             <p class="px-4 text-[11px] text-[#8e8e93]">
               Data penjualan produk akan terakumulasi otomatis saat kasir memproses pesanan.
@@ -288,7 +288,7 @@
                 <div class="flex items-center justify-between gap-2 text-xs">
                   <div class="flex min-w-0 items-center gap-2.5">
                     <span
-                      class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#e5e5ea] bg-[#f4f4f6] font-mono text-[10px] font-bold text-[#17171c]"
+                      class="flex size-5 shrink-0 items-center justify-center rounded-full border border-[#e5e5ea] bg-[#f4f4f6] font-mono text-[10px] font-bold text-[#17171c]"
                     >
                       {idx + 1}
                     </span>
@@ -361,7 +361,7 @@
             class="inline-flex cursor-pointer items-center gap-1 py-1 text-xs font-semibold text-[#2563eb] hover:underline {focusRing}"
           >
             <span>Buka Katalog Menu Lengkap</span>
-            <ChevronRight class="h-3.5 w-3.5" />
+            <ChevronRight class="size-3.5" />
           </button>
         </div>
       </div>
@@ -369,7 +369,7 @@
       <div class="space-y-4 pt-1">
         {#if timeframeData.payment_methods.length === 0}
           <div class="space-y-2 py-12 text-center text-[#8e8e93]">
-            <CreditCard class="mx-auto h-8 w-8 opacity-40" />
+            <CreditCard class="mx-auto size-8 opacity-40" />
             <p class="text-xs font-semibold text-[#17171c]">Belum ada riwayat pembayaran</p>
             <p class="px-4 text-[11px] text-[#8e8e93]">
               Metode pembayaran (QRIS, Tunai, EDC) akan otomatis terdata.
@@ -405,7 +405,7 @@
               >
                 <div class="flex min-w-0 items-center gap-3">
                   <div
-                    class={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                    class={`flex size-9 shrink-0 items-center justify-center rounded-xl ${
                       i === 0
                         ? 'bg-[#17171c] text-white'
                         : i === 1
@@ -414,11 +414,11 @@
                     }`}
                   >
                     {#if i === 0}
-                      <QrCode class="h-4 w-4" />
+                      <QrCode class="size-4" />
                     {:else if i === 1}
-                      <Banknote class="h-4 w-4" />
+                      <Banknote class="size-4" />
                     {:else}
-                      <CreditCard class="h-4 w-4" />
+                      <CreditCard class="size-4" />
                     {/if}
                   </div>
                   <div class="truncate">

@@ -890,7 +890,7 @@
           }`}
           title="Tampilkan / Sembunyikan garis omzet bersih"
         >
-          <span class="h-1.5 w-1.5 rounded-full {isTrendingUp ? 'bg-[#10b981]' : 'bg-[#ef4444]'}"
+          <span class="size-1.5 rounded-full {isTrendingUp ? 'bg-[#10b981]' : 'bg-[#ef4444]'}"
           ></span>
           <span>Bersih</span>
         </button>
@@ -907,7 +907,7 @@
           }`}
           title="Tampilkan / Sembunyikan garis omzet kotor"
         >
-          <span class="h-1.5 w-1.5 rounded-full {isTrendingUp ? 'bg-[#6366f1]' : 'bg-[#f97316]'}"
+          <span class="size-1.5 rounded-full {isTrendingUp ? 'bg-[#6366f1]' : 'bg-[#f97316]'}"
           ></span>
           <span>Kotor</span>
         </button>
@@ -922,7 +922,7 @@
             class="cursor-pointer rounded-md border border-white/10 bg-white/5 p-1 text-white/80 transition-all hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30"
             title="Persempit rentang waktu (Zoom Out)"
           >
-            <ZoomOut class="h-3.5 w-3.5" />
+            <ZoomOut class="size-3.5" />
           </button>
 
           <!-- Zoom In X (Lebarkan Skala X) -->
@@ -933,7 +933,7 @@
             class="cursor-pointer rounded-md border border-white/10 bg-white/5 p-1 text-white/80 transition-all hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30"
             title="Lebarkan rentang waktu (Zoom In)"
           >
-            <ZoomIn class="h-3.5 w-3.5" />
+            <ZoomIn class="size-3.5" />
           </button>
 
           <!-- Auto Fit / Reset Button -->
@@ -947,7 +947,7 @@
             }`}
             title="Reset skala &amp; posisi ke default auto-fit (Double-click juga bisa)"
           >
-            <RotateCcw class="h-3 w-3" />
+            <RotateCcw class="size-3" />
             <span>Auto</span>
           </button>
         </div>
@@ -969,7 +969,7 @@
         onmouseleave={handleMouseLeave}
         onwheel={handleWheel}
         ondblclick={resetScaleAndPan}
-        class="block h-full w-full"
+        class="block size-full"
       ></canvas>
 
       <!-- TradingView Interactive Axis Hover Tooltip Hints -->

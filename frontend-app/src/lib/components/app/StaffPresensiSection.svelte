@@ -476,7 +476,7 @@
           class="cursor-pointer rounded-2xl border border-[#e5e5ea] bg-white p-2.5 text-[#17171c] shadow-2xs transition-all hover:bg-[#f4f4f6]"
           title="Kembali ke Home"
         >
-          <ArrowLeft class="h-4 w-4" />
+          <ArrowLeft class="size-4" />
         </button>
       {/if}
       <div>
@@ -520,9 +520,9 @@
       class="animate-in zoom-in-95 space-y-5 rounded-3xl border border-[#a7f3d0] bg-white p-6 text-center shadow-xl sm:p-8"
     >
       <div
-        class="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
+        class="mx-auto flex size-16 items-center justify-center rounded-3xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
       >
-        <CheckCircle2 class="h-8 w-8" />
+        <CheckCircle2 class="size-8" />
       </div>
 
       <div class="space-y-1">
@@ -538,9 +538,9 @@
 
       {#if capturedPhotoUrl}
         <div
-          class="mx-auto aspect-[3/4] w-36 overflow-hidden rounded-2xl border border-[#e5e5ea] bg-[#17171c] shadow-sm"
+          class="mx-auto aspect-3/4 w-36 overflow-hidden rounded-2xl border border-[#e5e5ea] bg-[#17171c] shadow-sm"
         >
-          <img src={capturedPhotoUrl} alt="Selfie Presensi" class="h-full w-full object-cover" />
+          <img src={capturedPhotoUrl} alt="Selfie Presensi" class="size-full object-cover" />
         </div>
       {/if}
 
@@ -574,9 +574,9 @@
     <!-- GPS Loading Screen -->
     <div class="space-y-4 rounded-3xl border border-[#e5e5ea] bg-white p-8 text-center shadow-2xs">
       <div
-        class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#17171c]"
+        class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#17171c]"
       >
-        <Navigation class="h-6 w-6 animate-spin text-[#1863dc]" />
+        <Navigation class="size-6 animate-spin text-[#1863dc]" />
       </div>
       <div class="space-y-1">
         <h3 class="text-sm font-bold text-[#17171c]">Memverifikasi Lokasi GPS Toko</h3>
@@ -589,9 +589,9 @@
     <!-- GPS Error / Permission Denied Guard Screen -->
     <div class="space-y-5 rounded-3xl border border-[#fecaca] bg-white p-7 text-center shadow-2xs">
       <div
-        class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-[#fecaca] bg-[#fef2f2] text-[#e5484d]"
+        class="mx-auto flex size-14 items-center justify-center rounded-2xl border border-[#fecaca] bg-[#fef2f2] text-[#e5484d]"
       >
-        <Lock class="h-6 w-6" />
+        <Lock class="size-6" />
       </div>
       <div class="space-y-1.5">
         <h3 class="text-sm font-bold text-[#17171c]">Izin Lokasi (GPS) Diperlukan</h3>
@@ -605,7 +605,7 @@
         onclick={detectGps}
         class="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-full bg-[#17171c] py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
       >
-        <RefreshCw class="h-3.5 w-3.5" />
+        <RefreshCw class="size-3.5" />
         <span>Deteksi Ulang GPS</span>
       </button>
     </div>
@@ -616,16 +616,16 @@
     >
       <div class="space-y-3 text-center">
         <div
-          class="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-[#fecaca] bg-[#fef2f2] text-[#e5484d] shadow-xs"
+          class="mx-auto flex size-16 items-center justify-center rounded-3xl border border-[#fecaca] bg-[#fef2f2] text-[#e5484d] shadow-xs"
         >
-          <ShieldAlert class="h-8 w-8" />
+          <ShieldAlert class="size-8" />
         </div>
 
         <div class="space-y-1">
           <span
             class="inline-flex items-center gap-1.5 rounded-full border border-[#fecaca] bg-[#fef2f2] px-3 py-1 font-mono text-[10.5px] font-bold text-[#dc2626]"
           >
-            <span class="h-1.5 w-1.5 animate-ping rounded-full bg-[#dc2626]"></span>
+            <span class="size-1.5 animate-ping rounded-full bg-[#dc2626]"></span>
             DI LUAR RADIUS TOKO
           </span>
           <h2 class="pt-1 text-base font-bold text-[#17171c]">Akses Kamera Terkunci</h2>
@@ -667,7 +667,7 @@
           onclick={detectGps}
           class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
         >
-          <RefreshCw class="h-3.5 w-3.5" />
+          <RefreshCw class="size-3.5" />
           <span>Perbarui Posisi GPS</span>
         </button>
 
@@ -686,7 +686,7 @@
     <!-- CAMERA ACCESS GRANTED: INSIDE RADIUS -->
     <!-- 3:4 Camera Viewfinder Container -->
     <div
-      class="relative flex aspect-[3/4] w-full flex-col justify-between overflow-hidden rounded-3xl border border-[#e5e5ea] bg-black p-4 shadow-2xl select-none"
+      class="relative flex aspect-3/4 w-full flex-col justify-between overflow-hidden rounded-3xl border border-[#e5e5ea] bg-black p-4 shadow-2xl select-none"
     >
       {#if !capturedPhotoUrl}
         <!-- Live Video Element -->
@@ -695,7 +695,7 @@
           autoplay
           playsinline
           muted
-          class={`absolute inset-0 h-full w-full object-cover ${facingMode === 'user' ? 'scale-x-[-1]' : ''}`}
+          class={`absolute inset-0 size-full object-cover ${facingMode === 'user' ? '-scale-x-1' : ''}`}
         ></video>
 
         {#if !isCameraActive}
@@ -703,7 +703,7 @@
           <div
             class="absolute inset-0 flex flex-col items-center justify-center space-y-2 bg-[#17171c] p-6 text-center text-white"
           >
-            <Camera class="h-12 w-12 animate-pulse text-[#a1a1aa]" />
+            <Camera class="size-12 animate-pulse text-[#a1a1aa]" />
             <div class="text-xs font-semibold">{currentUser.name}</div>
             <div class="font-mono text-[10px] text-[#a1a1aa]">
               [KAMERA AKTIF: SIAP JEPRET SELFIE]
@@ -715,7 +715,7 @@
         <img
           src={capturedPhotoUrl}
           alt="Snapshot Preview"
-          class="absolute inset-0 h-full w-full object-cover"
+          class="absolute inset-0 size-full object-cover"
         />
       {/if}
 
@@ -724,7 +724,7 @@
         <div
           class="flex items-center gap-1.5 rounded-full border border-white/10 bg-black/60 px-3 py-1 font-mono text-[10px] backdrop-blur-md"
         >
-          <ShieldCheck class="h-3.5 w-3.5 text-[#34d399]" />
+          <ShieldCheck class="size-3.5 text-[#34d399]" />
           <span
             >DI DALAM RADIUS ({distanceMeters !== null ? Math.round(distanceMeters) : 0}m / maks {activeBranch.radius_meters}m)</span
           >
@@ -737,7 +737,7 @@
             class="cursor-pointer rounded-full border border-white/10 bg-black/60 p-2.5 text-white backdrop-blur-md transition-all hover:bg-black"
             title="Putar Kamera"
           >
-            <RotateCcw class="h-4 w-4" />
+            <RotateCcw class="size-4" />
           </button>
         {/if}
       </div>
@@ -759,7 +759,7 @@
           <div
             class="flex items-center gap-2 rounded-full border border-[#fecaca] bg-[#fef2f2]/90 px-4 py-2 text-xs font-semibold text-[#991b1b] backdrop-blur-xs"
           >
-            <AlertCircle class="h-4 w-4 shrink-0" />
+            <AlertCircle class="size-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         {/if}
@@ -771,13 +771,13 @@
               type="button"
               onclick={handleTakeSnapshot}
               disabled={isCapturing || !isInsideRadius}
-              class="group flex h-20 w-20 cursor-pointer items-center justify-center rounded-full border-4 border-white bg-white/30 p-1.5 shadow-xl backdrop-blur-xs transition-all active:scale-95"
+              class="group flex size-20 cursor-pointer items-center justify-center rounded-full border-4 border-white bg-white/30 p-1.5 shadow-xl backdrop-blur-xs transition-all active:scale-95"
               title="Ambil Foto Selfie"
             >
               <div
-                class="flex h-full w-full items-center justify-center rounded-full bg-white shadow-inner transition-colors group-hover:bg-[#f4f4f6]"
+                class="flex size-full items-center justify-center rounded-full bg-white shadow-inner transition-colors group-hover:bg-[#f4f4f6]"
               >
-                <Camera class="h-7 w-7 text-[#17171c]" />
+                <Camera class="size-7 text-[#17171c]" />
               </div>
             </button>
           </div>
@@ -799,10 +799,10 @@
               class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#059669] py-3 text-xs font-semibold text-white shadow-xl transition-all hover:bg-[#047857]"
             >
               {#if isSubmitting}
-                <RefreshCw class="h-4 w-4 animate-spin" />
+                <RefreshCw class="size-4 animate-spin" />
                 <span>Mengirim...</span>
               {:else}
-                <Check class="h-4 w-4" />
+                <Check class="size-4" />
                 <span>Kirim Presensi</span>
               {/if}
             </button>

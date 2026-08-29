@@ -30,7 +30,7 @@
   >
     <div class="flex flex-1 items-center gap-2">
       <div class="relative max-w-md flex-1">
-        <Search class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+        <Search class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
         <input
           type="text"
           bind:value={searchQuery}
@@ -50,7 +50,7 @@
 
       <!-- Date Filter -->
       <div class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5">
-        <Calendar class="h-3.5 w-3.5 text-zinc-500" />
+        <Calendar class="size-3.5 text-zinc-500" />
         <input
           type="date"
           bind:value={selectedDate}
@@ -72,9 +72,9 @@
           class="border-b border-zinc-200 bg-zinc-100/80 font-mono text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
         >
           <tr class="divide-x divide-zinc-200/80">
-            <th class="w-12 px-3 py-3 text-center">No.</th>
+            <th class="w-12 p-3 text-center">No.</th>
             <th class="px-4 py-3">Bahan Baku</th>
-            <th class="w-20 px-3 py-3 text-center">Satuan</th>
+            <th class="w-20 p-3 text-center">Satuan</th>
             <th class="w-28 bg-zinc-50 px-4 py-3 text-right">Stok Awal (Kemarin)</th>
             <th class="w-28 bg-emerald-50/50 px-4 py-3 text-right text-emerald-800"
               >Masuk / Restock (+)</th
@@ -110,7 +110,7 @@
                 }`}
               >
                 <!-- No -->
-                <td class="px-3 py-3 text-center text-[11px] text-zinc-400">
+                <td class="p-3 text-center text-[11px] text-zinc-400">
                   {idx + 1}
                 </td>
 
@@ -127,7 +127,7 @@
                 </td>
 
                 <!-- Satuan -->
-                <td class="px-3 py-3 text-center text-[11px] text-zinc-500">
+                <td class="p-3 text-center text-[11px] text-zinc-500">
                   {mat.unit}
                 </td>
 
@@ -192,7 +192,7 @@
     >
       <div class="flex items-center gap-5">
         <span class="flex items-center gap-1.5">
-          <CheckCircle2 class="h-3.5 w-3.5 text-emerald-600" />
+          <CheckCircle2 class="size-3.5 text-emerald-600" />
           <span
             >Formula Rekonsiliasi: <code>Stok Awal + Masuk - Terpakai = Ekspektasi Sistem</code
             ></span

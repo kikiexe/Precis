@@ -213,16 +213,16 @@
         onclick={() => (isCategoryModalOpen = true)}
         class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-100"
       >
-        <FolderPlus class="h-3.5 w-3.5 text-zinc-600" />
+        <FolderPlus class="size-3.5 text-zinc-600" />
         <span>Kelola Kategori</span>
       </button>
 
       <button
         type="button"
         onclick={handleOpenAddModal}
-        class="flex cursor-pointer items-center gap-1.5 rounded-xl bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black active:scale-[0.99]"
+        class="active:scale-0.99 flex cursor-pointer items-center gap-1.5 rounded-xl bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black"
       >
-        <Plus class="h-3.5 w-3.5" />
+        <Plus class="size-3.5" />
         <span>+ Tambah Menu Baru</span>
       </button>
     </div>
@@ -237,7 +237,7 @@
       >
         <div class="flex flex-1 items-center gap-2">
           <div class="relative max-w-md flex-1">
-            <Search class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+            <Search class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
             <input
               type="text"
               bind:value={searchQuery}
@@ -280,8 +280,8 @@
               class="border-b border-zinc-200 bg-zinc-100/90 font-mono text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
             >
               <tr class="divide-x divide-zinc-200/80">
-                <th class="w-12 px-3 py-3 text-center">No.</th>
-                <th class="w-16 px-3 py-3 text-center">Foto</th>
+                <th class="w-12 p-3 text-center">No.</th>
+                <th class="w-16 p-3 text-center">Foto</th>
                 <th class="px-4 py-3">Nama Produk / Menu</th>
                 <th class="w-40 px-4 py-3">Kategori</th>
                 <th class="w-36 px-4 py-3 text-right font-bold">Harga Jual</th>
@@ -293,7 +293,7 @@
               {#if filteredProducts.length === 0}
                 <tr>
                   <td colspan="7" class="py-16 text-center font-sans text-zinc-400">
-                    <UtensilsCrossed class="mx-auto mb-2 h-8 w-8 text-zinc-400 opacity-30" />
+                    <UtensilsCrossed class="mx-auto mb-2 size-8 text-zinc-400 opacity-30" />
                     <p class="text-sm font-semibold text-zinc-800">Tidak ada produk menu</p>
                     <p class="mt-0.5 text-xs text-zinc-500">
                       Ubah kata kunci pencarian atau tambah menu jualan baru.
@@ -308,7 +308,7 @@
                     }`}
                   >
                     <!-- No -->
-                    <td class="px-3 py-3 text-center text-[11px] text-zinc-400">
+                    <td class="p-3 text-center text-[11px] text-zinc-400">
                       {idx + 1}
                     </td>
 
@@ -318,11 +318,11 @@
                         <img
                           src={product.image_url}
                           alt={product.name}
-                          class="mx-auto h-10 w-10 rounded-lg border border-zinc-200 object-cover shadow-2xs"
+                          class="mx-auto size-10 rounded-lg border border-zinc-200 object-cover shadow-2xs"
                         />
                       {:else}
                         <div
-                          class="mx-auto flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 text-[10px] font-bold text-zinc-400"
+                          class="mx-auto flex size-10 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 text-[10px] font-bold text-zinc-400"
                         >
                           {product.name.substring(0, 2).toUpperCase()}
                         </div>
@@ -386,7 +386,7 @@
                           class="cursor-pointer rounded p-1 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
                           title="Edit Menu"
                         >
-                          <Edit2 class="h-3.5 w-3.5" />
+                          <Edit2 class="size-3.5" />
                         </button>
                         <button
                           type="button"
@@ -394,7 +394,7 @@
                           class="cursor-pointer rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600"
                           title="Hapus Menu"
                         >
-                          <Trash2 class="h-3.5 w-3.5" />
+                          <Trash2 class="size-3.5" />
                         </button>
                       </div>
                     </td>
@@ -430,9 +430,9 @@
       <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
         <div class="flex items-center gap-2.5">
           <div
-            class="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+            class="flex size-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
           >
-            <UtensilsCrossed class="h-4 w-4" />
+            <UtensilsCrossed class="size-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-zinc-900">
@@ -448,7 +448,7 @@
           onclick={() => (isAddMenuModalOpen = false)}
           class="cursor-pointer p-1 text-zinc-400 hover:text-zinc-700"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 
@@ -456,7 +456,7 @@
         <div
           class="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700"
         >
-          <AlertCircle class="h-4 w-4 shrink-0" />
+          <AlertCircle class="size-4 shrink-0" />
           <span>{formErrorMessage}</span>
         </div>
       {/if}
@@ -525,7 +525,7 @@
         <div class="space-y-2 rounded-xl border border-zinc-200 bg-zinc-50 p-3">
           <div class="flex items-center justify-between">
             <label class="flex items-center gap-1.5 font-semibold text-zinc-900">
-              <ImageIcon class="h-3.5 w-3.5 text-zinc-600" />
+              <ImageIcon class="size-3.5 text-zinc-600" />
               <span>Foto Produk Menu (Opsional)</span>
             </label>
             {#if formImageUrl}
@@ -542,12 +542,12 @@
           <div class="flex items-center gap-3">
             <!-- Preview Box -->
             <div
-              class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-zinc-200 bg-white"
+              class="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-zinc-200 bg-white"
             >
               {#if formImageUrl}
-                <img src={formImageUrl} alt="Preview" class="h-full w-full object-cover" />
+                <img src={formImageUrl} alt="Preview" class="size-full object-cover" />
               {:else}
-                <ImageIcon class="h-6 w-6 text-zinc-300" />
+                <ImageIcon class="size-6 text-zinc-300" />
               {/if}
             </div>
 
@@ -555,7 +555,7 @@
               <label
                 class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-100"
               >
-                <Upload class="h-3.5 w-3.5 text-zinc-600" />
+                <Upload class="size-3.5 text-zinc-600" />
                 <span>Pilih File Gambar</span>
                 <input
                   type="file"
@@ -586,7 +586,7 @@
           </button>
           <button
             type="submit"
-            class="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
+            class="active:scale-0.99 flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
           >
             <span>{editingProductId ? 'Simpan Perubahan' : 'Tambah Menu'}</span>
           </button>
@@ -607,9 +607,9 @@
       <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
         <div class="flex items-center gap-2.5">
           <div
-            class="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+            class="flex size-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
           >
-            <FolderPlus class="h-4 w-4" />
+            <FolderPlus class="size-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-zinc-900">Kelola Kategori Menu</h3>
@@ -621,7 +621,7 @@
           onclick={() => (isCategoryModalOpen = false)}
           class="cursor-pointer p-1 text-zinc-400 hover:text-zinc-700"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 
@@ -660,14 +660,14 @@
                   onclick={() => handleSaveEditCategory(cat.id)}
                   class="rounded p-1 text-emerald-600 hover:bg-emerald-50"
                 >
-                  <Check class="h-4 w-4" />
+                  <Check class="size-4" />
                 </button>
                 <button
                   type="button"
                   onclick={() => (editingCategoryId = null)}
                   class="rounded p-1 text-zinc-400 hover:bg-zinc-100"
                 >
-                  <X class="h-4 w-4" />
+                  <X class="size-4" />
                 </button>
               </div>
             {:else}
@@ -681,14 +681,14 @@
                   }}
                   class="cursor-pointer rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
                 >
-                  <Edit2 class="h-3.5 w-3.5" />
+                  <Edit2 class="size-3.5" />
                 </button>
                 <button
                   type="button"
                   onclick={() => handleDeleteCategory(cat.id)}
                   class="cursor-pointer rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600"
                 >
-                  <Trash2 class="h-3.5 w-3.5" />
+                  <Trash2 class="size-3.5" />
                 </button>
               </div>
             {/if}

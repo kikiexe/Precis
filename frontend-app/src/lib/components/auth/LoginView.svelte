@@ -153,7 +153,7 @@
     <div
       class="mb-2 inline-flex items-center gap-2.5 rounded-2xl border border-[#e5e5ea] bg-white px-4 py-2 shadow-2xs"
     >
-      <div class="h-3 w-3 rounded-full bg-[#17171c]"></div>
+      <div class="size-3 rounded-full bg-[#17171c]"></div>
       <span class="text-sm font-bold tracking-tight text-[#17171c]">PRÉCIS</span>
       <span class="border-l border-[#e5e5ea] pl-2 font-mono text-[10.5px] text-[#8e8e93]"
         >Enterprise POS &amp; HR</span
@@ -173,9 +173,9 @@
       <!-- Screen: Verifikasi Email Dikirim -->
       <div class="space-y-5 py-2 text-center">
         <div
-          class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
+          class="mx-auto flex size-12 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
         >
-          <Mail class="h-6 w-6" />
+          <Mail class="size-6" />
         </div>
 
         <div class="space-y-2">
@@ -220,7 +220,7 @@
             class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
           >
             <span>Masuk ke Akun</span>
-            <ArrowRight class="h-4 w-4" />
+            <ArrowRight class="size-4" />
           </button>
 
           <button
@@ -273,7 +273,7 @@
         <div
           class="mb-5 flex items-start gap-2.5 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-semibold text-[#991b1b]"
         >
-          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+          <AlertCircle class="mt-0.5 size-4 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       {/if}
@@ -301,7 +301,7 @@
                 disabled={isLoading}
                 class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] py-2.5 pr-4 pl-10 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
-              <Mail class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]" />
+              <Mail class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#8e8e93]" />
             </div>
           </div>
 
@@ -326,9 +326,9 @@
                 placeholder="••••••••"
                 required
                 disabled={isLoading}
-                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] py-2.5 pr-10 pl-10 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
+                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-10 py-2.5 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
-              <Lock class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]" />
+              <Lock class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#8e8e93]" />
               <button
                 type="button"
                 tabindex="-1"
@@ -337,9 +337,9 @@
                 aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
               >
                 {#if showPassword}
-                  <EyeOff class="h-4 w-4" />
+                  <EyeOff class="size-4" />
                 {:else}
-                  <Eye class="h-4 w-4" />
+                  <Eye class="size-4" />
                 {/if}
               </button>
             </div>
@@ -354,7 +354,7 @@
               <span>Memvalidasi...</span>
             {:else}
               <span>Masuk ke Portal</span>
-              <ArrowRight class="h-4 w-4" />
+              <ArrowRight class="size-4" />
             {/if}
           </button>
         </form>
@@ -373,7 +373,7 @@
                 disabled={isLoading}
                 class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] py-2.5 pr-4 pl-10 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
-              <User class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]" />
+              <User class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#8e8e93]" />
             </div>
           </div>
 
@@ -389,7 +389,7 @@
                 disabled={isLoading}
                 class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] py-2.5 pr-4 pl-10 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
-              <Mail class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]" />
+              <Mail class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#8e8e93]" />
             </div>
           </div>
 
@@ -404,9 +404,9 @@
                 required
                 minlength="6"
                 disabled={isLoading}
-                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] py-2.5 pr-10 pl-10 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
+                class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-10 py-2.5 text-xs text-[#17171c] placeholder-[#8e8e93] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               />
-              <Lock class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]" />
+              <Lock class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#8e8e93]" />
               <button
                 type="button"
                 tabindex="-1"
@@ -415,9 +415,9 @@
                 aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
               >
                 {#if showPassword}
-                  <EyeOff class="h-4 w-4" />
+                  <EyeOff class="size-4" />
                 {:else}
-                  <Eye class="h-4 w-4" />
+                  <Eye class="size-4" />
                 {/if}
               </button>
             </div>
@@ -439,7 +439,7 @@
               <span>Mendaftarkan Akun...</span>
             {:else}
               <span>Daftar Akun Baru</span>
-              <ArrowRight class="h-4 w-4" />
+              <ArrowRight class="size-4" />
             {/if}
           </button>
         </form>
@@ -449,7 +449,7 @@
 
   <!-- Security Note Footer -->
   <div class="mt-8 flex items-center gap-2 font-mono text-xs text-[#8e8e93]">
-    <Shield class="h-4 w-4 text-[#8e8e93]" />
+    <Shield class="size-4 text-[#8e8e93]" />
     <span>Terkoneksi Aman via Laravel Sanctum &amp; Multi-Tenant Database</span>
   </div>
 </div>

@@ -391,7 +391,7 @@
     <div
       class="animate-in fade-in flex items-center gap-2 rounded-xl border border-[#a7f3d0] bg-[#ecfdf5] p-3 text-xs font-semibold text-[#065f46]"
     >
-      <Check class="h-4 w-4 shrink-0 text-[#059669]" />
+      <Check class="size-4 shrink-0 text-[#059669]" />
       <span>{branchSuccessMsg}</span>
     </div>
   {/if}
@@ -400,7 +400,7 @@
     <div
       class="animate-in fade-in flex items-center gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3 text-xs font-semibold text-[#991b1b]"
     >
-      <AlertCircle class="h-4 w-4 shrink-0 text-[#dc2626]" />
+      <AlertCircle class="size-4 shrink-0 text-[#dc2626]" />
       <span>{branchErrorMsg}</span>
     </div>
   {/if}
@@ -421,7 +421,7 @@
   <div class="space-y-1.5">
     <div class="flex items-center justify-between">
       <span class="flex items-center gap-1.5 text-xs font-bold text-[#17171c]">
-        <MapPin class="h-3.5 w-3.5 text-[#2563eb]" />
+        <MapPin class="size-3.5 text-[#2563eb]" />
         <span>Titik Koordinat &amp; Geofence</span>
       </span>
       <span class="text-[11px] text-[#8e8e93]">Geser pin hitam ke atap outlet</span>
@@ -459,10 +459,10 @@
               title="Baca sensor GPS perangkat saat ini"
             >
               {#if isDetectingGps}
-                <RefreshCw class="h-3.5 w-3.5 animate-spin text-[#2563eb]" />
+                <RefreshCw class="size-3.5 animate-spin text-[#2563eb]" />
                 <span>Mendeteksi...</span>
               {:else}
-                <LocateFixed class="h-3.5 w-3.5 text-[#2563eb]" />
+                <LocateFixed class="size-3.5 text-[#2563eb]" />
                 <span>Lokasiku</span>
               {/if}
             </button>
@@ -474,7 +474,7 @@
               title="Buka titik koordinat pada Google Maps"
             >
               <span>GMaps</span>
-              <ExternalLink class="h-3.5 w-3.5 text-[#6b7280]" />
+              <ExternalLink class="size-3.5 text-[#6b7280]" />
             </a>
           </div>
         </div>
@@ -587,7 +587,7 @@
   <div class="space-y-3.5 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-4 shadow-2xs">
     <div class="flex flex-col justify-between gap-1 sm:flex-row sm:items-center">
       <div class="flex items-center gap-2">
-        <QrCode class="h-4 w-4 text-[#17171c]" />
+        <QrCode class="size-4 text-[#17171c]" />
         <h4 class="text-xs font-bold text-[#17171c]">Stiker QRIS Statis Toko</h4>
       </div>
       <span class="text-[11px] text-[#8e8e93]">
@@ -621,10 +621,10 @@
             class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-white px-4 py-2 text-xs font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#f8f8fa] disabled:opacity-50"
           >
             {#if isUploadingQris}
-              <RefreshCw class="h-3.5 w-3.5 animate-spin" />
+              <RefreshCw class="size-3.5 animate-spin" />
               <span>Mengunggah...</span>
             {:else}
-              <Upload class="h-3.5 w-3.5" />
+              <Upload class="size-3.5" />
               <span>Ganti Foto</span>
             {/if}
           </button>
@@ -636,7 +636,7 @@
             class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#fecaca] bg-[#fef2f2] px-4 py-2 text-xs font-semibold text-[#dc2626] shadow-2xs transition-all hover:bg-[#fee2e2] disabled:opacity-50"
             title="Hapus barcode QRIS cabang ini"
           >
-            <Trash2 class="h-3.5 w-3.5" />
+            <Trash2 class="size-3.5" />
             <span>Hapus</span>
           </button>
         </div>
@@ -666,13 +666,13 @@
         }`}
       >
         {#if isUploadingQris}
-          <RefreshCw class="h-8 w-8 animate-spin text-[#17171c]" />
+          <RefreshCw class="size-8 animate-spin text-[#17171c]" />
           <p class="text-xs font-bold text-[#17171c]">Mengunggah foto QRIS ke storage...</p>
         {:else}
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-full bg-[#f0f0f3] text-[#17171c]"
+            class="flex size-10 items-center justify-center rounded-full bg-[#f0f0f3] text-[#17171c]"
           >
-            <Upload class="h-5 w-5" />
+            <Upload class="size-5" />
           </div>
           <div>
             <p class="text-xs font-bold text-[#17171c]">
@@ -696,10 +696,10 @@
       class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] py-2.5 text-xs font-bold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
     >
       {#if isSavingBranch}
-        <RefreshCw class="h-3.5 w-3.5 animate-spin" />
+        <RefreshCw class="size-3.5 animate-spin" />
         <span>Menyimpan...</span>
       {:else}
-        <Save class="h-3.5 w-3.5" />
+        <Save class="size-3.5" />
         <span>Simpan Pengaturan Cabang</span>
       {/if}
     </button>
@@ -710,7 +710,7 @@
     <div class="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
       <div>
         <div class="flex items-center gap-2">
-          <Tablet class="h-4 w-4 text-[#17171c]" />
+          <Tablet class="size-4 text-[#17171c]" />
           <h3 class="text-sm font-bold text-[#17171c]">Terminal Kasir POS &amp; Device Token</h3>
         </div>
         <p class="mt-0.5 text-xs text-[#8e8e93]">
@@ -724,7 +724,7 @@
           onclick={() => (isShowAddTerminalModal = true)}
           class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-white px-3 py-1.5 text-xs font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#f8f8fa]"
         >
-          <Plus class="h-3.5 w-3.5" />
+          <Plus class="size-3.5" />
           <span>Tambah Terminal</span>
         </button>
 
@@ -735,7 +735,7 @@
           class="flex items-center gap-1.5 rounded-xl bg-[#17171c] px-3 py-1.5 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black"
         >
           <span>Buka POS Kiosk</span>
-          <ExternalLink class="h-3 w-3 text-white/80" />
+          <ExternalLink class="size-3 text-white/80" />
         </a>
       </div>
     </div>
@@ -744,7 +744,7 @@
       <div
         class="animate-in fade-in flex items-center gap-2 rounded-xl border border-[#a7f3d0] bg-[#ecfdf5] p-3 text-xs font-medium text-[#065f46]"
       >
-        <Check class="h-4 w-4 text-[#059669]" />
+        <Check class="size-4 text-[#059669]" />
         <span>{terminalActionMsg}</span>
       </div>
     {/if}
@@ -757,16 +757,16 @@
             <div class="flex items-start justify-between gap-2">
               <div class="flex items-center gap-2.5">
                 <div
-                  class="flex h-8 w-8 items-center justify-center rounded-xl border border-[#e5e5ea] bg-white text-[#17171c] shadow-2xs"
+                  class="flex size-8 items-center justify-center rounded-xl border border-[#e5e5ea] bg-white text-[#17171c] shadow-2xs"
                 >
-                  <Tablet class="h-4 w-4" />
+                  <Tablet class="size-4" />
                 </div>
                 <div>
                   <h4 class="text-xs font-bold text-[#17171c]">{terminal.terminal_name}</h4>
                   <span
                     class="inline-flex items-center gap-1 text-[10px] font-semibold text-[#059669]"
                   >
-                    <span class="h-1.5 w-1.5 rounded-full bg-[#10b981]"></span>
+                    <span class="size-1.5 rounded-full bg-[#10b981]"></span>
                     {terminal.is_active ? 'Siap Pairing / Aktif' : 'Nonaktif'}
                   </span>
                 </div>
@@ -779,7 +779,7 @@
                   title="Terbitkan Token Baru"
                   class="cursor-pointer rounded-lg border border-transparent p-1.5 text-[#8e8e93] transition-colors hover:border-[#e5e5ea] hover:bg-white hover:text-[#17171c]"
                 >
-                  <RefreshCw class="h-3.5 w-3.5" />
+                  <RefreshCw class="size-3.5" />
                 </button>
                 <button
                   type="button"
@@ -787,7 +787,7 @@
                   title="Hapus Terminal"
                   class="cursor-pointer rounded-lg p-1.5 text-[#8e8e93] transition-colors hover:bg-[#ffe4e6] hover:text-[#e11d48]"
                 >
-                  <Trash2 class="h-3.5 w-3.5" />
+                  <Trash2 class="size-3.5" />
                 </button>
               </div>
             </div>
@@ -800,7 +800,7 @@
               <div
                 class="flex items-center gap-2 rounded-xl border border-[#e5e5ea] bg-white p-2 shadow-2xs"
               >
-                <Key class="h-3.5 w-3.5 shrink-0 text-[#8e8e93]" />
+                <Key class="size-3.5 shrink-0 text-[#8e8e93]" />
                 <code
                   class="flex-1 truncate font-mono text-xs font-bold tracking-wide text-[#17171c] select-all"
                 >
@@ -816,10 +816,10 @@
                   }`}
                 >
                   {#if copiedTokenId === terminal.id}
-                    <Check class="h-3 w-3" />
+                    <Check class="size-3" />
                     <span>Tersalin</span>
                   {:else}
-                    <Copy class="h-3 w-3" />
+                    <Copy class="size-3" />
                     <span>Salin</span>
                   {/if}
                 </button>
@@ -832,7 +832,7 @@
       <div
         class="space-y-3 rounded-2xl border border-dashed border-[#d2d2d7] bg-[#fafafc] p-6 text-center"
       >
-        <Tablet class="mx-auto h-8 w-8 text-[#8e8e93] opacity-50" />
+        <Tablet class="mx-auto size-8 text-[#8e8e93] opacity-50" />
         <div>
           <p class="text-xs font-semibold text-[#17171c]">
             Belum ada terminal kasir untuk cabang ini
@@ -847,7 +847,7 @@
           disabled={isCreatingTerminal}
           class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#17171c] px-4 py-2 text-xs font-bold text-white shadow-2xs transition-all hover:bg-black"
         >
-          <Plus class="h-3.5 w-3.5" />
+          <Plus class="size-3.5" />
           <span>Buat Terminal Kasir Utama</span>
         </button>
       </div>
@@ -864,8 +864,8 @@
       class="animate-in zoom-in-95 w-full max-w-sm space-y-4 rounded-3xl border border-[#e5e5ea] bg-white p-5 font-sans shadow-xl sm:p-6"
     >
       <div class="flex items-center gap-3">
-        <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#17171c] text-white">
-          <Tablet class="h-5 w-5" />
+        <div class="flex size-10 items-center justify-center rounded-2xl bg-[#17171c] text-white">
+          <Tablet class="size-5" />
         </div>
         <div>
           <h3 class="text-sm font-bold text-[#17171c]">Tambah Terminal Kasir</h3>
@@ -917,10 +917,10 @@
           class="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-[#17171c] py-2 text-xs font-bold text-white transition-all hover:bg-black disabled:opacity-50"
         >
           {#if isCreatingTerminal}
-            <RefreshCw class="h-3.5 w-3.5 animate-spin" />
+            <RefreshCw class="size-3.5 animate-spin" />
             <span>Membuat...</span>
           {:else}
-            <Plus class="h-3.5 w-3.5" />
+            <Plus class="size-3.5" />
             <span>Buat Token</span>
           {/if}
         </button>

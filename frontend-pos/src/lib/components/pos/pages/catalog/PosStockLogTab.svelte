@@ -42,7 +42,7 @@
   >
     <div class="flex flex-1 items-center gap-2">
       <div class="relative max-w-md flex-1">
-        <Search class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+        <Search class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
         <input
           type="text"
           bind:value={searchQuery}
@@ -62,7 +62,7 @@
 
       <!-- Reason Filter -->
       <div class="flex items-center gap-1.5">
-        <Filter class="h-3.5 w-3.5 text-zinc-400" />
+        <Filter class="size-3.5 text-zinc-400" />
         <select
           bind:value={reasonFilter}
           class="h-9 cursor-pointer rounded-lg border border-zinc-200 bg-zinc-50 px-3 text-xs font-medium text-zinc-700 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
@@ -91,7 +91,7 @@
           class="border-b border-zinc-200 bg-zinc-100/80 font-mono text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
         >
           <tr class="divide-x divide-zinc-200/80">
-            <th class="w-12 px-3 py-3 text-center">No.</th>
+            <th class="w-12 p-3 text-center">No.</th>
             <th class="w-40 px-4 py-3 text-center">Waktu &amp; Tanggal</th>
             <th class="px-4 py-3">Nama Bahan Baku</th>
             <th class="w-36 px-4 py-3 text-center">Alasan Mutasi</th>
@@ -106,7 +106,7 @@
           {#if filteredLogs.length === 0}
             <tr>
               <td colspan="9" class="py-16 text-center font-sans text-zinc-400">
-                <History class="mx-auto mb-2 h-8 w-8 text-zinc-400 opacity-30" />
+                <History class="mx-auto mb-2 size-8 text-zinc-400 opacity-30" />
                 <p class="text-sm font-semibold text-zinc-800">
                   Belum ada riwayat penyesuaian stok
                 </p>
@@ -127,7 +127,7 @@
                 }`}
               >
                 <!-- No -->
-                <td class="px-3 py-3 text-center text-[11px] text-zinc-400">
+                <td class="p-3 text-center text-[11px] text-zinc-400">
                   {idx + 1}
                 </td>
 

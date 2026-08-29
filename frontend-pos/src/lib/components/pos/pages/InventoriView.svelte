@@ -293,7 +293,7 @@
       <span class="font-mono text-xs text-zinc-400">|</span>
       <!-- Date Picker (Per Hari & Riwayat Hari Sebelumnya) -->
       <div class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-2.5 py-1">
-        <Calendar class="h-3.5 w-3.5 text-zinc-500" />
+        <Calendar class="size-3.5 text-zinc-500" />
         <span class="text-[11px] font-semibold text-zinc-600">Tanggal:</span>
         <input
           type="date"
@@ -309,16 +309,16 @@
         onclick={() => (isCategoryModalOpen = true)}
         class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-100"
       >
-        <FolderPlus class="h-3.5 w-3.5 text-zinc-600" />
+        <FolderPlus class="size-3.5 text-zinc-600" />
         <span>Kelola Kategori</span>
       </button>
 
       <button
         type="button"
         onclick={handleOpenAddModal}
-        class="flex cursor-pointer items-center gap-1.5 rounded-xl bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black active:scale-[0.99]"
+        class="active:scale-0.99 flex cursor-pointer items-center gap-1.5 rounded-xl bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black"
       >
-        <Plus class="h-3.5 w-3.5" />
+        <Plus class="size-3.5" />
         <span>+ Tambah Bahan Baku</span>
       </button>
     </div>
@@ -333,7 +333,7 @@
       >
         <div class="flex flex-1 items-center gap-2">
           <div class="relative max-w-md flex-1">
-            <Search class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+            <Search class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
             <input
               type="text"
               bind:value={searchQuery}
@@ -376,13 +376,13 @@
               class="border-b border-zinc-200 bg-zinc-100/90 font-mono text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
             >
               <tr class="divide-x divide-zinc-200/80">
-                <th class="w-12 px-3 py-3 text-center">No.</th>
+                <th class="w-12 p-3 text-center">No.</th>
                 <th class="px-4 py-3">Nama Bahan Baku</th>
                 <th class="w-40 px-4 py-3">Kategori</th>
                 <th class="w-32 bg-zinc-50 px-4 py-3 text-right">Stok Kemarin</th>
                 <th class="w-32 px-4 py-3 text-right font-bold text-zinc-900">Stok Sekarang</th>
                 <th class="w-32 bg-red-50/40 px-4 py-3 text-right text-red-800">Stok Terpakai</th>
-                <th class="w-24 px-3 py-3 text-center">Satuan</th>
+                <th class="w-24 p-3 text-center">Satuan</th>
                 <th class="w-36 px-4 py-3 text-center">Aksi</th>
               </tr>
             </thead>
@@ -404,7 +404,7 @@
                     }`}
                   >
                     <!-- No -->
-                    <td class="px-3 py-3 text-center text-[11px] text-zinc-400">
+                    <td class="p-3 text-center text-[11px] text-zinc-400">
                       {idx + 1}
                     </td>
 
@@ -442,7 +442,7 @@
                     </td>
 
                     <!-- Satuan -->
-                    <td class="px-3 py-3 text-center text-[11px] text-zinc-600">
+                    <td class="p-3 text-center text-[11px] text-zinc-600">
                       {mat.unit}
                     </td>
 
@@ -453,7 +453,7 @@
                         onclick={() => handleOpenAdjustModal(mat)}
                         class="mx-auto flex cursor-pointer items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-[11px] font-semibold text-white shadow-2xs transition-all hover:bg-black active:scale-95"
                       >
-                        <SlidersHorizontal class="h-3 w-3" />
+                        <SlidersHorizontal class="size-3" />
                         <span>Sesuaikan Stok</span>
                       </button>
                     </td>
@@ -491,9 +491,9 @@
       <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
         <div class="flex items-center gap-2.5">
           <div
-            class="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+            class="flex size-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
           >
-            <SlidersHorizontal class="h-4 w-4" />
+            <SlidersHorizontal class="size-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-zinc-900">Sesuaikan Stok Fisik</h3>
@@ -505,7 +505,7 @@
           onclick={() => (adjustingMaterial = null)}
           class="cursor-pointer p-1 text-zinc-400 hover:text-zinc-700"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 
@@ -569,7 +569,7 @@
         <button
           type="button"
           onclick={handleSaveAdjustStock}
-          class="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
+          class="active:scale-0.99 flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
         >
           <span>Simpan Stok Sekarang</span>
         </button>
@@ -589,9 +589,9 @@
       <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
         <div class="flex items-center gap-2.5">
           <div
-            class="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+            class="flex size-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
           >
-            <Plus class="h-4 w-4" />
+            <Plus class="size-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-zinc-900">Tambah Bahan Baku Baru</h3>
@@ -603,7 +603,7 @@
           onclick={() => (isAddMaterialModalOpen = false)}
           class="cursor-pointer p-1 text-zinc-400 hover:text-zinc-700"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 
@@ -611,7 +611,7 @@
         <div
           class="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-700"
         >
-          <AlertCircle class="h-4 w-4 shrink-0" />
+          <AlertCircle class="size-4 shrink-0" />
           <span>{formErrorMessage}</span>
         </div>
       {/if}
@@ -702,7 +702,7 @@
           </button>
           <button
             type="submit"
-            class="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
+            class="active:scale-0.99 flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
           >
             <span>Simpan Bahan Baku</span>
           </button>
@@ -723,9 +723,9 @@
       <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
         <div class="flex items-center gap-2.5">
           <div
-            class="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+            class="flex size-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
           >
-            <FolderPlus class="h-4 w-4" />
+            <FolderPlus class="size-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-zinc-900">Kelola Kategori Bahan Baku</h3>
@@ -737,7 +737,7 @@
           onclick={() => (isCategoryModalOpen = false)}
           class="cursor-pointer p-1 text-zinc-400 hover:text-zinc-700"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 
@@ -776,14 +776,14 @@
                   onclick={() => handleSaveEditCategory(cat.id)}
                   class="rounded p-1 text-emerald-600 hover:bg-emerald-50"
                 >
-                  <Check class="h-4 w-4" />
+                  <Check class="size-4" />
                 </button>
                 <button
                   type="button"
                   onclick={() => (editingCategoryId = null)}
                   class="rounded p-1 text-zinc-400 hover:bg-zinc-100"
                 >
-                  <X class="h-4 w-4" />
+                  <X class="size-4" />
                 </button>
               </div>
             {:else}
@@ -797,14 +797,14 @@
                   }}
                   class="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
                 >
-                  <Edit2 class="h-3.5 w-3.5" />
+                  <Edit2 class="size-3.5" />
                 </button>
                 <button
                   type="button"
                   onclick={() => handleDeleteCategory(cat.id)}
                   class="rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600"
                 >
-                  <Trash2 class="h-3.5 w-3.5" />
+                  <Trash2 class="size-3.5" />
                 </button>
               </div>
             {/if}

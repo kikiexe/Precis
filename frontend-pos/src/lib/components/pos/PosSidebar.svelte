@@ -49,7 +49,7 @@
       class="flex h-14 items-center gap-3 overflow-hidden border-b border-zinc-800 bg-[#18181d] px-4"
     >
       <div
-        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 text-sm font-bold tracking-wider text-white"
+        class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 text-sm font-bold tracking-wider text-white"
       >
         P
       </div>
@@ -76,7 +76,7 @@
           } ${isCollapsed ? 'justify-center px-0' : ''}`}
         >
           <Icon
-            class={`h-4.5 w-4.5 shrink-0 ${activePage === item.id ? 'text-white' : 'text-zinc-400'}`}
+            class={`size-4.5 shrink-0 ${activePage === item.id ? 'text-white' : 'text-zinc-400'}`}
           />
           {#if !isCollapsed}
             <span class="truncate">{item.label}</span>
@@ -92,7 +92,7 @@
       <div
         class="flex items-center gap-2 truncate rounded-lg border border-zinc-700/60 bg-zinc-800/80 px-3 py-2 text-[11px] font-medium text-zinc-200"
       >
-        <Store class="h-3.5 w-3.5 shrink-0 text-zinc-400" />
+        <Store class="size-3.5 shrink-0 text-zinc-400" />
         <span class="truncate">Précis Coffee - Outlet 01</span>
       </div>
     {/if}
@@ -104,10 +104,10 @@
       aria-label="Toggle Sidebar"
     >
       {#if isCollapsed}
-        <ChevronRight class="h-4 w-4" />
+        <ChevronRight class="size-4" />
       {:else}
         <div class="flex items-center gap-1.5 text-[11px]">
-          <ChevronLeft class="h-3.5 w-3.5" />
+          <ChevronLeft class="size-3.5" />
           <span>Sembunyikan</span>
         </div>
       {/if}

@@ -129,7 +129,7 @@
       disabled={isLoading}
       class="inline-flex cursor-pointer items-center gap-1.5 self-start rounded-lg border border-[#d9d9dd] bg-white px-3.5 py-2 text-xs font-medium text-[#17171c] shadow-xs transition-all hover:bg-[#f4f4f4] disabled:opacity-50 sm:self-auto"
     >
-      <RefreshCw class={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+      <RefreshCw class={`size-3.5 ${isLoading ? 'animate-spin' : ''}`} />
       <span>Segarkan</span>
     </button>
   </div>
@@ -140,7 +140,7 @@
       class="flex items-center justify-between rounded-xl border border-[#bbf7d0] bg-[#edfce9] p-3.5 text-xs text-[#003c33]"
     >
       <div class="flex items-center gap-2">
-        <CheckCircle class="h-4 w-4 shrink-0 text-[#16a34a]" />
+        <CheckCircle class="size-4 shrink-0 text-[#16a34a]" />
         <span class="font-medium">{actionMessage}</span>
       </div>
       <button
@@ -148,7 +148,7 @@
         onclick={() => (actionMessage = null)}
         class="text-[#003c33] hover:opacity-70"
       >
-        <X class="h-4 w-4" />
+        <X class="size-4" />
       </button>
     </div>
   {/if}
@@ -158,7 +158,7 @@
       class="flex items-center justify-between rounded-xl border border-[#fecaca] bg-[#ffefef] p-3.5 text-xs text-[#e5484d]"
     >
       <div class="flex items-center gap-2">
-        <AlertTriangle class="h-4 w-4 shrink-0 text-[#dc2626]" />
+        <AlertTriangle class="size-4 shrink-0 text-[#dc2626]" />
         <span class="font-medium">{actionError}</span>
       </div>
       <button
@@ -166,7 +166,7 @@
         onclick={() => (actionError = null)}
         class="text-[#e5484d] hover:opacity-70"
       >
-        <X class="h-4 w-4" />
+        <X class="size-4" />
       </button>
     </div>
   {/if}
@@ -230,7 +230,7 @@
 
       <!-- Search Input -->
       <div class="relative w-full md:w-64">
-        <Search class="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-[#93939f]" />
+        <Search class="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-[#93939f]" />
         <input
           type="text"
           bind:value={searchQuery}
@@ -243,12 +243,12 @@
     <!-- Content State: Loading / Empty / Data -->
     {#if isLoading}
       <div class="space-y-2 py-16 text-center text-[#93939f]">
-        <RefreshCw class="mx-auto h-5 w-5 animate-spin text-[#17171c]" />
+        <RefreshCw class="mx-auto size-5 animate-spin text-[#17171c]" />
         <p class="text-xs">Memuat data direktori tenant...</p>
       </div>
     {:else if filteredTenants.length === 0}
       <div class="space-y-2 py-16 text-center text-[#93939f]">
-        <Building2 class="mx-auto h-8 w-8 text-[#93939f] opacity-40" />
+        <Building2 class="mx-auto size-8 text-[#93939f] opacity-40" />
         <p class="text-xs font-medium text-[#17171c]">Tidak ada data tenant yang cocok</p>
         <p class="text-[11px] text-[#75758a]">
           Data tenant terdaftar akan otomatis muncul di sini.
@@ -292,7 +292,7 @@
                     <div class="space-y-1">
                       {#each tenant.workspaces as ws}
                         <div class="flex items-center gap-1.5">
-                          <Store class="h-3.5 w-3.5 shrink-0 text-[#75758a]" />
+                          <Store class="size-3.5 shrink-0 text-[#75758a]" />
                           <span class="font-medium text-[#17171c]">{ws.name}</span>
                           <span
                             class="py-0.2 rounded-md bg-[#f1f5ff] px-1.5 font-mono text-[10px] text-[#1863dc]"
@@ -374,7 +374,7 @@
                       class="flex cursor-pointer items-center gap-1 rounded-md bg-[#17171c] px-2.5 py-1 text-xs font-medium text-white transition-all hover:bg-black"
                       title="Perpanjang Masa Aktif"
                     >
-                      <PlusCircle class="h-3 w-3" />
+                      <PlusCircle class="size-3" />
                       <span>Perpanjang</span>
                     </button>
 
@@ -487,7 +487,7 @@
                 onclick={() => openExtendModal(tenant)}
                 class="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#17171c] py-2 text-xs font-medium text-white"
               >
-                <PlusCircle class="h-3.5 w-3.5" />
+                <PlusCircle class="size-3.5" />
                 <span>Perpanjang</span>
               </button>
 
@@ -526,7 +526,7 @@
           onclick={closeExtendModal}
           class="cursor-pointer text-[#93939f] hover:text-[#17171c]"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 

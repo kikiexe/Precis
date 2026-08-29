@@ -113,7 +113,7 @@
       disabled={isLoading}
       class="inline-flex cursor-pointer items-center gap-1.5 self-start rounded-lg border border-[#d9d9dd] bg-white px-3.5 py-2 text-xs font-medium text-[#17171c] shadow-xs transition-all hover:bg-[#f4f4f4] disabled:opacity-50 sm:self-auto"
     >
-      <RefreshCw class={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+      <RefreshCw class={`size-3.5 ${isLoading ? 'animate-spin' : ''}`} />
       <span>Segarkan</span>
     </button>
   </div>
@@ -184,7 +184,7 @@
 
       <!-- Search Box -->
       <div class="relative w-full md:w-64">
-        <Search class="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-[#93939f]" />
+        <Search class="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-[#93939f]" />
         <input
           type="text"
           bind:value={searchQuery}
@@ -197,12 +197,12 @@
     <!-- Content State: Loading / Empty / Data -->
     {#if isLoading}
       <div class="space-y-2 py-16 text-center text-[#93939f]">
-        <RefreshCw class="mx-auto h-5 w-5 animate-spin text-[#17171c]" />
+        <RefreshCw class="mx-auto size-5 animate-spin text-[#17171c]" />
         <p class="text-xs">Memuat data faktur tagihan...</p>
       </div>
     {:else if filteredInvoices.length === 0}
       <div class="space-y-2 py-16 text-center text-[#93939f]">
-        <Receipt class="mx-auto h-8 w-8 text-[#93939f] opacity-40" />
+        <Receipt class="mx-auto size-8 text-[#93939f] opacity-40" />
         <p class="text-xs font-medium text-[#17171c]">Tidak ada faktur yang sesuai filter</p>
         <p class="text-[11px] text-[#75758a]">
           Faktur tagihan baru akan otomatis muncul di sini saat tenant membuat pesanan.
@@ -327,7 +327,7 @@
                         : 'border border-[#d9d9dd] bg-white text-[#17171c] hover:bg-[#f4f4f4]'
                     }`}
                   >
-                    <Eye class="h-3.5 w-3.5" />
+                    <Eye class="size-3.5" />
                     <span
                       >{invoice.status === 'PENDING_VERIFICATION' ? 'Verifikasi' : 'Detail'}</span
                     >
@@ -418,7 +418,7 @@
                   : 'border border-[#d9d9dd] bg-white text-[#17171c] hover:bg-[#f4f4f4]'
               }`}
             >
-              <Eye class="h-3.5 w-3.5" />
+              <Eye class="size-3.5" />
               <span
                 >{invoice.status === 'PENDING_VERIFICATION'
                   ? 'Inspeksi & Verifikasi'
@@ -445,7 +445,7 @@
         class="flex items-center justify-between border-b border-[#e5e5e5] bg-[#17171c] px-6 py-4 text-white"
       >
         <div class="flex items-center gap-2.5">
-          <ShieldCheck class="h-5 w-5 text-[#edfce9]" />
+          <ShieldCheck class="size-5 text-[#edfce9]" />
           <div>
             <h2 class="text-sm font-semibold tracking-tight">Inspeksi Bukti Pembayaran</h2>
             <p class="font-mono text-[10px] text-[#93939f]">{inspectingInvoice.invoice_number}</p>
@@ -456,7 +456,7 @@
           onclick={closeInspection}
           class="cursor-pointer p-1 text-[#93939f] transition-colors hover:text-white"
         >
-          <X class="h-5 w-5" />
+          <X class="size-5" />
         </button>
       </div>
 
@@ -466,7 +466,7 @@
           <div
             class="flex items-center gap-2 rounded-xl border border-[#bbf7d0] bg-[#edfce9] p-3 font-medium text-[#003c33]"
           >
-            <CheckCircle class="h-4 w-4 shrink-0 text-[#16a34a]" />
+            <CheckCircle class="size-4 shrink-0 text-[#16a34a]" />
             <span>{verificationSuccessMessage}</span>
           </div>
         {/if}
@@ -475,7 +475,7 @@
           <div
             class="flex items-center gap-2 rounded-xl border border-[#fecaca] bg-[#ffefef] p-3 font-medium text-[#e5484d]"
           >
-            <AlertCircle class="h-4 w-4 shrink-0 text-[#dc2626]" />
+            <AlertCircle class="size-4 shrink-0 text-[#dc2626]" />
             <span>{verificationErrorMessage}</span>
           </div>
         {/if}
@@ -587,10 +587,10 @@
             class="flex cursor-pointer items-center gap-1.5 rounded-lg bg-[#17171c] px-4 py-2 text-xs font-medium text-white transition-all hover:bg-black disabled:opacity-50"
           >
             {#if isVerifying}
-              <RefreshCw class="h-3.5 w-3.5 animate-spin" />
+              <RefreshCw class="size-3.5 animate-spin" />
               <span>Memproses...</span>
             {:else}
-              <CheckCircle class="h-3.5 w-3.5 text-[#bbf7d0]" />
+              <CheckCircle class="size-3.5 text-[#bbf7d0]" />
               <span>Setujui Pembayaran &amp; Aktifkan</span>
             {/if}
           </button>

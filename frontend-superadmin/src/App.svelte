@@ -110,7 +110,7 @@
   <div class="flex min-h-screen items-center justify-center bg-[#eeece7]/40 font-sans">
     <div class="space-y-3 text-center">
       <div
-        class="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-[#17171c] border-t-transparent"
+        class="mx-auto size-8 animate-spin rounded-full border-2 border-[#17171c] border-t-transparent"
       ></div>
       <p class="font-mono text-xs text-[#75758a]">Memvalidasi sesi Précis Superadmin...</p>
     </div>
@@ -140,7 +140,7 @@
         <img
           src="/logo.png"
           alt="Précis Logo"
-          class="h-7 w-7 rounded-lg border border-white/20 object-cover"
+          class="size-7 rounded-lg border border-white/20 object-cover"
         />
         <span class="text-xs font-medium tracking-tight uppercase">PRÉCIS Superadmin</span>
       </div>
@@ -152,9 +152,9 @@
         aria-label="Buka Menu Navigasi"
       >
         {#if isMobileSidebarOpen}
-          <X class="h-5 w-5" />
+          <X class="size-5" />
         {:else}
-          <Menu class="h-5 w-5" />
+          <Menu class="size-5" />
         {/if}
       </button>
     </div>

@@ -76,7 +76,7 @@
           onclick={onClose}
           class="cursor-pointer text-[#75758a] hover:text-[#17171c]"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 

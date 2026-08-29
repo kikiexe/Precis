@@ -36,7 +36,7 @@
   >
     <div class="flex flex-1 items-center gap-2">
       <div class="relative max-w-md flex-1">
-        <Search class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+        <Search class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
         <input
           type="text"
           bind:value={searchQuery}
@@ -69,9 +69,9 @@
     <button
       type="button"
       onclick={onOpenAddModal}
-      class="flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
+      class="active:scale-0.99 flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-zinc-900 px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
     >
-      <Plus class="h-3.5 w-3.5" />
+      <Plus class="size-3.5" />
       <span>+ Tambah Menu Baru</span>
     </button>
   </div>
@@ -84,7 +84,7 @@
           class="border-b border-zinc-200 bg-zinc-100/80 font-mono text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
         >
           <tr class="divide-x divide-zinc-200/80">
-            <th class="w-12 px-3 py-3 text-center">No.</th>
+            <th class="w-12 p-3 text-center">No.</th>
             <th class="px-4 py-3">Nama Produk / Menu</th>
             <th class="w-40 px-4 py-3">Kategori</th>
             <th class="w-36 px-4 py-3 text-right">Harga Jual</th>
@@ -113,7 +113,7 @@
                 }`}
               >
                 <!-- No -->
-                <td class="px-3 py-3 text-center font-mono text-[11px] text-zinc-400">
+                <td class="p-3 text-center font-mono text-[11px] text-zinc-400">
                   {idx + 1}
                 </td>
 
@@ -130,7 +130,7 @@
                 <!-- Kategori -->
                 <td class="px-4 py-3">
                   <span
-                    class="inline-block max-w-[140px] truncate rounded-md border border-zinc-200/60 bg-zinc-100 px-2.5 py-0.5 text-[11px] font-medium text-zinc-700"
+                    class="inline-block max-w-35 truncate rounded-md border border-zinc-200/60 bg-zinc-100 px-2.5 py-0.5 text-[11px] font-medium text-zinc-700"
                   >
                     {catName}
                   </span>
@@ -151,10 +151,10 @@
                     }`}
                   >
                     {#if product.is_active}
-                      <CheckCircle2 class="h-3 w-3 text-emerald-600" />
+                      <CheckCircle2 class="size-3 text-emerald-600" />
                       <span>Aktif</span>
                     {:else}
-                      <XCircle class="h-3 w-3 text-zinc-500" />
+                      <XCircle class="size-3 text-zinc-500" />
                       <span>Nonaktif</span>
                     {/if}
                   </span>

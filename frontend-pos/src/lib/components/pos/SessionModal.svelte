@@ -120,7 +120,7 @@
       <!-- header modal -->
       <div class="mb-4 flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
         <div class="flex items-center gap-2">
-          <DollarSign class="h-4 w-4 text-[#1863dc]" />
+          <DollarSign class="size-4 text-[#1863dc]" />
           <h2 class="text-sm font-medium text-[#212121]">
             {activeSession && activeSession.status === 'OPEN'
               ? 'Tutup Sesi Kasir & Rekonsiliasi'
@@ -133,7 +133,7 @@
           disabled={isLoading}
           class="cursor-pointer p-1 text-[#93939f] hover:text-[#212121]"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 
@@ -141,7 +141,7 @@
         <div
           class="mb-4 flex items-start gap-2 rounded-xl border border-[#ffad9b] bg-[#ffad9b]/15 p-3 text-xs text-[#b30000]"
         >
-          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+          <AlertCircle class="mt-0.5 size-4 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       {/if}
@@ -170,7 +170,7 @@
                   {/each}
                 </select>
                 <ChevronDown
-                  class="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+                  class="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-[#8e8e93]"
                 />
               </div>
             </div>
@@ -234,7 +234,7 @@
               {#if isLoading}
                 <span>Membuka...</span>
               {:else}
-                <Check class="h-3.5 w-3.5" />
+                <Check class="size-3.5" />
                 <span>Buka Sesi ({formatCurrency(openingCashInput)})</span>
               {/if}
             </button>
@@ -335,7 +335,7 @@
               {#if isLoading}
                 <span>Menutup...</span>
               {:else}
-                <Check class="h-3.5 w-3.5" />
+                <Check class="size-3.5" />
                 <span>Tutup Shift &amp; Settlement</span>
               {/if}
             </button>

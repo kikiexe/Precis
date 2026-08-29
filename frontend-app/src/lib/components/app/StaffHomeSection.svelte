@@ -178,9 +178,9 @@
       <div class="flex items-start justify-between gap-3 border-b border-[#f2f2f4] pb-4">
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
+            class="flex size-10 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
           >
-            <Mail class="h-5 w-5" />
+            <Mail class="size-5" />
           </div>
           <div>
             <h2 class="text-base font-bold text-[#17171c]">Belum Ada Outlet &amp; Jadwal Shift</h2>
@@ -211,7 +211,7 @@
             disabled={isCheckingInvitation}
             class="flex w-full flex-1 cursor-pointer items-center justify-center gap-2 rounded-full border border-[#e5e5ea] px-5 py-3 text-xs font-semibold text-[#17171c] transition-all hover:bg-[#f4f4f6] disabled:opacity-50 sm:w-auto"
           >
-            <RefreshCw class={`h-4 w-4 ${isCheckingInvitation ? 'animate-spin' : ''}`} />
+            <RefreshCw class={`size-4 ${isCheckingInvitation ? 'animate-spin' : ''}`} />
             <span>{isCheckingInvitation ? 'Memeriksa...' : 'Cek Status Undangan'}</span>
           </button>
         {/if}
@@ -222,7 +222,7 @@
             onclick={onOpenCreateWorkspaceModal}
             class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#17171c] px-5 py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black sm:w-auto"
           >
-            <Plus class="h-4 w-4" />
+            <Plus class="size-4" />
             <span>Buat Bisnis Baru</span>
           </button>
         {/if}

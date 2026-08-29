@@ -72,7 +72,7 @@
               >
                 {link.name}
                 <ArrowUpRight
-                  class="h-3 w-3 -translate-x-1 text-[#0f62fe] opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                  class="size-3 -translate-x-1 text-[#0f62fe] opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
                 />
               </a>
             {/each}
