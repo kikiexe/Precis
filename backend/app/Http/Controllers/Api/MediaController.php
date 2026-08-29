@@ -36,4 +36,25 @@ class MediaController
             'data' => $result,
         ], Response::HTTP_OK);
     }
+
+    /**
+     * terima upload biner file ke disk storage lokal (environment lokal / testing)
+     */
+    public function mockUpload(Request $request): \Illuminate\Http\Response|JsonResponse
+    {
+        $key = (string) $request->query('key');
+        if (empty($key)) {
+            return new JsonResponse([
+                'message' => 'Parameter query key wajib disertakan.',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        // sanitasi key path untuk mencegah directory traversal
+        $cleanKey = ltrim(str_replace('..', '', $key), '/');
+
+        $content = $request->getContent();
+        \Illuminate\Support\Facades\Storage::disk('public')->put($cleanKey, $content);
+
+        return response('', Response::HTTP_OK);
+    }
 }
