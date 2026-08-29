@@ -2,6 +2,7 @@
   import { Banknote, QrCode, CreditCard, X, Check, AlertTriangle } from 'lucide-svelte';
   import type { PaymentMethod, CartItem, OfflineOrder, CashierUser } from '../../types/pos';
   import { formatCurrency } from '../../services/printer-service';
+  import { getCachedImageUrl } from '../../services/image-cache';
 
   interface Props {
     isOpen: boolean;
@@ -13,6 +14,7 @@
     branchId: string;
     workspaceId: string;
     activeSessionId: string;
+    qrisImageUrl?: string | null;
     onClose: () => void;
     onCompleteOrder: (order: OfflineOrder) => void;
   }
@@ -27,6 +29,7 @@
     branchId = 'branch-sleman-01',
     workspaceId = 'ws-amore-01',
     activeSessionId = 'sess-active-01',
+    qrisImageUrl = null,
     onClose,
     onCompleteOrder,
   }: Props = $props();
@@ -34,11 +37,22 @@
   let selectedMethod = $state<PaymentMethod>('CASH');
   let cashTendered = $state<number>(0);
   let isProcessing = $state(false);
+  let resolvedQrisUrl = $state<string | null>(null);
 
   $effect(() => {
     if (isOpen) {
       cashTendered = finalAmount;
       isProcessing = false;
+    }
+  });
+
+  $effect(() => {
+    if (qrisImageUrl) {
+      getCachedImageUrl(qrisImageUrl).then((url) => {
+        resolvedQrisUrl = url;
+      });
+    } else {
+      resolvedQrisUrl = null;
     }
   });
 
@@ -150,7 +164,7 @@
           }`}
         >
           <QrCode class="h-5 w-5" />
-          <span class="text-xs">QRIS Dinamis</span>
+          <span class="text-xs">QRIS Toko</span>
         </button>
 
         <button
@@ -230,23 +244,85 @@
             {/if}
           </div>
         {:else if selectedMethod === 'QRIS'}
-          <div
-            class="space-y-3 rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-6 text-center"
-          >
+          {#if qrisImageUrl}
             <div
-              class="mx-auto flex h-44 w-44 flex-col items-center justify-center rounded-[16px] border border-[#d9d9dd] bg-white p-3 shadow-none"
+              class="space-y-4 rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-5 text-center"
             >
-              <!-- QR Simulator -->
-              <QrCode class="h-32 w-32 text-[#212121]" />
-              <span class="mt-1 font-mono text-[10px] text-[#75758a]">QRIS NATIONAL STANDARDS</span>
+              <div
+                class="mx-auto flex max-w-xs flex-col items-center justify-center rounded-[18px] border border-[#d9d9dd] bg-white p-4 shadow-2xs"
+              >
+                <!-- Foto QRIS Toko -->
+                <div
+                  class="relative flex h-56 w-56 items-center justify-center overflow-hidden rounded-xl bg-white p-1"
+                >
+                  <img
+                    src={resolvedQrisUrl || qrisImageUrl}
+                    alt="QRIS Toko"
+                    class="h-full w-full object-contain"
+                  />
+                </div>
+                <div class="mt-2 text-center">
+                  <span
+                    class="rounded-md bg-[#eeece7] px-2 py-0.5 font-mono text-[10px] font-bold text-[#616161]"
+                  >
+                    QRIS TOKO RESMI
+                  </span>
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <div class="text-xs font-semibold text-[#17171c]">
+                  Tunjukkan barcode ke pelanggan untuk di-scan
+                </div>
+                <div class="font-mono text-xs text-[#616161]">
+                  Pelanggan scan barcode &amp; masukkan nominal tagihan
+                </div>
+              </div>
+
+              <div class="rounded-xl border border-[#d9d9dd] bg-white p-3 font-mono">
+                <div class="text-[11px] text-[#616161]">Nominal Belanja yang Harus Dibayar:</div>
+                <div class="text-xl font-bold text-[#17171c]">
+                  {formatCurrency(finalAmount)}
+                </div>
+              </div>
             </div>
-            <div class="font-mono text-xs text-[#616161]">
-              Scan melalui BCA, GoPay, OVO, ShopeePay, atau DANA
+          {:else}
+            <!-- QRIS Belum Diunggah Fallback -->
+            <div
+              class="space-y-4 rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-6 text-center"
+            >
+              <div
+                class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-600"
+              >
+                <QrCode class="h-8 w-8 opacity-70" />
+              </div>
+
+              <div class="space-y-1">
+                <h3 class="text-sm font-bold text-[#17171c]">QRIS Toko Belum Diunggah</h3>
+                <p class="mx-auto max-w-sm text-xs text-[#616161]">
+                  QRIS toko belum diunggah. Owner dapat mengunggah barcode QRIS di menu Pengaturan Cabang pada Web App.
+                </p>
+              </div>
+
+              <div
+                class="rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-left text-xs text-amber-900"
+              >
+                <div class="flex items-start gap-2">
+                  <AlertTriangle class="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                  <span>
+                    Jika memiliki stiker QRIS fisik di meja kasir, minta pelanggan memindai stiker tersebut dengan nominal <strong>{formatCurrency(finalAmount)}</strong>, lalu klik konfirmasi di bawah.
+                  </span>
+                </div>
+              </div>
+
+              <div class="rounded-xl border border-[#d9d9dd] bg-white p-3 font-mono">
+                <div class="text-[11px] text-[#616161]">Nominal Tagihan:</div>
+                <div class="text-lg font-bold text-[#17171c]">
+                  {formatCurrency(finalAmount)}
+                </div>
+              </div>
             </div>
-            <div class="font-mono text-lg font-medium text-[#17171c]">
-              {formatCurrency(finalAmount)}
-            </div>
-          </div>
+          {/if}
         {:else if selectedMethod === 'EDC' || selectedMethod === 'TRANSFER'}
           <div class="space-y-3 rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-5 text-xs">
             <div class="flex items-center gap-2.5">
@@ -309,7 +385,11 @@
             <span>Memproses...</span>
           {:else}
             <Check class="h-4 w-4" />
-            <span>Selesaikan Transaksi &amp; Cetak</span>
+            {#if selectedMethod === 'QRIS'}
+              <span>Konfirmasi Pembayaran QRIS Diterima</span>
+            {:else}
+              <span>Selesaikan Transaksi &amp; Cetak</span>
+            {/if}
           {/if}
         </button>
       </div>

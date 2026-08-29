@@ -4,6 +4,7 @@ export interface PosTerminalInfo {
   workspace_id: string;
   branch_id: string;
   branch_name?: string;
+  qris_image_url?: string | null;
   cashiers?: CashierUser[];
 }
 

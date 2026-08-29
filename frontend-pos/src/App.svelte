@@ -4,6 +4,7 @@
   import { posApiClient } from './lib/services/api-client';
   import { posService } from './lib/services/pos-service';
   import { syncEngine } from './lib/services/sync-engine';
+  import { preloadAndCacheImage } from './lib/services/image-cache';
   import type {
     Product,
     Category,
@@ -129,6 +130,24 @@
   async function initTerminalAndDb() {
     await loadDbData();
 
+    // 1. Muat snapshot terminalInfo terakhir dari cache lokal sebagai fallback offline
+    const cachedTerminalRaw =
+      typeof window !== 'undefined' ? localStorage.getItem('precis_pos_terminal_info') : null;
+    if (cachedTerminalRaw) {
+      try {
+        const parsed = JSON.parse(cachedTerminalRaw) as PosTerminalInfo;
+        terminalInfo = parsed;
+        if (parsed.cashiers && parsed.cashiers.length > 0) {
+          cashiers = parsed.cashiers;
+          if (!activeCashier.id || activeCashier.id === 'team-outlet') {
+            activeCashier = parsed.cashiers[0];
+          }
+        }
+      } catch {
+        // Fallback silent failure
+      }
+    }
+
     const deviceToken = posApiClient.getDeviceToken();
     if (!deviceToken) {
       isPairingModalOpen = true;
@@ -136,12 +155,19 @@
     }
 
     try {
-      terminalInfo = await posService.getTerminalInfo();
-      if (terminalInfo?.cashiers && terminalInfo.cashiers.length > 0) {
-        await db.cashiers.bulkPut(terminalInfo.cashiers);
-        cashiers = terminalInfo.cashiers;
+      const freshInfo = await posService.getTerminalInfo();
+      terminalInfo = freshInfo;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('precis_pos_terminal_info', JSON.stringify(freshInfo));
+      }
+      if (freshInfo.qris_image_url) {
+        preloadAndCacheImage(freshInfo.qris_image_url);
+      }
+      if (freshInfo?.cashiers && freshInfo.cashiers.length > 0) {
+        await db.cashiers.bulkPut(freshInfo.cashiers);
+        cashiers = freshInfo.cashiers;
         if (!activeCashier.id || activeCashier.id === 'team-outlet') {
-          activeCashier = cashiers[0];
+          activeCashier = freshInfo.cashiers[0];
         }
       }
       // sinkronkan katalog terbaru ke IndexedDB secara background
@@ -150,7 +176,10 @@
       await posService.syncRecentOrdersToLocalDb();
       await loadDbData();
     } catch {
-      isPairingModalOpen = true;
+      // Jika request server gagal (offline), jangan lempar modal pairing jika snapshot lokal ada
+      if (!terminalInfo) {
+        isPairingModalOpen = true;
+      }
     }
   }
 
@@ -174,6 +203,12 @@
 
   async function handlePairingSuccess(info: PosTerminalInfo) {
     terminalInfo = info;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('precis_pos_terminal_info', JSON.stringify(info));
+    }
+    if (info.qris_image_url) {
+      preloadAndCacheImage(info.qris_image_url);
+    }
     isPairingModalOpen = false;
     if (info.cashiers && info.cashiers.length > 0) {
       await db.cashiers.bulkPut(info.cashiers);
@@ -491,6 +526,7 @@
     branchId={terminalInfo?.branch_id || 'branch-sleman-01'}
     workspaceId={terminalInfo?.workspace_id || 'ws-amore-01'}
     activeSessionId={activeSession?.id || 'sess-active-01'}
+    qrisImageUrl={terminalInfo?.qris_image_url}
     onClose={() => (isPaymentModalOpen = false)}
     onCompleteOrder={handleCompleteOrder}
   />
