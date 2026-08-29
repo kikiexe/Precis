@@ -118,7 +118,7 @@
     class="fixed inset-0 z-50 flex items-center justify-center bg-[#17171c]/40 p-4 font-sans backdrop-blur-xs"
   >
     <div
-      class="flex max-h-[90vh] w-full max-w-xl flex-col rounded-[22px] border border-[#d9d9dd] bg-white p-6 shadow-none"
+      class="flex max-h-[92vh] w-full max-w-xl flex-col rounded-[22px] border border-[#d9d9dd] bg-white p-6 shadow-none sm:max-w-2xl"
     >
       <!-- Header -->
       <div class="mb-5 flex items-center justify-between border-b border-[#d9d9dd] pb-4">
@@ -246,42 +246,23 @@
         {:else if selectedMethod === 'QRIS'}
           {#if qrisImageUrl}
             <div
-              class="space-y-4 rounded-[16px] border border-[#d9d9dd] bg-[#eeece7]/30 p-5 text-center"
+              class="flex flex-col items-center justify-center space-y-4 rounded-2xl border border-[#d9d9dd] bg-[#eeece7]/25 p-5 text-center"
             >
+              <!-- Foto QRIS Toko Besar & Bersih -->
               <div
-                class="mx-auto flex max-w-xs flex-col items-center justify-center rounded-[18px] border border-[#d9d9dd] bg-white p-4 shadow-2xs"
+                class="flex w-full items-center justify-center overflow-hidden rounded-2xl bg-white p-3 shadow-2xs"
               >
-                <!-- Foto QRIS Toko -->
-                <div
-                  class="relative flex h-56 w-56 items-center justify-center overflow-hidden rounded-xl bg-white p-1"
-                >
-                  <img
-                    src={resolvedQrisUrl || qrisImageUrl}
-                    alt="QRIS Toko"
-                    class="h-full w-full object-contain"
-                  />
-                </div>
-                <div class="mt-2 text-center">
-                  <span
-                    class="rounded-md bg-[#eeece7] px-2 py-0.5 font-mono text-[10px] font-bold text-[#616161]"
-                  >
-                    QRIS TOKO RESMI
-                  </span>
-                </div>
+                <img
+                  src={resolvedQrisUrl || qrisImageUrl}
+                  alt="QRIS Toko"
+                  class="max-h-72 w-auto max-w-full rounded-xl object-contain sm:max-h-84 md:max-h-96"
+                />
               </div>
 
-              <div class="space-y-1">
-                <div class="text-xs font-semibold text-[#17171c]">
-                  Tunjukkan barcode ke pelanggan untuk di-scan
-                </div>
-                <div class="font-mono text-xs text-[#616161]">
-                  Pelanggan scan barcode &amp; masukkan nominal tagihan
-                </div>
-              </div>
-
-              <div class="rounded-xl border border-[#d9d9dd] bg-white p-3 font-mono">
-                <div class="text-[11px] text-[#616161]">Nominal Belanja yang Harus Dibayar:</div>
-                <div class="text-xl font-bold text-[#17171c]">
+              <!-- Nominal Belanja Jelas & Kontras -->
+              <div class="w-full rounded-xl border border-[#d9d9dd] bg-white p-3.5 font-mono">
+                <div class="text-[11px] text-[#616161]">Minta Pelanggan Scan Barcode Sesuai Nominal:</div>
+                <div class="mt-0.5 text-2xl font-bold text-[#17171c]">
                   {formatCurrency(finalAmount)}
                 </div>
               </div>
