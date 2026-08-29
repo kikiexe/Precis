@@ -53,9 +53,9 @@
       class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-white p-12 text-center shadow-2xs sm:rounded-3xl"
     >
       <div
-        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#8e8e93]"
+        class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#8e8e93]"
       >
-        <CheckCircle2 class="h-6 w-6 text-[#10b981]" />
+        <CheckCircle2 class="size-6 text-[#10b981]" />
       </div>
       <div>
         <h3 class="text-sm font-bold text-[#17171c]">Semua Kasbon Sudah Diproses</h3>
@@ -128,7 +128,7 @@
               onclick={() => onApproveKasbon(kasbon.id)}
               class="flex cursor-pointer items-center gap-1.5 rounded-xl bg-[#17171c] px-5 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
             >
-              <Check class="h-3.5 w-3.5" />
+              <Check class="size-3.5" />
               <span>Setujui Kasbon</span>
             </button>
           </div>

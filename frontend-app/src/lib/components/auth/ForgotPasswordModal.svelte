@@ -63,14 +63,14 @@
         class="absolute top-5 right-5 cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-colors hover:bg-[#f4f4f6] hover:text-[#17171c]"
         aria-label="Tutup modal"
       >
-        <X class="h-5 w-5" />
+        <X class="size-5" />
       </button>
 
       <div class="mb-5 flex items-center gap-3 border-b border-[#f2f2f4] pb-3">
         <div
-          class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
+          class="flex size-10 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
         >
-          <Mail class="h-5 w-5" />
+          <Mail class="size-5" />
         </div>
         <div>
           <h3 class="text-base font-bold tracking-tight text-[#17171c]">Pemulihan Kata Sandi</h3>
@@ -82,7 +82,7 @@
         <div
           class="mb-4 flex items-start gap-2.5 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
         >
-          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+          <AlertCircle class="mt-0.5 size-4 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       {/if}
@@ -91,7 +91,7 @@
         <div
           class="mb-4 flex items-start gap-2.5 rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] p-4 text-xs text-[#065f46]"
         >
-          <CheckCircle2 class="mt-0.5 h-5 w-5 shrink-0 text-[#059669]" />
+          <CheckCircle2 class="mt-0.5 size-5 shrink-0 text-[#059669]" />
           <div>
             <div class="font-bold">Permohonan Berhasil Dikirim</div>
             <div class="mt-1 text-xs text-[#065f46]">{successMessage}</div>
@@ -132,7 +132,7 @@
                 <span>Mengirim...</span>
               {:else}
                 <span>Kirim Tautan</span>
-                <ArrowRight class="h-4 w-4" />
+                <ArrowRight class="size-4" />
               {/if}
             </button>
           </div>

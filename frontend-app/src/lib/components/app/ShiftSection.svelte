@@ -444,7 +444,7 @@
               : 'border border-[#e5e5ea] bg-white text-[#17171c] hover:bg-[#f4f4f6]'
           }`}
         >
-          <Layers class="h-4 w-4" />
+          <Layers class="size-4" />
           <span>Template Shift</span>
         </button>
 
@@ -456,7 +456,7 @@
           }}
           class="flex cursor-pointer items-center gap-1.5 rounded-full bg-[#17171c] px-4 py-2 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
         >
-          <Plus class="h-4 w-4" />
+          <Plus class="size-4" />
           <span>+ Tetapkan Shift</span>
         </button>
       {/if}
@@ -471,7 +471,7 @@
         }}
         class="flex cursor-pointer items-center gap-1.5 rounded-full border border-[#e5e5ea] bg-[#f4f4f6] px-4 py-2 text-xs font-semibold text-[#17171c] transition-all hover:bg-[#ececee]"
       >
-        <RefreshCw class="h-3.5 w-3.5" />
+        <RefreshCw class="size-3.5" />
         <span>Tukar Shift</span>
       </button>
     </div>
@@ -485,9 +485,9 @@
       <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-2.5">
           <div
-            class="flex h-8 w-8 items-center justify-center rounded-xl bg-[#eff6ff] text-[#2563eb]"
+            class="flex size-8 items-center justify-center rounded-xl bg-[#eff6ff] text-[#2563eb]"
           >
-            <Layers class="h-4 w-4" />
+            <Layers class="size-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-[#17171c]">Shift Template Builder</h3>
@@ -505,7 +505,7 @@
         <div
           class="flex items-start gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
         >
-          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+          <AlertCircle class="mt-0.5 size-4 shrink-0" />
           <span>{templateError}</span>
         </div>
       {/if}
@@ -605,7 +605,7 @@
           onclick={handleCreateTemplate}
           class="flex cursor-pointer items-center gap-1.5 rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
         >
-          <Plus class="h-4 w-4" />
+          <Plus class="size-4" />
           <span>{isSubmittingTemplate ? 'Menyimpan...' : 'Buat Template Shift'}</span>
         </button>
       </div>
@@ -660,7 +660,7 @@
               {/each}
             </select>
             <ChevronDown
-              class="pointer-events-none absolute top-1/2 right-2.5 h-3.5 w-3.5 -translate-y-1/2 text-[#8e8e93]"
+              class="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-[#8e8e93]"
             />
           </div>
 
@@ -675,7 +675,7 @@
               {/each}
             </select>
             <ChevronDown
-              class="pointer-events-none absolute top-1/2 right-2.5 h-3.5 w-3.5 -translate-y-1/2 text-[#8e8e93]"
+              class="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-[#8e8e93]"
             />
           </div>
         {/if}
@@ -688,7 +688,7 @@
             class="cursor-pointer rounded-lg p-1.5 text-[#686873] transition-all hover:bg-white hover:text-[#17171c]"
             title={viewPeriod === 'week' ? 'Pekan Sebelumnya' : 'Bulan Sebelumnya'}
           >
-            <ChevronLeft class="h-4 w-4" />
+            <ChevronLeft class="size-4" />
           </button>
 
           <button
@@ -705,7 +705,7 @@
             class="cursor-pointer rounded-lg p-1.5 text-[#686873] transition-all hover:bg-white hover:text-[#17171c]"
             title={viewPeriod === 'week' ? 'Pekan Berikutnya' : 'Bulan Berikutnya'}
           >
-            <ChevronRight class="h-4 w-4" />
+            <ChevronRight class="size-4" />
           </button>
         </div>
 
@@ -713,7 +713,7 @@
         <div
           class="flex items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-[#f4f4f6] px-3 py-1.5 font-mono text-xs font-semibold text-[#17171c]"
         >
-          <Calendar class="h-3.5 w-3.5 text-[#8e8e93]" />
+          <Calendar class="size-3.5 text-[#8e8e93]" />
           <span>{formatDateIndo(startDate)} &mdash; {formatDateIndo(endDate)}</span>
         </div>
       </div>
@@ -724,7 +724,7 @@
     <div
       class="animate-pulse space-y-3 rounded-2xl border border-[#e5e5ea] bg-white p-12 text-center shadow-2xs sm:rounded-3xl"
     >
-      <div class="mx-auto h-8 w-8 rounded-full bg-[#17171c]/20"></div>
+      <div class="mx-auto size-8 rounded-full bg-[#17171c]/20"></div>
       <div class="font-mono text-xs text-[#8e8e93]">Memuat data jadwal roster shift...</div>
     </div>
   {:else if viewPeriod === 'week'}
@@ -751,7 +751,7 @@
               </div>
               <div class="mt-0.5 font-mono text-xs font-bold">{day.dayDate}</div>
               {#if day.isToday && selectedDayIndex !== idx}
-                <div class="mx-auto mt-1 h-1 w-1 rounded-full bg-[#1863dc]"></div>
+                <div class="mx-auto mt-1 size-1 rounded-full bg-[#1863dc]"></div>
               {/if}
             </button>
           {/each}
@@ -762,7 +762,7 @@
       <div class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-white p-4 shadow-2xs">
         <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
           <div class="flex items-center gap-2">
-            <Calendar class="h-4 w-4 text-[#17171c]" />
+            <Calendar class="size-4 text-[#17171c]" />
             <div>
               <h3 class="text-xs font-bold text-[#17171c]">
                 {activeMobileDay.fullDayName}, {activeMobileDay.fullDateFormatted}
@@ -853,7 +853,7 @@
     >
       <div class="flex items-center justify-between border-b border-[#e5e5ea] p-5">
         <div class="flex items-center gap-2.5">
-          <Calendar class="h-4 w-4 text-[#17171c]" />
+          <Calendar class="size-4 text-[#17171c]" />
           <h3 class="text-xs font-bold tracking-wider text-[#17171c] uppercase">
             Matriks Roster Mingguan
           </h3>
@@ -869,10 +869,10 @@
             <tr
               class="border-b border-[#e5e5ea] bg-[#fafafc] font-mono text-[10.5px] text-[#686873]"
             >
-              <th class="min-w-[160px] px-5 py-3.5 font-bold uppercase">Nama Karyawan</th>
+              <th class="min-w-40 px-5 py-3.5 font-bold uppercase">Nama Karyawan</th>
               {#each weekDays as day}
                 <th
-                  class={`min-w-[100px] px-3 py-3.5 text-center ${day.isToday ? 'bg-[#17171c] text-white' : ''}`}
+                  class={`min-w-25 px-3 py-3.5 text-center ${day.isToday ? 'bg-[#17171c] text-white' : ''}`}
                 >
                   <div class="font-bold">{day.dayName.toUpperCase()}</div>
                   <div class="text-[9.5px] opacity-80">{day.dayDate}</div>
@@ -972,7 +972,7 @@
         class="flex flex-col justify-between gap-3 border-b border-[#e5e5ea] p-5 sm:flex-row sm:items-center"
       >
         <div class="flex items-center gap-2.5">
-          <Calendar class="h-4 w-4 text-[#17171c]" />
+          <Calendar class="size-4 text-[#17171c]" />
           <div>
             <h3 class="text-xs font-bold tracking-wider text-[#17171c] uppercase">
               Daftar Penugasan Shift Bulanan ({filteredMonthShifts.length})
@@ -985,7 +985,7 @@
         </div>
 
         <div class="relative min-w-0 sm:w-64">
-          <Search class="absolute top-1/2 left-3.5 h-3.5 w-3.5 -translate-y-1/2 text-[#8e8e93]" />
+          <Search class="absolute top-1/2 left-3.5 size-3.5 -translate-y-1/2 text-[#8e8e93]" />
           <input
             type="text"
             bind:value={monthSearchQuery}
@@ -1082,7 +1082,7 @@
                         onclick={() => openSwapForShift(shift.id)}
                         class="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[#e5e5ea] bg-[#f4f4f6] px-2.5 py-1 text-[11px] font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#e5e5ea]"
                       >
-                        <RefreshCw class="h-3 w-3 text-[#2563eb]" />
+                        <RefreshCw class="size-3 text-[#2563eb]" />
                         <span>Ajukan Tukar</span>
                       </button>
                     {:else}
@@ -1110,9 +1110,9 @@
       <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
+            class="flex size-10 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
           >
-            <RefreshCw class="h-5 w-5" />
+            <RefreshCw class="size-5" />
           </div>
           <div>
             <h3 class="text-base font-bold text-[#17171c]">Permohonan Tukar Shift</h3>
@@ -1124,7 +1124,7 @@
           onclick={() => (isSwapModalOpen = false)}
           class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="h-5 w-5" />
+          <X class="size-5" />
         </button>
       </div>
 
@@ -1132,7 +1132,7 @@
         <div
           class="flex items-start gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
         >
-          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+          <AlertCircle class="mt-0.5 size-4 shrink-0" />
           <span>{swapErrorMessage}</span>
         </div>
       {/if}
@@ -1166,7 +1166,7 @@
                 {/each}
               </select>
               <ChevronDown
-                class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+                class="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-[#8e8e93]"
               />
             </div>
           {/if}
@@ -1188,7 +1188,7 @@
               {/each}
             </select>
             <ChevronDown
-              class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+              class="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-[#8e8e93]"
             />
           </div>
         </div>

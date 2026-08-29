@@ -162,4 +162,4 @@
   });
 </script>
 
-<canvas bind:this={canvasRef} class="block h-full w-full"></canvas>
+<canvas bind:this={canvasRef} class="block size-full"></canvas>

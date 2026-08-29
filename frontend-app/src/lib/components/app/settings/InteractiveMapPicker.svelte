@@ -281,7 +281,7 @@
     <div class="flex items-center gap-2">
       <!-- Search Input -->
       <div class="relative flex-1">
-        <Search class="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-[#8e8e93]" />
+        <Search class="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-[#8e8e93]" />
         <input
           type="text"
           bind:value={searchQuery}
@@ -296,7 +296,7 @@
           class="absolute top-1/2 right-1 flex -translate-y-1/2 cursor-pointer items-center gap-1 rounded-lg bg-[#17171c] px-2.5 py-1 text-[11px] font-bold text-white transition-all hover:bg-black disabled:opacity-40"
         >
           {#if isSearching}
-            <RefreshCw class="h-3 w-3 animate-spin" />
+            <RefreshCw class="size-3 animate-spin" />
           {:else}
             <span>Cari</span>
           {/if}
@@ -311,7 +311,7 @@
           class="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-white px-2.5 py-2 text-xs font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#f8f8fa]"
           title="Kembalikan pin ke koordinat cabang tersimpan"
         >
-          <RotateCcw class="h-3.5 w-3.5 text-[#059669]" />
+          <RotateCcw class="size-3.5 text-[#059669]" />
           <span class="hidden sm:inline">Titik Tersimpan</span>
         </button>
       {/if}
@@ -325,9 +325,9 @@
         title="Gunakan posisi GPS live perangkat saat ini"
       >
         {#if isLocating}
-          <RefreshCw class="h-4 w-4 animate-spin" />
+          <RefreshCw class="size-4 animate-spin" />
         {:else}
-          <LocateFixed class="h-4 w-4" />
+          <LocateFixed class="size-4" />
         {/if}
       </button>
     </div>
@@ -335,7 +335,7 @@
     <!-- Search Results Dropdown -->
     {#if searchResults.length > 0}
       <div
-        class="animate-in fade-in absolute top-full right-0 left-0 z-1000 mt-1.5 divide-y divide-[#f2f2f4] overflow-hidden rounded-2xl border border-[#e5e5ea] bg-white shadow-xl"
+        class="animate-in fade-in absolute inset-x-0 top-full z-1000 mt-1.5 divide-y divide-[#f2f2f4] overflow-hidden rounded-2xl border border-[#e5e5ea] bg-white shadow-xl"
       >
         {#each searchResults as item}
           <button
@@ -343,7 +343,7 @@
             onclick={() => selectSearchResult(item)}
             class="group flex w-full cursor-pointer items-start gap-2 px-3.5 py-2.5 text-left text-xs transition-all hover:bg-[#f8f8fa]"
           >
-            <MapPin class="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#2563eb]" />
+            <MapPin class="mt-0.5 size-3.5 shrink-0 text-[#2563eb]" />
             <div class="min-w-0">
               <span class="block truncate font-bold text-[#17171c] group-hover:text-[#2563eb]">
                 {item.display_name.split(',')[0]}
@@ -362,7 +362,7 @@
     <div
       class="animate-in fade-in flex items-center gap-1.5 rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-2 text-xs font-medium text-[#1e40af]"
     >
-      <Navigation class="h-3 w-3 shrink-0 text-[#2563eb]" />
+      <Navigation class="size-3 shrink-0 text-[#2563eb]" />
       <span>{locateMessage}</span>
     </div>
   {/if}
@@ -371,25 +371,25 @@
   <div
     class="relative h-72 w-full overflow-hidden rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] sm:h-80"
   >
-    <div bind:this={mapContainer} class="z-0 h-full w-full"></div>
+    <div bind:this={mapContainer} class="z-0 size-full"></div>
 
     <!-- Zoom Controls (Bottom Right) -->
     <div class="absolute right-2.5 bottom-2.5 z-500 flex flex-col gap-1">
       <button
         type="button"
         onclick={zoomIn}
-        class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-[#e5e5ea] bg-white text-[#17171c] shadow-xs transition-all hover:bg-[#f8f8fa] active:scale-95"
+        class="flex size-7 cursor-pointer items-center justify-center rounded-lg border border-[#e5e5ea] bg-white text-[#17171c] shadow-xs transition-all hover:bg-[#f8f8fa] active:scale-95"
         title="Perbesar"
       >
-        <Plus class="h-3.5 w-3.5" />
+        <Plus class="size-3.5" />
       </button>
       <button
         type="button"
         onclick={zoomOut}
-        class="flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg border border-[#e5e5ea] bg-white text-[#17171c] shadow-xs transition-all hover:bg-[#f8f8fa] active:scale-95"
+        class="flex size-7 cursor-pointer items-center justify-center rounded-lg border border-[#e5e5ea] bg-white text-[#17171c] shadow-xs transition-all hover:bg-[#f8f8fa] active:scale-95"
         title="Perkecil"
       >
-        <Minus class="h-3.5 w-3.5" />
+        <Minus class="size-3.5" />
       </button>
     </div>
 
@@ -398,7 +398,7 @@
       class="absolute bottom-2.5 left-2.5 z-500 flex items-center gap-2 rounded-xl bg-[#17171c]/90 px-2.5 py-1.5 font-mono text-[11px] text-white shadow-md backdrop-blur-xs"
     >
       <div class="flex items-center gap-1">
-        <MapPin class="h-3 w-3 text-[#60a5fa]" />
+        <MapPin class="size-3 text-[#60a5fa]" />
         <span>{latitude.toFixed(6)}, {longitude.toFixed(6)}</span>
       </div>
       <span class="text-[#71717a]">|</span>

@@ -39,7 +39,7 @@
   bind:this={sectionEl}
   class="relative overflow-hidden border-t border-[#e0e0e0] bg-white py-24 lg:py-32"
 >
-  <div class="mx-auto max-w-[1400px] px-6 lg:px-12">
+  <div class="mx-auto max-w-350 px-6 lg:px-12">
     <div class="grid items-center gap-16 lg:grid-cols-2 lg:gap-24">
       <!-- Left: Content -->
       <div
@@ -51,7 +51,7 @@
           <span class="h-px w-8 bg-[#0f62fe]"></span>
           Keandalan Multi-Outlet
         </span>
-        <h2 class="font-display mb-8 text-4xl tracking-tight text-[#161616] lg:text-6xl">
+        <h2 class="mb-8 font-display text-4xl tracking-tight text-[#161616] lg:text-6xl">
           Real-time di
           <br />
           seluruh cabang.
@@ -64,19 +64,19 @@
         <!-- Stats - 3 columns side-by-side horizontal on all devices -->
         <div class="grid grid-cols-3 gap-4 lg:gap-8">
           <div>
-            <div class="font-display mb-2 text-3xl text-[#161616] sm:text-4xl lg:text-5xl">
+            <div class="mb-2 font-display text-3xl text-[#161616] sm:text-4xl lg:text-5xl">
               0 Detik
             </div>
             <div class="text-xs text-[#525252] sm:text-sm">Kasir macet saat offline</div>
           </div>
           <div>
-            <div class="font-display mb-2 text-3xl text-[#161616] sm:text-4xl lg:text-5xl">
+            <div class="mb-2 font-display text-3xl text-[#161616] sm:text-4xl lg:text-5xl">
               99.9%
             </div>
             <div class="text-xs text-[#525252] sm:text-sm">Uptime server</div>
           </div>
           <div>
-            <div class="font-display mb-2 text-3xl text-[#161616] sm:text-4xl lg:text-5xl">
+            <div class="mb-2 font-display text-3xl text-[#161616] sm:text-4xl lg:text-5xl">
               &lt;5ms
             </div>
             <div class="text-xs text-[#525252] sm:text-sm">Kecepatan sinkronisasi</div>
@@ -97,7 +97,7 @@
           >
             <span class="font-mono text-sm text-[#525252]">Jaringan Cabang Toko</span>
             <span class="flex items-center gap-2 font-mono text-xs text-[#24a148]">
-              <span class="h-2 w-2 animate-pulse rounded-full bg-[#24a148]"></span>
+              <span class="size-2 animate-pulse rounded-full bg-[#24a148]"></span>
               Semua Cabang Aktif
             </span>
           </div>
@@ -112,7 +112,7 @@
               >
                 <div class="flex items-center gap-4">
                   <span
-                    class={`h-2 w-2 rounded-full transition-colors duration-300 ${
+                    class={`size-2 rounded-full transition-colors duration-300 ${
                       activeLocation === index ? 'bg-[#0f62fe]' : 'bg-[#8c8c8c]'
                     }`}
                   ></span>

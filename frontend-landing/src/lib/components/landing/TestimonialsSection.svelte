@@ -85,7 +85,7 @@
           }`}
         >
           <p
-            class="font-display text-4xl leading-[1.1] tracking-tight text-[#161616] md:text-5xl lg:text-6xl"
+            class="leading-1.1 font-display text-4xl tracking-tight text-[#161616] md:text-5xl lg:text-6xl"
           >
             "{testimonials[activeIndex].quote}"
           </p>
@@ -98,7 +98,7 @@
           }`}
         >
           <div
-            class="flex h-16 w-16 items-center justify-center rounded-full border border-[#e0e0e0] bg-[#f4f4f4]"
+            class="flex size-16 items-center justify-center rounded-full border border-[#e0e0e0] bg-[#f4f4f4]"
           >
             <span class="font-display text-2xl text-[#0f62fe]">
               {testimonials[activeIndex].author.charAt(0)}
@@ -161,7 +161,7 @@
   <!-- Marquee -->
   <div class="w-full">
     <div class="marquee flex items-center gap-16">
-      {#each Array(2) as _, setIdx}
+      {#each Array(2) as _, _setIdx}
         <div class="flex shrink-0 items-center gap-16">
           {#each brandPartners as company}
             <span

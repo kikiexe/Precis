@@ -16,7 +16,7 @@
 >
   <div class="flex min-w-0 items-center gap-3">
     <div
-      class={`h-2.5 w-2.5 shrink-0 rounded-full ${hasWorkspace ? 'bg-[#10b981] ring-4 ring-[#10b981]/20' : 'bg-[#a1a1aa]'}`}
+      class={`size-2.5 shrink-0 rounded-full ${hasWorkspace ? 'bg-[#10b981] ring-4 ring-[#10b981]/20' : 'bg-[#a1a1aa]'}`}
     ></div>
     <div class="truncate">
       <div class="truncate text-sm font-bold text-white sm:text-base">

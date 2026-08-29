@@ -38,16 +38,16 @@
       >
         <div class="flex min-w-0 items-center gap-3.5">
           <div
-            class={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+            class={`flex size-10 shrink-0 items-center justify-center rounded-xl ${
               cat.type === 'MENU'
                 ? 'border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]'
                 : 'border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]'
             }`}
           >
             {#if cat.type === 'MENU'}
-              <Package class="h-5 w-5" />
+              <Package class="size-5" />
             {:else}
-              <Layers class="h-5 w-5" />
+              <Layers class="size-5" />
             {/if}
           </div>
           <div class="truncate">
@@ -76,7 +76,7 @@
             class="cursor-pointer rounded-xl border border-[#e5e5ea] p-2 text-[#8e8e93] transition-all hover:border-[#fecaca] hover:bg-[#fef2f2] hover:text-[#e5484d]"
             title="Hapus Kategori"
           >
-            <Trash2 class="h-4 w-4" />
+            <Trash2 class="size-4" />
           </button>
         </div>
       </div>

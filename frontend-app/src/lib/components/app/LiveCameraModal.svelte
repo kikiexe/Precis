@@ -256,7 +256,7 @@
       class="z-20 flex items-center justify-between border-b border-white/10 bg-[#17171c]/90 p-4 text-white backdrop-blur-md"
     >
       <div class="flex items-center gap-2 font-mono text-xs text-[#edfce9]">
-        <MapPin class="h-3.5 w-3.5 text-[#edfce9]" />
+        <MapPin class="size-3.5 text-[#edfce9]" />
         <span>{gpsStatus}</span>
       </div>
       <button
@@ -265,7 +265,7 @@
         disabled={isProcessing}
         class="cursor-pointer p-1 text-white/80 transition-colors hover:text-white"
       >
-        <X class="h-5 w-5" />
+        <X class="size-5" />
       </button>
     </div>
 
@@ -274,7 +274,7 @@
       <div
         class="animate-in slide-in-from-top-2 z-30 mx-4 mt-3 flex items-start gap-2.5 rounded-xl bg-[#b30000] p-3.5 font-mono text-xs text-white shadow-none"
       >
-        <ShieldAlert class="mt-0.5 h-4 w-4 shrink-0" />
+        <ShieldAlert class="mt-0.5 size-4 shrink-0" />
         <div>
           <div class="font-medium">Radius Lokasi Ditolak (Geofence)</div>
           <div class="mt-0.5 text-[11px] opacity-90">{geofenceWarning}</div>
@@ -284,7 +284,7 @@
       <div
         class="animate-in slide-in-from-top-2 z-30 mx-4 mt-3 flex items-start gap-2.5 rounded-xl bg-[#b30000] p-3.5 font-mono text-xs text-white shadow-none"
       >
-        <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+        <AlertCircle class="mt-0.5 size-4 shrink-0" />
         <span>{errorMessage}</span>
       </div>
     {/if}
@@ -297,15 +297,15 @@
           autoplay
           playsinline
           muted
-          class="h-full w-full -scale-x-100 transform object-cover"
+          class="size-full -scale-x-100 transform object-cover"
         ></video>
       {:else}
         <!-- tampilan simulator jika webcam tidak terdeteksi -->
         <div class="space-y-4 p-6 text-center">
           <div
-            class="mx-auto flex h-32 w-32 items-center justify-center rounded-full border-2 border-dashed border-[#edfce9]/40"
+            class="mx-auto flex size-32 items-center justify-center rounded-full border-2 border-dashed border-[#edfce9]/40"
           >
-            <Camera class="h-12 w-12 text-[#edfce9]" />
+            <Camera class="size-12 text-[#edfce9]" />
           </div>
           <div class="text-sm font-medium text-white">{currentUser.name}</div>
           <div class="font-mono text-xs text-[#93939f]">Posisikan wajah di dalam frame kamera</div>
@@ -314,7 +314,7 @@
 
       <!-- stamp watermark di bagian bawah layar kamera -->
       <div
-        class="absolute right-0 bottom-0 left-0 space-y-1 border-t border-white/10 bg-[#17171c]/90 p-3.5 font-mono text-xs text-white backdrop-blur-sm"
+        class="absolute inset-x-0 bottom-0 space-y-1 border-t border-white/10 bg-[#17171c]/90 p-3.5 font-mono text-xs text-white backdrop-blur-sm"
       >
         <div class="flex items-center justify-between font-medium">
           <span>{liveTimestamp} WIB</span>
@@ -336,16 +336,16 @@
         type="button"
         disabled={isProcessing}
         onclick={handleCaptureSelfie}
-        class="flex h-20 w-20 cursor-pointer items-center justify-center rounded-full border-4 border-white/30 bg-white transition-all active:scale-95 disabled:opacity-50"
+        class="flex size-20 cursor-pointer items-center justify-center rounded-full border-4 border-white/30 bg-white transition-all active:scale-95 disabled:opacity-50"
         aria-label="Ambil Foto"
       >
         <div
-          class={`flex h-14 w-14 items-center justify-center rounded-full bg-[#17171c] text-white ${isProcessing ? 'animate-spin' : ''}`}
+          class={`flex size-14 items-center justify-center rounded-full bg-[#17171c] text-white ${isProcessing ? 'animate-spin' : ''}`}
         >
           {#if isProcessing}
-            <RefreshCw class="h-6 w-6" />
+            <RefreshCw class="size-6" />
           {:else}
-            <Camera class="h-6 w-6" />
+            <Camera class="size-6" />
           {/if}
         </div>
       </button>

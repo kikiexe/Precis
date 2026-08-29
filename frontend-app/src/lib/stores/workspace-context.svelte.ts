@@ -11,6 +11,7 @@ import type {
   UserProfile,
   UserWorkspace,
   AttendanceRecord,
+  WallOfFacesItem,
   ShiftRosterItem,
   ShiftTemplateItem,
   PendingSwapItem,
@@ -149,7 +150,10 @@ export class WorkspaceContext {
     }
 
     try {
-      const branchesData = await inventoryService.getBranches().catch(() => []);
+      const branchesData = await inventoryService.getBranches().catch((err) => {
+        console.warn('[WorkspaceContext] Gagal memuat daftar cabang:', err);
+        return [];
+      });
       this.workspaceBranches = branchesData;
 
       const branchId =
@@ -183,25 +187,60 @@ export class WorkspaceContext {
         planData,
         membersData,
       ] = await Promise.all([
-        shiftService.getRoster(branchId).catch(() => []),
-        shiftService.getTemplates(branchId).catch(() => []),
+        shiftService.getRoster(branchId).catch((err) => {
+          console.warn('[WorkspaceContext] Gagal memuat roster shift:', err);
+          return [];
+        }),
+        shiftService.getTemplates(branchId).catch((err) => {
+          console.warn('[WorkspaceContext] Gagal memuat template shift:', err);
+          return [];
+        }),
         isManagement
-          ? shiftService.getPendingSwapRequests(branchId).catch(() => [])
+          ? shiftService.getPendingSwapRequests(branchId).catch((err) => {
+              console.warn('[WorkspaceContext] Gagal memuat permohonan swap shift:', err);
+              return [];
+            })
           : Promise.resolve([]),
         isManagement
-          ? attendanceService.getWallOfFaces(branchId).catch(() => [])
+          ? attendanceService.getWallOfFaces(branchId).catch((err) => {
+              console.warn('[WorkspaceContext] Gagal memuat feed wall of faces:', err);
+              return [];
+            })
           : Promise.resolve([]),
-        cashAdvanceService.getMyCashAdvances().catch(() => []),
+        cashAdvanceService.getMyCashAdvances().catch((err) => {
+          console.warn('[WorkspaceContext] Gagal memuat kasbon saya:', err);
+          return [];
+        }),
         isManagement
-          ? cashAdvanceService.getAdminCashAdvances('PENDING', branchId).catch(() => [])
+          ? cashAdvanceService.getAdminCashAdvances('PENDING', branchId).catch((err) => {
+              console.warn('[WorkspaceContext] Gagal memuat pengajuan kasbon admin:', err);
+              return [];
+            })
           : Promise.resolve([]),
-        payrollService.getMySlip().catch(() => null),
+        payrollService.getMySlip().catch((err) => {
+          console.warn('[WorkspaceContext] Gagal memuat slip gaji saya:', err);
+          return null;
+        }),
         canViewPayroll
-          ? payrollService.calculatePreview(undefined, undefined, branchId).catch(() => null)
+          ? payrollService.calculatePreview(undefined, undefined, branchId).catch((err) => {
+              console.warn('[WorkspaceContext] Gagal memuat preview payroll:', err);
+              return null;
+            })
           : Promise.resolve(null),
-        billingService.getInvoices().catch(() => []),
-        billingService.getPlans().catch(() => []),
-        isManagement ? teamService.getMembers().catch(() => []) : Promise.resolve([]),
+        billingService.getInvoices().catch((err) => {
+          console.warn('[WorkspaceContext] Gagal memuat invoice langganan:', err);
+          return [];
+        }),
+        billingService.getPlans().catch((err) => {
+          console.warn('[WorkspaceContext] Gagal memuat daftar paket langganan:', err);
+          return [];
+        }),
+        isManagement
+          ? teamService.getMembers().catch((err) => {
+              console.warn('[WorkspaceContext] Gagal memuat anggota tim:', err);
+              return [];
+            })
+          : Promise.resolve([]),
       ]);
 
       this.rosterShifts = rosterData;
@@ -216,23 +255,23 @@ export class WorkspaceContext {
       this.teamMembers = membersData;
 
       if (wallData && wallData.length > 0) {
-        this.allAttendances = wallData.map((item: any) => ({
+        this.allAttendances = wallData.map((item: WallOfFacesItem) => ({
           id: item.id,
-          user_id: item.user_id || item.user?.id || '',
-          user_name: item.user_name || item.user?.name || 'Staf',
+          user_id: item.user_id || '',
+          user_name: item.user_name || 'Staf',
           avatar_url: item.avatar_url || item.photo_in_url || '',
-          branch_name: item.branch_name || item.branch?.name || '',
-          shift_name: item.shift_name || item.shift?.name || 'Shift Pagi',
+          branch_name: item.branch_name || '',
+          shift_name: item.shift_name || 'Shift Kerja',
           clock_in_time: item.clock_in_time,
           clock_out_time: item.clock_out_time,
           photo_in_url: item.photo_in_url,
           photo_out_url: item.photo_out_url,
-          lat_in: item.lat_in || -7.7654,
-          lng_in: item.lng_in || 110.4091,
+          lat_in: 0,
+          lng_in: 0,
           status: item.late_minutes && item.late_minutes > 0 ? 'LATE' : 'ON_TIME',
           late_minutes: item.late_minutes || 0,
-          overtime_minutes: item.overtime_minutes || 0,
-          created_at: item.created_at || item.clock_in_time,
+          overtime_minutes: 0,
+          created_at: item.clock_in_time || item.date,
         }));
       } else {
         this.allAttendances = [];

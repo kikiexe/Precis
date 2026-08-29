@@ -59,7 +59,7 @@
       <span class="mb-6 block font-mono text-xs tracking-widest text-[#525252] uppercase">
         Paket &amp; Harga
       </span>
-      <h2 class="font-display mb-6 text-5xl tracking-tight text-[#161616] md:text-6xl lg:text-7xl">
+      <h2 class="mb-6 font-display text-5xl tracking-tight text-[#161616] md:text-6xl lg:text-7xl">
         Biaya sederhana,
         <br />
         <span class="text-stroke">transparan</span>
@@ -86,7 +86,7 @@
         aria-label="Toggle annual billing"
       >
         <div
-          class={`h-5 w-5 rounded-full bg-[#0f62fe] transition-transform duration-300 ${
+          class={`size-5 rounded-full bg-[#0f62fe] transition-transform duration-300 ${
             isAnnual ? 'translate-x-7' : 'translate-x-0'
           }`}
         ></div>
@@ -129,7 +129,7 @@
               <span class="font-mono text-xs text-[#8c8c8c]">
                 {String(idx + 1).padStart(2, '0')}
               </span>
-              <h3 class="font-display mt-2 text-3xl text-[#161616]">{plan.name}</h3>
+              <h3 class="mt-2 font-display text-3xl text-[#161616]">{plan.name}</h3>
               <p class="mt-2 text-sm text-[#525252]">{plan.description}</p>
             </div>
 
@@ -148,7 +148,7 @@
             <ul class="mb-10 space-y-4">
               {#each plan.features as feature}
                 <li class="flex items-start gap-3">
-                  <Check class="mt-0.5 h-4 w-4 shrink-0 text-[#0f62fe]" />
+                  <Check class="mt-0.5 size-4 shrink-0 text-[#0f62fe]" />
                   <span class="text-sm text-[#525252]">{feature}</span>
                 </li>
               {/each}
@@ -165,7 +165,7 @@
             }`}
           >
             {plan.cta}
-            <ArrowRight class="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <ArrowRight class="size-4 transition-transform group-hover:translate-x-1" />
           </a>
         </div>
       {/each}

@@ -46,7 +46,7 @@
       <img
         src="/logo.png"
         alt="Précis Logo"
-        class="h-9 w-9 rounded-[10px] border border-[#d9d9dd] object-cover"
+        class="size-9 rounded-[10px] border border-[#d9d9dd] object-cover"
       />
       <div>
         <div class="flex items-center space-x-2">
@@ -75,7 +75,7 @@
       <div
         class="mb-5 flex items-start space-x-2 rounded-xl border border-[#ffad9b] bg-[#ffad9b]/15 p-3.5 text-xs text-[#b30000]"
       >
-        <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+        <AlertCircle class="mt-0.5 size-4 shrink-0" />
         <span>{errorMessage}</span>
       </div>
     {/if}
@@ -87,7 +87,7 @@
           Email Superadmin
         </label>
         <div class="relative">
-          <Mail class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#93939f]" />
+          <Mail class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#93939f]" />
           <input
             id="admin-email"
             type="email"
@@ -104,14 +104,14 @@
           Kata Sandi Root
         </label>
         <div class="relative">
-          <Lock class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#93939f]" />
+          <Lock class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#93939f]" />
           <input
             id="admin-password"
             type={showPassword ? 'text' : 'password'}
             bind:value={password}
             required
             placeholder="••••••••••••"
-            class="w-full rounded-xl border border-[#d9d9dd] bg-white py-2.5 pr-10 pl-10 text-[#212121] transition-all focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+            class="w-full rounded-xl border border-[#d9d9dd] bg-white px-10 py-2.5 text-[#212121] transition-all focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
           />
           <button
             type="button"
@@ -121,9 +121,9 @@
             aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
           >
             {#if showPassword}
-              <EyeOff class="h-4 w-4" />
+              <EyeOff class="size-4" />
             {:else}
-              <Eye class="h-4 w-4" />
+              <Eye class="size-4" />
             {/if}
           </button>
         </div>
@@ -136,10 +136,10 @@
           class="flex w-full cursor-pointer items-center justify-center space-x-2 rounded-full bg-[#17171c] py-3 text-xs font-medium text-white shadow-none transition-all hover:bg-[#000000] disabled:opacity-50"
         >
           {#if isSubmitting}
-            <RefreshCw class="h-4 w-4 animate-spin" />
+            <RefreshCw class="size-4 animate-spin" />
             <span>Memverifikasi Sesi...</span>
           {:else}
-            <ShieldCheck class="h-4 w-4" />
+            <ShieldCheck class="size-4" />
             <span>Otorisasi Masuk</span>
           {/if}
         </button>

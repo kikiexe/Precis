@@ -39,7 +39,7 @@
   bind:this={sectionEl}
   class="relative border-y border-[#e0e0e0] bg-white py-24 lg:py-32"
 >
-  <div class="mx-auto max-w-[1400px] px-6 lg:px-12">
+  <div class="mx-auto max-w-350 px-6 lg:px-12">
     <!-- Header -->
     <div class="mb-16 flex flex-col gap-8 lg:mb-24 lg:flex-row lg:items-end lg:justify-between">
       <div>
@@ -59,7 +59,7 @@
       </div>
       <div class="flex items-center gap-4 font-mono text-sm text-[#525252]">
         <span class="flex items-center gap-2">
-          <span class="h-2 w-2 animate-pulse rounded-full bg-[#24a148]"></span>
+          <span class="size-2 animate-pulse rounded-full bg-[#24a148]"></span>
           Live WIB
         </span>
         <span class="text-[#8c8c8c]">|</span>

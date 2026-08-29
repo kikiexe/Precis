@@ -247,7 +247,7 @@
               : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900'
           }`}
         >
-          <Layers class="h-4 w-4" />
+          <Layers class="size-4" />
           <span>Stok Bahan Baku ({rawMaterials.length})</span>
         </button>
 
@@ -260,7 +260,7 @@
               : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900'
           }`}
         >
-          <Calendar class="h-4 w-4" />
+          <Calendar class="size-4" />
           <span>Rekap Harian &amp; Mutasi</span>
         </button>
 
@@ -273,7 +273,7 @@
               : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900'
           }`}
         >
-          <Package class="h-4 w-4" />
+          <Package class="size-4" />
           <span>Menu Jualan POS ({products.length})</span>
         </button>
 
@@ -286,7 +286,7 @@
               : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-100/70 hover:text-zinc-900'
           }`}
         >
-          <History class="h-4 w-4" />
+          <History class="size-4" />
           <span>Log Audit Opname ({stockLogs.length})</span>
         </button>
       </div>

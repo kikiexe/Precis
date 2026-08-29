@@ -80,7 +80,7 @@
 >
   <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
     <div class="flex items-center gap-2.5">
-      <Calendar class="h-4 w-4 text-[#17171c]" />
+      <Calendar class="size-4 text-[#17171c]" />
       <h3 class="text-sm font-bold text-[#17171c] sm:text-base">Jadwal Kerja 7 Hari ke Depan</h3>
     </div>
     <button
@@ -89,7 +89,7 @@
       class="flex cursor-pointer items-center gap-1 font-mono text-xs font-semibold text-[#2563eb] hover:underline"
     >
       <span>Lihat Roster</span>
-      <ChevronRight class="h-3.5 w-3.5" />
+      <ChevronRight class="size-3.5" />
     </button>
   </div>
 

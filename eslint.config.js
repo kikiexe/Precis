@@ -2,11 +2,16 @@ import js from '@eslint/js';
 import ts from 'typescript-eslint';
 import svelte from 'eslint-plugin-svelte';
 import svelteParser from 'svelte-eslint-parser';
+import tailwind from 'eslint-plugin-tailwindcss';
 
 export default ts.config(
   js.configs.recommended,
   ...ts.configs.recommended,
   ...svelte.configs['flat/recommended'],
+  {
+    ...tailwind.configs.recommended,
+    files: ['frontend-*/**/*.svelte', 'frontend-*/**/*.ts', 'frontend-*/**/*.js'],
+  },
   {
     ignores: [
       '**/node_modules/**',
@@ -20,6 +25,14 @@ export default ts.config(
     ],
   },
   {
+    plugins: {
+      tailwindcss: tailwind,
+    },
+    settings: {
+      tailwindcss: {
+        css: 'frontend-app/src/app.css',
+      },
+    },
     languageOptions: {
       parserOptions: {
         ecmaVersion: 'latest',
@@ -34,6 +47,8 @@ export default ts.config(
       ],
       'no-undef': 'off',
       'no-useless-assignment': 'warn',
+      'tailwindcss/no-custom-classname': 'off',
+      'tailwindcss/enforces-shorthand': 'warn',
     },
   },
   {
@@ -53,6 +68,7 @@ export default ts.config(
       'svelte/no-useless-mustaches': 'warn',
       'svelte/prefer-svelte-reactivity': 'off',
       'svelte/prefer-writable-derived': 'off',
+      'tailwindcss/no-custom-classname': 'off',
     },
   }
 );

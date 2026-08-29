@@ -82,7 +82,7 @@
   <div class="shrink-0 space-y-2.5 border-b border-zinc-200 bg-white p-3 shadow-2xs">
     <!-- Search Box -->
     <div class="relative">
-      <Search class="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+      <Search class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
       <input
         type="text"
         bind:value={searchQuery}
@@ -126,7 +126,7 @@
     {#if catalogTab === 'library'}
       {#if filteredProducts.length === 0}
         <div class="flex h-64 flex-col items-center justify-center text-center text-zinc-400">
-          <Coffee class="mb-2 h-10 w-10 text-zinc-400 opacity-40" />
+          <Coffee class="mb-2 size-10 text-zinc-400 opacity-40" />
           <p class="text-sm font-medium text-zinc-800">Menu tidak ditemukan</p>
           <p class="text-xs text-zinc-500">Coba ubah kata kunci pencarian atau kategori.</p>
         </div>
@@ -139,12 +139,12 @@
             <button
               type="button"
               onclick={() => onAddToCart(product)}
-              class="group relative flex min-h-[135px] cursor-pointer flex-col justify-between rounded-xl border border-zinc-200 bg-white p-3 text-left shadow-2xs transition-all duration-150 select-none hover:border-zinc-900 hover:shadow-sm active:scale-[0.98]"
+              class="group active:scale-0.98 relative flex min-h-[135px] cursor-pointer flex-col justify-between rounded-xl border border-zinc-200 bg-white p-3 text-left shadow-2xs transition-all duration-150 select-none hover:border-zinc-900 hover:shadow-sm"
             >
               <div class="space-y-1.5">
                 <!-- Abbreviation Badge -->
                 <div
-                  class="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 text-xs font-bold text-zinc-900 transition-colors group-hover:bg-zinc-200"
+                  class="flex size-9 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-100 text-xs font-bold text-zinc-900 transition-colors group-hover:bg-zinc-200"
                 >
                   {abbr}
                 </div>
@@ -167,9 +167,9 @@
                   {formatCurrency(product.base_price)}
                 </span>
                 <div
-                  class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-zinc-100 text-zinc-700 transition-colors group-hover:bg-zinc-900 group-hover:text-white"
+                  class="flex size-6 shrink-0 items-center justify-center rounded-md bg-zinc-100 text-zinc-700 transition-colors group-hover:bg-zinc-900 group-hover:text-white"
                 >
-                  <Plus class="h-3.5 w-3.5" />
+                  <Plus class="size-3.5" />
                 </div>
               </div>
             </button>
@@ -214,7 +214,7 @@
               class="flex h-12 cursor-pointer items-center justify-center rounded-xl bg-zinc-100 font-mono text-base font-bold text-zinc-900 transition-all hover:bg-zinc-200/80 active:bg-zinc-300"
             >
               {#if key === 'DEL'}
-                <Delete class="h-5 w-5 text-zinc-600" />
+                <Delete class="size-5 text-zinc-600" />
               {:else}
                 {key}
               {/if}
@@ -240,7 +240,7 @@
                 : 'bg-zinc-900 text-white shadow-xs hover:bg-black'
             }`}
           >
-            <Plus class="h-4 w-4" />
+            <Plus class="size-4" />
             <span>Tambah ke Pesanan</span>
           </button>
         </div>
@@ -255,26 +255,26 @@
     <button
       type="button"
       onclick={() => (catalogTab = 'library')}
-      class={`flex max-w-[200px] flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border py-1.5 text-xs font-semibold transition-all ${
+      class={`flex max-w-50 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border py-1.5 text-xs font-semibold transition-all ${
         catalogTab === 'library'
           ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
           : 'border-zinc-200 bg-zinc-100 text-zinc-600 hover:text-zinc-900'
       }`}
     >
-      <LayoutGrid class="h-3.5 w-3.5" />
+      <LayoutGrid class="size-3.5" />
       <span>Library</span>
     </button>
 
     <button
       type="button"
       onclick={() => (catalogTab = 'custom')}
-      class={`flex max-w-[200px] flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border py-1.5 text-xs font-semibold transition-all ${
+      class={`flex max-w-50 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border py-1.5 text-xs font-semibold transition-all ${
         catalogTab === 'custom'
           ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xs'
           : 'border-zinc-200 bg-zinc-100 text-zinc-600 hover:text-zinc-900'
       }`}
     >
-      <Calculator class="h-3.5 w-3.5" />
+      <Calculator class="size-3.5" />
       <span>Custom</span>
     </button>
   </div>

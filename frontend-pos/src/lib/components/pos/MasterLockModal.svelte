@@ -61,7 +61,7 @@
     >
       <div class="mb-4 flex items-center justify-between border-b border-[#d9d9dd] pb-3.5">
         <div class="flex items-center gap-2 text-[#b30000]">
-          <ShieldAlert class="h-5 w-5" />
+          <ShieldAlert class="size-5" />
           <h2 class="text-sm font-medium text-[#212121]">Master Lock Kiosk</h2>
         </div>
         <button
@@ -70,7 +70,7 @@
           disabled={isLoading}
           class="cursor-pointer p-1 text-[#93939f] hover:text-[#212121]"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 
@@ -83,7 +83,7 @@
         <div
           class="mb-3.5 flex items-start gap-2 rounded-xl border border-[#ffad9b] bg-[#ffad9b]/15 p-3 text-xs text-[#b30000]"
         >
-          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+          <AlertCircle class="mt-0.5 size-4 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       {/if}
@@ -102,7 +102,7 @@
               disabled={isLoading}
               class="w-full rounded-xl border border-[#d9d9dd] bg-white py-2 pr-3 pl-9 text-xs text-[#212121] transition-all focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
             />
-            <Mail class="absolute top-2.5 left-3 h-3.5 w-3.5 text-[#93939f]" />
+            <Mail class="absolute top-2.5 left-3 size-3.5 text-[#93939f]" />
           </div>
         </div>
 
@@ -118,9 +118,9 @@
               placeholder="••••••••"
               required
               disabled={isLoading}
-              class="w-full rounded-xl border border-[#d9d9dd] bg-white py-2 pr-9 pl-9 text-xs text-[#212121] transition-all focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+              class="w-full rounded-xl border border-[#d9d9dd] bg-white px-9 py-2 text-xs text-[#212121] transition-all focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
             />
-            <Lock class="absolute top-1/2 left-3 h-3.5 w-3.5 -translate-y-1/2 text-[#93939f]" />
+            <Lock class="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-[#93939f]" />
             <button
               type="button"
               tabindex="-1"
@@ -129,9 +129,9 @@
               aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
             >
               {#if showPassword}
-                <EyeOff class="h-4 w-4" />
+                <EyeOff class="size-4" />
               {:else}
-                <Eye class="h-4 w-4" />
+                <Eye class="size-4" />
               {/if}
             </button>
           </div>
@@ -154,7 +154,7 @@
             {#if isLoading}
               <span>Memverifikasi...</span>
             {:else}
-              <Check class="h-4 w-4" />
+              <Check class="size-4" />
               <span>Buka Otorisasi</span>
             {/if}
           </button>

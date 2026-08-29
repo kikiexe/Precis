@@ -45,9 +45,9 @@
       class="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-[#e5e5ea] bg-white p-4 text-center shadow-2xs transition-all hover:border-[#17171c] sm:rounded-3xl"
     >
       <div
-        class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
+        class="flex size-10 items-center justify-center rounded-2xl border border-[#bfdbfe] bg-[#eff6ff] text-[#2563eb]"
       >
-        <ArrowRightLeft class="h-4 w-4" />
+        <ArrowRightLeft class="size-4" />
       </div>
       <span class="text-xs font-bold text-[#17171c]">Tukar Shift</span>
     </button>
@@ -58,9 +58,9 @@
       class="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-[#e5e5ea] bg-white p-4 text-center shadow-2xs transition-all hover:border-[#17171c] sm:rounded-3xl"
     >
       <div
-        class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
+        class="flex size-10 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
       >
-        <Wallet class="h-4 w-4" />
+        <Wallet class="size-4" />
       </div>
       <span class="text-xs font-bold text-[#17171c]">Ajukan Kasbon</span>
     </button>
@@ -71,9 +71,9 @@
       class="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-[#e5e5ea] bg-white p-4 text-center shadow-2xs transition-all hover:border-[#17171c] sm:rounded-3xl"
     >
       <div
-        class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
+        class="flex size-10 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
       >
-        <FileText class="h-4 w-4" />
+        <FileText class="size-4" />
       </div>
       <span class="text-xs font-bold text-[#17171c]">Slip Gaji</span>
     </button>
@@ -85,7 +85,7 @@
   >
     <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
       <div class="flex items-center gap-2.5">
-        <Wallet class="h-4 w-4 text-[#17171c]" />
+        <Wallet class="size-4 text-[#17171c]" />
         <h3 class="text-sm font-bold text-[#17171c] sm:text-base">
           Finansial &amp; Kedisiplinan Berjalan
         </h3>
@@ -96,7 +96,7 @@
         class="flex cursor-pointer items-center gap-1 font-mono text-xs font-semibold text-[#2563eb] hover:underline"
       >
         <span>Detail</span>
-        <ChevronRight class="h-3.5 w-3.5" />
+        <ChevronRight class="size-3.5" />
       </button>
     </div>
 

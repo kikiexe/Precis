@@ -78,7 +78,7 @@
     <div
       class="flex items-center gap-2 rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] p-3.5 text-xs font-semibold text-[#065f46]"
     >
-      <Check class="h-4 w-4 shrink-0" />
+      <Check class="size-4 shrink-0" />
       <span>{profileSuccessMsg}</span>
     </div>
   {/if}
@@ -137,7 +137,7 @@
             <option value="JAGO">Bank Jago</option>
           </select>
           <ChevronDown
-            class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+            class="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-[#8e8e93]"
           />
         </div>
       </div>
@@ -178,7 +178,7 @@
       {#if isSavingProfile}
         <span>Menyimpan...</span>
       {:else}
-        <Save class="h-4 w-4" />
+        <Save class="size-4" />
         <span>Simpan Profil</span>
       {/if}
     </button>

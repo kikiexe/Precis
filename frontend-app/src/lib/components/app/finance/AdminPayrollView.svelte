@@ -116,7 +116,7 @@
         <div
           class="flex min-w-0 flex-1 items-center gap-2 rounded-2xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-xs shadow-2xs"
         >
-          <Calendar class="h-4 w-4 shrink-0 text-[#8e8e93]" />
+          <Calendar class="size-4 shrink-0 text-[#8e8e93]" />
           <input
             id="filter-period-start"
             type="date"
@@ -139,7 +139,7 @@
           class="flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#17171c] px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
           title="Hitung ulang kalkulasi penggajian"
         >
-          <RefreshCw class={`h-3.5 w-3.5 ${isFiltering ? 'animate-spin' : ''}`} />
+          <RefreshCw class={`size-3.5 ${isFiltering ? 'animate-spin' : ''}`} />
           <span class="hidden sm:inline">{isFiltering ? 'Memuat...' : 'Hitung Ulang'}</span>
         </button>
       </div>
@@ -153,7 +153,7 @@
             disabled={isExporting || !payrollPreview}
             class="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-[#e5e5ea] bg-white px-4 py-2.5 text-xs font-semibold text-[#17171c] shadow-2xs transition-all hover:bg-[#f8f8fa] disabled:opacity-50 sm:flex-none"
           >
-            <Download class="h-4 w-4 shrink-0 text-[#8e8e93]" />
+            <Download class="size-4 shrink-0 text-[#8e8e93]" />
             <span>{isExporting ? 'Mengunduh...' : 'Export CSV (BCA)'}</span>
           </button>
 
@@ -165,7 +165,7 @@
               ? 'cursor-default border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]'
               : 'cursor-pointer bg-[#059669] text-white hover:bg-[#047857]'} flex flex-1 items-center justify-center gap-2 rounded-2xl text-xs font-semibold shadow-xs transition-all disabled:opacity-50 sm:flex-none"
           >
-            <Check class="h-4 w-4 shrink-0" />
+            <Check class="size-4 shrink-0" />
             <span>{isAllDisbursed ? 'Sudah Dicairkan' : 'Cairkan Payroll'}</span>
           </button>
         {:else}
@@ -265,7 +265,7 @@
                 <span
                   class="flex items-center gap-1 rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#059669]"
                 >
-                  <Check class="h-3 w-3" />
+                  <Check class="size-3" />
                   <span>DICAIRKAN</span>
                 </span>
               {:else}
@@ -365,7 +365,7 @@
                     <span
                       class="inline-flex items-center gap-1 rounded-full border border-[#a7f3d0] bg-[#ecfdf5] px-2.5 py-0.5 font-mono text-[10px] font-semibold text-[#059669]"
                     >
-                      <Check class="h-3 w-3" />
+                      <Check class="size-3" />
                       <span>DICAIRKAN</span>
                     </span>
                   {:else}

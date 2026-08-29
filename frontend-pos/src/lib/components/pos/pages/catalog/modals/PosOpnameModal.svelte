@@ -55,9 +55,9 @@
       <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
         <div class="flex items-center gap-2.5">
           <div
-            class="flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
+            class="flex size-9 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-zinc-900"
           >
-            <SlidersHorizontal class="h-4 w-4" />
+            <SlidersHorizontal class="size-4" />
           </div>
           <div>
             <h3 class="text-sm font-bold text-zinc-900">Audit Stock Opname Bar</h3>
@@ -69,7 +69,7 @@
           onclick={onClose}
           class="cursor-pointer p-1 text-zinc-400 hover:text-zinc-700"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 
@@ -149,7 +149,7 @@
           <div
             class="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-2.5 text-xs text-red-700"
           >
-            <AlertTriangle class="h-4 w-4 shrink-0" />
+            <AlertTriangle class="size-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         {/if}
@@ -166,10 +166,10 @@
         <button
           type="button"
           onclick={handleSubmit}
-          class="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99]"
+          class="active:scale-0.99 flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
         >
           <span>Simpan &amp; Catat Audit</span>
-          <ArrowRight class="h-3.5 w-3.5" />
+          <ArrowRight class="size-3.5" />
         </button>
       </div>
     </div>

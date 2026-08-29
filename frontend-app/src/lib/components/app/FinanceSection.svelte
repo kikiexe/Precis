@@ -163,7 +163,7 @@
       class="animate-in fade-in flex items-center justify-between gap-3 rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] p-4 text-xs text-[#065f46] shadow-2xs"
     >
       <div class="flex items-center gap-2.5">
-        <CheckCircle2 class="h-4 w-4 shrink-0 text-[#059669]" />
+        <CheckCircle2 class="size-4 shrink-0 text-[#059669]" />
         <span class="font-medium">{successNotification}</span>
       </div>
       <button
@@ -171,7 +171,7 @@
         onclick={() => (successNotification = null)}
         class="cursor-pointer rounded-lg p-1 text-[#059669] transition-all hover:bg-[#d1fae5]"
       >
-        <X class="h-3.5 w-3.5" />
+        <X class="size-3.5" />
       </button>
     </div>
   {/if}
@@ -181,7 +181,7 @@
       class="animate-in fade-in flex items-center justify-between gap-3 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-4 text-xs text-[#991b1b] shadow-2xs"
     >
       <div class="flex items-center gap-2.5">
-        <AlertCircle class="h-4 w-4 shrink-0 text-[#e5484d]" />
+        <AlertCircle class="size-4 shrink-0 text-[#e5484d]" />
         <span class="font-medium">{errorNotification}</span>
       </div>
       <button
@@ -189,7 +189,7 @@
         onclick={() => (errorNotification = null)}
         class="cursor-pointer rounded-lg p-1 text-[#e5484d] transition-all hover:bg-[#fee2e2]"
       >
-        <X class="h-3.5 w-3.5" />
+        <X class="size-3.5" />
       </button>
     </div>
   {/if}
@@ -212,7 +212,7 @@
                 : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
             }`}
           >
-            <Icon class={`h-4 w-4 ${isActive ? 'text-white' : 'text-[#8e8e93]'}`} />
+            <Icon class={`size-4 ${isActive ? 'text-white' : 'text-[#8e8e93]'}`} />
             <span class="whitespace-nowrap">{tab.label}</span>
           </button>
         {/each}
@@ -306,7 +306,7 @@
               {formatRupiah(totalRevenue)}
             </div>
             <div class="flex items-center gap-1 text-[10.5px] font-medium text-[#059669]">
-              <TrendingUp class="h-3 w-3" />
+              <TrendingUp class="size-3" />
               <span>{liveAnalytics?.growth_label || 'vs periode lalu'}</span>
             </div>
           </div>
@@ -362,13 +362,13 @@
             {#if isAnalyticsLoading}
               <div class="flex flex-col items-center justify-center space-y-3 py-12">
                 <div
-                  class="h-6 w-6 animate-spin rounded-full border-2 border-[#17171c] border-t-transparent"
+                  class="size-6 animate-spin rounded-full border-2 border-[#17171c] border-t-transparent"
                 ></div>
                 <span class="text-xs text-[#8e8e93]">Memuat data saluran bayar...</span>
               </div>
             {:else if paymentMethods.length === 0}
               <div class="space-y-1 py-8 text-center text-[#8e8e93]">
-                <Wallet class="mx-auto h-6 w-6 opacity-40" />
+                <Wallet class="mx-auto size-6 opacity-40" />
                 <p class="text-xs font-semibold text-[#17171c]">Belum ada transaksi pembayaran</p>
                 <p class="text-[11px] text-[#8e8e93]">
                   Data akan muncul saat kasir memproses pesanan di periode ini.
@@ -389,16 +389,16 @@
                     <div class="flex items-center justify-between text-xs">
                       <div class="flex min-w-0 items-center gap-2.5">
                         <div
-                          class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#e5e5ea] bg-white"
+                          class="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[#e5e5ea] bg-white"
                         >
                           {#if isQris}
-                            <QrCode class="h-4 w-4 text-[#17171c]" />
+                            <QrCode class="size-4 text-[#17171c]" />
                           {:else if isCash}
-                            <Coins class="h-4 w-4 text-[#059669]" />
+                            <Coins class="size-4 text-[#059669]" />
                           {:else if isCard}
-                            <CreditCard class="h-4 w-4 text-[#2563eb]" />
+                            <CreditCard class="size-4 text-[#2563eb]" />
                           {:else}
-                            <Wallet class="h-4 w-4 text-[#7c3aed]" />
+                            <Wallet class="size-4 text-[#7c3aed]" />
                           {/if}
                         </div>
                         <div class="min-w-0">
@@ -481,7 +481,7 @@
               >
               {#if adjustmentLogs.length === 0}
                 <div class="space-y-1 py-6 text-center text-[#8e8e93]">
-                  <FileText class="mx-auto h-6 w-6 opacity-40" />
+                  <FileText class="mx-auto size-6 opacity-40" />
                   <p class="text-xs font-semibold text-[#17171c]">Belum ada riwayat stock opname</p>
                 </div>
               {:else}

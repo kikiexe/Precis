@@ -22,7 +22,7 @@
           <img
             src="/logo.png"
             alt="Précis Logo"
-            class="h-8 w-8 rounded-[10px] border border-white/20 object-cover"
+            class="size-8 rounded-[10px] border border-white/20 object-cover"
           />
           <div>
             <div class="flex items-center space-x-2">
@@ -47,7 +47,7 @@
                 : 'text-[#93939f] hover:bg-white/10 hover:text-white'
             }`}
           >
-            <BarChart3 class="h-3.5 w-3.5" />
+            <BarChart3 class="size-3.5" />
             <span>Metrik SaaS</span>
           </button>
 
@@ -60,7 +60,7 @@
                 : 'text-[#93939f] hover:bg-white/10 hover:text-white'
             }`}
           >
-            <CheckCircle2 class="h-3.5 w-3.5" />
+            <CheckCircle2 class="size-3.5" />
             <span>Verifikasi Faktur</span>
             {#if pendingInvoicesCount > 0}
               <span
@@ -80,7 +80,7 @@
                 : 'text-[#93939f] hover:bg-white/10 hover:text-white'
             }`}
           >
-            <Building2 class="h-3.5 w-3.5" />
+            <Building2 class="size-3.5" />
             <span>Direktori Tenant</span>
           </button>
 
@@ -93,7 +93,7 @@
                 : 'text-[#93939f] hover:bg-white/10 hover:text-white'
             }`}
           >
-            <Layers class="h-3.5 w-3.5" />
+            <Layers class="size-3.5" />
             <span>Master Paket</span>
           </button>
         </nav>
@@ -105,7 +105,7 @@
           <div
             class="hidden items-center space-x-2 rounded-full border border-white/5 bg-white/5 px-3 py-1 text-xs text-[#d9d9dd] sm:flex"
           >
-            <User class="h-3.5 w-3.5 text-[#93939f]" />
+            <User class="size-3.5 text-[#93939f]" />
             <span class="font-mono text-[11px] text-white">{user.email}</span>
           </div>
         {/if}
@@ -116,7 +116,7 @@
           class="flex cursor-pointer items-center space-x-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-medium text-white transition-all hover:bg-[#b30000]"
           title="Logout Superadmin"
         >
-          <LogOut class="h-3.5 w-3.5" />
+          <LogOut class="size-3.5" />
           <span class="hidden sm:inline">Keluar</span>
         </button>
       </div>

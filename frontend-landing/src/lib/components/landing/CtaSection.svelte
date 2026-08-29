@@ -32,7 +32,7 @@
   bind:this={sectionEl}
   class="relative overflow-hidden border-t border-[#e0e0e0] bg-white py-24 lg:py-32"
 >
-  <div class="mx-auto max-w-[1400px] px-6 lg:px-12">
+  <div class="mx-auto max-w-350 px-6 lg:px-12">
     <!-- Spotlight Box -->
     <div
       role="region"
@@ -53,7 +53,7 @@
           <!-- Left content -->
           <div class="flex-1">
             <h2
-              class="font-display mb-8 text-4xl leading-[0.95] tracking-tight text-[#161616] lg:text-7xl"
+              class="leading-0.95 mb-8 font-display text-4xl tracking-tight text-[#161616] lg:text-7xl"
             >
               Siap merapikan
               <br />
@@ -71,7 +71,7 @@
                 class="group inline-flex h-14 items-center justify-center rounded-full bg-[#0f62fe] px-8 text-base font-medium text-white transition-colors hover:bg-[#0050e6]"
               >
                 Mulai Uji Coba 1 Bulan Gratis
-                <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                <ArrowRight class="ml-2 size-4 transition-transform group-hover:translate-x-1" />
               </a>
               <a
                 href="#features"
@@ -88,10 +88,10 @@
 
           <!-- Right animation -->
           <div
-            class="relative -mr-12 hidden h-[460px] w-[460px] items-center justify-center lg:flex"
+            class="relative -mr-12 hidden size-[460px] items-center justify-center lg:flex"
           >
             <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div class="flex h-[740px] w-[740px] shrink-0 items-center justify-center">
+              <div class="flex size-[740px] shrink-0 items-center justify-center">
                 <AnimatedTetrahedron />
               </div>
             </div>
@@ -101,10 +101,10 @@
 
       <!-- Decorative corners -->
       <div
-        class="pointer-events-none absolute top-0 right-0 h-32 w-32 border-b border-l border-[#e0e0e0]"
+        class="pointer-events-none absolute top-0 right-0 size-32 border-b border-l border-[#e0e0e0]"
       ></div>
       <div
-        class="pointer-events-none absolute bottom-0 left-0 h-32 w-32 border-t border-r border-[#e0e0e0]"
+        class="pointer-events-none absolute bottom-0 left-0 size-32 border-t border-r border-[#e0e0e0]"
       ></div>
     </div>
   </div>

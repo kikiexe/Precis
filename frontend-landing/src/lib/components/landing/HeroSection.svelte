@@ -19,7 +19,7 @@
 <section class="relative flex min-h-screen flex-col justify-center overflow-hidden bg-white">
   <!-- Animated sphere background - Brightened & Positioned -->
   <div
-    class="pointer-events-none absolute top-1/2 -right-8 h-170 w-170 -translate-y-1/2 opacity-60 sm:-right-10 sm:h-195 sm:w-195 lg:right-0 lg:h-237.5 lg:w-237.5"
+    class="pointer-events-none absolute top-1/2 -right-8 size-170 -translate-y-1/2 opacity-60 sm:-right-10 sm:size-195 lg:right-0 lg:size-237.5"
   >
     <AnimatedSphere />
   </div>
@@ -58,13 +58,13 @@
     <!-- Main headline -->
     <div class="mb-12">
       <h1
-        class={`font-display text-[clamp(3rem,12vw,10rem)] leading-[0.9] tracking-tight text-[#161616] transition-all duration-1000 ${
+        class={`leading-0.9 font-display text-[clamp(3rem,12vw,10rem)] tracking-tight text-[#161616] transition-all duration-1000 ${
           isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
         }`}
       >
         <span class="block">Satu platform</span>
         <span class="block">
-          kelola{' '}
+          kelola
           <span class="relative inline-block">
             {#key wordIndex}
               <span class="inline-flex text-[#161616]">
@@ -78,7 +78,7 @@
                 {/each}
               </span>
             {/key}
-            <span class="absolute right-0 -bottom-2 left-0 h-3 bg-[#0f62fe]/20"></span>
+            <span class="absolute inset-x-0 -bottom-2 h-3 bg-[#0f62fe]/20"></span>
           </span>
         </span>
       </h1>
@@ -106,7 +106,7 @@
           class="group inline-flex h-14 items-center justify-center rounded-full bg-[#0f62fe] px-8 text-base font-medium text-white shadow-sm transition-colors hover:bg-[#0050e6]"
         >
           Mulai Uji Coba 1 Bulan
-          <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+          <ArrowRight class="ml-2 size-4 transition-transform group-hover:translate-x-1" />
         </a>
         <a
           href="#features"
@@ -120,7 +120,7 @@
 
   <!-- Stats Marquee Ticker - Refined size & Positioned -->
   <div
-    class={`absolute right-0 bottom-4 left-0 transition-all delay-500 duration-700 sm:bottom-6 ${
+    class={`absolute inset-x-0 bottom-4 transition-all delay-500 duration-700 sm:bottom-6 ${
       isVisible ? 'opacity-100' : 'opacity-0'
     }`}
   >

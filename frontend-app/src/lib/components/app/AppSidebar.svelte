@@ -133,17 +133,17 @@
   <button
     type="button"
     onclick={toggleSidebar}
-    class="group absolute top-1/2 -right-3.5 z-40 flex h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-[#e5e5ea] bg-white text-[#17171c] shadow-md transition-all hover:scale-110 hover:bg-[#f4f4f6] active:scale-95"
+    class="group absolute top-1/2 -right-3.5 z-40 flex size-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-[#e5e5ea] bg-white text-[#17171c] shadow-md transition-all hover:scale-110 hover:bg-[#f4f4f6] active:scale-95"
     title={isCollapsed ? 'Besarkan Sidebar' : 'Kecilkan Sidebar'}
     aria-label={isCollapsed ? 'Besarkan Sidebar' : 'Kecilkan Sidebar'}
   >
     {#if isCollapsed}
       <ChevronRight
-        class="h-4 w-4 text-[#17171c] transition-transform group-hover:translate-x-0.5"
+        class="size-4 text-[#17171c] transition-transform group-hover:translate-x-0.5"
       />
     {:else}
       <ChevronLeft
-        class="h-4 w-4 text-[#17171c] transition-transform group-hover:-translate-x-0.5"
+        class="size-4 text-[#17171c] transition-transform group-hover:-translate-x-0.5"
       />
     {/if}
   </button>
@@ -158,7 +158,7 @@
       <img
         src="/logo.png"
         alt="Précis Logo"
-        class="h-8 w-8 shrink-0 rounded-xl border border-[#e5e5ea] object-cover"
+        class="size-8 shrink-0 rounded-xl border border-[#e5e5ea] object-cover"
       />
       {#if !isCollapsed}
         <div class="min-w-0">
@@ -194,7 +194,7 @@
             </div>
           </div>
           <ChevronDown
-            class="h-4 w-4 text-[#8e8e93] transition-transform duration-200 group-hover:text-[#17171c]"
+            class="size-4 text-[#8e8e93] transition-transform duration-200 group-hover:text-[#17171c]"
           />
         </button>
       {:else}
@@ -203,13 +203,13 @@
           <button
             type="button"
             onclick={() => (isDropdownOpen = !isDropdownOpen)}
-            class="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-xs font-bold text-[#17171c] shadow-2xs transition-all hover:bg-[#eaeaea]"
+            class="relative flex size-10 cursor-pointer items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-xs font-bold text-[#17171c] shadow-2xs transition-all hover:bg-[#eaeaea]"
             title={`${currentUser.name} (${badge.label}) - ${currentWorkspaceName}`}
             aria-label="Pilih Workspace"
           >
             <span>{userInitial}</span>
             <span
-              class="absolute -right-0.5 -bottom-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full border border-white bg-[#17171c] font-mono text-[8px] font-bold text-white"
+              class="absolute -right-0.5 -bottom-0.5 flex size-3.5 items-center justify-center rounded-full border border-white bg-[#17171c] font-mono text-[8px] font-bold text-white"
             >
               {badge.short.charAt(0)}
             </span>
@@ -242,7 +242,7 @@
           class={`animate-in fade-in zoom-in-95 z-50 space-y-1 rounded-2xl border border-[#e5e5ea] bg-white p-2 shadow-xl ${
             isCollapsed
               ? 'absolute top-0 left-full ml-3 w-60'
-              : 'absolute top-full right-2.5 left-2.5 mt-2'
+              : 'absolute inset-x-2.5 top-full mt-2'
           }`}
         >
           {#if userWorkspaces.length > 0}
@@ -269,7 +269,7 @@
                   <div class="font-mono text-[10px] text-[#8e8e93]">{ws.role}</div>
                 </div>
                 {#if ws.workspace_id === activeWorkspaceId}
-                  <Check class="h-3.5 w-3.5 text-[#17171c]" />
+                  <Check class="size-3.5 text-[#17171c]" />
                 {/if}
               </button>
             {/each}
@@ -285,7 +285,7 @@
                 }}
                 class="flex w-full cursor-pointer items-center gap-1.5 rounded-xl px-3 py-1.5 text-left text-xs font-semibold text-[#2563eb] transition-colors hover:bg-[#eff6ff]"
               >
-                <Plus class="h-3.5 w-3.5" />
+                <Plus class="size-3.5" />
                 <span>Buat Workspace Baru</span>
               </button>
             </div>
@@ -318,7 +318,7 @@
                 : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
             }`}
           >
-            <LayoutDashboard class="h-4 w-4 shrink-0" />
+            <LayoutDashboard class="size-4 shrink-0" />
             {#if !isCollapsed}
               <span class="truncate">Dashboard Ringkasan</span>
             {/if}
@@ -345,7 +345,7 @@
                 : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
             }`}
           >
-            <Package class="h-4 w-4 shrink-0" />
+            <Package class="size-4 shrink-0" />
             {#if !isCollapsed}
               <span class="truncate">Katalog Produk</span>
             {/if}
@@ -373,7 +373,7 @@
             }`}
           >
             <div class={`flex items-center ${isCollapsed ? '' : 'gap-3 truncate'}`}>
-              <Users class="h-4 w-4 shrink-0" />
+              <Users class="size-4 shrink-0" />
               {#if !isCollapsed}
                 <span class="truncate">Manajemen Tim</span>
               {/if}
@@ -388,7 +388,7 @@
                 </span>
               {:else}
                 <span
-                  class="absolute top-1.5 right-2 h-2.5 w-2.5 rounded-full border-2 border-white bg-[#e5484d]"
+                  class="absolute top-1.5 right-2 size-2.5 rounded-full border-2 border-white bg-[#e5484d]"
                 ></span>
               {/if}
             {/if}
@@ -422,7 +422,7 @@
                 : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
             }`}
           >
-            <Wallet class="h-4 w-4 shrink-0" />
+            <Wallet class="size-4 shrink-0" />
             {#if !isCollapsed}
               <span class="truncate">Keuangan &amp; Payroll</span>
             {/if}
@@ -449,7 +449,7 @@
                 : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
             }`}
           >
-            <Settings class="h-4 w-4 shrink-0" />
+            <Settings class="size-4 shrink-0" />
             {#if !isCollapsed}
               <span class="truncate">Pengaturan</span>
             {/if}
@@ -484,7 +484,7 @@
                 : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
             }`}
           >
-            <LayoutDashboard class="h-4 w-4 shrink-0" />
+            <LayoutDashboard class="size-4 shrink-0" />
             {#if !isCollapsed}
               <span class="truncate">Beranda Staf</span>
             {/if}
@@ -510,7 +510,7 @@
                 : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
             }`}
           >
-            <Camera class="h-4 w-4 shrink-0" />
+            <Camera class="size-4 shrink-0" />
             {#if !isCollapsed}
               <span class="truncate">Presensi Harian</span>
             {/if}
@@ -536,7 +536,7 @@
                 : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
             }`}
           >
-            <Calendar class="h-4 w-4 shrink-0" />
+            <Calendar class="size-4 shrink-0" />
             {#if !isCollapsed}
               <span class="truncate">Jadwal Shift</span>
             {/if}
@@ -562,7 +562,7 @@
                 : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
             }`}
           >
-            <UserIcon class="h-4 w-4 shrink-0" />
+            <UserIcon class="size-4 shrink-0" />
             {#if !isCollapsed}
               <span class="truncate">Slip Gaji &amp; Profil</span>
             {/if}
@@ -591,7 +591,7 @@
           }`}
           title="Keluar Portal"
         >
-          <LogOut class="h-4 w-4 shrink-0" />
+          <LogOut class="size-4 shrink-0" />
           {#if !isCollapsed}
             <span>Keluar Portal</span>
           {/if}

@@ -30,7 +30,7 @@
       <div class="flex items-center justify-between border-b border-[#f2f2f4] p-5">
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#f4f4f6] font-bold text-[#17171c]"
+            class="flex size-10 items-center justify-center rounded-2xl bg-[#f4f4f6] font-bold text-[#17171c]"
           >
             {attendance.user_name?.charAt(0) || 'U'}
           </div>
@@ -49,7 +49,7 @@
           onclick={onClose}
           class="cursor-pointer rounded-full p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="h-4 w-4" />
+          <X class="size-4" />
         </button>
       </div>
 
@@ -57,19 +57,19 @@
       <div class="max-h-[75vh] space-y-4 overflow-y-auto p-5">
         <!-- Selfie Photo in 3:4 Aspect Ratio -->
         <div
-          class="relative mx-auto aspect-[3/4] max-h-72 overflow-hidden rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6]"
+          class="relative mx-auto aspect-3/4 max-h-72 overflow-hidden rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6]"
         >
           {#if attendance.photo_in_url || attendance.avatar_url}
             <img
               src={attendance.photo_in_url || attendance.avatar_url}
               alt={attendance.user_name}
-              class="h-full w-full object-cover"
+              class="size-full object-cover"
             />
           {:else}
             <div
-              class="flex h-full w-full flex-col items-center justify-center space-y-2 text-[#8e8e93]"
+              class="flex size-full flex-col items-center justify-center space-y-2 text-[#8e8e93]"
             >
-              <Camera class="h-8 w-8" />
+              <Camera class="size-8" />
               <span class="font-mono text-xs">Tidak ada foto presensi</span>
             </div>
           {/if}
@@ -114,7 +114,7 @@
         <div class="space-y-2.5 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2 text-xs font-bold text-[#17171c]">
-              <MapPin class="h-4 w-4 text-[#1863dc]" />
+              <MapPin class="size-4 text-[#1863dc]" />
               <span>Verifikasi Geolocation GPS</span>
             </div>
             <span
@@ -143,7 +143,7 @@
               class="inline-flex cursor-pointer items-center gap-1.5 pt-1 text-xs font-medium text-[#1863dc] hover:underline"
             >
               <span>Buka di Google Maps</span>
-              <ExternalLink class="h-3 w-3" />
+              <ExternalLink class="size-3" />
             </a>
           {/if}
         </div>

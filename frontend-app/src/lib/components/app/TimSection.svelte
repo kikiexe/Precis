@@ -160,7 +160,7 @@
               : 'text-[#686873] hover:bg-[#f4f4f6] hover:text-[#17171c]'
           }`}
         >
-          <Icon class={`h-4 w-4 ${isActive ? 'text-white' : 'text-[#8e8e93]'}`} />
+          <Icon class={`size-4 ${isActive ? 'text-white' : 'text-[#8e8e93]'}`} />
           <span class="whitespace-nowrap">{tab.label}</span>
 
           {#if tab.count !== undefined && tab.count > 0}
@@ -178,7 +178,7 @@
           {/if}
 
           {#if tab.badge && !isActive}
-            <span class="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-[#e5484d]"></span>
+            <span class="absolute top-1.5 right-1.5 size-2 rounded-full bg-[#e5484d]"></span>
           {/if}
         </button>
       {/each}

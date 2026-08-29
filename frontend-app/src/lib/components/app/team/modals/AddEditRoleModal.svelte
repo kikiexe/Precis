@@ -162,9 +162,9 @@
       >
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#17171c] text-white shadow-xs"
+            class="flex size-10 items-center justify-center rounded-2xl bg-[#17171c] text-white shadow-xs"
           >
-            <ShieldCheck class="h-5 w-5 text-[#10b981]" />
+            <ShieldCheck class="size-5 text-[#10b981]" />
           </div>
           <div>
             <h3 class="text-base font-bold text-[#17171c]">
@@ -182,7 +182,7 @@
           onclick={onClose}
           class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="h-5 w-5" />
+          <X class="size-5" />
         </button>
       </div>
 
@@ -192,7 +192,7 @@
           <div
             class="flex items-center gap-2 rounded-2xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
           >
-            <AlertTriangle class="h-4 w-4 shrink-0" />
+            <AlertTriangle class="size-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         {/if}
@@ -253,9 +253,9 @@
                 >
                   <div class="flex min-w-0 items-center gap-3">
                     <div
-                      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-[#e5e5ea] bg-white"
+                      class="flex size-8 shrink-0 items-center justify-center rounded-xl border border-[#e5e5ea] bg-white"
                     >
-                      <IconComp class="h-4 w-4 text-[#17171c]" />
+                      <IconComp class="size-4 text-[#17171c]" />
                     </div>
                     <div class="min-w-0">
                       <div class="text-xs font-bold text-[#17171c]">{mod.name}</div>
@@ -296,14 +296,14 @@
                           class="sr-only"
                         />
                         <div
-                          class={`flex h-4 w-4 items-center justify-center rounded-md transition-all ${
+                          class={`flex size-4 items-center justify-center rounded-md transition-all ${
                             isChecked
                               ? 'bg-[#17171c] text-white'
                               : 'border border-[#d1d1d6] bg-white hover:border-[#17171c]'
                           }`}
                         >
                           {#if isChecked}
-                            <Check class="h-3 w-3 stroke-[3]" />
+                            <Check class="size-3 stroke-3" />
                           {/if}
                         </div>
                       </div>
@@ -316,7 +316,7 @@
                             <span
                               class="inline-flex items-center gap-1 rounded-full bg-[#fee2e2] px-2 py-0.5 text-[9.5px] font-bold text-[#991b1b] uppercase"
                             >
-                              <AlertTriangle class="h-2.5 w-2.5" />
+                              <AlertTriangle class="size-2.5" />
                               Sensitif
                             </span>
                           {/if}
@@ -358,7 +358,7 @@
             {#if isSubmitting}
               <span>Menyimpan...</span>
             {:else}
-              <Check class="h-4 w-4" />
+              <Check class="size-4" />
               <span>{roleToEdit ? 'Simpan Perubahan' : 'Buat Role'}</span>
             {/if}
           </button>

@@ -185,7 +185,7 @@
 {:else if isCheckingSession}
   <div class="flex min-h-screen items-center justify-center bg-[#eeece7] font-sans">
     <div class="space-y-3 text-center">
-      <div class="mx-auto h-8 w-8 animate-pulse rounded-lg bg-[#17171c]"></div>
+      <div class="mx-auto size-8 animate-pulse rounded-lg bg-[#17171c]"></div>
       <div class="font-mono text-xs text-[#75758a]">Memuat Sesi Pr&eacute;cis...</div>
     </div>
   </div>

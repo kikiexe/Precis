@@ -74,8 +74,12 @@ export class PosService {
         await db.orders.bulkPut(response.data);
         return { ordersCount: response.data.length };
       }
-    } catch {
-      // offline fallback
+    } catch (err: unknown) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        // mode offline normal: kasir beroperasi tanpa koneksi internet
+        return { ordersCount: 0 };
+      }
+      console.warn('[POS Sync] Gagal menyinkronkan riwayat transaksi server ke IndexedDB:', err);
     }
     return { ordersCount: 0 };
   }

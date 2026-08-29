@@ -137,7 +137,7 @@ export class PosApiClient {
         headers: requestHeaders,
         body: formattedBody,
       });
-    } catch (networkError) {
+    } catch {
       throw new PosApiError(
         0,
         'Koneksi jaringan gagal. Transaksi offline tetap dapat diproses secara lokal.',

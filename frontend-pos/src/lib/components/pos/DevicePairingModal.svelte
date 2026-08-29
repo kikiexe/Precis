@@ -48,9 +48,9 @@
     >
       <div class="mb-5 flex items-center gap-3">
         <div
-          class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#17171c] font-medium text-white shadow-none"
+          class="flex size-10 items-center justify-center rounded-xl bg-[#17171c] font-medium text-white shadow-none"
         >
-          <Tablet class="h-5 w-5" />
+          <Tablet class="size-5" />
         </div>
         <div>
           <h2 class="text-base font-medium tracking-tight text-[#212121]">
@@ -73,7 +73,7 @@
         <div
           class="mb-4 flex items-start gap-2 rounded-xl border border-[#ffad9b] bg-[#ffad9b]/15 p-3 text-xs text-[#b30000]"
         >
-          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+          <AlertCircle class="mt-0.5 size-4 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       {/if}
@@ -93,7 +93,7 @@
               disabled={isLoading}
               class="w-full rounded-xl border border-[#d9d9dd] bg-white py-2.5 pr-3 pl-9 font-mono text-xs text-[#212121] transition-all focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
             />
-            <Key class="absolute top-3 left-3 h-4 w-4 text-[#93939f]" />
+            <Key class="absolute top-3 left-3 size-4 text-[#93939f]" />
           </div>
         </div>
 
@@ -106,7 +106,7 @@
             <span>Memverifikasi Token...</span>
           {:else}
             <span>Hubungkan Terminal (Pair Device)</span>
-            <ArrowRight class="h-4 w-4" />
+            <ArrowRight class="size-4" />
           {/if}
         </button>
       </form>
@@ -114,7 +114,7 @@
       <div
         class="mt-6 flex items-center justify-center gap-1.5 border-t border-[#d9d9dd] pt-4 font-mono text-[10px] text-[#75758a]"
       >
-        <ShieldCheck class="h-3.5 w-3.5 text-[#003c33]" />
+        <ShieldCheck class="size-3.5 text-[#003c33]" />
         <span>Terenkripsi SHA-256 &amp; Terisolasi Multi-Tenant</span>
       </div>
     </div>

@@ -113,7 +113,7 @@
     <div class="flex items-center gap-3">
       <div class="relative flex-1 sm:w-60">
         <Search
-          class="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+          class="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-[#8e8e93]"
         />
         <input
           type="text"
@@ -128,7 +128,7 @@
         onclick={handleOpenCreate}
         class="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-[#17171c] px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black"
       >
-        <Plus class="h-4 w-4" />
+        <Plus class="size-4" />
         <span>Buat Role</span>
       </button>
     </div>
@@ -150,9 +150,9 @@
       class="space-y-3 rounded-2xl border border-[#e5e5ea] bg-white p-12 text-center shadow-2xs sm:rounded-3xl"
     >
       <div
-        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#8e8e93]"
+        class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-[#f4f4f6] text-[#8e8e93]"
       >
-        <Shield class="h-6 w-6" />
+        <Shield class="size-6" />
       </div>
       <div>
         <h3 class="text-sm font-bold text-[#17171c]">Tidak Ada Role Ditemukan</h3>
@@ -171,9 +171,9 @@
           <div class="flex items-start justify-between gap-2">
             <div class="flex items-center gap-3">
               <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#17171c] text-white"
+                class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#17171c] text-white"
               >
-                <Lock class="h-4 w-4 text-[#10b981]" />
+                <Lock class="size-4 text-[#10b981]" />
               </div>
               <div>
                 <h3 class="text-sm font-bold text-[#17171c]">Owner (Pemilik Usaha)</h3>
@@ -196,7 +196,7 @@
 
           <div class="flex items-center justify-between border-t border-[#f2f2f4] pt-3 text-xs">
             <div class="flex items-center gap-1.5 text-[11px] font-semibold text-[#17171c]">
-              <CheckCircle2 class="h-4 w-4 text-[#10b981]" />
+              <CheckCircle2 class="size-4 text-[#10b981]" />
               <span>Semua Izin Aktif (*)</span>
             </div>
             <span class="font-mono text-[10.5px] text-[#8e8e93]">Role Utama</span>
@@ -219,7 +219,7 @@
                   <span
                     class="flex items-center gap-1 rounded-full border border-[#e5e5ea] bg-[#f8f8fa] px-2.5 py-0.5 font-mono text-[11px] text-[#8e8e93]"
                   >
-                    <Users class="h-3.5 w-3.5" />
+                    <Users class="size-3.5" />
                     {role.members_count} Staf
                   </span>
                 </div>
@@ -260,7 +260,7 @@
                 onclick={() => handleOpenEdit(role)}
                 class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-3 py-1.5 text-xs font-semibold text-[#17171c] transition-all hover:bg-[#eeece7]"
               >
-                <Edit2 class="h-3.5 w-3.5" />
+                <Edit2 class="size-3.5" />
                 <span>Edit</span>
               </button>
 
@@ -270,7 +270,7 @@
                 class="cursor-pointer rounded-xl border border-[#e5e5ea] p-2 text-[#8e8e93] transition-all hover:border-[#fecaca] hover:bg-[#fef2f2] hover:text-[#e5484d]"
                 title="Hapus Role"
               >
-                <Trash2 class="h-3.5 w-3.5" />
+                <Trash2 class="size-3.5" />
               </button>
             </div>
           </div>
@@ -300,9 +300,9 @@
       class="animate-in fade-in zoom-in-95 w-full max-w-sm space-y-4 rounded-3xl border border-[#e5e5ea] bg-white p-6 shadow-xl"
     >
       <div
-        class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fef2f2] text-[#e5484d]"
+        class="mx-auto flex size-12 items-center justify-center rounded-2xl bg-[#fef2f2] text-[#e5484d]"
       >
-        <Trash2 class="h-6 w-6" />
+        <Trash2 class="size-6" />
       </div>
 
       <div class="space-y-1 text-center">
@@ -317,7 +317,7 @@
         <div
           class="flex items-center gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3 text-xs text-[#991b1b]"
         >
-          <AlertCircle class="h-4 w-4 shrink-0" />
+          <AlertCircle class="size-4 shrink-0" />
           <span>{deleteError}</span>
         </div>
       {/if}

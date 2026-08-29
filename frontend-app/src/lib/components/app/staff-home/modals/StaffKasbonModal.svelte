@@ -59,9 +59,9 @@
       <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
+            class="flex size-10 items-center justify-center rounded-2xl border border-[#a7f3d0] bg-[#ecfdf5] text-[#059669]"
           >
-            <Wallet class="h-5 w-5" />
+            <Wallet class="size-5" />
           </div>
           <div>
             <h3 class="text-base font-bold text-[#17171c]">Pengajuan Kasbon Staf</h3>
@@ -73,7 +73,7 @@
           onclick={onClose}
           class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="h-5 w-5" />
+          <X class="size-5" />
         </button>
       </div>
 
@@ -81,7 +81,7 @@
         <div
           class="flex items-start gap-2 rounded-xl border border-[#fecaca] bg-[#fef2f2] p-3.5 text-xs font-medium text-[#991b1b]"
         >
-          <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
+          <AlertCircle class="mt-0.5 size-4 shrink-0" />
           <span>{kasbonErrorMessage}</span>
         </div>
       {/if}
@@ -90,7 +90,7 @@
         <div
           class="flex items-start gap-2 rounded-xl border border-[#a7f3d0] bg-[#ecfdf5] p-3.5 text-xs font-semibold text-[#065f46]"
         >
-          <Check class="mt-0.5 h-4 w-4 shrink-0" />
+          <Check class="mt-0.5 size-4 shrink-0" />
           <span>{kasbonSuccessMessage}</span>
         </div>
       {/if}
@@ -144,7 +144,7 @@
           {#if isSubmittingKasbon}
             <span>Mengajukan...</span>
           {:else}
-            <Send class="h-4 w-4" />
+            <Send class="size-4" />
             <span>Kirim Pengajuan</span>
           {/if}
         </button>

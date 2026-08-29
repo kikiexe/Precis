@@ -63,9 +63,9 @@
       <div class="flex items-center justify-between border-b border-[#f2f2f4] pb-3">
         <div class="flex items-center gap-3">
           <div
-            class="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
+            class="flex size-10 items-center justify-center rounded-2xl border border-[#e5e5ea] bg-[#f4f4f6] text-[#17171c]"
           >
-            <Package class="h-5 w-5" />
+            <Package class="size-5" />
           </div>
           <div>
             <h3 class="text-base font-bold text-[#17171c]">Tambah Menu Jualan Baru</h3>
@@ -77,7 +77,7 @@
           onclick={onClose}
           class="cursor-pointer rounded-xl p-2 text-[#8e8e93] transition-all hover:bg-[#f4f4f6] hover:text-[#17171c]"
         >
-          <X class="h-5 w-5" />
+          <X class="size-5" />
         </button>
       </div>
 
@@ -106,7 +106,7 @@
               {/each}
             </select>
             <ChevronDown
-              class="pointer-events-none absolute top-1/2 right-3.5 h-4 w-4 -translate-y-1/2 text-[#8e8e93]"
+              class="pointer-events-none absolute top-1/2 right-3.5 size-4 -translate-y-1/2 text-[#8e8e93]"
             />
           </div>
         </div>
@@ -169,7 +169,7 @@
           {#if isSubmitting}
             <span>Menyimpan...</span>
           {:else}
-            <Plus class="h-4 w-4" />
+            <Plus class="size-4" />
             <span>Simpan Menu</span>
           {/if}
         </button>
