@@ -32,6 +32,7 @@ class BranchController
                     'lat' => (float) $b->lat,
                     'lng' => (float) $b->lng,
                     'radius_meters' => (int) $b->radius_meters,
+                    'qris_image_url' => $b->qris_image_url,
                     'late_penalty_per_minute' => $setting ? (float) $setting->late_penalty_per_minute : 1000.0,
                     'overtime_pay_per_hour' => $setting ? (float) $setting->overtime_pay_per_hour : 20000.0,
                     'min_overtime_threshold_minutes' => $setting ? (int) $setting->min_overtime_threshold_minutes : 30,
@@ -72,6 +73,7 @@ class BranchController
             'lat' => 'sometimes|numeric|between:-90,90',
             'lng' => 'sometimes|numeric|between:-180,180',
             'radius_meters' => 'sometimes|integer|min:10|max:1000',
+            'qris_image_url' => 'nullable|string|max:500',
             'late_penalty_per_minute' => 'sometimes|numeric|min:0',
             'overtime_pay_per_hour' => 'sometimes|numeric|min:0',
             'min_overtime_threshold_minutes' => 'sometimes|integer|min:0|max:180',
@@ -88,6 +90,9 @@ class BranchController
         }
         if (isset($validated['radius_meters'])) {
             $branch->radius_meters = $validated['radius_meters'];
+        }
+        if (array_key_exists('qris_image_url', $validated)) {
+            $branch->qris_image_url = $validated['qris_image_url'];
         }
         $branch->save();
 
@@ -122,6 +127,7 @@ class BranchController
                 'lat' => (float) $branch->lat,
                 'lng' => (float) $branch->lng,
                 'radius_meters' => (int) $branch->radius_meters,
+                'qris_image_url' => $branch->qris_image_url,
                 'late_penalty_per_minute' => (float) $setting->late_penalty_per_minute,
                 'overtime_pay_per_hour' => (float) $setting->overtime_pay_per_hour,
                 'min_overtime_threshold_minutes' => (int) $setting->min_overtime_threshold_minutes,
