@@ -265,6 +265,7 @@ Route::prefix('v1')->group(function (): void {
                 'workspace_id' => $terminal->workspace_id,
                 'branch_id' => $terminal->branch_id,
                 'branch_name' => $terminal->branch?->name,
+                'qris_image_url' => $terminal->branch?->qris_image_url,
                 'cashiers' => $cashiers,
             ]);
         });

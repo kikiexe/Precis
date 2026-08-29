@@ -27,6 +27,7 @@ class Branch extends Model
         'lat',
         'lng',
         'radius_meters',
+        'qris_image_url',
     ];
 
     protected function casts(): array
