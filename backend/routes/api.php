@@ -41,6 +41,9 @@ Route::prefix('v1')->group(function (): void {
         ]);
     });
 
+    // endpoint simulasi upload media lokal / testing (PUT biner)
+    Route::put('/media/mock-upload', [\App\Http\Controllers\Api\MediaController::class, 'mockUpload']);
+
     // endpoint auth portal users
     Route::prefix('auth')->group(function (): void {
         Route::middleware('throttle:10,1')->group(function (): void {

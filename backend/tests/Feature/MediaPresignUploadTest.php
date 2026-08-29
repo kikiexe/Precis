@@ -87,4 +87,21 @@ class MediaPresignUploadTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonValidationErrors(['size_bytes']);
     }
+
+    public function test_mock_upload_endpoint_saves_binary_file_to_local_disk(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $key = 'staging/ws-test-123/qris-test.png';
+        $binaryContent = 'fake-png-binary-content-12345';
+
+        $response = $this->call(
+            method: 'PUT',
+            uri: '/api/v1/media/mock-upload?key=' . urlencode($key),
+            content: $binaryContent
+        );
+
+        $response->assertOk();
+        \Illuminate\Support\Facades\Storage::disk('public')->assertExists($key);
+    }
 }
