@@ -1,47 +1,54 @@
+import { normalizeMediaUrl } from '@precis/shared-utils/formatters';
+
 export const IMAGE_CACHE_NAME = 'precis-pos-images-v1';
 
 /**
- * Mengambil URL gambar dari Cache Storage lokal jika tersedia saat offline,
- * atau mengunduh dan menyimpannya ke cache secara otomatis saat online.
+ * mengambil URL gambar dari Cache Storage lokal jika tersedia saat offline,
+ * atau mengunduh dan menyimpannya ke cache secara otomatis saat online
  */
 export async function getCachedImageUrl(url: string | null | undefined): Promise<string | null> {
   if (!url || typeof window === 'undefined') {
     return url || null;
   }
 
-  // Jika URL berupa data URI atau Blob URL, kembalikan langsung
-  if (url.startsWith('data:') || url.startsWith('blob:')) {
-    return url;
+  const normalized = normalizeMediaUrl(url);
+  if (!normalized) {
+    return null;
   }
 
-  // Fallback jika browser tidak mendukung Cache Storage API
+  // Jika URL berupa data URI atau Blob URL, kembalikan langsung
+  if (normalized.startsWith('data:') || normalized.startsWith('blob:')) {
+    return normalized;
+  }
+
+  // fallback jika browser tidak mendukung Cache Storage API
   if (!('caches' in window)) {
-    return url;
+    return normalized;
   }
 
   try {
     const cache = await caches.open(IMAGE_CACHE_NAME);
-    const cachedResponse = await cache.match(url);
+    const cachedResponse = await cache.match(normalized);
 
     if (cachedResponse) {
       const blob = await cachedResponse.blob();
       return URL.createObjectURL(blob);
     }
 
-    // Jika belum ada di cache dan online, unduh dan simpan
+    // jika belum ada di cache dan online, unduh dan simpan
     if (navigator.onLine) {
-      const response = await fetch(url, { mode: 'cors' });
+      const response = await fetch(normalized, { mode: 'cors' });
       if (response.ok) {
-        await cache.put(url, response.clone());
+        await cache.put(normalized, response.clone());
         const blob = await response.blob();
         return URL.createObjectURL(blob);
       }
     }
   } catch {
-    // Network failure atau CORS error: fallback ke URL asli
+    // network failure atau CORS error: fallback ke URL normal
   }
 
-  return url;
+  return normalized;
 }
 
 /**
@@ -52,20 +59,25 @@ export async function preloadAndCacheImage(url: string | null | undefined): Prom
     return false;
   }
 
-  if (url.startsWith('data:') || url.startsWith('blob:')) {
+  const normalized = normalizeMediaUrl(url);
+  if (!normalized) {
+    return false;
+  }
+
+  if (normalized.startsWith('data:') || normalized.startsWith('blob:')) {
     return true;
   }
 
   try {
     const cache = await caches.open(IMAGE_CACHE_NAME);
-    const cachedResponse = await cache.match(url);
+    const cachedResponse = await cache.match(normalized);
     if (cachedResponse) {
       return true;
     }
 
-    const response = await fetch(url, { mode: 'cors' });
+    const response = await fetch(normalized, { mode: 'cors' });
     if (response.ok) {
-      await cache.put(url, response);
+      await cache.put(normalized, response);
       return true;
     }
   } catch {
@@ -76,7 +88,7 @@ export async function preloadAndCacheImage(url: string | null | undefined): Prom
 }
 
 /**
- * Hapus seluruh cache gambar lokal jika user ingin membersihkan storage.
+ * hapus seluruh cache gambar lokal jika user ingin membersihkan storage  
  */
 export async function clearImageCache(): Promise<boolean> {
   if (typeof window === 'undefined' || !('caches' in window)) {

@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { formatRupiah, formatDateIndo, formatDateTimeIndo } from './formatters';
+import {
+  formatRupiah,
+  formatDateIndo,
+  formatDateTimeIndo,
+  normalizeMediaUrl,
+} from './formatters';
 
 describe('formatRupiah', () => {
   it('formats positive numbers as IDR currency without decimal places', () => {
@@ -51,3 +56,32 @@ describe('formatDateTimeIndo', () => {
     expect(formatDateTimeIndo(undefined)).toBe('-');
   });
 });
+
+describe('normalizeMediaUrl', () => {
+  it('converts local absolute backend URLs to relative paths', () => {
+    expect(normalizeMediaUrl('http://127.0.0.1:8000/storage/staging/abc.jpg')).toBe(
+      '/storage/staging/abc.jpg'
+    );
+    expect(normalizeMediaUrl('http://localhost:8000/uploads/avatar.png')).toBe(
+      '/uploads/avatar.png'
+    );
+  });
+
+  it('preserves blob:, data:, and external https URLs untouched', () => {
+    expect(normalizeMediaUrl('blob:http://localhost:5174/xyz')).toBe(
+      'blob:http://localhost:5174/xyz'
+    );
+    expect(normalizeMediaUrl('data:image/png;base64,123')).toBe(
+      'data:image/png;base64,123'
+    );
+    expect(normalizeMediaUrl('https://r2.precis.com/images/qris.webp')).toBe(
+      'https://r2.precis.com/images/qris.webp'
+    );
+  });
+
+  it('returns empty string for null or undefined', () => {
+    expect(normalizeMediaUrl(null)).toBe('');
+    expect(normalizeMediaUrl(undefined)).toBe('');
+  });
+});
+
