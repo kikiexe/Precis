@@ -282,4 +282,26 @@ class PosEngineTest extends TestCase
         // pastikan hanya ada 1 record di database
         $this->assertDatabaseCount('orders', 1);
     }
+
+    public function test_pos_terminal_can_fetch_recent_orders_list(): void
+    {
+        \App\Models\Order::create([
+            'workspace_id' => $this->workspace->id,
+            'branch_id' => $this->branch->id,
+            'client_order_id' => (string) Str::uuid(),
+            'order_number' => 'ORD-RECENT-001',
+            'total_amount' => 30000,
+            'final_amount' => 30000,
+            'payment_method' => 'QRIS',
+            'payment_status' => 'PAID',
+        ]);
+
+        $response = $this->withHeader('X-Device-Token', $this->deviceToken)
+            ->getJson('/api/v1/pos/orders');
+
+        $response->assertOk()
+            ->assertJsonPath('message', 'Riwayat transaksi pesanan POS berhasil dimuat.')
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.order_number', 'ORD-RECENT-001');
+    }
 }

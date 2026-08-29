@@ -117,4 +117,54 @@ class PosController
             'data' => $result,
         ], Response::HTTP_OK);
     }
+
+    /**
+     * ambil riwayat transaksi pesanan terbaru cabang ini untuk sinkronisasi POS offline
+     */
+    public function orders(Request $request): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        $branchId = (string) $request->attributes->get('current_branch_id');
+
+        $orders = \App\Models\Order::withoutGlobalScopes()
+            ->with(['items'])
+            ->where('workspace_id', $workspaceId)
+            ->where('branch_id', $branchId)
+            ->latest('id')
+            ->limit(50)
+            ->get()
+            ->map(function (\App\Models\Order $o): array {
+                return [
+                    'client_order_id' => $o->client_order_id ?? (string) $o->id,
+                    'order_number' => $o->order_number,
+                    'workspace_id' => $o->workspace_id,
+                    'branch_id' => $o->branch_id,
+                    'pos_session_id' => $o->pos_session_id,
+                    'cashier_user_id' => $o->cashier_user_id,
+                    'cashier_name' => $o->cashier_name ?? 'Kasir',
+                    'order_type' => $o->order_type,
+                    'total_amount' => (float) $o->total_amount,
+                    'discount_amount' => (float) $o->discount_amount,
+                    'final_amount' => (float) $o->final_amount,
+                    'payment_method' => $o->payment_method,
+                    'cash_tendered' => $o->cash_tendered ? (float) $o->cash_tendered : null,
+                    'change_amount' => $o->change_amount ? (float) $o->change_amount : null,
+                    'items' => $o->items->map(fn ($i) => [
+                        'product_id' => $i->product_id,
+                        'product_name' => $i->product_name,
+                        'quantity' => (int) $i->quantity,
+                        'unit_price' => (float) $i->unit_price,
+                        'subtotal' => (float) $i->subtotal,
+                        'notes' => $i->notes,
+                    ])->toArray(),
+                    'created_at' => $o->created_at?->toIso8601String() ?? now()->toIso8601String(),
+                    'sync_status' => 'SYNCED',
+                ];
+            });
+
+        return new JsonResponse([
+            'message' => 'Riwayat transaksi pesanan POS berhasil dimuat.',
+            'data' => $orders,
+        ], Response::HTTP_OK);
+    }
 }

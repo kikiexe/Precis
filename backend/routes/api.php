@@ -275,6 +275,7 @@ Route::prefix('v1')->group(function (): void {
 
         // katalog produk offline & manajemen sesi kasir
         Route::get('/products', [PosController::class, 'products']);
+        Route::get('/orders', [PosController::class, 'orders']);
         Route::post('/sessions/open', [PosController::class, 'openSession']);
         Route::post('/sessions/close', [PosController::class, 'closeSession']);
         Route::post('/orders/sync-batch', [PosController::class, 'syncBatch']);
