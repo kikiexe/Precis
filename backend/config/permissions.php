@@ -159,6 +159,11 @@ return [
                     'description' => 'Membatalkan pesanan yang sudah tercatat di kasir dengan master PIN',
                     'is_high_risk' => true,
                 ],
+                'pos.refund_order' => [
+                    'name' => 'Otorisasi Refund Dana Transaksi',
+                    'description' => 'Mengembalikan dana pembayaran pesanan ke pelanggan',
+                    'is_high_risk' => true,
+                ],
                 'pos.apply_discount' => [
                     'name' => 'Otorisasi Diskon Khusus',
                     'description' => 'Memberikan potongan harga manual khusus di aplikasi kasir',
@@ -190,6 +195,7 @@ return [
                 'members.view',
                 'pos.manage_terminals',
                 'pos.void_order',
+                'pos.refund_order',
                 'pos.apply_discount',
             ],
         ],

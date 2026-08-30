@@ -146,13 +146,33 @@ Route::prefix('v1')->group(function (): void {
         // katalog produk & kategori web portal
         Route::get('/products', [\App\Http\Controllers\Api\ProductCatalogController::class, 'products']);
         Route::get('/categories', [\App\Http\Controllers\Api\ProductCatalogController::class, 'categories']);
+        Route::get('/addon-categories', [\App\Http\Controllers\Api\AddonController::class, 'index']);
+        Route::get('/addon-categories/{id}', [\App\Http\Controllers\Api\AddonController::class, 'show']);
         Route::middleware('permission:catalog.manage')->group(function (): void {
             Route::post('/products', [\App\Http\Controllers\Api\ProductCatalogController::class, 'storeProduct']);
             Route::put('/products/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'updateProduct']);
             Route::delete('/products/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'deleteProduct']);
             Route::post('/categories', [\App\Http\Controllers\Api\ProductCatalogController::class, 'storeCategory']);
             Route::delete('/categories/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'deleteCategory']);
+            Route::post('/addon-categories', [\App\Http\Controllers\Api\AddonController::class, 'store']);
+            Route::put('/addon-categories/{id}', [\App\Http\Controllers\Api\AddonController::class, 'update']);
+            Route::delete('/addon-categories/{id}', [\App\Http\Controllers\Api\AddonController::class, 'destroy']);
+            Route::post('/addons', [\App\Http\Controllers\Api\AddonController::class, 'storeAddon']);
+            Route::put('/addons/{id}', [\App\Http\Controllers\Api\AddonController::class, 'updateAddon']);
+            Route::delete('/addons/{id}', [\App\Http\Controllers\Api\AddonController::class, 'destroyAddon']);
         });
+
+        // belanja operasional outlet & kas keluar (petty cash)
+        Route::get('/outlet-purchases', [\App\Http\Controllers\Api\OutletPurchaseController::class, 'index']);
+        Route::get('/outlet-purchases/{id}', [\App\Http\Controllers\Api\OutletPurchaseController::class, 'show']);
+        Route::post('/outlet-purchases', [\App\Http\Controllers\Api\OutletPurchaseController::class, 'store']);
+        Route::delete('/outlet-purchases/{id}', [\App\Http\Controllers\Api\OutletPurchaseController::class, 'destroy']);
+
+        // pencatatan barang rusak terbuang (stock waste)
+        Route::get('/stock-wastes', [\App\Http\Controllers\Api\StockWasteController::class, 'index']);
+        Route::get('/stock-wastes/{id}', [\App\Http\Controllers\Api\StockWasteController::class, 'show']);
+        Route::post('/stock-wastes', [\App\Http\Controllers\Api\StockWasteController::class, 'store']);
+        Route::delete('/stock-wastes/{id}', [\App\Http\Controllers\Api\StockWasteController::class, 'destroy']);
 
         // presensi mobile PWA
         Route::prefix('attendances')->group(function (): void {
@@ -278,9 +298,16 @@ Route::prefix('v1')->group(function (): void {
 
         // katalog produk offline & manajemen sesi kasir
         Route::get('/products', [PosController::class, 'products']);
+        Route::get('/addons', [PosController::class, 'addons']);
         Route::get('/orders', [PosController::class, 'orders']);
         Route::middleware('throttle:pos-session-open')->post('/sessions/open', [PosController::class, 'openSession']);
         Route::post('/sessions/close', [PosController::class, 'closeSession']);
         Route::post('/orders/sync-batch', [PosController::class, 'syncBatch']);
+        Route::post('/orders/{id}/void', [PosController::class, 'voidOrder']);
+        Route::post('/orders/{id}/refund', [PosController::class, 'refundOrder']);
+        Route::get('/purchases', [PosController::class, 'purchases']);
+        Route::post('/purchases', [PosController::class, 'storePurchase']);
+        Route::get('/inventory/waste', [PosController::class, 'wastes']);
+        Route::post('/inventory/waste', [PosController::class, 'storeWaste']);
     });
 });

@@ -168,4 +168,240 @@ class PosController
             'data' => $orders,
         ], Response::HTTP_OK);
     }
+
+    /**
+     * ambil daftar kategori addon dan modifier aktif untuk cache POS offline
+     */
+    public function addons(Request $request): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+
+        $categories = \App\Models\AddonCategory::withoutGlobalScopes()
+            ->with(['addons' => fn ($q) => $q->where('is_active', true)])
+            ->where('workspace_id', $workspaceId)
+            ->get();
+
+        return new JsonResponse([
+            'message' => 'Daftar add-on dan modifier POS berhasil dimuat.',
+            'data' => $categories,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * proses pembatalan / void transaksi pesanan di meja kasir
+     */
+    public function voidOrder(Request $request, string $id): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        $branchId = (string) $request->attributes->get('current_branch_id');
+
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'max:255'],
+            'pin' => ['nullable', 'string', 'min:4', 'max:6'],
+            'approved_by_user_id' => ['nullable', 'uuid', 'exists:users,id'],
+        ]);
+
+        $order = $this->posService->voidOrder(
+            workspaceId: $workspaceId,
+            branchId: $branchId,
+            orderIdOrClientId: $id,
+            reason: $validated['reason'],
+            pin: $validated['pin'] ?? null,
+            approvedByUserId: $validated['approved_by_user_id'] ?? null
+        );
+
+        return new JsonResponse([
+            'message' => 'Transaksi pesanan berhasil dibatalkan (void).',
+            'data' => $order,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * proses refund pengembalian dana transaksi pesanan
+     */
+    public function refundOrder(Request $request, string $id): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        $branchId = (string) $request->attributes->get('current_branch_id');
+
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'max:255'],
+            'refund_amount' => ['nullable', 'numeric', 'min:0'],
+            'pin' => ['nullable', 'string', 'min:4', 'max:6'],
+            'approved_by_user_id' => ['nullable', 'uuid', 'exists:users,id'],
+        ]);
+
+        $order = $this->posService->refundOrder(
+            workspaceId: $workspaceId,
+            branchId: $branchId,
+            orderIdOrClientId: $id,
+            reason: $validated['reason'],
+            refundAmount: isset($validated['refund_amount']) ? (float) $validated['refund_amount'] : null,
+            pin: $validated['pin'] ?? null,
+            approvedByUserId: $validated['approved_by_user_id'] ?? null
+        );
+
+        return new JsonResponse([
+            'message' => 'Pengembalian dana (refund) transaksi berhasil diproses.',
+            'data' => $order,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * ambil riwayat pengeluaran belanja operasional outlet (petty cash)
+     */
+    public function purchases(Request $request): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        $branchId = (string) $request->attributes->get('current_branch_id');
+        $sessionId = $request->query('pos_session_id');
+
+        $purchases = $this->posService->getOutletPurchases(
+            workspaceId: $workspaceId,
+            branchId: $branchId,
+            posSessionId: $sessionId ? (string) $sessionId : null
+        );
+
+        return new JsonResponse([
+            'message' => 'Daftar pengeluaran belanja outlet berhasil dimuat.',
+            'data' => $purchases,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * catat pengeluaran belanja kas kecil (petty cash) dari kasir POS
+     */
+    public function storePurchase(Request $request): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        $branchId = (string) $request->attributes->get('current_branch_id');
+
+        $validated = $request->validate([
+            'item_name' => ['required', 'string', 'max:255'],
+            'unit' => ['required', 'string', 'max:50'],
+            'quantity' => ['required', 'numeric', 'min:0.01'],
+            'unit_price' => ['required', 'numeric', 'min:0'],
+            'total_price' => ['nullable', 'numeric', 'min:0'],
+            'category' => ['required', 'string', 'in:BAHAN_BAKU_DARURAT,OPERASIONAL_TOKO,KEBERSIHAN,UTILITAS,LAINNYA'],
+            'funding_source' => ['required', 'string', 'in:CASH_DRAWER,EXTERNAL_REIMBURSE'],
+            'pos_session_id' => ['nullable', 'uuid'],
+            'cashier_user_id' => ['required', 'uuid', 'exists:users,id'],
+            'pin' => ['nullable', 'string', 'min:4', 'max:6'],
+            'receipt_photo_url' => ['nullable', 'string', 'max:1000'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $cashierUser = \App\Models\User::findOrFail($validated['cashier_user_id']);
+
+        if (! empty($validated['pin'])) {
+            $member = \App\Models\WorkspaceMember::where('workspace_id', $workspaceId)
+                ->where('user_id', $cashierUser->id)
+                ->first();
+
+            if ($member && ! empty($member->pin) && ! \Illuminate\Support\Facades\Hash::check($validated['pin'], $member->pin)) {
+                return new JsonResponse([
+                    'message' => 'PIN Kasir tidak valid.',
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        }
+
+        $purchase = $this->posService->createOutletPurchase(
+            workspaceId: $workspaceId,
+            branchId: $branchId,
+            posSessionId: $validated['pos_session_id'] ?? null,
+            recordedByUserId: $cashierUser->id,
+            data: $validated
+        );
+
+        return new JsonResponse([
+            'message' => 'Pengeluaran belanja outlet berhasil dicatat.',
+            'data' => $purchase,
+        ], Response::HTTP_CREATED);
+    }
+
+    /**
+     * ambil riwayat stock waste cabang ini untuk sinkronisasi POS offline
+     */
+    public function wastes(Request $request): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        $branchId = (string) $request->attributes->get('current_branch_id');
+
+        $wastes = \App\Models\StockWaste::withoutGlobalScopes()
+            ->with(['product:id,name', 'recordedByUser:id,name'])
+            ->where('workspace_id', $workspaceId)
+            ->where('branch_id', $branchId)
+            ->latest('created_at')
+            ->limit(50)
+            ->get();
+
+        return new JsonResponse([
+            'message' => 'Riwayat stock waste berhasil dimuat.',
+            'data' => $wastes,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * rekam pengeluaran stock waste langsung dari tablet kasir POS
+     */
+    public function storeWaste(Request $request): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        $branchId = (string) $request->attributes->get('current_branch_id');
+
+        $validated = $request->validate([
+            'product_id' => ['nullable', 'uuid', 'exists:products,id'],
+            'item_name' => ['required', 'string', 'max:255'],
+            'quantity' => ['required', 'numeric', 'min:0.01'],
+            'unit' => ['required', 'string', 'max:50'],
+            'cost_per_unit' => ['required', 'numeric', 'min:0'],
+            'total_loss_cost' => ['nullable', 'numeric', 'min:0'],
+            'reason' => ['required', 'string', 'in:EXPIRED,SPOILED,ACCIDENT_SPILL,BARISTA_MISTAKE,QC_REJECT,OTHER'],
+            'photo_url' => ['nullable', 'string', 'max:1000'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+            'cashier_user_id' => ['required', 'uuid', 'exists:users,id'],
+            'pin' => ['nullable', 'string', 'min:4', 'max:6'],
+        ]);
+
+        $cashierUser = \App\Models\User::findOrFail($validated['cashier_user_id']);
+        if (! empty($validated['pin'])) {
+            $member = \App\Models\WorkspaceMember::where('workspace_id', $workspaceId)
+                ->where('user_id', $cashierUser->id)
+                ->first();
+
+            if ($member && ! empty($member->pin) && ! \Illuminate\Support\Facades\Hash::check($validated['pin'], $member->pin)) {
+                return new JsonResponse([
+                    'message' => 'PIN Kasir tidak valid.',
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        }
+
+        $quantity = (float) $validated['quantity'];
+        $costPerUnit = (float) $validated['cost_per_unit'];
+        $totalLoss = isset($validated['total_loss_cost'])
+            ? (float) $validated['total_loss_cost']
+            : round($quantity * $costPerUnit, 2);
+
+        $waste = \App\Models\StockWaste::create([
+            'workspace_id' => $workspaceId,
+            'branch_id' => $branchId,
+            'product_id' => $validated['product_id'] ?? null,
+            'item_name' => $validated['item_name'],
+            'quantity' => $quantity,
+            'unit' => $validated['unit'] ?? 'Pcs',
+            'cost_per_unit' => $costPerUnit,
+            'total_loss_cost' => $totalLoss,
+            'reason' => $validated['reason'],
+            'photo_url' => $validated['photo_url'] ?? null,
+            'notes' => $validated['notes'] ?? null,
+            'recorded_by_user_id' => $cashierUser->id,
+        ]);
+
+        $waste->load(['product:id,name', 'recordedByUser:id,name']);
+
+        return new JsonResponse([
+            'message' => 'Pencatatan stock waste POS berhasil disimpan.',
+            'data' => $waste,
+        ], Response::HTTP_CREATED);
+    }
 }

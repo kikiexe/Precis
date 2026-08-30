@@ -177,8 +177,25 @@ class PosService
             ->where('payment_status', 'PAID')
             ->sum('final_amount');
 
+        // kalkulasi pengeluaran belanja kas laci kasir (CASH_DRAWER) selama sesi ini
+        $cashPurchases = (float) \App\Models\OutletPurchase::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->where('branch_id', $branchId)
+            ->where('pos_session_id', $session->id)
+            ->where('funding_source', 'CASH_DRAWER')
+            ->sum('total_price');
+
+        // kalkulasi refund kas tunai selama sesi ini jika ada
+        $cashRefunds = (float) Order::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->where('branch_id', $branchId)
+            ->where('pos_session_id', $session->id)
+            ->where('payment_method', 'CASH')
+            ->where('payment_status', 'REFUNDED')
+            ->sum('refund_amount');
+
         $openingCash = (float) $session->opening_cash;
-        $closingCashExpected = $openingCash + $cashSales;
+        $closingCashExpected = $openingCash + $cashSales - $cashPurchases - $cashRefunds;
         $discrepancyAmount = $closingCashActual - $closingCashExpected;
 
         $session->update([
@@ -338,5 +355,182 @@ class PosService
                 'order_ids' => $syncedIds,
             ];
         });
+    }
+
+    /**
+     * proses void pembatalan transaksi pesanan
+     */
+    public function voidOrder(
+        string $workspaceId,
+        string $branchId,
+        string $orderIdOrClientId,
+        string $reason,
+        ?string $pin = null,
+        ?string $approvedByUserId = null
+    ): Order {
+        return DB::transaction(function () use ($workspaceId, $branchId, $orderIdOrClientId, $reason, $pin, $approvedByUserId): Order {
+            $order = Order::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->where(function ($q) use ($orderIdOrClientId) {
+                    $q->where('id', $orderIdOrClientId)
+                        ->orWhere('client_order_id', $orderIdOrClientId);
+                })
+                ->first();
+
+            if (! $order) {
+                throw ValidationException::withMessages([
+                    'order_id' => ['Pesanan tidak ditemukan pada cabang ini.'],
+                ]);
+            }
+
+            if ($order->payment_status === 'VOID') {
+                throw ValidationException::withMessages([
+                    'order_id' => ['Pesanan ini sudah dibatalkan (VOID) sebelumnya.'],
+                ]);
+            }
+
+            if ($approvedByUserId && $pin) {
+                $member = \App\Models\WorkspaceMember::where('workspace_id', $workspaceId)
+                    ->where('user_id', $approvedByUserId)
+                    ->first();
+
+                if ($member && ! empty($member->pin) && ! \Illuminate\Support\Facades\Hash::check($pin, $member->pin)) {
+                    throw ValidationException::withMessages([
+                        'pin' => ['PIN Otorisasi supervisor/manajer tidak valid.'],
+                    ]);
+                }
+            }
+
+            $order->update([
+                'payment_status' => 'VOID',
+                'void_reason' => $reason,
+                'voided_at' => Carbon::now(),
+                'voided_by_user_id' => $approvedByUserId,
+            ]);
+
+            return $order;
+        });
+    }
+
+    /**
+     * proses refund pengembalian dana pesanan
+     */
+    public function refundOrder(
+        string $workspaceId,
+        string $branchId,
+        string $orderIdOrClientId,
+        string $reason,
+        ?float $refundAmount = null,
+        ?string $pin = null,
+        ?string $approvedByUserId = null
+    ): Order {
+        return DB::transaction(function () use ($workspaceId, $branchId, $orderIdOrClientId, $reason, $refundAmount, $pin, $approvedByUserId): Order {
+            $order = Order::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->where(function ($q) use ($orderIdOrClientId) {
+                    $q->where('id', $orderIdOrClientId)
+                        ->orWhere('client_order_id', $orderIdOrClientId);
+                })
+                ->first();
+
+            if (! $order) {
+                throw ValidationException::withMessages([
+                    'order_id' => ['Pesanan tidak ditemukan pada cabang ini.'],
+                ]);
+            }
+
+            if ($order->payment_status === 'REFUNDED') {
+                throw ValidationException::withMessages([
+                    'order_id' => ['Pesanan ini sudah direfund sebelumnya.'],
+                ]);
+            }
+
+            $finalRefund = $refundAmount ?? (float) $order->final_amount;
+
+            if ($approvedByUserId && $pin) {
+                $member = \App\Models\WorkspaceMember::where('workspace_id', $workspaceId)
+                    ->where('user_id', $approvedByUserId)
+                    ->first();
+
+                if ($member && ! empty($member->pin) && ! \Illuminate\Support\Facades\Hash::check($pin, $member->pin)) {
+                    throw ValidationException::withMessages([
+                        'pin' => ['PIN Otorisasi supervisor/manajer tidak valid.'],
+                    ]);
+                }
+            }
+
+            $order->update([
+                'payment_status' => 'REFUNDED',
+                'refund_amount' => $finalRefund,
+                'refund_reason' => $reason,
+                'refunded_at' => Carbon::now(),
+                'refunded_by_user_id' => $approvedByUserId,
+            ]);
+
+            return $order;
+        });
+    }
+
+    /**
+     * ambil riwayat pengeluaran belanja operasional outlet
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, \App\Models\OutletPurchase>
+     */
+    public function getOutletPurchases(
+        string $workspaceId,
+        string $branchId,
+        ?string $posSessionId = null
+    ): \Illuminate\Database\Eloquent\Collection {
+        $query = \App\Models\OutletPurchase::withoutGlobalScopes()
+            ->with(['recordedByUser:id,name'])
+            ->where('workspace_id', $workspaceId)
+            ->where('branch_id', $branchId);
+
+        if ($posSessionId) {
+            $query->where('pos_session_id', $posSessionId);
+        }
+
+        return $query->latest('created_at')->get();
+    }
+
+    /**
+     * catat belanja operasional outlet (petty cash)
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function createOutletPurchase(
+        string $workspaceId,
+        string $branchId,
+        ?string $posSessionId,
+        string $recordedByUserId,
+        array $data
+    ): \App\Models\OutletPurchase {
+        $quantity = (float) ($data['quantity'] ?? 1);
+        $unitPrice = (float) ($data['unit_price'] ?? 0);
+        $totalPrice = isset($data['total_price'])
+            ? (float) $data['total_price']
+            : round($quantity * $unitPrice, 2);
+
+        $purchase = \App\Models\OutletPurchase::create([
+            'workspace_id' => $workspaceId,
+            'branch_id' => $branchId,
+            'pos_session_id' => $posSessionId,
+            'item_name' => (string) $data['item_name'],
+            'unit' => (string) ($data['unit'] ?? 'Pcs'),
+            'quantity' => $quantity,
+            'unit_price' => $unitPrice,
+            'total_price' => $totalPrice,
+            'category' => (string) $data['category'],
+            'funding_source' => (string) $data['funding_source'],
+            'receipt_photo_url' => $data['receipt_photo_url'] ?? null,
+            'notes' => $data['notes'] ?? null,
+            'recorded_by_user_id' => $recordedByUserId,
+        ]);
+
+        $purchase->load(['recordedByUser:id,name']);
+
+        return $purchase;
     }
 }

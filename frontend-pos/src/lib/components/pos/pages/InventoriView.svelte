@@ -10,8 +10,11 @@
     AlertCircle,
     Trash2,
     Edit2,
+    Flame,
+    Boxes,
   } from 'lucide-svelte';
-  import type { RawMaterial } from '../../../types/pos';
+  import type { RawMaterial, Product, CashierUser, StockWaste } from '../../../types/pos';
+  import StockWasteModal from '../StockWasteModal.svelte';
 
   interface RawCategory {
     id: string;
@@ -20,10 +23,35 @@
 
   interface Props {
     rawMaterials?: RawMaterial[];
+    products?: Product[];
+    cashiers?: CashierUser[];
+    activeCashier?: CashierUser | null;
+    stockWastes?: StockWaste[];
     onUpdateMaterials?: (materials: RawMaterial[]) => void;
+    onRecordWaste?: (waste: StockWaste) => void;
   }
 
-  let { rawMaterials: initialMaterials = [], onUpdateMaterials }: Props = $props();
+  let {
+    rawMaterials: initialMaterials = [],
+    products = [],
+    cashiers = [],
+    activeCashier = null,
+    stockWastes: initialWastes = [],
+    onUpdateMaterials,
+    onRecordWaste,
+  }: Props = $props();
+
+  // Tab State: Stok Bahan Baku vs Catatan Kerugian (Waste)
+  let activeTab = $state<'STOCK' | 'WASTE'>('STOCK');
+  let isWasteModalOpen = $state(false);
+  let selectedWasteReason = $state<string>('ALL');
+  let wastes = $state<StockWaste[]>([]);
+
+  $effect(() => {
+    if (initialWastes) {
+      wastes = initialWastes;
+    }
+  });
 
   // State Tanggal Filter (Default Hari Ini)
   let selectedDate = $state(new Date().toISOString().substring(0, 10));
@@ -155,7 +183,7 @@
     'pouch',
   ];
 
-  // Filtered List
+  // Filtered List Bahan Baku
   let filteredMaterials = $derived(
     materials.filter((m) => {
       const matchSearch =
@@ -168,6 +196,49 @@
       return matchSearch && matchCategory;
     })
   );
+
+  // Filtered List Stock Waste / Kerugian
+  let filteredWastes = $derived(
+    wastes.filter((w) => {
+      const matchSearch =
+        searchQuery.trim() === '' ||
+        w.item_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (w.notes && w.notes.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchReason = selectedWasteReason === 'ALL' || w.reason === selectedWasteReason;
+
+      return matchSearch && matchReason;
+    })
+  );
+
+  let totalLossAmount = $derived(
+    filteredWastes.reduce((acc, curr) => acc + Number(curr.total_loss_cost || 0), 0)
+  );
+
+  function formatRupiah(amount: number): string {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(amount);
+  }
+
+  function getReasonBadge(reason: string): { label: string; bg: string; text: string } {
+    switch (reason) {
+      case 'EXPIRED':
+        return { label: 'Kedaluwarsa', bg: 'bg-rose-500/15', text: 'text-rose-600' };
+      case 'SPOILED':
+        return { label: 'Basi / Rusak', bg: 'bg-red-500/15', text: 'text-red-700' };
+      case 'ACCIDENT_SPILL':
+        return { label: 'Tumpah / Pecah', bg: 'bg-amber-500/15', text: 'text-amber-700' };
+      case 'BARISTA_MISTAKE':
+        return { label: 'Salah Buat', bg: 'bg-orange-500/15', text: 'text-orange-700' };
+      case 'QC_REJECT':
+        return { label: 'Reject QC', bg: 'bg-purple-500/15', text: 'text-purple-700' };
+      default:
+        return { label: 'Lainnya', bg: 'bg-slate-500/15', text: 'text-slate-700' };
+    }
+  }
 
   // Actions: Sesuaikan Stok
   function handleOpenAdjustModal(mat: RawMaterial) {
@@ -284,13 +355,50 @@
 </script>
 
 <div class="flex h-full flex-1 flex-col overflow-hidden bg-[#f4f6f9] font-sans select-none">
-  <!-- Top Bar -->
+  <!-- Top Bar with Sub-Tab Navigation -->
   <div
     class="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-6 shadow-2xs"
   >
     <div class="flex items-center gap-3">
-      <h1 class="text-base font-bold tracking-tight text-zinc-900">Inventori Bahan Baku</h1>
+      <!-- Tabs -->
+      <div class="flex items-center gap-1 rounded-xl bg-zinc-100 p-1">
+        <button
+          type="button"
+          onclick={() => (activeTab = 'STOCK')}
+          class={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+            activeTab === 'STOCK'
+              ? 'bg-white text-zinc-900 shadow-2xs'
+              : 'text-zinc-500 hover:text-zinc-800'
+          }`}
+        >
+          <Boxes class="size-3.5" />
+          <span>Stok Bahan Baku</span>
+        </button>
+        <button
+          type="button"
+          onclick={() => (activeTab = 'WASTE')}
+          class={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+            activeTab === 'WASTE'
+              ? 'bg-rose-600 text-white shadow-2xs'
+              : 'text-zinc-500 hover:text-zinc-800'
+          }`}
+        >
+          <Flame class="size-3.5" />
+          <span>Catatan Kerugian (Waste)</span>
+          {#if wastes.length > 0}
+            <span
+              class={`py-0.2 rounded-full px-1.5 text-[10px] font-extrabold ${
+                activeTab === 'WASTE' ? 'bg-rose-800 text-white' : 'bg-rose-100 text-rose-700'
+              }`}
+            >
+              {wastes.length}
+            </span>
+          {/if}
+        </button>
+      </div>
+
       <span class="font-mono text-xs text-zinc-400">|</span>
+
       <!-- Date Picker (Per Hari & Riwayat Hari Sebelumnya) -->
       <div class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-2.5 py-1">
         <Calendar class="size-3.5 text-zinc-500" />
@@ -304,178 +412,343 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <button
-        type="button"
-        onclick={() => (isCategoryModalOpen = true)}
-        class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-100"
-      >
-        <FolderPlus class="size-3.5 text-zinc-600" />
-        <span>Kelola Kategori</span>
-      </button>
+      {#if activeTab === 'STOCK'}
+        <button
+          type="button"
+          onclick={() => (isCategoryModalOpen = true)}
+          class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-100"
+        >
+          <FolderPlus class="size-3.5 text-zinc-600" />
+          <span>Kelola Kategori</span>
+        </button>
 
-      <button
-        type="button"
-        onclick={handleOpenAddModal}
-        class="active:scale-0.99 flex cursor-pointer items-center gap-1.5 rounded-xl bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black"
-      >
-        <Plus class="size-3.5" />
-        <span>+ Tambah Bahan Baku</span>
-      </button>
+        <button
+          type="button"
+          onclick={handleOpenAddModal}
+          class="active:scale-0.99 flex cursor-pointer items-center gap-1.5 rounded-xl bg-zinc-900 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs transition-all hover:bg-black"
+        >
+          <Plus class="size-3.5" />
+          <span>+ Tambah Bahan Baku</span>
+        </button>
+      {:else}
+        <button
+          type="button"
+          onclick={() => (isWasteModalOpen = true)}
+          class="active:scale-0.99 flex cursor-pointer items-center gap-1.5 rounded-xl bg-rose-600 px-3.5 py-2 text-xs font-semibold text-white shadow-2xs shadow-rose-600/20 transition-all hover:bg-rose-700"
+        >
+          <Plus class="size-3.5" />
+          <span>+ Catat Stock Waste</span>
+        </button>
+      {/if}
     </div>
   </div>
 
   <!-- Content Body -->
   <div class="flex-1 space-y-4 overflow-y-auto p-4 sm:p-6 lg:p-8">
-    <div class="mx-auto w-full max-w-7xl space-y-3">
-      <!-- Excel-like Toolbar: Search & Category Dropdown -->
-      <div
-        class="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-2xs sm:flex-row sm:items-center"
-      >
-        <div class="flex flex-1 items-center gap-2">
-          <div class="relative max-w-md flex-1">
-            <Search class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
-            <input
-              type="text"
-              bind:value={searchQuery}
-              placeholder="Cari nama bahan baku, susu, sirup, beans..."
-              class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2 pr-4 pl-9 text-xs text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:outline-hidden"
-            />
-            {#if searchQuery}
-              <button
-                type="button"
-                onclick={() => (searchQuery = '')}
-                class="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer font-mono text-xs text-zinc-400 hover:text-zinc-700"
-              >
-                ✕
-              </button>
-            {/if}
+    <div class="mx-auto w-full max-w-7xl space-y-4">
+      {#if activeTab === 'STOCK'}
+        <!-- Excel-like Toolbar: Search & Category Dropdown -->
+        <div
+          class="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-2xs sm:flex-row sm:items-center"
+        >
+          <div class="flex flex-1 items-center gap-2">
+            <div class="relative max-w-md flex-1">
+              <Search class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
+              <input
+                type="text"
+                bind:value={searchQuery}
+                placeholder="Cari nama bahan baku, susu, sirup, beans..."
+                class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2 pr-4 pl-9 text-xs text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:outline-hidden"
+              />
+              {#if searchQuery}
+                <button
+                  type="button"
+                  onclick={() => (searchQuery = '')}
+                  class="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer font-mono text-xs text-zinc-400 hover:text-zinc-700"
+                >
+                  ✕
+                </button>
+              {/if}
+            </div>
+
+            <!-- Category Filter -->
+            <select
+              bind:value={selectedCategoryId}
+              class="h-9 cursor-pointer rounded-lg border border-zinc-200 bg-zinc-50 px-3 text-xs font-semibold text-zinc-700 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
+            >
+              <option value="ALL">Semua Kategori ({materials.length})</option>
+              {#each categories as cat}
+                <option value={cat.id}>{cat.name}</option>
+              {/each}
+            </select>
           </div>
 
-          <!-- Category Filter -->
-          <select
-            bind:value={selectedCategoryId}
-            class="h-9 cursor-pointer rounded-lg border border-zinc-200 bg-zinc-50 px-3 text-xs font-semibold text-zinc-700 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
-          >
-            <option value="ALL">Semua Kategori ({materials.length})</option>
-            {#each categories as cat}
-              <option value={cat.id}>{cat.name}</option>
-            {/each}
-          </select>
+          <div class="self-center font-mono text-xs text-zinc-500">
+            Total Bahan: <strong class="text-zinc-900">{filteredMaterials.length}</strong> Item
+          </div>
         </div>
 
-        <div class="self-center font-mono text-xs text-zinc-500">
-          Total Bahan: <strong class="text-zinc-900">{filteredMaterials.length}</strong> Item
-        </div>
-      </div>
-
-      <!-- Excel-like Spreadsheet Table -->
-      <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xs">
-        <div class="overflow-x-auto">
-          <table class="w-full border-collapse text-left text-xs">
-            <thead
-              class="border-b border-zinc-200 bg-zinc-100/90 font-mono text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
-            >
-              <tr class="divide-x divide-zinc-200/80">
-                <th class="w-12 p-3 text-center">No.</th>
-                <th class="px-4 py-3">Nama Bahan Baku</th>
-                <th class="w-40 px-4 py-3">Kategori</th>
-                <th class="w-32 bg-zinc-50 px-4 py-3 text-right">Stok Kemarin</th>
-                <th class="w-32 px-4 py-3 text-right font-bold text-zinc-900">Stok Sekarang</th>
-                <th class="w-32 bg-red-50/40 px-4 py-3 text-right text-red-800">Stok Terpakai</th>
-                <th class="w-24 p-3 text-center">Satuan</th>
-                <th class="w-36 px-4 py-3 text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-zinc-200/70 font-mono">
-              {#if filteredMaterials.length === 0}
-                <tr>
-                  <td colspan="8" class="py-16 text-center font-sans text-zinc-400">
-                    <p class="text-sm font-semibold text-zinc-800">Tidak ada data bahan baku</p>
-                    <p class="mt-0.5 text-xs text-zinc-500">
-                      Ubah kata kunci pencarian atau tambah bahan baku baru.
-                    </p>
-                  </td>
+        <!-- Excel-like Spreadsheet Table -->
+        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xs">
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left text-xs">
+              <thead
+                class="border-b border-zinc-200 bg-zinc-100/90 font-mono text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
+              >
+                <tr class="divide-x divide-zinc-200/80">
+                  <th class="w-12 p-3 text-center">No.</th>
+                  <th class="px-4 py-3">Nama Bahan Baku</th>
+                  <th class="w-40 px-4 py-3">Kategori</th>
+                  <th class="w-32 bg-zinc-50 px-4 py-3 text-right">Stok Kemarin</th>
+                  <th class="w-32 px-4 py-3 text-right font-bold text-zinc-900">Stok Sekarang</th>
+                  <th class="w-32 bg-red-50/40 px-4 py-3 text-right text-red-800">Stok Terpakai</th>
+                  <th class="w-24 p-3 text-center">Satuan</th>
+                  <th class="w-36 px-4 py-3 text-center">Aksi</th>
                 </tr>
-              {:else}
-                {#each filteredMaterials as mat, idx (mat.id)}
-                  <tr
-                    class={`divide-x divide-zinc-200/60 transition-colors hover:bg-zinc-50/80 ${
-                      idx % 2 === 1 ? 'bg-zinc-50/30' : 'bg-white'
-                    }`}
-                  >
-                    <!-- No -->
-                    <td class="p-3 text-center text-[11px] text-zinc-400">
-                      {idx + 1}
-                    </td>
-
-                    <!-- Nama Bahan Baku -->
-                    <td class="px-4 py-3 font-sans font-semibold text-zinc-900">
-                      {mat.name}
-                    </td>
-
-                    <!-- Kategori -->
-                    <td class="px-4 py-3 font-sans">
-                      <span
-                        class="inline-block rounded-md border border-zinc-200/60 bg-zinc-100 px-2.5 py-0.5 text-[11px] font-medium text-zinc-700"
-                      >
-                        {mat.category_name || 'Umum'}
-                      </span>
-                    </td>
-
-                    <!-- Stok Kemarin -->
-                    <td class="bg-zinc-50/50 px-4 py-3 text-right text-zinc-600">
-                      {mat.stock_previous_day ?? mat.current_stock}
-                    </td>
-
-                    <!-- Stok Sekarang -->
-                    <td class="px-4 py-3 text-right text-xs font-bold text-zinc-900">
-                      {mat.current_stock}
-                    </td>
-
-                    <!-- Stok Terpakai -->
-                    <td class="bg-red-50/30 px-4 py-3 text-right font-bold text-red-700">
-                      {mat.stock_used_today ??
-                        Math.max(
-                          0,
-                          (mat.stock_previous_day ?? mat.current_stock) - mat.current_stock
-                        )}
-                    </td>
-
-                    <!-- Satuan -->
-                    <td class="p-3 text-center text-[11px] text-zinc-600">
-                      {mat.unit}
-                    </td>
-
-                    <!-- Aksi: Sesuaikan Stok -->
-                    <td class="px-4 py-3 text-center font-sans">
-                      <button
-                        type="button"
-                        onclick={() => handleOpenAdjustModal(mat)}
-                        class="mx-auto flex cursor-pointer items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-[11px] font-semibold text-white shadow-2xs transition-all hover:bg-black active:scale-95"
-                      >
-                        <SlidersHorizontal class="size-3" />
-                        <span>Sesuaikan Stok</span>
-                      </button>
+              </thead>
+              <tbody class="divide-y divide-zinc-200/70 font-mono">
+                {#if filteredMaterials.length === 0}
+                  <tr>
+                    <td colspan="8" class="py-16 text-center font-sans text-zinc-400">
+                      <p class="text-sm font-semibold text-zinc-800">Tidak ada data bahan baku</p>
+                      <p class="mt-0.5 text-xs text-zinc-500">
+                        Ubah kata kunci pencarian atau tambah bahan baku baru.
+                      </p>
                     </td>
                   </tr>
-                {/each}
-              {/if}
-            </tbody>
-          </table>
+                {:else}
+                  {#each filteredMaterials as mat, idx (mat.id)}
+                    <tr
+                      class={`divide-x divide-zinc-200/60 transition-colors hover:bg-zinc-50/80 ${
+                        idx % 2 === 1 ? 'bg-zinc-50/30' : 'bg-white'
+                      }`}
+                    >
+                      <!-- No -->
+                      <td class="p-3 text-center text-[11px] text-zinc-400">
+                        {idx + 1}
+                      </td>
+
+                      <!-- Nama Bahan Baku -->
+                      <td class="px-4 py-3 font-sans font-semibold text-zinc-900">
+                        {mat.name}
+                      </td>
+
+                      <!-- Kategori -->
+                      <td class="px-4 py-3 font-sans">
+                        <span
+                          class="inline-block rounded-md border border-zinc-200/60 bg-zinc-100 px-2.5 py-0.5 text-[11px] font-medium text-zinc-700"
+                        >
+                          {mat.category_name || 'Umum'}
+                        </span>
+                      </td>
+
+                      <!-- Stok Kemarin -->
+                      <td class="bg-zinc-50/50 px-4 py-3 text-right text-zinc-600">
+                        {mat.stock_previous_day ?? mat.current_stock}
+                      </td>
+
+                      <!-- Stok Sekarang -->
+                      <td class="px-4 py-3 text-right text-xs font-bold text-zinc-900">
+                        {mat.current_stock}
+                      </td>
+
+                      <!-- Stok Terpakai -->
+                      <td class="bg-red-50/30 px-4 py-3 text-right font-bold text-red-700">
+                        {mat.stock_used_today ??
+                          Math.max(
+                            0,
+                            (mat.stock_previous_day ?? mat.current_stock) - mat.current_stock
+                          )}
+                      </td>
+
+                      <!-- Satuan -->
+                      <td class="p-3 text-center text-[11px] text-zinc-600">
+                        {mat.unit}
+                      </td>
+
+                      <!-- Aksi: Sesuaikan Stok -->
+                      <td class="px-4 py-3 text-center font-sans">
+                        <button
+                          type="button"
+                          onclick={() => handleOpenAdjustModal(mat)}
+                          class="mx-auto flex cursor-pointer items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-[11px] font-semibold text-white shadow-2xs transition-all hover:bg-black active:scale-95"
+                        >
+                          <SlidersHorizontal class="size-3" />
+                          <span>Sesuaikan Stok</span>
+                        </button>
+                      </td>
+                    </tr>
+                  {/each}
+                {/if}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Summary Footer -->
+          <div
+            class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-2.5 font-mono text-xs text-zinc-600"
+          >
+            <div>
+              Data inventori tanggal: <strong class="text-zinc-900">{selectedDate}</strong>
+            </div>
+            <div>
+              Total Terdaftar: <strong class="text-zinc-900">{filteredMaterials.length}</strong> Bahan Baku
+            </div>
+          </div>
+        </div>
+      {:else}
+        <!-- Waste Summary KPI Cards -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="rounded-2xl border border-rose-200/80 bg-rose-50/50 p-4 shadow-2xs">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-rose-800">Total Estimasi Kerugian</span>
+              <div class="rounded-lg bg-rose-500/15 p-1.5 text-rose-600">
+                <Flame class="size-4" />
+              </div>
+            </div>
+            <div class="mt-2 text-2xl font-black tracking-tight text-rose-900">
+              {formatRupiah(totalLossAmount)}
+            </div>
+            <p class="mt-1 text-[11px] text-rose-700/80">Total kerugian operasional bahan baku</p>
+          </div>
+
+          <div class="rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xs">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-zinc-600">Total Insiden Waste</span>
+              <div class="rounded-lg bg-zinc-100 p-1.5 text-zinc-600">
+                <AlertCircle class="size-4" />
+              </div>
+            </div>
+            <div class="mt-2 text-2xl font-black tracking-tight text-zinc-900">
+              {filteredWastes.length} <span class="text-sm font-semibold text-zinc-500">Insiden</span>
+            </div>
+            <p class="mt-1 text-[11px] text-zinc-400">Tercatat di sistem kasir & portal</p>
+          </div>
         </div>
 
-        <!-- Summary Footer -->
+        <!-- Waste Filter Toolbar -->
         <div
-          class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-2.5 font-mono text-xs text-zinc-600"
+          class="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-zinc-200 bg-white p-3 shadow-2xs sm:flex-row sm:items-center"
         >
-          <div>
-            Data inventori tanggal: <strong class="text-zinc-900">{selectedDate}</strong>
-          </div>
-          <div>
-            Total Terdaftar: <strong class="text-zinc-900">{filteredMaterials.length}</strong> Bahan Baku
+          <div class="flex flex-1 items-center gap-2">
+            <div class="relative max-w-md flex-1">
+              <Search class="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-zinc-400" />
+              <input
+                type="text"
+                bind:value={searchQuery}
+                placeholder="Cari item terbuang, catatan kronologi..."
+                class="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2 pr-4 pl-9 text-xs text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:outline-hidden"
+              />
+              {#if searchQuery}
+                <button
+                  type="button"
+                  onclick={() => (searchQuery = '')}
+                  class="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer font-mono text-xs text-zinc-400 hover:text-zinc-700"
+                >
+                  ✕
+                </button>
+              {/if}
+            </div>
+
+            <!-- Reason Filter -->
+            <select
+              bind:value={selectedWasteReason}
+              class="h-9 cursor-pointer rounded-lg border border-zinc-200 bg-zinc-50 px-3 text-xs font-semibold text-zinc-700 focus:border-zinc-900 focus:bg-white focus:outline-hidden"
+            >
+              <option value="ALL">Semua Alasan Waste ({wastes.length})</option>
+              <option value="SPOILED">Basi / Rusak Kulkas</option>
+              <option value="EXPIRED">Kedaluwarsa (Expired)</option>
+              <option value="ACCIDENT_SPILL">Tumpah / Pecah</option>
+              <option value="BARISTA_MISTAKE">Salah Buat / Racik</option>
+              <option value="QC_REJECT">Reject QC / Mutu</option>
+              <option value="OTHER">Lainnya</option>
+            </select>
           </div>
         </div>
-      </div>
+
+        <!-- Waste Records Table -->
+        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-2xs">
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left text-xs">
+              <thead
+                class="border-b border-zinc-200 bg-zinc-100/90 font-mono text-[11px] font-bold tracking-wider text-zinc-600 uppercase"
+              >
+                <tr class="divide-x divide-zinc-200/80">
+                  <th class="w-12 p-3 text-center">No.</th>
+                  <th class="w-36 px-4 py-3">Tanggal / Waktu</th>
+                  <th class="px-4 py-3">Nama Bahan / Menu Terbuang</th>
+                  <th class="w-36 px-4 py-3 text-center">Alasan</th>
+                  <th class="w-28 px-4 py-3 text-right">Jumlah</th>
+                  <th class="w-32 px-4 py-3 text-right">Modal / Unit</th>
+                  <th class="w-36 bg-rose-50/50 px-4 py-3 text-right font-bold text-rose-900">Total Kerugian</th>
+                  <th class="w-48 px-4 py-3">Pelapor / Catatan</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-zinc-200/70 font-mono">
+                {#if filteredWastes.length === 0}
+                  <tr>
+                    <td colspan="8" class="py-16 text-center font-sans text-zinc-400">
+                      <p class="text-sm font-semibold text-zinc-800">Tidak ada catatan stock waste</p>
+                      <p class="mt-0.5 text-xs text-zinc-500">
+                        Belum ada insiden bahan baku rusak atau terbuang yang dicatat.
+                      </p>
+                    </td>
+                  </tr>
+                {:else}
+                  {#each filteredWastes as w, idx (w.id)}
+                    {@const badge = getReasonBadge(w.reason)}
+                    <tr
+                      class={`divide-x divide-zinc-200/60 transition-colors hover:bg-zinc-50/80 ${
+                        idx % 2 === 1 ? 'bg-zinc-50/30' : 'bg-white'
+                      }`}
+                    >
+                      <td class="p-3 text-center text-[11px] text-zinc-400">{idx + 1}</td>
+                      <td class="px-4 py-3 text-[11px] text-zinc-500">
+                        {w.created_at ? new Date(w.created_at).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-'}
+                      </td>
+                      <td class="px-4 py-3 font-sans font-semibold text-zinc-900">
+                        {w.item_name}
+                      </td>
+                      <td class="px-4 py-3 text-center font-sans">
+                        <span class={`inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold ${badge.bg} ${badge.text}`}>
+                          {badge.label}
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-right font-bold text-zinc-800">
+                        {w.quantity} {w.unit}
+                      </td>
+                      <td class="px-4 py-3 text-right text-zinc-600">
+                        {formatRupiah(w.cost_per_unit)}
+                      </td>
+                      <td class="bg-rose-50/30 px-4 py-3 text-right font-black text-rose-700">
+                        {formatRupiah(w.total_loss_cost)}
+                      </td>
+                      <td class="px-4 py-3 font-sans text-xs">
+                        <div class="font-semibold text-zinc-800">{w.recorded_by_user?.name || 'Kasir'}</div>
+                        {#if w.notes}
+                          <p class="mt-0.5 line-clamp-1 text-[11px] text-zinc-500 italic">{w.notes}</p>
+                        {/if}
+                      </td>
+                    </tr>
+                  {/each}
+                {/if}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Waste Table Footer -->
+          <div
+            class="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-zinc-50 px-4 py-2.5 font-mono text-xs text-zinc-600"
+          >
+            <div>
+              Total Insiden Tercatat: <strong class="text-zinc-900">{filteredWastes.length}</strong>
+            </div>
+            <div>
+              Akumulasi Kerugian: <strong class="text-rose-700">{formatRupiah(totalLossAmount)}</strong>
+            </div>
+          </div>
+        </div>
+      {/if}
     </div>
   </div>
 </div>
@@ -824,3 +1097,17 @@
     </div>
   </div>
 {/if}
+
+<!-- Modal Catat Stock Waste -->
+<StockWasteModal
+  isOpen={isWasteModalOpen}
+  {products}
+  {cashiers}
+  {activeCashier}
+  onRecorded={(waste) => {
+    wastes = [waste, ...wastes];
+    onRecordWaste?.(waste);
+  }}
+  onClose={() => (isWasteModalOpen = false)}
+/>
+

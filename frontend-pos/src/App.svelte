@@ -17,6 +17,7 @@
     CloseSessionResponse,
     OpenBill,
     PosPage,
+    StockWaste,
   } from './lib/types/pos';
   import PosSidebar from './lib/components/pos/PosSidebar.svelte';
   import PenjualanView from './lib/components/pos/pages/PenjualanView.svelte';
@@ -44,6 +45,7 @@
   let cashiers = $state<CashierUser[]>([]);
   let allOrders = $state<OfflineOrder[]>([]);
   let closedSessions = $state<PosSession[]>([]);
+  let stockWastes = $state<StockWaste[]>([]);
 
   // state staf / shift operator bersama
   let activeCashier = $state<CashierUser>({
@@ -172,8 +174,14 @@
       }
       // sinkronkan katalog terbaru ke IndexedDB secara background
       await posService.syncCatalogToLocalDb();
+      // sinkronkan add-on dan modifier ke IndexedDB
+      await posService.syncAddonsToLocalDb();
       // sinkronkan riwayat transaksi server ke IndexedDB
       await posService.syncRecentOrdersToLocalDb();
+      // sinkronkan pengeluaran belanja outlet ke IndexedDB
+      await posService.syncPurchasesToLocalDb();
+      // sinkronkan riwayat stock waste ke IndexedDB
+      await posService.syncStockWastesToLocalDb();
       await loadDbData();
     } catch {
       // Jika request server gagal (offline), jangan lempar modal pairing jika snapshot lokal ada
@@ -192,6 +200,7 @@
         activeCashier = cashiers[0];
       }
       allOrders = await db.orders.reverse().toArray();
+      stockWastes = await posService.getStockWastes();
 
       const openSess = await db.sessions.where('status').equals('OPEN').first();
       activeSession = openSess || null;
@@ -499,7 +508,15 @@
           onUpdateCategories={handleUpdateCategories}
         />
       {:else if activePage === 'inventori'}
-        <InventoriView />
+        <InventoriView
+          {products}
+          {cashiers}
+          {activeCashier}
+          {stockWastes}
+          onRecordWaste={(w) => {
+            stockWastes = [w, ...stockWastes];
+          }}
+        />
       {:else if activePage === 'profil'}
         <ProfilView
           {activeCashier}

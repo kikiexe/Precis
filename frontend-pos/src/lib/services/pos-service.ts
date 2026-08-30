@@ -10,6 +10,9 @@ import type {
   CloseSessionResponse,
   MasterUnlockResult,
   OfflineOrder,
+  AddonCategory,
+  OutletPurchase,
+  StockWaste,
 } from '../types/pos';
 
 export class PosService {
@@ -168,6 +171,171 @@ export class PosService {
   public async pairDevice(deviceToken: string): Promise<PosTerminalInfo> {
     posApiClient.setDeviceToken(deviceToken);
     return await this.getTerminalInfo();
+  }
+
+  public async syncAddonsToLocalDb(): Promise<{ addonCategoriesCount: number }> {
+    try {
+      const response = await posApiClient.get<AddonCategory[]>('/pos/addons');
+      if (response.data && Array.isArray(response.data)) {
+        await db.addonCategories.bulkPut(response.data);
+        return { addonCategoriesCount: response.data.length };
+      }
+    } catch (err: unknown) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        return { addonCategoriesCount: 0 };
+      }
+      console.warn('[POS Sync] Gagal menyinkronkan data modifier/addon ke IndexedDB:', err);
+    }
+    return { addonCategoriesCount: 0 };
+  }
+
+  public async syncPurchasesToLocalDb(): Promise<{ purchasesCount: number }> {
+    try {
+      const response = await posApiClient.get<OutletPurchase[]>('/pos/purchases');
+      if (response.data && Array.isArray(response.data)) {
+        await db.purchases.bulkPut(response.data);
+        return { purchasesCount: response.data.length };
+      }
+    } catch (err: unknown) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        return { purchasesCount: 0 };
+      }
+      console.warn('[POS Sync] Gagal menyinkronkan data belanja ke IndexedDB:', err);
+    }
+    return { purchasesCount: 0 };
+  }
+
+  public async getOutletPurchases(sessionId?: string): Promise<OutletPurchase[]> {
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+      try {
+        const url = sessionId ? `/pos/purchases?pos_session_id=${sessionId}` : '/pos/purchases';
+        const response = await posApiClient.get<OutletPurchase[]>(url);
+        if (response.data && Array.isArray(response.data)) {
+          await db.purchases.bulkPut(response.data);
+          return response.data;
+        }
+      } catch {
+        // fallback ke IndexedDB lokal
+      }
+    }
+
+    if (sessionId) {
+      return await db.purchases.where('pos_session_id').equals(sessionId).reverse().toArray();
+    }
+    return await db.purchases.reverse().toArray();
+  }
+
+  public async createOutletPurchase(data: {
+    item_name: string;
+    unit: string;
+    quantity: number;
+    unit_price: number;
+    total_price: number;
+    category: string;
+    funding_source: string;
+    pos_session_id?: string | null;
+    cashier_user_id?: string;
+    pin?: string;
+    notes?: string;
+  }): Promise<OutletPurchase> {
+    const response = await posApiClient.post<OutletPurchase>('/pos/purchases', data);
+    if (response.data) {
+      await db.purchases.put(response.data);
+      return response.data;
+    }
+    throw new Error(response.message || 'Gagal mencatat belanja outlet.');
+  }
+
+  public async syncStockWastesToLocalDb(): Promise<{ count: number }> {
+    try {
+      const response = await posApiClient.get<StockWaste[]>('/pos/inventory/waste');
+      if (response.data && Array.isArray(response.data)) {
+        await db.stockWastes.bulkPut(response.data);
+        return { count: response.data.length };
+      }
+    } catch (err: unknown) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        return { count: 0 };
+      }
+      console.warn('[POS Sync] Gagal menyinkronkan data stock waste ke IndexedDB:', err);
+    }
+    return { count: 0 };
+  }
+
+  public async getStockWastes(): Promise<StockWaste[]> {
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+      try {
+        const response = await posApiClient.get<StockWaste[]>('/pos/inventory/waste');
+        if (response.data && Array.isArray(response.data)) {
+          await db.stockWastes.bulkPut(response.data);
+          return response.data;
+        }
+      } catch {
+        // fallback ke IndexedDB lokal
+      }
+    }
+    return await db.stockWastes.reverse().toArray();
+  }
+
+  public async createStockWaste(data: {
+    item_name: string;
+    quantity: number;
+    unit: string;
+    cost_per_unit: number;
+    total_loss_cost?: number;
+    reason: string;
+    product_id?: string | null;
+    photo_url?: string;
+    notes?: string;
+    cashier_user_id?: string;
+    pin?: string;
+  }): Promise<StockWaste> {
+    const response = await posApiClient.post<StockWaste>('/pos/inventory/waste', data);
+    if (response.data) {
+      await db.stockWastes.put(response.data);
+      return response.data;
+    }
+    throw new Error(response.message || 'Gagal mencatat stock waste.');
+  }
+
+  public async voidOrder(
+    orderId: string,
+    reason: string,
+    pin?: string,
+    approvedByUserId?: string
+  ): Promise<OfflineOrder> {
+    const payload = {
+      reason,
+      pin: pin || undefined,
+      approved_by_user_id: approvedByUserId || undefined,
+    };
+    const response = await posApiClient.post<OfflineOrder>(`/pos/orders/${orderId}/void`, payload);
+    if (response.data) {
+      await db.orders.put(response.data);
+      return response.data;
+    }
+    throw new Error(response.message || 'Gagal membatalkan transaksi pesanan.');
+  }
+
+  public async refundOrder(
+    orderId: string,
+    reason: string,
+    refundAmount?: number,
+    pin?: string,
+    approvedByUserId?: string
+  ): Promise<OfflineOrder> {
+    const payload = {
+      reason,
+      refund_amount: refundAmount || undefined,
+      pin: pin || undefined,
+      approved_by_user_id: approvedByUserId || undefined,
+    };
+    const response = await posApiClient.post<OfflineOrder>(`/pos/orders/${orderId}/refund`, payload);
+    if (response.data) {
+      await db.orders.put(response.data);
+      return response.data;
+    }
+    throw new Error(response.message || 'Gagal merefund dana transaksi pesanan.');
   }
 }
 
