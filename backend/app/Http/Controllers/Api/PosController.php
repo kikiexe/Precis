@@ -263,4 +263,79 @@ class PosController
             'data' => $orders,
         ], Response::HTTP_OK);
     }
+
+    /**
+     * ambil riwayat catatan belanja outlet pada cabang ini
+     */
+    public function purchases(Request $request): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        $branchId = (string) $request->attributes->get('current_branch_id');
+        $sessionId = $request->query('pos_session_id');
+
+        $purchases = $this->posService->getOutletPurchases(
+            workspaceId: $workspaceId,
+            branchId: $branchId,
+            posSessionId: $sessionId ? (string) $sessionId : null,
+        );
+
+        return new JsonResponse([
+            'message' => 'Riwayat pengeluaran belanja outlet berhasil dimuat.',
+            'data' => $purchases,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * catat pengeluaran belanja operasional / kas laci dari perangkat POS
+     */
+    public function storePurchase(\App\Http\Requests\Pos\CreateOutletPurchaseRequest $request): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        $branchId = (string) $request->attributes->get('current_branch_id');
+
+        // temukan kasir penanggung jawab
+        $cashierUserId = $request->validated('cashier_user_id');
+        if (! $cashierUserId) {
+            $firstMember = \App\Models\WorkspaceMember::where('workspace_id', $workspaceId)->first();
+            $cashierUserId = $firstMember?->user_id;
+        }
+
+        $pin = $request->validated('pin');
+        if ($cashierUserId && $pin) {
+            $member = \App\Models\WorkspaceMember::where('workspace_id', $workspaceId)
+                ->where('user_id', $cashierUserId)
+                ->first();
+
+            if (! $member || empty($member->pin) || ! \Illuminate\Support\Facades\Hash::check((string) $pin, (string) $member->pin)) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'pin' => ['PIN kasir tidak valid untuk otorisasi pengeluaran kas.'],
+                ]);
+            }
+        }
+
+        // jika pos_session_id tidak diberikan, coba cari sesi aktif yang sedang buka di cabang ini
+        $posSessionId = $request->validated('pos_session_id');
+        if (! $posSessionId) {
+            $activeSession = \App\Models\PosSession::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->where('status', 'OPEN')
+                ->latest('opened_at')
+                ->first();
+            $posSessionId = $activeSession?->id;
+        }
+
+        $purchase = $this->posService->createOutletPurchase(
+            workspaceId: $workspaceId,
+            branchId: $branchId,
+            posSessionId: $posSessionId,
+            recordedByUserId: (string) $cashierUserId,
+            data: $request->validated(),
+        );
+
+        return new JsonResponse([
+            'message' => 'Pengeluaran belanja outlet berhasil dicatat.',
+            'data' => $purchase->load(['recordedByUser:id,name', 'branch:id,name']),
+        ], Response::HTTP_CREATED);
+    }
 }

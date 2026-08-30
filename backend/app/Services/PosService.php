@@ -9,6 +9,7 @@ use App\Models\AddonCategory;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OutletPurchase;
 use App\Models\PosSession;
 use App\Models\Product;
 use App\Models\WorkspaceMember;
@@ -220,6 +221,14 @@ class PosService
             ->where('payment_status', 'PAID')
             ->sum('final_amount');
 
+        // kalkulasi total pengeluaran belanja kas laci (petty cash) selama sesi ini
+        $cashPurchases = (float) OutletPurchase::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->where('branch_id', $branchId)
+            ->where('pos_session_id', $session->id)
+            ->where('funding_source', 'CASH_DRAWER')
+            ->sum('total_price');
+
         // kalkulasi total pengembalian kas tunai selama sesi ini
         $cashRefunds = (float) Order::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
@@ -229,7 +238,7 @@ class PosService
             ->sum('refund_amount');
 
         $openingCash = (float) $session->opening_cash;
-        $closingCashExpected = $openingCash + $cashSales - $cashRefunds;
+        $closingCashExpected = $openingCash + $cashSales - $cashPurchases - $cashRefunds;
         $discrepancyAmount = $closingCashActual - $closingCashExpected;
 
         $session->update([
@@ -655,5 +664,63 @@ class PosService
                 'order_ids' => $syncedIds,
             ];
         });
+    }
+
+    /**
+     * catat belanja operasional outlet / petty cash kasir
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public function createOutletPurchase(
+        string $workspaceId,
+        string $branchId,
+        ?string $posSessionId,
+        string $recordedByUserId,
+        array $data
+    ): OutletPurchase {
+        $quantity = (float) ($data['quantity'] ?? 1);
+        $unitPrice = (float) ($data['unit_price'] ?? 0);
+        $totalPrice = (float) ($data['total_price'] ?? ($quantity * $unitPrice));
+
+        return OutletPurchase::create([
+            'workspace_id' => $workspaceId,
+            'branch_id' => $branchId,
+            'pos_session_id' => $posSessionId,
+            'item_name' => (string) $data['item_name'],
+            'unit' => (string) ($data['unit'] ?? 'Pcs'),
+            'quantity' => $quantity,
+            'unit_price' => $unitPrice,
+            'total_price' => $totalPrice,
+            'category' => (string) ($data['category'] ?? 'OPERASIONAL_TOKO'),
+            'funding_source' => (string) ($data['funding_source'] ?? 'CASH_DRAWER'),
+            'receipt_photo_url' => $data['receipt_photo_url'] ?? null,
+            'notes' => $data['notes'] ?? null,
+            'recorded_by_user_id' => $recordedByUserId,
+        ]);
+    }
+
+    /**
+     * ambil daftar riwayat belanja operasional outlet
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, OutletPurchase>
+     */
+    public function getOutletPurchases(
+        string $workspaceId,
+        ?string $branchId = null,
+        ?string $posSessionId = null
+    ): \Illuminate\Database\Eloquent\Collection {
+        $query = OutletPurchase::withoutGlobalScopes()
+            ->with(['recordedByUser:id,name', 'branch:id,name', 'session:id,opened_at,closed_at'])
+            ->where('workspace_id', $workspaceId);
+
+        if ($branchId) {
+            $query->where('branch_id', $branchId);
+        }
+
+        if ($posSessionId) {
+            $query->where('pos_session_id', $posSessionId);
+        }
+
+        return $query->latest('created_at')->limit(100)->get();
     }
 }

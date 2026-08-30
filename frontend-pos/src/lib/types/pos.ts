@@ -8,18 +8,6 @@ export interface PosTerminalInfo {
   cashiers?: CashierUser[];
 }
 
-export interface Product {
-  id: string;
-  category_id: string;
-  name: string;
-  base_price: number;
-  image_url?: string;
-  description?: string;
-  is_active: boolean;
-  stock?: number;
-  addon_category_ids?: string[];
-}
-
 export interface Addon {
   id: string;
   addon_category_id: string;
@@ -44,6 +32,19 @@ export interface SelectedModifier {
   addon_category_id?: string;
   name: string;
   price: number;
+}
+
+export interface Product {
+  id: string;
+  category_id: string;
+  name: string;
+  base_price: number;
+  image_url?: string;
+  description?: string;
+  is_active: boolean;
+  stock?: number;
+  addon_category_ids?: string[];
+  addon_categories?: AddonCategory[];
 }
 
 export interface Category {
@@ -228,5 +229,36 @@ export interface StockAdjustmentLog {
   reason: StockAdjustmentReason;
   notes?: string;
   adjusted_by: string;
+  created_at: string;
+}
+
+export type PurchaseCategory =
+  | 'BAHAN_BAKU_DARURAT'
+  | 'OPERASIONAL_TOKO'
+  | 'KEBERSIHAN'
+  | 'UTILITAS'
+  | 'LAINNYA';
+
+export type FundingSource = 'CASH_DRAWER' | 'EXTERNAL_REIMBURSE';
+
+export interface OutletPurchase {
+  id: string;
+  workspace_id: string;
+  branch_id: string;
+  pos_session_id?: string | null;
+  item_name: string;
+  unit: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  category: PurchaseCategory;
+  funding_source: FundingSource;
+  receipt_photo_url?: string | null;
+  notes?: string | null;
+  recorded_by_user_id: string;
+  recorded_by_user?: {
+    id: string;
+    name: string;
+  };
   created_at: string;
 }

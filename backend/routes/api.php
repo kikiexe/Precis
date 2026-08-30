@@ -162,6 +162,12 @@ Route::prefix('v1')->group(function (): void {
             Route::delete('/addons/{id}', [\App\Http\Controllers\Api\AddonController::class, 'destroyAddon']);
         });
 
+        // belanja operasional outlet & kas keluar (petty cash)
+        Route::get('/outlet-purchases', [\App\Http\Controllers\Api\OutletPurchaseController::class, 'index']);
+        Route::get('/outlet-purchases/{id}', [\App\Http\Controllers\Api\OutletPurchaseController::class, 'show']);
+        Route::post('/outlet-purchases', [\App\Http\Controllers\Api\OutletPurchaseController::class, 'store']);
+        Route::delete('/outlet-purchases/{id}', [\App\Http\Controllers\Api\OutletPurchaseController::class, 'destroy']);
+
         // presensi mobile PWA
         Route::prefix('attendances')->group(function (): void {
             Route::post('/clock-in', [AttendanceController::class, 'clockIn']);
@@ -293,5 +299,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/orders/sync-batch', [PosController::class, 'syncBatch']);
         Route::post('/orders/{id}/void', [PosController::class, 'voidOrder']);
         Route::post('/orders/{id}/refund', [PosController::class, 'refundOrder']);
+        Route::get('/purchases', [PosController::class, 'purchases']);
+        Route::post('/purchases', [PosController::class, 'storePurchase']);
     });
 });

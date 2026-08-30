@@ -19,6 +19,7 @@
     PosPage,
     AddonCategory,
     SelectedModifier,
+    OutletPurchase,
   } from './lib/types/pos';
   import PosSidebar from './lib/components/pos/PosSidebar.svelte';
   import PenjualanView from './lib/components/pos/pages/PenjualanView.svelte';
@@ -35,6 +36,7 @@
   import DevicePairingModal from './lib/components/pos/DevicePairingModal.svelte';
   import OpenBillsModal from './lib/components/pos/OpenBillsModal.svelte';
   import ModifierModal from './lib/components/pos/ModifierModal.svelte';
+  import OutletPurchaseModal from './lib/components/pos/OutletPurchaseModal.svelte';
 
   // state navigasi halaman
   let activePage = $state<PosPage>('penjualan');
@@ -45,14 +47,16 @@
   let categories = $state<Category[]>([]);
   let products = $state<Product[]>([]);
   let addonCategories = $state<AddonCategory[]>([]);
+  let purchases = $state<OutletPurchase[]>([]);
   let cashiers = $state<CashierUser[]>([]);
   let allOrders = $state<OfflineOrder[]>([]);
   let closedSessions = $state<PosSession[]>([]);
 
-  // state modal modifier / add-on
+  // state modal modifier / add-on & belanja
   let isModifierModalOpen = $state(false);
   let modifierProduct = $state<Product | null>(null);
   let editingCartItem = $state<CartItem | null>(null);
+  let isPurchaseModalOpen = $state(false);
 
   // state staf / shift operator bersama
   let activeCashier = $state<CashierUser>({
@@ -182,6 +186,7 @@
       // sinkronkan katalog terbaru ke IndexedDB secara background
       await posService.syncCatalogToLocalDb();
       await posService.syncAddonsToLocalDb();
+      await posService.syncPurchasesToLocalDb();
       // sinkronkan riwayat transaksi server ke IndexedDB
       await posService.syncRecentOrdersToLocalDb();
       await loadDbData();
@@ -198,6 +203,7 @@
       products = await db.products.toArray();
       categories = await db.categories.toArray();
       addonCategories = await db.addonCategories.toArray();
+      purchases = await db.purchases.reverse().toArray();
       cashiers = await db.cashiers.toArray();
       if (cashiers.length > 0 && (!activeCashier.id || activeCashier.id === 'team-outlet')) {
         activeCashier = cashiers[0];
@@ -230,8 +236,14 @@
     }
     await posService.syncCatalogToLocalDb();
     await posService.syncAddonsToLocalDb();
+    await posService.syncPurchasesToLocalDb();
     await posService.syncRecentOrdersToLocalDb();
     await loadDbData();
+  }
+
+  function handlePurchaseCreated(newPurchase: OutletPurchase) {
+    purchases = [newPurchase, ...purchases];
+    loadDbData();
   }
 
   // fungsi keranjang belanja
@@ -297,7 +309,6 @@
     editingCartItem = item;
     isModifierModalOpen = true;
   }
-
   function handleUpdateQuantity(productId: string, delta: number) {
     const index = cartItems.findIndex((i) => i.product.id === productId);
     if (index > -1) {
@@ -546,7 +557,9 @@
         <ShiftView
           {activeSession}
           {activeCashier}
+          {purchases}
           onOpenSessionModal={() => (isSessionModalOpen = true)}
+          onOpenPurchaseModal={() => (isPurchaseModalOpen = true)}
           onGoToSettlement={() => (activePage = 'settlement')}
         />
       {:else if activePage === 'settlement'}
@@ -618,6 +631,18 @@
   />
 {/if}
 
+<!-- modal belanja outlet petty cash -->
+{#if isPurchaseModalOpen}
+  <OutletPurchaseModal
+    isOpen={isPurchaseModalOpen}
+    {activeSession}
+    {activeCashier}
+    {cashiers}
+    onClose={() => (isPurchaseModalOpen = false)}
+    onPurchaseCreated={handlePurchaseCreated}
+  />
+{/if}
+
 <!-- modal struk cetak -->
 <ReceiptModal
   isOpen={isReceiptModalOpen}
@@ -632,6 +657,7 @@
   cashierUserId={activeCashier?.id}
   {cashiers}
   {activeCashier}
+  {purchases}
   onClose={() => (isSessionModalOpen = false)}
   onSessionOpened={handleSessionOpened}
   onSessionClosed={handleSessionClosed}
