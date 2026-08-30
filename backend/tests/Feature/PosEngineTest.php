@@ -89,6 +89,7 @@ class PosEngineTest extends TestCase
         $response = $this->withHeader('X-Device-Token', $this->deviceToken)
             ->postJson('/api/v1/pos/sessions/open', [
                 'cashier_user_id' => $cashier->id,
+                'pin' => '123456',
                 'opening_cash' => 200000,
                 'notes' => 'Sesi pagi kasir 1',
             ]);
@@ -116,6 +117,7 @@ class PosEngineTest extends TestCase
         $this->withHeader('X-Device-Token', $this->deviceToken)
             ->postJson('/api/v1/pos/sessions/open', [
                 'cashier_user_id' => $cashier->id,
+                'pin' => '123456',
                 'opening_cash' => 200000,
             ])->assertStatus(201);
 
@@ -123,6 +125,7 @@ class PosEngineTest extends TestCase
         $response = $this->withHeader('X-Device-Token', $this->deviceToken)
             ->postJson('/api/v1/pos/sessions/open', [
                 'cashier_user_id' => $cashier->id,
+                'pin' => '123456',
                 'opening_cash' => 150000,
             ]);
 
@@ -139,6 +142,7 @@ class PosEngineTest extends TestCase
         $openResponse = $this->withHeader('X-Device-Token', $this->deviceToken)
             ->postJson('/api/v1/pos/sessions/open', [
                 'cashier_user_id' => $cashier->id,
+                'pin' => '123456',
                 'opening_cash' => 200000,
             ]);
         $sessionId = $openResponse->json('data.id');

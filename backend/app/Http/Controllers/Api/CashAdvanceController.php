@@ -69,8 +69,20 @@ class CashAdvanceController
     public function adminList(Request $request): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var \App\Models\WorkspaceMember|null $actorMember */
+        $actorMember = $request->attributes->get('current_member');
         $status = $request->query('status');
         $branchId = $request->query('branch_id');
+
+        if ($actorMember && $actorMember->role !== 'OWNER' && $actorMember->branch_id !== null) {
+            if ($branchId && $branchId !== $actorMember->branch_id) {
+                return new JsonResponse([
+                    'message' => 'Daftar pengajuan kasbon berhasil dimuat.',
+                    'data' => [],
+                ], Response::HTTP_OK);
+            }
+            $branchId = $actorMember->branch_id;
+        }
 
         $list = $this->cashAdvanceService->getAdminCashAdvances(
             workspaceId: $workspaceId,

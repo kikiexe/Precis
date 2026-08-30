@@ -18,7 +18,16 @@ class InviteMemberRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email', 'max:255'],
             'job_title' => ['required', 'string', 'max:100'],
-            'role' => ['sometimes', 'string', 'max:50'],
+            'role' => [
+                'sometimes',
+                'string',
+                'max:50',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (strtoupper(trim((string) $value)) === 'OWNER') {
+                        $fail('Role OWNER tidak dapat ditetapkan secara manual. Kepemilikan workspace ditetapkan secara otomatis saat registrasi.');
+                    }
+                },
+            ],
             'role_id' => ['nullable', 'string', 'uuid'],
             'base_salary' => ['required', 'numeric', 'min:0'],
             'branch_id' => ['nullable', 'string', 'uuid'],

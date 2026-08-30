@@ -102,7 +102,7 @@ class CashAdvanceService
     }
 
     /**
-     * setujui permohonan pencairan kasbon oleh Admin/Owner
+     * setujui permohonan pencairan kasbon oleh ADMIN dan OWNER
      */
     public function approveCashAdvance(User $approver, string $workspaceId, string $cashAdvanceId): CashAdvance
     {
@@ -119,6 +119,24 @@ class CashAdvanceService
             ]);
         }
 
+        /** @var WorkspaceMember|null $approverMember */
+        $approverMember = WorkspaceMember::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->where('user_id', $approver->id)
+            ->first();
+
+        if ($approverMember && $approverMember->role !== 'OWNER' && $approverMember->branch_id !== null) {
+            /** @var WorkspaceMember|null $applicantMember */
+            $applicantMember = WorkspaceMember::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('user_id', $advance->user_id)
+                ->first();
+
+            if (! $applicantMember || $applicantMember->branch_id !== $approverMember->branch_id) {
+                abort(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, 'Akses ditolak. Anda hanya berwenang memproses kasbon staf di cabang Anda.');
+            }
+        }
+
         $advance->update([
             'status' => 'APPROVED',
             'approved_by_user_id' => $approver->id,
@@ -128,7 +146,7 @@ class CashAdvanceService
     }
 
     /**
-     * tolak permohonan kasbon oleh Admin/Owner
+     * tolak permohonan kasbon oleh ADMIN dan OWNER
      */
     public function rejectCashAdvance(User $approver, string $workspaceId, string $cashAdvanceId): CashAdvance
     {
@@ -143,6 +161,24 @@ class CashAdvanceService
             throw ValidationException::withMessages([
                 'cash_advance_id' => ['Permohonan kasbon tidak ditemukan atau sudah diproses.'],
             ]);
+        }
+
+        /** @var WorkspaceMember|null $approverMember */
+        $approverMember = WorkspaceMember::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->where('user_id', $approver->id)
+            ->first();
+
+        if ($approverMember && $approverMember->role !== 'OWNER' && $approverMember->branch_id !== null) {
+            /** @var WorkspaceMember|null $applicantMember */
+            $applicantMember = WorkspaceMember::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('user_id', $advance->user_id)
+                ->first();
+
+            if (! $applicantMember || $applicantMember->branch_id !== $approverMember->branch_id) {
+                abort(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, 'Akses ditolak. Anda hanya berwenang memproses kasbon staf di cabang Anda.');
+            }
         }
 
         $advance->update([

@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsurePermission
 {
     /**
-     * Memvalidasi bahwa member saat ini memiliki salah satu hak akses (permission) yang diwajibkan.
+     * memvalidasi bahwa member saat ini memiliki salah satu hak akses (permission) yang diwajibkan
      *
      * @param string ...$permissions daftar permission yang salah satunya harus dimiliki
      */
@@ -28,12 +28,12 @@ class EnsurePermission
             ], Response::HTTP_FORBIDDEN);
         }
 
-        // Owner selalu memiliki bypass penuh ke seluruh endpoint
+        // owner selalu memiliki bypass penuh ke seluruh endpoint
         if ($member->role === 'OWNER') {
             return $next($request);
         }
 
-        // Cek apakah member memiliki setidaknya salah satu permission yang diminta
+        // cek apakah member memiliki setidaknya salah satu permission yang diminta
         foreach ($permissions as $perm) {
             if ($member->hasPermission($perm)) {
                 return $next($request);

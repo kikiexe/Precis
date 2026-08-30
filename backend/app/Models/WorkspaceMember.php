@@ -70,19 +70,19 @@ class WorkspaceMember extends Model
     }
 
     /**
-     * Memeriksa apakah member memiliki izin akses (permission) tertentu.
-     * Owner selalu memiliki bypass izin penuh (wildcard).
+     * periksa apakah member memiliki izin akses (permission) tertentu
+     * owner selalu memiliki bypass izin penuh (wildcard)
      *
      * @param string|array<int, string> $permission
      */
     public function hasPermission(string|array $permission): bool
     {
-        // 1. Owner selalu memiliki hak akses penuh ke seluruh modul
+        // 1. owner selalu memiliki hak akses penuh ke seluruh modul
         if ($this->role === 'OWNER') {
             return true;
         }
 
-        // 2. Jika role kustom terhubung, periksa permission mapping
+        // 2. jika role kustom terhubung, periksa mapping permission
         $customRole = null;
         if ($this->relationLoaded('customRole')) {
             $customRole = $this->customRole;
@@ -99,9 +99,35 @@ class WorkspaceMember extends Model
             }
         }
 
-        // 3. Fallback compatibility untuk legacy static role (ADMIN / MANAGER / STAFF)
+        // 3. kompatibilitas fallback untuk static role bawaan (ADMIN / MANAGER / STAFF)
         if ($this->role === 'ADMIN') {
-            return true;
+            $adminDefaultAllowed = [
+                'catalog.view',
+                'catalog.manage',
+                'inventory.view',
+                'inventory.adjust',
+                'attendance.view_all',
+                'attendance.exempt_penalty',
+                'shifts.manage',
+                'shifts.approve_swap',
+                'sales.view_analytics',
+                'reports.export',
+                'cash_advance.approve',
+                'members.view',
+                'members.manage',
+                'pos.manage_terminals',
+                'pos.reprint_receipt',
+                'pos.void_order',
+                'pos.apply_discount',
+            ];
+            $perms = (array) $permission;
+            foreach ($perms as $p) {
+                if (in_array($p, $adminDefaultAllowed, true)) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         if ($this->role === 'MANAGER') {

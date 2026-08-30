@@ -87,7 +87,7 @@ class ShiftService
         string $date
     ): ShiftAssignment {
         /** @var ShiftTemplate|null $template */
-        $template = ShiftTemplate::where('workspace_id', $workspaceId)->where('id', $shiftTemplateId)->first();
+        $template = ShiftTemplate::withoutGlobalScopes()->where('workspace_id', $workspaceId)->where('id', $shiftTemplateId)->first();
         if (! $template) {
             throw ValidationException::withMessages([
                 'shift_template_id' => ['Template shift tidak ditemukan.'],
@@ -112,6 +112,21 @@ class ShiftService
 
         $realUserId = (string) $member->user_id;
         $formattedDate = Carbon::parse($date)->toDateString();
+
+        /** @var WorkspaceMember|null $creatorMember */
+        $creatorMember = WorkspaceMember::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->where('user_id', $creator->id)
+            ->first();
+
+        if ($creatorMember && $creatorMember->role !== 'OWNER' && $creatorMember->branch_id !== null) {
+            if ($template->branch_id !== null && $template->branch_id !== $creatorMember->branch_id) {
+                abort(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, 'Akses ditolak. Anda hanya berwenang mengelola shift pada cabang penugasan Anda.');
+            }
+            if ($member->branch_id !== null && $member->branch_id !== $creatorMember->branch_id) {
+                abort(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, 'Akses ditolak. Anda hanya berwenang mengelola shift staf pada cabang penugasan Anda.');
+            }
+        }
 
         // validasi anti-duplikasi: staf tidak boleh memiliki 2 shift di hari yang sama
         $existing = ShiftAssignment::withoutGlobalScopes()
@@ -144,11 +159,12 @@ class ShiftService
     }
 
     /**
-     * Hapus / batalkan penugasan shift (menjadikan hari libur / off)
+     * hapus atau batalkan penugasan shift (menjadikan hari libur / off)
      */
-    public function deleteAssignment(string $workspaceId, string $assignmentId): void
+    public function deleteAssignment(string $workspaceId, string $assignmentId, ?User $actor = null): void
     {
         $assignment = ShiftAssignment::withoutGlobalScopes()
+            ->with('template')
             ->where('workspace_id', $workspaceId)
             ->where('id', $assignmentId)
             ->first();
@@ -157,6 +173,20 @@ class ShiftService
             throw ValidationException::withMessages([
                 'shift_assignment_id' => ['Penugasan shift tidak ditemukan.'],
             ]);
+        }
+
+        if ($actor) {
+            /** @var WorkspaceMember|null $actorMember */
+            $actorMember = WorkspaceMember::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('user_id', $actor->id)
+                ->first();
+
+            if ($actorMember && $actorMember->role !== 'OWNER' && $actorMember->branch_id !== null) {
+                if ($assignment->template && $assignment->template->branch_id !== null && $assignment->template->branch_id !== $actorMember->branch_id) {
+                    abort(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, 'Akses ditolak. Anda hanya berwenang mengelola shift pada cabang penugasan Anda.');
+                }
+            }
         }
 
         $assignment->delete();
@@ -280,7 +310,7 @@ class ShiftService
     }
 
     /**
-     * setujui permohonan tukar shift oleh Admin/Owner dalam transaksi database
+     * setujui permohonan tukar shift oleh ADMIN dan OWNER dalam transaksi database
      */
     public function approveSwap(User $approver, string $workspaceId, string $shiftAssignmentId): ShiftAssignment
     {
@@ -300,6 +330,19 @@ class ShiftService
                 ]);
             }
 
+            /** @var WorkspaceMember|null $approverMember */
+            $approverMember = WorkspaceMember::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('user_id', $approver->id)
+                ->first();
+
+            if ($approverMember && $approverMember->role !== 'OWNER' && $approverMember->branch_id !== null) {
+                $assignment->loadMissing('template');
+                if ($assignment->template && $assignment->template->branch_id !== null && $assignment->template->branch_id !== $approverMember->branch_id) {
+                    abort(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, 'Akses ditolak. Anda hanya berwenang menyetujui tukar shift pada cabang penugasan Anda.');
+                }
+            }
+
             $assignment->update([
                 'swap_status' => 'APPROVED',
                 'swap_approved_by_user_id' => $approver->id,
@@ -310,7 +353,7 @@ class ShiftService
     }
 
     /**
-     * tolak permohonan tukar shift oleh Admin/Owner
+     * tolak permohonan tukar shift oleh ADMIN dan OWNER
      */
     public function rejectSwap(User $approver, string $workspaceId, string $shiftAssignmentId): ShiftAssignment
     {
@@ -328,6 +371,19 @@ class ShiftService
                 throw ValidationException::withMessages([
                     'shift_assignment_id' => ['Permohonan tukar shift tidak ditemukan atau sudah diproses.'],
                 ]);
+            }
+
+            /** @var WorkspaceMember|null $approverMember */
+            $approverMember = WorkspaceMember::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('user_id', $approver->id)
+                ->first();
+
+            if ($approverMember && $approverMember->role !== 'OWNER' && $approverMember->branch_id !== null) {
+                $assignment->loadMissing('template');
+                if ($assignment->template && $assignment->template->branch_id !== null && $assignment->template->branch_id !== $approverMember->branch_id) {
+                    abort(\Symfony\Component\HttpFoundation\Response::HTTP_FORBIDDEN, 'Akses ditolak. Anda hanya berwenang menolak tukar shift pada cabang penugasan Anda.');
+                }
             }
 
             $assignment->update([

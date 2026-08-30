@@ -13,15 +13,15 @@ use Illuminate\Validation\ValidationException;
 class RoleService
 {
     /**
-     * Membuat role default bawaan untuk workspace baru (opsional)
+     * buat role default bawaan untuk workspace baru (opsional)
      */
     public function createDefaultRolesForWorkspace(string $workspaceId): void
     {
-        // Workspaces start clean without forced auto-generated roles.
+        // workspace dimulai tanpa role otomatis
     }
 
     /**
-     * Mengambil katalog seluruh modul hak akses dan preset yang tersedia di sistem
+     * ambil katalog seluruh modul hak akses dan preset yang tersedia di sistem
      *
      * @return array{modules: array<string, mixed>, presets: array<string, mixed>}
      */
@@ -34,7 +34,7 @@ class RoleService
     }
 
     /**
-     * Mendapatkan daftar seluruh role dalam workspace beserta daftar permission dan jumlah anggota
+     * dapatkan daftar seluruh role dalam workspace beserta daftar permission dan jumlah anggota
      */
     public function listRoles(string $workspaceId): Collection
     {
@@ -48,7 +48,7 @@ class RoleService
     }
 
     /**
-     * Mengambil detail satu role
+     * ambil detail satu role
      */
     public function getRole(string $workspaceId, string $roleId): WorkspaceRole
     {
@@ -69,7 +69,7 @@ class RoleService
     }
 
     /**
-     * Membuat custom role baru dalam workspace
+     * buat custom role baru dalam workspace
      *
      * @param array{name: string, description?: string|null, permissions: array<int, string>} $data
      */
@@ -77,14 +77,14 @@ class RoleService
     {
         $name = trim($data['name']);
 
-        // Validasi nama tidak boleh sama dengan OWNER
+        // validasi nama tidak boleh sama dengan OWNER
         if (strtoupper($name) === 'OWNER') {
             throw ValidationException::withMessages([
                 'name' => ['Nama peran "OWNER" dilindungi sistem dan tidak dapat dibuat manual.'],
             ]);
         }
 
-        // Validasi keunikan nama peran di workspace ini
+        // validasi keunikan nama peran di workspace ini
         $exists = WorkspaceRole::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
             ->whereRaw('LOWER(name) = ?', [strtolower($name)])
@@ -119,7 +119,7 @@ class RoleService
     }
 
     /**
-     * Memperbarui peran dan checklist hak aksesnya
+     * perbarui peran dan checklist hak aksesnya
      *
      * @param array{name?: string, description?: string|null, permissions?: array<int, string>} $data
      */
@@ -135,7 +135,7 @@ class RoleService
                 ]);
             }
 
-            // Cek keunikan jika nama diubah
+            // cek keunikan jika nama diubah
             if (strtolower($role->name) !== strtolower($name)) {
                 $exists = WorkspaceRole::withoutGlobalScopes()
                     ->where('workspace_id', $workspaceId)
@@ -160,7 +160,7 @@ class RoleService
             $role->save();
 
             if (isset($data['permissions']) && is_array($data['permissions'])) {
-                // Hapus dan pasang ulang permission baru
+                // hapus dan pasang ulang permission baru
                 WorkspaceRolePermission::where('role_id', $role->id)->delete();
                 $permissions = array_unique($data['permissions']);
                 foreach ($permissions as $perm) {
@@ -178,7 +178,7 @@ class RoleService
     }
 
     /**
-     * Menghapus custom role
+     * hapus custom role
      */
     public function deleteRole(string $workspaceId, string $roleId): void
     {

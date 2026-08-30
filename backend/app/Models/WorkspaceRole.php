@@ -49,7 +49,7 @@ class WorkspaceRole extends Model
     }
 
     /**
-     * Mengecek apakah role memiliki permission tertentu
+     * cek apakah role memiliki permission tertentu
      */
     public function hasPermission(string $permission): bool
     {
@@ -57,7 +57,7 @@ class WorkspaceRole extends Model
     }
 
     /**
-     * Mendapatkan array slug permission
+     * dapatkan array slug permission
      *
      * @return array<int, string>
      */

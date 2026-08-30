@@ -57,14 +57,12 @@ class BranchSeeder extends Seeder
                 'terminal_name' => 'Norde POS Tab Seturan',
             ],
             [
-                'device_token' => 'pos-device-token-seturan-01',
                 'device_token_hash' => hash('sha256', 'pos-device-token-seturan-01'),
                 'is_active' => true,
                 'created_at' => $pilotCreationDate,
                 'updated_at' => $pilotCreationDate,
             ]
         );
-        $terminalSeturan->update(['device_token' => 'pos-device-token-seturan-01']);
 
         // 2. Cabang 2: Norde Coffee - Kaliurang (pada Workspace 2: Kaliurang)
         $targetWsKaliurang = ($workspaceKaliurang->id !== $workspaceSeturan->id) ? $workspaceKaliurang : $workspaceSeturan;
@@ -104,13 +102,11 @@ class BranchSeeder extends Seeder
                 'terminal_name' => 'Norde POS Tab Kaliurang',
             ],
             [
-                'device_token' => 'pos-device-token-kaliurang-01',
                 'device_token_hash' => hash('sha256', 'pos-device-token-kaliurang-01'),
                 'is_active' => true,
                 'created_at' => $pilotCreationDate,
                 'updated_at' => $pilotCreationDate,
             ]
         );
-        $terminalKaliurang->update(['device_token' => 'pos-device-token-kaliurang-01']);
     }
 }

@@ -13,8 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureSuperadmin
 {
     /**
-     * Handle an incoming request.
-     * Pastikan pengguna yang terautentikasi adalah instance Superadmin yang sah.
+     * pastikan pengguna yang terautentikasi adalah instance Superadmin yang sah
      */
     public function handle(Request $request, Closure $next): Response
     {

@@ -6,14 +6,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Branch;
 use App\Models\BranchSetting;
+use App\Models\PosTerminal;
+use App\Models\WorkspaceMember;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class BranchController
 {
     /**
-     * List all branches in the active workspace with their settings and terminals.
+     * ambil daftar seluruh cabang dalam workspace aktif beserta pengaturan dan terminal
      */
     public function index(Request $request): JsonResponse
     {
@@ -23,8 +26,9 @@ class BranchController
             ->where('workspace_id', $workspaceId)
             ->with(['setting', 'posTerminals'])
             ->get()
-            ->map(function (Branch $b) {
+            ->map(function (Branch $b): array {
                 $setting = $b->setting;
+
                 return [
                     'id' => $b->id,
                     'workspace_id' => $b->workspace_id,
@@ -37,11 +41,12 @@ class BranchController
                     'overtime_pay_per_hour' => $setting ? (float) $setting->overtime_pay_per_hour : 20000.0,
                     'min_overtime_threshold_minutes' => $setting ? (int) $setting->min_overtime_threshold_minutes : 30,
                     'terminals_count' => $b->posTerminals->count(),
-                    'terminals' => $b->posTerminals->map(function ($t) {
+                    'terminals' => $b->posTerminals->map(function (PosTerminal $t): array {
                         return [
                             'id' => $t->id,
                             'terminal_name' => $t->terminal_name,
-                            'device_token' => $t->device_token ?? 'pos-device-token-default',
+                            'device_token_preview' => 'pos_tok_' . substr($t->device_token_hash, 0, 6) . '***',
+                            'is_paired' => ! empty($t->device_token_hash),
                             'is_active' => (bool) $t->is_active,
                             'created_at' => $t->created_at?->toIso8601String(),
                         ];
@@ -57,11 +62,19 @@ class BranchController
     }
 
     /**
-     * Update branch details & geofence settings (Owner / Admin only).
+     * perbarui pengaturan cabang dan geofence (khusus OWNER dan ADMIN)
      */
     public function update(Request $request, string $id): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var WorkspaceMember|null $member */
+        $member = $request->attributes->get('current_member');
+
+        if ($member && $member->role !== 'OWNER' && $member->branch_id !== null && $member->branch_id !== $id) {
+            return new JsonResponse([
+                'message' => 'Akses ditolak. Anda tidak berwenang mengelola pengaturan pada cabang lain.',
+            ], Response::HTTP_FORBIDDEN);
+        }
 
         $branch = Branch::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
@@ -136,11 +149,19 @@ class BranchController
     }
 
     /**
-     * Create a new POS terminal for a branch with a fresh device pairing token.
+     * buat terminal POS baru untuk cabang dengan token pairing baru
      */
     public function createTerminal(Request $request, string $branchId): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var WorkspaceMember|null $member */
+        $member = $request->attributes->get('current_member');
+
+        if ($member && $member->role !== 'OWNER' && $member->branch_id !== null && $member->branch_id !== $branchId) {
+            return new JsonResponse([
+                'message' => 'Akses ditolak. Anda tidak berwenang mengelola terminal pada cabang lain.',
+            ], Response::HTTP_FORBIDDEN);
+        }
 
         $branch = Branch::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
@@ -154,17 +175,16 @@ class BranchController
 
         $name = ! empty($validated['terminal_name'])
             ? trim($validated['terminal_name'])
-            : 'Terminal Kasir #' . (\App\Models\PosTerminal::withoutGlobalScopes()->where('branch_id', $branch->id)->count() + 1);
+            : 'Terminal Kasir #' . (PosTerminal::withoutGlobalScopes()->where('branch_id', $branch->id)->count() + 1);
 
         $rawToken = ! empty($validated['device_token'])
             ? trim($validated['device_token'])
-            : 'pos-' . \Illuminate\Support\Str::slug($branch->name) . '-' . \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6));
+            : 'pos-' . Str::slug($branch->name) . '-' . Str::lower(Str::random(6));
 
-        $terminal = \App\Models\PosTerminal::create([
+        $terminal = PosTerminal::create([
             'workspace_id' => $workspaceId,
             'branch_id' => $branch->id,
             'terminal_name' => $name,
-            'device_token' => $rawToken,
             'device_token_hash' => hash('sha256', $rawToken),
             'is_active' => true,
         ]);
@@ -182,31 +202,38 @@ class BranchController
     }
 
     /**
-     * Regenerate or set custom device token for an existing POS terminal.
+     * regenerasi atau setel token perangkat kustom untuk terminal POS
      */
     public function regenerateTerminalToken(Request $request, string $branchId, string $terminalId): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var WorkspaceMember|null $member */
+        $member = $request->attributes->get('current_member');
+
+        if ($member && $member->role !== 'OWNER' && $member->branch_id !== null && $member->branch_id !== $branchId) {
+            return new JsonResponse([
+                'message' => 'Akses ditolak. Anda tidak berwenang mengelola terminal pada cabang lain.',
+            ], Response::HTTP_FORBIDDEN);
+        }
 
         $validated = $request->validate([
             'device_token' => 'nullable|string|min:3|max:100',
         ]);
 
-        $terminal = \App\Models\PosTerminal::withoutGlobalScopes()
+        $terminal = PosTerminal::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
             ->where('branch_id', $branchId)
             ->where('id', $terminalId)
             ->firstOrFail();
 
         $branch = Branch::withoutGlobalScopes()->find($branchId);
-        $branchSlug = $branch ? \Illuminate\Support\Str::slug($branch->name) : 'outlet';
-        
+        $branchSlug = $branch ? Str::slug($branch->name) : 'outlet';
+
         $rawToken = ! empty($validated['device_token'])
             ? trim($validated['device_token'])
-            : 'pos-' . $branchSlug . '-' . \Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6));
+            : 'pos-' . $branchSlug . '-' . Str::lower(Str::random(6));
 
         $terminal->update([
-            'device_token' => $rawToken,
             'device_token_hash' => hash('sha256', $rawToken),
         ]);
 
@@ -222,13 +249,21 @@ class BranchController
     }
 
     /**
-     * Delete a POS terminal.
+     * hapus terminal POS
      */
     public function deleteTerminal(Request $request, string $branchId, string $terminalId): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var WorkspaceMember|null $member */
+        $member = $request->attributes->get('current_member');
 
-        $terminal = \App\Models\PosTerminal::withoutGlobalScopes()
+        if ($member && $member->role !== 'OWNER' && $member->branch_id !== null && $member->branch_id !== $branchId) {
+            return new JsonResponse([
+                'message' => 'Akses ditolak. Anda tidak berwenang mengelola terminal pada cabang lain.',
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        $terminal = PosTerminal::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
             ->where('branch_id', $branchId)
             ->where('id', $terminalId)

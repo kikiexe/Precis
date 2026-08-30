@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ProductCatalogController
 {
     /**
-     * List all products in the active workspace.
+     * ambil daftar seluruh produk dalam workspace aktif
      */
     public function products(Request $request): JsonResponse
     {
@@ -50,7 +50,7 @@ class ProductCatalogController
     }
 
     /**
-     * List all categories in the active workspace.
+     * ambil daftar seluruh kategori dalam workspace aktif
      */
     public function categories(Request $request): JsonResponse
     {
@@ -77,7 +77,7 @@ class ProductCatalogController
     }
 
     /**
-     * Store new product (Owner / Admin only).
+     * simpan produk baru (khusus OWNER dan ADMIN)
      */
     public function storeProduct(Request $request): JsonResponse
     {
@@ -112,7 +112,7 @@ class ProductCatalogController
     }
 
     /**
-     * Update product.
+     * perbarui data produk
      */
     public function updateProduct(Request $request, string $id): JsonResponse
     {
@@ -156,7 +156,7 @@ class ProductCatalogController
     }
 
     /**
-     * Delete product.
+     * hapus produk
      */
     public function deleteProduct(Request $request, string $id): JsonResponse
     {
@@ -175,7 +175,7 @@ class ProductCatalogController
     }
 
     /**
-     * Store new category.
+     * simpan kategori baru
      */
     public function storeCategory(Request $request): JsonResponse
     {
@@ -202,7 +202,7 @@ class ProductCatalogController
     }
 
     /**
-     * Delete category.
+     * hapus kategori
      */
     public function deleteCategory(Request $request, string $id): JsonResponse
     {
