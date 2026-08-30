@@ -20,15 +20,23 @@
   let isSubmitting = $state(false);
   let activeView = $state<'ADJUST' | 'LOGS'>('ADJUST');
 
+  let materialLogs = $state<import('../../types/app').StockAdjustmentLog[]>([]);
+
   $effect(() => {
     physicalCountInput = material?.current_stock ?? 0;
+    if (material) {
+      inventoryService
+        .getAdjustmentLogs()
+        .then((logs) => {
+          materialLogs = logs.filter((l) => l.material_id === material.id);
+        })
+        .catch(() => {
+          materialLogs = [];
+        });
+    } else {
+      materialLogs = [];
+    }
   });
-
-  let materialLogs = $derived(
-    material
-      ? inventoryService.getAdjustmentLogs().filter((l) => l.material_id === material.id)
-      : []
-  );
 
   let previewNewStock = $derived.by(() => {
     if (!material) return 0;
@@ -48,34 +56,37 @@
       case 'STOCK_TAKE':
         return 'Opname Fisik / Rekonsiliasi Shift';
       case 'DAMAGED':
-        return 'Barang Rusak / Pecah di Bar';
+        return 'Barang Rusak / Pecah / Cacat';
       case 'EXPIRED':
-        return 'Bahan Kedaluwarsa';
+        return 'Barang / Bahan Kedaluwarsa';
       case 'RESTOCK':
         return 'Pembelian / Restock Masuk';
       case 'WASTE':
-        return 'Waste / Kalibrasi Mesin Tumpah';
+        return 'Barang Terbuang / Waste';
       case 'OTHER':
         return 'Alasan Lainnya';
     }
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!material || isSubmitting) return;
 
     isSubmitting = true;
-    const result = inventoryService.adjustStock({
-      material_id: material.id,
-      new_stock: adjustmentMode === 'PHYSICAL_COUNT' ? physicalCountInput : undefined,
-      delta_stock: adjustmentMode === 'DELTA' ? deltaInput : undefined,
-      reason: selectedReason,
-      notes: notesInput.trim() || undefined,
-      performed_by: currentUserName,
-    });
+    try {
+      const result = await inventoryService.adjustStock({
+        material_id: material.id,
+        new_stock: adjustmentMode === 'PHYSICAL_COUNT' ? physicalCountInput : undefined,
+        delta_stock: adjustmentMode === 'DELTA' ? deltaInput : undefined,
+        reason: selectedReason,
+        notes: notesInput.trim() || undefined,
+        performed_by: currentUserName,
+      });
 
-    isSubmitting = false;
-    if (result) {
-      onSuccess(result.material);
+      if (result) {
+        onSuccess(result.material);
+      }
+    } finally {
+      isSubmitting = false;
     }
   }
 </script>
@@ -272,10 +283,10 @@
                 class="w-full cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 pr-10 text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
               >
                 <option value="STOCK_TAKE">Opname Fisik / Rekonsiliasi Shift</option>
-                <option value="DAMAGED">Barang Rusak / Pecah di Bar</option>
-                <option value="EXPIRED">Bahan Kedaluwarsa</option>
+                <option value="DAMAGED">Barang Rusak / Pecah / Cacat</option>
+                <option value="EXPIRED">Barang / Bahan Kedaluwarsa</option>
                 <option value="RESTOCK">Pembelian / Restock Masuk</option>
-                <option value="WASTE">Waste / Kalibrasi Mesin Tumpah</option>
+                <option value="WASTE">Barang Terbuang / Waste</option>
                 <option value="OTHER">Alasan Lainnya</option>
               </select>
               <ChevronDown

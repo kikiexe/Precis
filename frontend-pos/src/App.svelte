@@ -624,9 +624,9 @@
     {taxAmount}
     items={cartItems}
     {activeCashier}
-    branchId={terminalInfo?.branch_id || 'branch-sleman-01'}
-    workspaceId={terminalInfo?.workspace_id || 'ws-amore-01'}
-    activeSessionId={activeSession?.id || 'sess-active-01'}
+    branchId={terminalInfo?.branch_id || ''}
+    workspaceId={terminalInfo?.workspace_id || ''}
+    activeSessionId={activeSession?.id || ''}
     qrisImageUrl={terminalInfo?.qris_image_url}
     onClose={() => (isPaymentModalOpen = false)}
     onCompleteOrder={handleCompleteOrder}

@@ -34,16 +34,16 @@
 
   let menuItems = $state<ProductMenuItem[]>([]);
   let categories = $state<CategoryItem[]>([]);
-  let rawMaterials = $state<RawMaterialItem[]>(inventoryService.getRawMaterials());
+  let rawMaterials = $state<RawMaterialItem[]>([]);
   let isLoading = $state(false);
 
-  // Modal States
+  // state modal
   let isAddMenuModalOpen = $state(false);
   let isAddCategoryModalOpen = $state(false);
   let isAddMaterialModalOpen = $state(false);
   let adjustingMaterial = $state<RawMaterialItem | null>(null);
 
-  // Delete State
+  // state hapus
   let deleteTarget = $state<{
     type: 'menu' | 'kategori' | 'bahan';
     id: string;
@@ -54,12 +54,14 @@
   async function loadData() {
     isLoading = true;
     try {
-      const [cats, prods] = await Promise.all([
+      const [cats, prods, raws] = await Promise.all([
         inventoryService.fetchLiveCategories(),
         inventoryService.fetchLiveProducts(),
+        inventoryService.getRawMaterials(),
       ]);
       categories = cats;
       menuItems = prods;
+      rawMaterials = raws;
     } finally {
       isLoading = false;
     }
@@ -94,15 +96,15 @@
     await loadData();
   }
 
-  function handleSaveMaterial(material: {
+  async function handleSaveMaterial(material: {
     name: string;
     category_id: string;
     current_stock: number;
     min_stock_alert: number;
     unit: RawMaterialUnit;
   }) {
-    inventoryService.createRawMaterial(material);
-    rawMaterials = inventoryService.getRawMaterials();
+    await inventoryService.createRawMaterial(material);
+    rawMaterials = await inventoryService.getRawMaterials();
   }
 
   async function executeDelete() {
@@ -112,8 +114,8 @@
       await loadData();
       deleteTarget = null;
     } else if (deleteTarget.type === 'bahan') {
-      inventoryService.deleteRawMaterial(deleteTarget.id);
-      rawMaterials = inventoryService.getRawMaterials();
+      await inventoryService.deleteRawMaterial(deleteTarget.id);
+      rawMaterials = await inventoryService.getRawMaterials();
       deleteTarget = null;
     } else if (deleteTarget.type === 'kategori') {
       const res = await inventoryService.deleteCategory(deleteTarget.id);
@@ -260,8 +262,8 @@
   <StockAdjustmentModal
     material={adjustingMaterial}
     onClose={() => (adjustingMaterial = null)}
-    onSuccess={() => {
-      rawMaterials = inventoryService.getRawMaterials();
+    onSuccess={async () => {
+      rawMaterials = await inventoryService.getRawMaterials();
       adjustingMaterial = null;
     }}
   />

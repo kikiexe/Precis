@@ -6,7 +6,10 @@ namespace Database\Seeders;
 
 use App\Models\Branch;
 use App\Models\BranchSetting;
+use App\Models\OutletPurchase;
 use App\Models\PosTerminal;
+use App\Models\StockWaste;
+use App\Models\User;
 use App\Models\Workspace;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -20,6 +23,7 @@ class BranchSeeder extends Seeder
 
         $workspaceSeturan = Workspace::where('slug', 'norde-coffee')->firstOrFail();
         $workspaceKaliurang = Workspace::where('slug', 'norde-coffee-kaliurang')->first() ?? $workspaceSeturan;
+        $owner = User::where('email', 'kiki@gmail.com')->first();
 
         // 1. Cabang 1: Norde Coffee - Seturan (pada Workspace 1: Seturan)
         $branchSeturan = Branch::withoutGlobalScopes()->firstOrCreate(
@@ -36,7 +40,7 @@ class BranchSeeder extends Seeder
             ]
         );
 
-        BranchSetting::withoutGlobalScopes()->firstOrCreate(
+        BranchSetting::withoutGlobalScopes()->updateOrCreate(
             [
                 'workspace_id' => $workspaceSeturan->id,
                 'branch_id' => $branchSeturan->id,
@@ -45,6 +49,10 @@ class BranchSeeder extends Seeder
                 'late_penalty_per_minute' => 1000.00,
                 'overtime_pay_per_hour' => 20000.00,
                 'min_overtime_threshold_minutes' => 30,
+                'tax_enabled' => true,
+                'tax_name' => 'PB1',
+                'tax_rate' => 10.00,
+                'tax_type' => 'INCLUSIVE',
                 'created_at' => $pilotCreationDate,
                 'updated_at' => $pilotCreationDate,
             ]
@@ -81,7 +89,7 @@ class BranchSeeder extends Seeder
             ]
         );
 
-        BranchSetting::withoutGlobalScopes()->firstOrCreate(
+        BranchSetting::withoutGlobalScopes()->updateOrCreate(
             [
                 'workspace_id' => $targetWsKaliurang->id,
                 'branch_id' => $branchKaliurang->id,
@@ -90,6 +98,10 @@ class BranchSeeder extends Seeder
                 'late_penalty_per_minute' => 1000.00,
                 'overtime_pay_per_hour' => 20000.00,
                 'min_overtime_threshold_minutes' => 30,
+                'tax_enabled' => true,
+                'tax_name' => 'PB1',
+                'tax_rate' => 10.00,
+                'tax_type' => 'INCLUSIVE',
                 'created_at' => $pilotCreationDate,
                 'updated_at' => $pilotCreationDate,
             ]
@@ -108,5 +120,121 @@ class BranchSeeder extends Seeder
                 'updated_at' => $pilotCreationDate,
             ]
         );
+
+        if (app()->environment('testing') || app()->runningUnitTests()) {
+            return;
+        }
+
+        // 3. sample riwayat belanja kasir outlet purchases petty cash
+        $purchasesSample = [
+            [
+                'item_name' => 'Es Batu Kristal Higienis 5 Pack',
+                'unit' => 'Pack',
+                'quantity' => 5,
+                'unit_price' => 10000.00,
+                'total_price' => 50000.00,
+                'category' => 'BAHAN_BAKU_DARURAT',
+                'funding_source' => 'CASH_DRAWER',
+                'notes' => 'Pembelian es batu darurat karena freezer mati sementara saat rush hour',
+            ],
+            [
+                'item_name' => 'Sabun Cuci Piring & Spons Bar 3 pcs',
+                'unit' => 'Pcs',
+                'quantity' => 3,
+                'unit_price' => 12000.00,
+                'total_price' => 36000.00,
+                'category' => 'KEBERSIHAN',
+                'funding_source' => 'CASH_DRAWER',
+                'notes' => 'Stok pembersih bar habis sebelum closing',
+            ],
+            [
+                'item_name' => 'Paper Bag & Kantong Takeaway 100 pcs',
+                'unit' => 'Pack',
+                'quantity' => 1,
+                'unit_price' => 75000.00,
+                'total_price' => 75000.00,
+                'category' => 'OPERASIONAL_TOKO',
+                'funding_source' => 'EXTERNAL_REIMBURSE',
+                'notes' => 'Beli di agen kemasan dekat outlet',
+            ],
+        ];
+
+        foreach ([$branchSeturan, $branchKaliurang] as $branch) {
+            foreach ($purchasesSample as $p) {
+                OutletPurchase::withoutGlobalScopes()->firstOrCreate(
+                    [
+                        'workspace_id' => $branch->workspace_id,
+                        'branch_id' => $branch->id,
+                        'item_name' => $p['item_name'],
+                    ],
+                    [
+                        'unit' => $p['unit'],
+                        'quantity' => $p['quantity'],
+                        'unit_price' => $p['unit_price'],
+                        'total_price' => $p['total_price'],
+                        'category' => $p['category'],
+                        'funding_source' => $p['funding_source'],
+                        'notes' => $p['notes'],
+                        'recorded_by_user_id' => $owner?->id ?? (string) \Illuminate\Support\Str::uuid(),
+                        'created_at' => (clone $now)->subDays(rand(1, 10)),
+                        'updated_at' => (clone $now)->subDays(rand(1, 10)),
+                    ]
+                );
+            }
+        }
+
+        // 4. sample riwayat barang rusak terbuang stock waste
+        $wastesSample = [
+            [
+                'item_name' => 'Sirup Monin Vanilla 700ml',
+                'quantity' => 1,
+                'unit' => 'Botol',
+                'cost_per_unit' => 135000.00,
+                'total_loss_cost' => 135000.00,
+                'reason' => 'ACCIDENT_SPILL',
+                'notes' => 'Botol tersenggol staf saat rush hour malam minggu',
+            ],
+            [
+                'item_name' => 'Fresh Milk Diamond 1L (2 Karton)',
+                'quantity' => 2,
+                'unit' => 'Karton',
+                'cost_per_unit' => 19500.00,
+                'total_loss_cost' => 39000.00,
+                'reason' => 'EXPIRED',
+                'notes' => 'Kedaluwarsa karena tidak terpakai saat libur operasional',
+            ],
+            [
+                'item_name' => 'Butter French Croissant Dough',
+                'quantity' => 3,
+                'unit' => 'Pcs',
+                'cost_per_unit' => 12000.00,
+                'total_loss_cost' => 36000.00,
+                'reason' => 'BARISTA_MISTAKE',
+                'notes' => 'Overbaked saat pemanggangan pagi',
+            ],
+        ];
+
+        foreach ([$branchSeturan, $branchKaliurang] as $branch) {
+            foreach ($wastesSample as $w) {
+                StockWaste::withoutGlobalScopes()->firstOrCreate(
+                    [
+                        'workspace_id' => $branch->workspace_id,
+                        'branch_id' => $branch->id,
+                        'item_name' => $w['item_name'],
+                    ],
+                    [
+                        'quantity' => $w['quantity'],
+                        'unit' => $w['unit'],
+                        'cost_per_unit' => $w['cost_per_unit'],
+                        'total_loss_cost' => $w['total_loss_cost'],
+                        'reason' => $w['reason'],
+                        'notes' => $w['notes'],
+                        'recorded_by_user_id' => $owner?->id ?? (string) \Illuminate\Support\Str::uuid(),
+                        'created_at' => (clone $now)->subDays(rand(1, 10)),
+                        'updated_at' => (clone $now)->subDays(rand(1, 10)),
+                    ]
+                );
+            }
+        }
     }
 }

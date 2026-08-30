@@ -8,9 +8,9 @@ export interface PrintReceiptOptions {
 }
 
 export const defaultPrintOptions: PrintReceiptOptions = {
-  storeName: 'PRÉCIS COFFEE & EATERY',
-  storeAddress: 'Jl. Kaliurang KM 5.2 No. 18, Sleman, Yogyakarta',
-  storePhone: 'Telp: 0812-3456-7890',
+  storeName: '',
+  storeAddress: '',
+  storePhone: '',
   footerNote: 'Terima kasih atas kunjungan Anda!\nBarang yang dibeli tidak dapat ditukar.',
 };
 

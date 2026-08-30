@@ -16,6 +16,8 @@
   import type { RawMaterial, Product, CashierUser, StockWaste } from '../../../types/pos';
   import StockWasteModal from '../StockWasteModal.svelte';
 
+  import { posService } from '../../../services/pos-service';
+
   interface RawCategory {
     id: string;
     name: string;
@@ -41,7 +43,7 @@
     onRecordWaste,
   }: Props = $props();
 
-  // Tab State: Stok Bahan Baku vs Catatan Kerugian (Waste)
+  // tab state stok bahan baku vs catatan kerugian waste
   let activeTab = $state<'STOCK' | 'WASTE'>('STOCK');
   let isWasteModalOpen = $state(false);
   let selectedWasteReason = $state<string>('ALL');
@@ -53,119 +55,50 @@
     }
   });
 
-  // State Tanggal Filter (Default Hari Ini)
+  // state tanggal filter
   let selectedDate = $state(new Date().toISOString().substring(0, 10));
   let searchQuery = $state('');
   let selectedCategoryId = $state('ALL');
 
-  // Master Categories
-  let categories = $state<RawCategory[]>([
-    { id: 'cat-dairy', name: 'Dairy & Susu' },
-    { id: 'cat-beans', name: 'Biji Kopi & Powder' },
-    { id: 'cat-syrup', name: 'Sirup & Flavor' },
-    { id: 'cat-packaging', name: 'Cup & Packaging' },
-    { id: 'cat-other', name: 'Lainnya' },
-  ]);
+  // master kategori
+  let categories = $state<RawCategory[]>([]);
 
-  const defaultMaterials: RawMaterial[] = [
-    {
-      id: 'raw-1',
-      name: 'Fresh Milk Diamond 1L',
-      category_id: 'cat-dairy',
-      category_name: 'Dairy & Susu',
-      stock_previous_day: 24,
-      current_stock: 18,
-      stock_used_today: 6,
-      min_stock_alert: 10,
-      unit: 'liter',
-      last_adjusted_at: '2026-08-28 07:30',
-    },
-    {
-      id: 'raw-2',
-      name: 'Oatside Barista Oat Milk 1L',
-      category_id: 'cat-dairy',
-      category_name: 'Dairy & Susu',
-      stock_previous_day: 12,
-      current_stock: 6,
-      stock_used_today: 6,
-      min_stock_alert: 8,
-      unit: 'liter',
-      last_adjusted_at: '2026-08-28 08:00',
-    },
-    {
-      id: 'raw-3',
-      name: 'Biji Kopi House Blend (1kg)',
-      category_id: 'cat-beans',
-      category_name: 'Biji Kopi & Powder',
-      stock_previous_day: 15,
-      current_stock: 12,
-      stock_used_today: 3,
-      min_stock_alert: 5,
-      unit: 'kg',
-      last_adjusted_at: '2026-08-28 06:45',
-    },
-    {
-      id: 'raw-4',
-      name: 'Sirup Monin Caramel 700ml',
-      category_id: 'cat-syrup',
-      category_name: 'Sirup & Flavor',
-      stock_previous_day: 3,
-      current_stock: 2,
-      stock_used_today: 1,
-      min_stock_alert: 3,
-      unit: 'botol',
-      last_adjusted_at: '2026-08-28 09:30',
-    },
-    {
-      id: 'raw-5',
-      name: 'Paper Cup Hot 8oz (50 pcs)',
-      category_id: 'cat-packaging',
-      category_name: 'Cup & Packaging',
-      stock_previous_day: 20,
-      current_stock: 15,
-      stock_used_today: 5,
-      min_stock_alert: 8,
-      unit: 'pack',
-      last_adjusted_at: '2026-08-28 10:00',
-    },
-    {
-      id: 'raw-6',
-      name: 'Bubuk Matcha Uji Premium 1kg',
-      category_id: 'cat-beans',
-      category_name: 'Biji Kopi & Powder',
-      stock_previous_day: 5,
-      current_stock: 4,
-      stock_used_today: 1,
-      min_stock_alert: 2,
-      unit: 'kg',
-      last_adjusted_at: '2026-08-28 07:00',
-    },
-  ];
-
-  // Master Raw Materials List
-  let materials = $state<RawMaterial[]>(defaultMaterials);
+  // master daftar bahan baku
+  let materials = $state<RawMaterial[]>([]);
 
   $effect(() => {
+    posService.getInventoryCategories().then((cats) => {
+      if (cats && cats.length > 0) {
+        categories = cats;
+      }
+    });
+
     if (initialMaterials && initialMaterials.length > 0) {
       materials = initialMaterials;
+    } else {
+      posService.getRawMaterials().then((data) => {
+        if (data && data.length > 0) {
+          materials = data;
+        }
+      });
     }
   });
 
-  // Modal States
+  // state modal
   let isAddMaterialModalOpen = $state(false);
   let isCategoryModalOpen = $state(false);
   let adjustingMaterial = $state<RawMaterial | null>(null);
   let newCurrentStockInput = $state(0);
 
-  // Form State: Add Raw Material
+  // state form tambah bahan baku
   let formName = $state('');
-  let formCategoryId = $state('cat-dairy');
+  let formCategoryId = $state('');
   let formUnit = $state('liter');
   let formInitialStock = $state(0);
   let formMinStock = $state(5);
   let formErrorMessage = $state('');
 
-  // Form State: Category Management
+  // state form kelola kategori
   let newCategoryName = $state('');
   let editingCategoryId = $state<string | null>(null);
   let editingCategoryName = $state('');
@@ -183,7 +116,7 @@
     'pouch',
   ];
 
-  // Filtered List Bahan Baku
+  // daftar bahan baku terfilter
   let filteredMaterials = $derived(
     materials.filter((m) => {
       const matchSearch =
@@ -197,7 +130,7 @@
     })
   );
 
-  // Filtered List Stock Waste / Kerugian
+  // daftar barang terbuang terfilter
   let filteredWastes = $derived(
     wastes.filter((w) => {
       const matchSearch =
@@ -240,7 +173,7 @@
     }
   }
 
-  // Actions: Sesuaikan Stok
+  // aksi sesuaikan stok
   function handleOpenAdjustModal(mat: RawMaterial) {
     adjustingMaterial = mat;
     newCurrentStockInput = mat.current_stock;
@@ -268,10 +201,10 @@
     adjustingMaterial = null;
   }
 
-  // Actions: Tambah Bahan Baku Baru
+  // aksi tambah bahan baku baru
   function handleOpenAddModal() {
     formName = '';
-    formCategoryId = categories[0]?.id || 'cat-dairy';
+    formCategoryId = categories[0]?.id || '';
     formUnit = 'liter';
     formInitialStock = 0;
     formMinStock = 5;
@@ -316,7 +249,7 @@
     isAddMaterialModalOpen = false;
   }
 
-  // Actions: Kelola Kategori
+  // aksi kelola kategori
   function handleAddCategory() {
     if (!newCategoryName.trim()) return;
     const newCat: RawCategory = {

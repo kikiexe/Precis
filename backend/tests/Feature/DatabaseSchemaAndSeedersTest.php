@@ -85,6 +85,6 @@ class DatabaseSchemaAndSeedersTest extends TestCase
         $this->assertEquals(4, $categories);
 
         $products = Product::withoutGlobalScopes()->where('workspace_id', $workspace->id)->count();
-        $this->assertEquals(15, $products);
+        $this->assertEquals(12, $products); // 4 kategori x 3 menu = 12 produk
     }
 }

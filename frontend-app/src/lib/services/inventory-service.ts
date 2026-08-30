@@ -13,12 +13,7 @@ import type {
 } from '../types/app';
 
 class InventoryService {
-  private getStorageKey(type: string): string {
-    const wsId = apiClient.getWorkspaceId() || 'default';
-    return `precis_ws_${wsId}_${type}`;
-  }
-
-  // --- BRANCHES & POS TERMINALS ---
+  // cabang dan terminal pos
   async getBranches(): Promise<BranchItem[]> {
     const res = await apiClient.get<BranchItem[]>('/branches');
     return res.data || [];
@@ -126,7 +121,7 @@ class InventoryService {
     await apiClient.delete(`/branches/${branchId}/terminals/${terminalId}`);
   }
 
-  // --- CATEGORIES ---
+  // kategori
   async fetchLiveCategories(): Promise<CategoryItem[]> {
     const res = await apiClient.get<CategoryItem[]>('/categories');
     return res.data || [];
@@ -145,7 +140,7 @@ class InventoryService {
     return { success: true, message: res.message };
   }
 
-  // --- MENU ITEMS (PRODUCTS) ---
+  // menu produk
   async fetchLiveProducts(categoryId?: string): Promise<ProductMenuItem[]> {
     const params: Record<string, string> = {};
     if (categoryId && categoryId !== 'ALL') {
@@ -182,192 +177,45 @@ class InventoryService {
     return true;
   }
 
-  // --- RAW MATERIALS (INVENTORY TRACKING) ---
-  getRawMaterials(): RawMaterialItem[] {
-    if (typeof window === 'undefined') return [];
-    const raw = localStorage.getItem(this.getStorageKey('raw_materials'));
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      } catch {
-        // fallback
-      }
-    }
-    const defaultMaterials: RawMaterialItem[] = [
-      {
-        id: 'raw-1',
-        name: 'Arabica House Blend Beans',
-        category_id: 'cat-1',
-        category_name: 'Kopi',
-        current_stock: 12.5,
-        min_stock_alert: 5,
-        unit: 'kg',
-        last_adjusted_at: '2026-08-27 10:00',
-      },
-      {
-        id: 'raw-2',
-        name: 'Fresh Milk Pasteurisasi',
-        category_id: 'cat-2',
-        category_name: 'Dairy',
-        current_stock: 24,
-        min_stock_alert: 10,
-        unit: 'liter',
-        last_adjusted_at: '2026-08-27 08:30',
-      },
-      {
-        id: 'raw-3',
-        name: 'Oatmilk Barista Edition',
-        category_id: 'cat-2',
-        category_name: 'Dairy',
-        current_stock: 8,
-        min_stock_alert: 5,
-        unit: 'liter',
-        last_adjusted_at: '2026-08-26 18:00',
-      },
-      {
-        id: 'raw-4',
-        name: 'Syrup Vanilla Artisan',
-        category_id: 'cat-3',
-        category_name: 'Sirup',
-        current_stock: 3.5,
-        min_stock_alert: 2,
-        unit: 'botol',
-        last_adjusted_at: '2026-08-25 14:00',
-      },
-      {
-        id: 'raw-5',
-        name: 'Paper Cup 8oz Hot',
-        category_id: 'cat-4',
-        category_name: 'Packaging',
-        current_stock: 250,
-        min_stock_alert: 100,
-        unit: 'pcs',
-        last_adjusted_at: '2026-08-27 07:00',
-      },
-    ];
-    localStorage.setItem(this.getStorageKey('raw_materials'), JSON.stringify(defaultMaterials));
-    return defaultMaterials;
+  // bahan baku
+  async getRawMaterials(): Promise<RawMaterialItem[]> {
+    const res = await apiClient.get<RawMaterialItem[]>('/raw-materials');
+    return res.data || [];
   }
 
-  createRawMaterial(data: Omit<RawMaterialItem, 'id' | 'last_adjusted_at'>): RawMaterialItem {
-    const newMat: RawMaterialItem = {
-      ...data,
-      id: `raw-${Date.now()}`,
-      last_adjusted_at: new Date().toISOString().replace('T', ' ').substring(0, 16),
-    };
-    const current = this.getRawMaterials();
-    current.unshift(newMat);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(this.getStorageKey('raw_materials'), JSON.stringify(current));
+  async createRawMaterial(data: Omit<RawMaterialItem, 'id' | 'last_adjusted_at'>): Promise<RawMaterialItem> {
+    const res = await apiClient.post<RawMaterialItem>('/raw-materials', data);
+    if (!res.data) {
+      throw new Error(res.message || 'Gagal membuat bahan baku baru.');
     }
-    return newMat;
+    return res.data;
   }
 
-  deleteRawMaterial(id: string): void {
-    let current = this.getRawMaterials();
-    current = current.filter((m) => m.id !== id);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(this.getStorageKey('raw_materials'), JSON.stringify(current));
-    }
+  async deleteRawMaterial(id: string): Promise<void> {
+    await apiClient.delete(`/raw-materials/${id}`);
   }
 
-  getAdjustmentLogs(): StockAdjustmentLog[] {
-    if (typeof window === 'undefined') return [];
-    const raw = localStorage.getItem(this.getStorageKey('stock_adjustment_logs'));
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      } catch {
-        // fallback
-      }
-    }
-    const defaultLogs: StockAdjustmentLog[] = [
-      {
-        id: 'adj-1',
-        material_id: 'raw-2',
-        material_name: 'Fresh Milk Pasteurisasi',
-        prev_stock: 28,
-        new_stock: 24,
-        adjusted_amount: -4,
-        reason: 'EXPIRED',
-        notes: 'Kadaluarsa saat inspeksi chiller pagi',
-        performed_by: 'Paundra (Manager)',
-        created_at: '2026-08-26 09:30',
-      },
-      {
-        id: 'adj-2',
-        material_id: 'raw-1',
-        material_name: 'Arabica House Blend Beans',
-        prev_stock: 15,
-        new_stock: 12.5,
-        adjusted_amount: -2.5,
-        reason: 'RESTOCK',
-        notes: 'Opname rutin mingguan bar',
-        performed_by: 'Ami (Head Barista)',
-        created_at: '2026-08-25 21:00',
-      },
-    ];
-    localStorage.setItem(this.getStorageKey('stock_adjustment_logs'), JSON.stringify(defaultLogs));
-    return defaultLogs;
+  async getAdjustmentLogs(): Promise<StockAdjustmentLog[]> {
+    const res = await apiClient.get<StockAdjustmentLog[]>('/inventory/adjustments');
+    return res.data || [];
   }
 
-  adjustStock(params: {
+  async adjustStock(params: {
     material_id: string;
     new_stock?: number;
     delta_stock?: number;
     reason: StockAdjustmentReason;
     notes?: string;
     performed_by?: string;
-  }): { log: StockAdjustmentLog; material: RawMaterialItem } | null {
-    const materials = this.getRawMaterials();
-    const item = materials.find((m) => m.id === params.material_id);
-    if (!item) return null;
-
-    const prevStock = item.current_stock;
-    let computedNewStock = prevStock;
-    if (params.new_stock !== undefined) {
-      computedNewStock = Math.max(0, params.new_stock);
-    } else if (params.delta_stock !== undefined) {
-      computedNewStock = Math.max(0, prevStock + params.delta_stock);
-    }
-
-    const diff = computedNewStock - prevStock;
-    item.current_stock = computedNewStock;
-    item.last_adjusted_at = new Date().toISOString().replace('T', ' ').substring(0, 16);
-
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(this.getStorageKey('raw_materials'), JSON.stringify(materials));
-    }
-
-    const log: StockAdjustmentLog = {
-      id: `adj-${Date.now()}`,
-      material_id: params.material_id,
-      material_name: item.name,
-      prev_stock: prevStock,
-      adjusted_amount: diff,
-      new_stock: computedNewStock,
-      reason: params.reason,
-      notes: params.notes,
-      performed_by: params.performed_by || 'Owner',
-      created_at: item.last_adjusted_at,
-    };
-
-    const allLogs = this.getAdjustmentLogs();
-    allLogs.unshift(log);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(this.getStorageKey('stock_adjustment_logs'), JSON.stringify(allLogs));
-    }
-
-    return { log, material: item };
+  }): Promise<{ log: StockAdjustmentLog; material: RawMaterialItem } | null> {
+    const res = await apiClient.post<{ log: StockAdjustmentLog; material: RawMaterialItem }>(
+      '/inventory/adjustments',
+      params
+    );
+    return res.data || null;
   }
 
-  // --- SALES ANALYTICS ---
+  // analitik penjualan
   async fetchLiveSalesAnalytics(
     timeframe: TimeframePeriod,
     branchId?: string

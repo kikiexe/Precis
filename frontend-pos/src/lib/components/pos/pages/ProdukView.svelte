@@ -14,6 +14,7 @@
   import PosAddMenuModal from './catalog/modals/PosAddMenuModal.svelte';
   import PosAddMaterialModal from './catalog/modals/PosAddMaterialModal.svelte';
   import PosOpnameModal from './catalog/modals/PosOpnameModal.svelte';
+  import { posService } from '../../../services/pos-service';
 
   interface Props {
     products: Product[];
@@ -26,128 +27,39 @@
 
   let activeSubTab = $state<'bahan' | 'rekap' | 'menu' | 'logs'>('bahan');
 
-  // Raw Materials in POS state (with Flux-inspired daily tracking)
-  let rawMaterials = $state<Array<RawMaterial & { stock_previous_day?: number }>>([
-    {
-      id: 'raw-pos-1',
-      name: 'Fresh Milk Diamond 1L',
-      category_id: 'cat-dairy',
-      category_name: 'Dairy',
-      stock_previous_day: 24,
-      stock_in_today: 0,
-      stock_used_today: 6,
-      current_stock: 18,
-      min_stock_alert: 10,
-      unit: 'liter',
-      last_adjusted_at: '2026-08-28 07:30',
-    },
-    {
-      id: 'raw-pos-2',
-      name: 'Oatside Barista Oat Milk 1L',
-      category_id: 'cat-dairy',
-      category_name: 'Dairy',
-      stock_previous_day: 12,
-      stock_in_today: 0,
-      stock_used_today: 6,
-      current_stock: 6,
-      min_stock_alert: 8,
-      unit: 'liter',
-      last_adjusted_at: '2026-08-28 08:00',
-    },
-    {
-      id: 'raw-pos-3',
-      name: 'Biji Kopi House Blend (1kg)',
-      category_id: 'cat-beans',
-      category_name: 'Beans & Powder',
-      stock_previous_day: 15,
-      stock_in_today: 0,
-      stock_used_today: 3,
-      current_stock: 12,
-      min_stock_alert: 5,
-      unit: 'kg',
-      last_adjusted_at: '2026-08-28 06:45',
-    },
-    {
-      id: 'raw-pos-4',
-      name: 'Sirup Monin Caramel 700ml',
-      category_id: 'cat-syrup',
-      category_name: 'Sirup',
-      stock_previous_day: 3,
-      stock_in_today: 0,
-      stock_used_today: 1,
-      current_stock: 2,
-      min_stock_alert: 3,
-      unit: 'botol',
-      last_adjusted_at: '2026-08-28 09:30',
-    },
-    {
-      id: 'raw-pos-5',
-      name: 'Paper Cup Hot 8oz (50 pcs)',
-      category_id: 'cat-packaging',
-      category_name: 'Packaging',
-      stock_previous_day: 20,
-      stock_in_today: 0,
-      stock_used_today: 5,
-      current_stock: 15,
-      min_stock_alert: 8,
-      unit: 'pack',
-      last_adjusted_at: '2026-08-28 10:00',
-    },
-  ]);
+  // bahan baku kasir
+  let rawMaterials = $state<Array<RawMaterial & { stock_previous_day?: number }>>([]);
 
-  // Stock Adjustment Audit Trail (Flux-like Entity)
-  let stockLogs = $state<StockAdjustmentLog[]>([
-    {
-      id: 'log-pos-1',
-      raw_material_id: 'raw-pos-1',
-      raw_material_name: 'Fresh Milk Diamond 1L',
-      previous_stock: 24,
-      new_stock: 18,
-      variance: -6,
-      reason: 'STOCK_TAKE',
-      notes: 'Opname rutin pergantian shift pagi',
-      adjusted_by: 'Budi (Barista)',
-      created_at: '2026-08-28 07:30',
-    },
-    {
-      id: 'log-pos-2',
-      raw_material_id: 'raw-pos-2',
-      raw_material_name: 'Oatside Barista Oat Milk 1L',
-      previous_stock: 12,
-      new_stock: 6,
-      variance: -6,
-      reason: 'STOCK_TAKE',
-      notes: 'Pengecekan chiller susu bar',
-      adjusted_by: 'Budi (Barista)',
-      created_at: '2026-08-28 08:00',
-    },
-    {
-      id: 'log-pos-3',
-      raw_material_id: 'raw-pos-3',
-      raw_material_name: 'Biji Kopi House Blend (1kg)',
-      previous_stock: 10,
-      new_stock: 15,
-      variance: 5,
-      reason: 'RESTOCK',
-      notes: 'Penerimaan 5 pack biji kopi dari roastery',
-      adjusted_by: 'Paundra (Manager)',
-      created_at: '2026-08-27 15:00',
-    },
-  ]);
+  // log audit opname stok
+  let stockLogs = $state<StockAdjustmentLog[]>([]);
 
-  // Modals state
+  // state modal
   let isAddMenuModalOpen = $state(false);
   let isAddMaterialModalOpen = $state(false);
   let editingMaterial = $state<(RawMaterial & { stock_previous_day?: number }) | null>(null);
   let adjustingMaterial = $state<(RawMaterial & { stock_previous_day?: number }) | null>(null);
 
-  const rawMaterialCategories = [
-    { id: 'cat-dairy', name: 'Dairy & Milk' },
-    { id: 'cat-beans', name: 'Coffee Beans & Powder' },
-    { id: 'cat-syrup', name: 'Syrup & Flavor' },
-    { id: 'cat-packaging', name: 'Packaging & Cups' },
-    { id: 'cat-other', name: 'Lainnya' },
-  ];
+  let rawMaterialCategories = $state<Array<{ id: string; name: string }>>([]);
+
+  $effect(() => {
+    posService.getRawMaterials().then((data) => {
+      if (data && data.length > 0) {
+        rawMaterials = data;
+      }
+    });
+
+    posService.getInventoryCategories().then((cats) => {
+      if (cats && cats.length > 0) {
+        rawMaterialCategories = cats;
+      }
+    });
+
+    posService.getStockLogs().then((logs) => {
+      if (logs && logs.length > 0) {
+        stockLogs = logs;
+      }
+    });
+  });
 
   function handleSaveMaterial(materialData: {
     name: string;
@@ -194,7 +106,7 @@
     const variance = newStock - prevStock;
     const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
 
-    // Update raw materials
+    // perbarui bahan baku
     rawMaterials = rawMaterials.map((m) => {
       if (m.id === materialId) {
         return {
@@ -207,7 +119,7 @@
       return m;
     });
 
-    // Record audit log
+    // catat log audit
     const newLog: StockAdjustmentLog = {
       id: `log-pos-${Date.now()}`,
       raw_material_id: materialId,
