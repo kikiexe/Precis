@@ -135,6 +135,9 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/branches', [\App\Http\Controllers\Api\BranchController::class, 'index']);
         Route::middleware('permission:catalog.manage,roles.manage,members.manage,pos.manage_terminals')->group(function (): void {
             Route::put('/branches/{id}', [\App\Http\Controllers\Api\BranchController::class, 'update']);
+        });
+
+        Route::middleware('permission:pos.manage_terminals')->group(function (): void {
             Route::post('/branches/{id}/terminals', [\App\Http\Controllers\Api\BranchController::class, 'createTerminal']);
             Route::post('/branches/{id}/terminals/{terminalId}/regenerate-token', [\App\Http\Controllers\Api\BranchController::class, 'regenerateTerminalToken']);
             Route::delete('/branches/{id}/terminals/{terminalId}', [\App\Http\Controllers\Api\BranchController::class, 'deleteTerminal']);
@@ -276,7 +279,7 @@ Route::prefix('v1')->group(function (): void {
         // katalog produk offline & manajemen sesi kasir
         Route::get('/products', [PosController::class, 'products']);
         Route::get('/orders', [PosController::class, 'orders']);
-        Route::post('/sessions/open', [PosController::class, 'openSession']);
+        Route::middleware('throttle:pos-session-open')->post('/sessions/open', [PosController::class, 'openSession']);
         Route::post('/sessions/close', [PosController::class, 'closeSession']);
         Route::post('/orders/sync-batch', [PosController::class, 'syncBatch']);
     });

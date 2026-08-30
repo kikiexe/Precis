@@ -31,7 +31,7 @@ class WorkspaceService
                 'owner_user_id' => $user->id,
             ]);
 
-            // Seed default system roles untuk workspace baru ini
+            // seed default system roles untuk workspace baru ini
             $this->roleService->createDefaultRolesForWorkspace($workspace->id);
 
             $branch = Branch::create([
@@ -55,7 +55,6 @@ class WorkspaceService
                 'workspace_id' => $workspace->id,
                 'branch_id' => $branch->id,
                 'terminal_name' => 'Terminal Kasir Utama #01',
-                'device_token' => $rawToken,
                 'device_token_hash' => hash('sha256', $rawToken),
                 'is_active' => true,
             ]);
@@ -68,7 +67,7 @@ class WorkspaceService
                 'is_active' => true,
             ]);
 
-            // Ambil semua daftar workspace yang diikuti user beserta perannya
+            // ambil semua daftar workspace yang diikuti user beserta perannya
             $allMemberships = WorkspaceMember::with('workspace')
                 ->where('user_id', $user->id)
                 ->where('is_active', true)

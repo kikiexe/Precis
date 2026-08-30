@@ -13,9 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pos_terminals', function (Blueprint $table): void {
-            $table->string('device_token', 255)->nullable()->after('terminal_name');
-        });
+        if (Schema::hasColumn('pos_terminals', 'device_token')) {
+            Schema::table('pos_terminals', function (Blueprint $table): void {
+                $table->dropColumn('device_token');
+            });
+        }
     }
 
     /**
@@ -23,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pos_terminals', function (Blueprint $table): void {
-            $table->dropColumn('device_token');
-        });
+        // Plaintext device tokens are prohibited in the database schema.
     }
 };

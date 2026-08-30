@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\WorkspaceMember;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class PosService
@@ -49,57 +50,88 @@ class PosService
     }
 
     /**
-     * buka sesi kasir baru dengan input modal awal laci kasir
+     * buka sesi kasir baru dengan input modal awal laci kasir dan verifikasi PIN
      */
     public function openSession(
         string $workspaceId,
         string $branchId,
         string $cashierUserId,
+        string $pin,
         float $openingCash,
         ?string $notes = null
     ): PosSession {
-        // cek apakah sudah ada sesi kasir aktif yang terbuka di cabang ini
-        $activeSession = PosSession::withoutGlobalScopes()
-            ->where('workspace_id', $workspaceId)
-            ->where('branch_id', $branchId)
-            ->where('status', 'OPEN')
-            ->first();
+        return DB::transaction(function () use (
+            $workspaceId,
+            $branchId,
+            $cashierUserId,
+            $pin,
+            $openingCash,
+            $notes
+        ): PosSession {
+            // kunci cabang dengan pessimistic lock untuk mencegah race condition (TOCTOU)
+            $branch = \App\Models\Branch::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('id', $branchId)
+                ->lockForUpdate()
+                ->first();
 
-        if ($activeSession) {
-            throw ValidationException::withMessages([
-                'status' => ['Sesi kasir aktif masih terbuka pada cabang ini. Tutup sesi sebelumnya terlebih dahulu.'],
+            if (! $branch) {
+                throw ValidationException::withMessages([
+                    'branch_id' => ['Cabang tidak ditemukan pada workspace ini.'],
+                ]);
+            }
+
+            // cek apakah sudah ada sesi kasir aktif yang terbuka di cabang ini
+            $activeSession = PosSession::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->where('status', 'OPEN')
+                ->lockForUpdate()
+                ->first();
+
+            if ($activeSession) {
+                throw ValidationException::withMessages([
+                    'status' => ['Sesi kasir aktif masih terbuka pada cabang ini. Tutup sesi sebelumnya terlebih dahulu.'],
+                ]);
+            }
+
+            /** @var WorkspaceMember|null $member */
+            $member = WorkspaceMember::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('user_id', $cashierUserId)
+                ->where('is_active', true)
+                ->first();
+
+            if (! $member) {
+                throw ValidationException::withMessages([
+                    'cashier_user_id' => ['Kasir bukan anggota aktif di workspace ini.'],
+                ]);
+            }
+
+            // verifikasi PIN kasir
+            if (empty($member->pin) || ! Hash::check($pin, (string) $member->pin)) {
+                throw ValidationException::withMessages([
+                    'pin' => ['PIN kasir tidak valid.'],
+                ]);
+            }
+
+            // jika member terikat ke cabang tertentu, pastikan sesuai dengan cabang terminal
+            if ($member->branch_id && $member->branch_id !== $branchId) {
+                throw ValidationException::withMessages([
+                    'cashier_user_id' => ['Kasir tidak ditugaskan pada cabang terminal POS ini.'],
+                ]);
+            }
+
+            return PosSession::create([
+                'workspace_id' => $workspaceId,
+                'branch_id' => $branchId,
+                'opened_by_user_id' => $cashierUserId,
+                'opening_cash' => $openingCash,
+                'status' => 'OPEN',
+                'opened_at' => Carbon::now(),
+                'notes' => $notes,
             ]);
-        }
-
-        /** @var WorkspaceMember|null $member */
-        $member = WorkspaceMember::withoutGlobalScopes()
-            ->where('workspace_id', $workspaceId)
-            ->where('user_id', $cashierUserId)
-            ->where('is_active', true)
-            ->first();
-
-        if (! $member) {
-            throw ValidationException::withMessages([
-                'cashier_user_id' => ['Kasir bukan anggota aktif di workspace ini.'],
-            ]);
-        }
-
-        // Jika member terikat ke branch tertentu, pastikan sesuai dengan branch terminal
-        if ($member->branch_id && $member->branch_id !== $branchId) {
-            throw ValidationException::withMessages([
-                'cashier_user_id' => ['Kasir tidak ditugaskan pada cabang terminal POS ini.'],
-            ]);
-        }
-
-        return PosSession::create([
-            'workspace_id' => $workspaceId,
-            'branch_id' => $branchId,
-            'opened_by_user_id' => $cashierUserId,
-            'opening_cash' => $openingCash,
-            'status' => 'OPEN',
-            'opened_at' => Carbon::now(),
-            'notes' => $notes,
-        ]);
+        });
     }
 
     /**
@@ -177,7 +209,7 @@ class PosService
         return DB::transaction(function () use ($workspaceId, $branchId, $posTerminalId, $ordersPayload): array {
             $syncedIds = [];
 
-            // Kumpulkan seluruh product_id dari payload untuk prefetch harga dari database
+            // kumpulkan seluruh product_id dari payload untuk prefetch harga dari database
             $productIds = [];
             foreach ($ordersPayload as $orderData) {
                 if (! empty($orderData['items']) && is_array($orderData['items'])) {
@@ -210,7 +242,7 @@ class PosService
                     continue;
                 }
 
-                // Kalkulasi ulang subtotal dan total harga di sisi server
+                // kalkulasi ulang subtotal dan total harga di sisi server
                 $calculatedTotalAmount = 0.0;
                 $processedItems = [];
 
@@ -221,7 +253,7 @@ class PosService
                         /** @var Product|null $product */
                         $product = $productId ? $products->get($productId) : null;
 
-                        // Gunakan harga resmi database jika produk terdaftar, fallback ke unit_price client
+                        // gunakan harga resmi database jika produk terdaftar, fallback ke unit_price client
                         $unitPrice = $product ? (float) $product->base_price : (float) ($item['unit_price'] ?? 0.0);
                         $productName = $product ? $product->name : (string) ($item['product_name'] ?? 'Item');
                         $subtotal = $unitPrice * $quantity;
@@ -242,7 +274,7 @@ class PosService
                 $discountAmount = max(0.0, min($totalAmount, (float) ($orderData['discount_amount'] ?? 0.00)));
                 $finalAmount = max(0.0, $totalAmount - $discountAmount);
 
-                // Validasi kasir di dalam workspace
+                // validasi kasir di dalam workspace
                 $cashierUserId = isset($orderData['cashier_user_id']) ? (string) $orderData['cashier_user_id'] : null;
                 if ($cashierUserId) {
                     $cashierExists = WorkspaceMember::withoutGlobalScopes()
@@ -256,10 +288,25 @@ class PosService
                     }
                 }
 
+                // validasi sesi kasir agar tidak terjadi keracunan rekonsiliasi kas (cash reconciliation poisoning)
+                $rawPosSessionId = isset($orderData['pos_session_id']) ? (string) $orderData['pos_session_id'] : null;
+                $posSessionId = null;
+                if ($rawPosSessionId) {
+                    $sessionExists = PosSession::withoutGlobalScopes()
+                        ->where('workspace_id', $workspaceId)
+                        ->where('branch_id', $branchId)
+                        ->where('id', $rawPosSessionId)
+                        ->exists();
+
+                    if ($sessionExists) {
+                        $posSessionId = $rawPosSessionId;
+                    }
+                }
+
                 $order = Order::create([
                     'workspace_id' => $workspaceId,
                     'branch_id' => $branchId,
-                    'pos_session_id' => $orderData['pos_session_id'] ?? null,
+                    'pos_session_id' => $posSessionId,
                     'pos_terminal_id' => $posTerminalId,
                     'cashier_user_id' => $cashierUserId,
                     'client_order_id' => $clientOrderId,

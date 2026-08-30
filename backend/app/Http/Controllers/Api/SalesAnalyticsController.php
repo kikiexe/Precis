@@ -18,7 +18,7 @@ class SalesAnalyticsController
     }
 
     /**
-     * Agregasi analitik penjualan dinamis dari database untuk Owner/Manager
+     * agregasi analitik penjualan dinamis dari database untuk OWNER dan MANAGER
      */
     public function sales(Request $request): JsonResponse
     {

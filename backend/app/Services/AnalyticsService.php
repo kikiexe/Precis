@@ -26,7 +26,7 @@ class AnalyticsService
         $growthLabel = $dateRanges['growthLabel'];
         $normalizedPeriod = $dateRanges['period'];
 
-        // 1. Single aggregation query for primary period summary
+        // 1. kueri agregasi tunggal untuk ringkasan periode utama
         $summary = DB::table('orders')
             ->where('workspace_id', $workspaceId)
             ->whereBetween('created_at', [$start, $end])
@@ -40,7 +40,7 @@ class AnalyticsService
         $totalRevenue = (float) ($summary->total_revenue ?? 0.0);
         $averageOrderValue = $totalOrders > 0 ? (int) round($totalRevenue / $totalOrders) : 0;
 
-        // 2. Query previous period revenue for PoP delta calculation
+        // 2. kueri pendapatan periode sebelumnya untuk kalkulasi pertumbuhan
         $prevRevenue = (float) (DB::table('orders')
             ->where('workspace_id', $workspaceId)
             ->whereBetween('created_at', [$prevStart, $prevEnd])
@@ -51,7 +51,7 @@ class AnalyticsService
             ? round((($totalRevenue - $prevRevenue) / $prevRevenue) * 100, 1)
             : ($totalRevenue > 0 ? 100.0 : 0.0);
 
-        // 3. Optimized breakdown retrieval: 1 query + in-memory bucketing
+        // 3. kueri rincian transaksi: 1 kueri + pengelompokan di memori
         $ordersInPeriod = DB::table('orders')
             ->where('workspace_id', $workspaceId)
             ->whereBetween('created_at', [$start, $end])
@@ -61,13 +61,13 @@ class AnalyticsService
 
         $breakdown = $this->buildBreakdownPoints($normalizedPeriod, $start, $end, $ordersInPeriod);
 
-        // 4. Top 10 products
+        // 4. sepuluh produk teratas
         $topProducts = $this->buildTopProducts($workspaceId, $start, $end, $branchId, $totalRevenue);
 
-        // 5. Category breakdown
+        // 5. rincian kategori
         $categoryBreakdown = $this->buildCategoryBreakdown($workspaceId, $start, $end, $branchId, $totalRevenue);
 
-        // 6. Payment methods breakdown
+        // 6. rincian metode pembayaran
         $paymentMethods = $this->buildPaymentMethods($workspaceId, $start, $end, $branchId, $totalRevenue);
 
         return [
@@ -126,7 +126,7 @@ class AnalyticsService
                     }
                 }
 
-                // Mulai dari bulan pembukaan workspace / transaksi pertama, berakhir di hari saat ini
+                // mulai dari bulan pembukaan workspace / transaksi pertama, berakhir di hari saat ini
                 $earliestAllowed = $now->copy()->subYears(2)->startOfMonth();
                 $start = $wsCreatedAt->isAfter($earliestAllowed) ? $wsCreatedAt->copy()->startOfMonth() : $now->copy()->startOfYear();
                 $end = $now->copy()->endOfDay();
@@ -240,44 +240,99 @@ class AnalyticsService
                 ['d' => 6, 'l' => 'Sabtu'],
                 ['d' => 7, 'l' => 'Minggu'],
             ];
+            foreach ($hours as $slot) {
+                $h = $slot['h'];
+                $matching = $mappedOrders->filter(function ($o) use ($h) {
+                    $orderHour = (int) $o['timestamp']->format('G');
+                    return $orderHour >= $h && $orderHour < $h + 2;
+                });
 
-            foreach ($days as $d) {
-                $dStart = $start->copy()->startOfWeek()->addDays($d['d'] - 1)->startOfDay();
-                $dEnd = $dStart->copy()->endOfDay();
-
-                $matching = $mappedOrders->filter(fn ($o) => $o['timestamp']->betweenIncluded($dStart, $dEnd));
                 $count = $matching->count();
                 $rev = (float) $matching->sum('amount');
 
                 $breakdown[] = [
-                    'id' => 'w-' . $d['d'],
-                    'label' => $d['l'],
-                    'subLabel' => $dStart->format('d M'),
+                    'id' => 'slot-' . $h,
+                    'label' => $slot['l'],
+                    'subLabel' => $slot['sub'],
                     'revenue' => (int) $rev,
                     'orders_count' => $count,
                     'average_ticket' => $count > 0 ? (int) round($rev / $count) : 0,
                 ];
             }
-        } elseif ($period === 'month') {
-            for ($w = 1; $w <= 4; $w++) {
-                $wStart = $start->copy()->addDays(($w - 1) * 7)->startOfDay();
-                $wEnd = $w === 4 ? $end->copy() : $wStart->copy()->addDays(6)->endOfDay();
+        } elseif ($period === 'week' || $period === 'month') {
+            $cursor = $start->copy()->startOfDay();
+            while ($cursor->lte($end)) {
+                $dayStr = $cursor->toDateString();
+                $matching = $mappedOrders->filter(fn ($o) => $o['timestamp']->toDateString() === $dayStr);
+                $count = $matching->count();
+                $rev = (float) $matching->sum('amount');
+
+                $breakdown[] = [
+                    'id' => 'd-' . $dayStr,
+                    'label' => $cursor->isoFormat('D MMM'),
+                    'subLabel' => $cursor->isoFormat('dddd'),
+                    'revenue' => (int) $rev,
+                    'orders_count' => $count,
+                    'average_ticket' => $count > 0 ? (int) round($rev / $count) : 0,
+                ];
+
+                $cursor->addDay();
+            }
+        } elseif ($period === 'quarter') {
+            // periode kuartal (3 bulan): tampilkan mingguan (w1 s/d w12)
+            $cursor = $start->copy()->startOfWeek();
+            $weekNum = 1;
+
+            while ($cursor->lte($end)) {
+                $wStart = $cursor->copy()->startOfDay();
+                $wEnd = $cursor->copy()->endOfWeek()->endOfDay();
+                if ($wEnd->gt($end)) {
+                    $wEnd = $end->copy();
+                }
 
                 $matching = $mappedOrders->filter(fn ($o) => $o['timestamp']->betweenIncluded($wStart, $wEnd));
                 $count = $matching->count();
                 $rev = (float) $matching->sum('amount');
 
                 $breakdown[] = [
-                    'id' => 'm-w' . $w,
-                    'label' => 'Minggu ' . $w,
-                    'subLabel' => $wStart->format('d M') . ' - ' . $wEnd->format('d M'),
+                    'id' => 'w-' . $cursor->format('Y-W'),
+                    'label' => 'M' . $weekNum . ' (' . $cursor->isoFormat('D MMM') . ')',
+                    'subLabel' => $cursor->isoFormat('MMM YYYY'),
+                    'revenue' => (int) $rev,
+                    'orders_count' => $count,
+                    'average_ticket' => $count > 0 ? (int) round($rev / $count) : 0,
+                ];
+
+                $cursor->addWeek();
+                $weekNum++;
+            }
+        } elseif ($period === 'half_year') {
+            // periode semester (6 bulan): tampilkan per 2 mingguan
+            for ($biWeek = 1; $biWeek <= 12; $biWeek++) {
+                $wStart = $start->copy()->addWeeks(($biWeek - 1) * 2)->startOfDay();
+                $wEnd = $wStart->copy()->addWeeks(2)->subDay()->endOfDay();
+                if ($wStart->gt($end)) {
+                    break;
+                }
+                if ($wEnd->gt($end)) {
+                    $wEnd = $end->copy();
+                }
+
+                $matching = $mappedOrders->filter(fn ($o) => $o['timestamp']->betweenIncluded($wStart, $wEnd));
+                $count = $matching->count();
+                $rev = (float) $matching->sum('amount');
+
+                $breakdown[] = [
+                    'id' => 'bw-' . $biWeek,
+                    'label' => $wStart->isoFormat('D MMM') . ' - ' . $wEnd->isoFormat('D MMM'),
+                    'subLabel' => 'Dua Mingguan ' . $biWeek,
                     'revenue' => (int) $rev,
                     'orders_count' => $count,
                     'average_ticket' => $count > 0 ? (int) round($rev / $count) : 0,
                 ];
             }
         } else {
-            // Periode Tahunan & Sepanjang Waktu: Dari bulan pembuatan workspace hingga bulan saat ini
+            // periode tahunan dan sepanjang waktu: dari bulan pembuatan workspace hingga bulan saat ini
             $cursor = $start->copy()->startOfMonth();
             $currentMonth = $end->copy()->startOfMonth();
 

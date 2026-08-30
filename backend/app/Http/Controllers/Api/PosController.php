@@ -47,6 +47,7 @@ class PosController
             workspaceId: $workspaceId,
             branchId: $branchId,
             cashierUserId: (string) $request->validated('cashier_user_id'),
+            pin: (string) $request->validated('pin'),
             openingCash: (float) $request->validated('opening_cash'),
             notes: $request->validated('notes'),
         );

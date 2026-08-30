@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Scope;
 class WorkspaceScope implements Scope
 {
     /**
-     * Apply the scope to a given Eloquent query builder.
+     * terapkan pembatasan workspace pada query builder eloquent
      */
     public function apply(Builder $builder, Model $model): void
     {

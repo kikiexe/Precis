@@ -11,14 +11,14 @@ use Illuminate\Database\Eloquent\Scope;
 class BranchScope implements Scope
 {
     /**
-     * Apply the scope to a given Eloquent query builder.
+     * terapkan pembatasan cabang pada query builder eloquent
      */
     public function apply(Builder $builder, Model $model): void
     {
         $request = request();
         if ($request && $request->attributes->has('current_member')) {
             $member = $request->attributes->get('current_member');
-            // If the member is tied to a specific branch (Manager / Staff), restrict queries to that branch
+            // batasi kueri ke cabang penugasan jika staf terikat ke cabang tertentu
             if ($member && ! empty($member->branch_id)) {
                 $builder->where($model->getTable() . '.branch_id', $member->branch_id);
             }
