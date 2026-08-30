@@ -173,7 +173,6 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/stock-wastes/{id}', [\App\Http\Controllers\Api\StockWasteController::class, 'show']);
         Route::post('/stock-wastes', [\App\Http\Controllers\Api\StockWasteController::class, 'store']);
         Route::delete('/stock-wastes/{id}', [\App\Http\Controllers\Api\StockWasteController::class, 'destroy']);
-
         // presensi mobile PWA
         Route::prefix('attendances')->group(function (): void {
             Route::post('/clock-in', [AttendanceController::class, 'clockIn']);

@@ -1,16 +1,49 @@
 <script lang="ts">
-  import { Monitor, Clock, Banknote, ArrowRight } from 'lucide-svelte';
-  import type { PosSession, CashierUser } from '../../../types/pos';
+  import { Monitor, Clock, Banknote, ArrowRight, ShoppingBag, Plus } from 'lucide-svelte';
+  import type { PosSession, CashierUser, OutletPurchase } from '../../../types/pos';
   import { formatCurrency } from '../../../services/printer-service';
 
   interface Props {
     activeSession: PosSession | null;
     activeCashier: CashierUser | null;
+    purchases?: OutletPurchase[];
     onOpenSessionModal: () => void;
+    onOpenPurchaseModal?: () => void;
     onGoToSettlement?: () => void;
   }
 
-  let { activeSession, activeCashier, onOpenSessionModal, onGoToSettlement }: Props = $props();
+  let {
+    activeSession,
+    activeCashier,
+    purchases = [],
+    onOpenSessionModal,
+    onOpenPurchaseModal,
+    onGoToSettlement,
+  }: Props = $props();
+
+  let sessionPurchases = $derived(
+    activeSession
+      ? purchases.filter((p) => p.pos_session_id === activeSession?.id)
+      : purchases
+  );
+
+  let totalCashPurchases = $derived(
+    sessionPurchases
+      .filter((p) => p.funding_source === 'CASH_DRAWER')
+      .reduce((sum, p) => sum + Number(p.total_price), 0)
+  );
+
+  let totalReimbursePurchases = $derived(
+    sessionPurchases
+      .filter((p) => p.funding_source === 'EXTERNAL_REIMBURSE')
+      .reduce((sum, p) => sum + Number(p.total_price), 0)
+  );
+
+  let expectedDrawerCash = $derived(
+    activeSession
+      ? Number(activeSession.opening_cash) + Number(activeSession.total_cash_sales) - totalCashPurchases
+      : 0
+  );
 </script>
 
 <div class="flex h-full flex-1 flex-col overflow-hidden bg-[#f4f6f9] font-sans select-none">
@@ -24,7 +57,18 @@
       <span class="text-xs font-medium text-zinc-500">Laci Kas &amp; Operasional Kasir</span>
     </div>
 
-    <div>
+    <div class="flex items-center gap-2">
+      {#if activeSession && activeSession.status === 'OPEN' && onOpenPurchaseModal}
+        <button
+          type="button"
+          onclick={onOpenPurchaseModal}
+          class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-zinc-300 bg-white px-3.5 py-2 text-xs font-bold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-100"
+        >
+          <Plus class="size-4 text-zinc-600" />
+          <span>Catat Belanja (Petty Cash)</span>
+        </button>
+      {/if}
+
       <button
         type="button"
         onclick={onOpenSessionModal}
@@ -34,11 +78,11 @@
             : 'bg-zinc-900 text-white hover:bg-black'
         }`}
       >
-        <span
-          >{activeSession && activeSession.status === 'OPEN'
+        <span>
+          {activeSession && activeSession.status === 'OPEN'
             ? 'Tutup Shift Sekarang'
-            : 'Buka Shift Baru'}</span
-        >
+            : 'Buka Shift Baru'}
+        </span>
       </button>
     </div>
   </div>
@@ -92,27 +136,39 @@
 
         {#if activeSession && activeSession.status === 'OPEN'}
           <!-- Live Financial Metrics Grid -->
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div class="space-y-1 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-4">
+            <div class="space-y-1 rounded-xl border border-zinc-200 bg-zinc-50 p-3.5">
               <div class="text-[11px] font-medium text-zinc-500">Penjualan Tunai Masuk</div>
-              <div class="font-mono text-base font-bold text-emerald-700">
+              <div class="font-mono text-sm font-bold text-emerald-700">
                 +{formatCurrency(activeSession.total_cash_sales)}
               </div>
             </div>
 
-            <div class="space-y-1 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+            <div class="space-y-1 rounded-xl border border-zinc-200 bg-zinc-50 p-3.5">
+              <div class="text-[11px] font-medium text-zinc-500">Belanja Kas Laci (-)</div>
+              <div class="font-mono text-sm font-bold text-amber-700">
+                -{formatCurrency(totalCashPurchases)}
+              </div>
+              {#if totalReimbursePurchases > 0}
+                <div class="text-[10px] text-zinc-500">
+                  Reimburse: {formatCurrency(totalReimbursePurchases)}
+                </div>
+              {/if}
+            </div>
+
+            <div class="space-y-1 rounded-xl border border-zinc-200 bg-zinc-50 p-3.5">
               <div class="text-[11px] font-medium text-zinc-500">Non-Tunai (QRIS / EDC)</div>
-              <div class="font-mono text-base font-bold text-zinc-900">
+              <div class="font-mono text-sm font-bold text-zinc-900">
                 +{formatCurrency(
                   activeSession.total_qris_sales + activeSession.total_transfer_sales
                 )}
               </div>
             </div>
 
-            <div class="space-y-1 rounded-xl bg-zinc-900 p-4 text-white shadow-xs">
-              <div class="text-[11px] font-medium text-zinc-400">Ekspektasi Kas Fisik di Laci</div>
-              <div class="font-mono text-base font-bold text-white">
-                {formatCurrency(activeSession.opening_cash + activeSession.total_cash_sales)}
+            <div class="space-y-1 rounded-xl bg-zinc-900 p-3.5 text-white shadow-xs">
+              <div class="text-[11px] font-medium text-zinc-400">Ekspektasi Kas di Laci</div>
+              <div class="font-mono text-sm font-bold text-white">
+                {formatCurrency(expectedDrawerCash)}
               </div>
             </div>
           </div>
@@ -166,6 +222,76 @@
           </div>
         {/if}
       </div>
+
+      <!-- Card 2: Petty Cash / Belanja Outlet List -->
+      {#if activeSession && activeSession.status === 'OPEN'}
+        <div class="space-y-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-2xs">
+          <div class="flex items-center justify-between border-b border-zinc-100 pb-3">
+            <div class="flex items-center gap-2">
+              <ShoppingBag class="size-4 text-zinc-800" />
+              <h3 class="text-sm font-bold text-zinc-900">
+                Pengeluaran Kas Belanja Outlet (Shift Ini)
+              </h3>
+              <span class="rounded-md bg-zinc-100 px-2 py-0.5 font-mono text-xs font-semibold text-zinc-700">
+                {sessionPurchases.length} Catatan
+              </span>
+            </div>
+
+            {#if onOpenPurchaseModal}
+              <button
+                type="button"
+                onclick={onOpenPurchaseModal}
+                class="flex cursor-pointer items-center gap-1 text-xs font-bold text-zinc-900 hover:underline"
+              >
+                <Plus class="size-3.5" />
+                <span>+ Catat Belanja</span>
+              </button>
+            {/if}
+          </div>
+
+          {#if sessionPurchases.length === 0}
+            <div class="py-6 text-center text-xs text-zinc-400">
+              Belum ada pengeluaran kas belanja yang dicatat pada shift aktif ini.
+            </div>
+          {:else}
+            <div class="divide-y divide-zinc-100 overflow-hidden rounded-xl border border-zinc-200">
+              {#each sessionPurchases as p (p.id)}
+                <div class="flex items-center justify-between p-3 text-xs hover:bg-zinc-50/70">
+                  <div class="space-y-0.5">
+                    <div class="flex items-center gap-2">
+                      <span class="font-bold text-zinc-900">{p.item_name}</span>
+                      <span class="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-600">
+                        {p.quantity} {p.unit}
+                      </span>
+                      <span
+                        class={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                          p.funding_source === 'CASH_DRAWER'
+                            ? 'bg-amber-100 text-amber-900'
+                            : 'bg-blue-100 text-blue-900'
+                        }`}
+                      >
+                        {p.funding_source === 'CASH_DRAWER' ? 'Kas Laci' : 'Reimburse'}
+                      </span>
+                    </div>
+                    <div class="text-[11px] text-zinc-500">
+                      {p.category.replace(/_/g, ' ')} {p.notes ? `• ${p.notes}` : ''}
+                    </div>
+                  </div>
+
+                  <div class="text-right">
+                    <div class="font-mono text-xs font-bold text-zinc-900">
+                      {formatCurrency(p.total_price)}
+                    </div>
+                    <div class="text-[10px] text-zinc-400">
+                      {new Date(p.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                </div>
+              {/each}
+            </div>
+          {/if}
+        </div>
+      {/if}
     </div>
   </div>
 </div>

@@ -55,7 +55,7 @@ class OutletPurchaseTest extends TestCase
                 'message' => 'Belanja outlet berhasil dicatat.',
                 'data' => [
                     'item_name' => 'Es Batu Kristal 10kg',
-                    'total_price' => '36000.00',
+                    'total_price' => 36000.0,
                     'funding_source' => 'CASH_DRAWER',
                 ],
             ]);
@@ -131,7 +131,7 @@ class OutletPurchaseTest extends TestCase
                 'message' => 'Pengeluaran belanja outlet berhasil dicatat.',
                 'data' => [
                     'item_name' => 'Susu Segar Darurat 2L',
-                    'total_price' => '25000.00',
+                    'total_price' => 25000.0,
                 ],
             ]);
 

@@ -71,4 +71,12 @@ class PosSession extends Model
     {
         return $this->hasMany(Order::class, 'pos_session_id');
     }
+
+    /**
+     * relasi pengeluaran kas belanja outlet pada sesi kasir
+     */
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(OutletPurchase::class, 'pos_session_id');
+    }
 }

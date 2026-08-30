@@ -160,8 +160,8 @@ return [
                     'is_high_risk' => true,
                 ],
                 'pos.refund_order' => [
-                    'name' => 'Otorisasi Refund Dana Transaksi',
-                    'description' => 'Mengembalikan dana pembayaran pesanan ke pelanggan',
+                    'name' => 'Otorisasi Refund Transaksi',
+                    'description' => 'Mengembalikan dana pesanan pelanggan dengan otorisasi PIN',
                     'is_high_risk' => true,
                 ],
                 'pos.apply_discount' => [

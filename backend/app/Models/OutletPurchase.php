@@ -45,7 +45,7 @@ class OutletPurchase extends Model
     }
 
     /**
-     * relasi ke workspace tenant
+     * relasi tenant workspace
      */
     public function workspace(): BelongsTo
     {
@@ -53,7 +53,7 @@ class OutletPurchase extends Model
     }
 
     /**
-     * relasi ke outlet cabang
+     * relasi cabang outlet
      */
     public function branch(): BelongsTo
     {
@@ -61,7 +61,7 @@ class OutletPurchase extends Model
     }
 
     /**
-     * relasi ke sesi kasir terkait
+     * relasi sesi kasir POS
      */
     public function session(): BelongsTo
     {
@@ -69,7 +69,7 @@ class OutletPurchase extends Model
     }
 
     /**
-     * relasi ke kasir / staf pencatat
+     * user / kasir yang mencatat belanja
      */
     public function recordedByUser(): BelongsTo
     {

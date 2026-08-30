@@ -7,77 +7,70 @@ namespace App\Http\Controllers\Api;
 use App\Http\Requests\Pos\CreateOutletPurchaseRequest;
 use App\Models\Branch;
 use App\Models\OutletPurchase;
+use App\Models\PosSession;
 use App\Models\WorkspaceMember;
+use App\Services\PosService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class OutletPurchaseController
 {
+    public function __construct(
+        private readonly PosService $posService,
+    ) {
+    }
+
     /**
-     * ambil daftar belanja operasional outlet (petty cash)
+     * ambil daftar belanja operasional outlet dengan filter cabang dan pagination
      */
     public function index(Request $request): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
         $user = $request->user();
 
+        /** @var WorkspaceMember|null $member */
         $member = WorkspaceMember::where('workspace_id', $workspaceId)
-            ->where('user_id', $user->id)
+            ->where('user_id', $user?->id)
             ->first();
 
-        $isOwner = $user->is_superadmin || ($member && $member->role === 'OWNER');
+        $branchId = $request->query('branch_id');
 
-        $query = OutletPurchase::query()
-            ->with(['branch:id,name', 'recordedByUser:id,name', 'session:id,opened_at'])
-            ->where('workspace_id', $workspaceId);
-
-        // isolasi cabang untuk non-owner
-        if (! $isOwner && $member && $member->branch_id) {
-            $query->where('branch_id', $member->branch_id);
-        } elseif ($request->filled('branch_id')) {
-            $query->where('branch_id', $request->query('branch_id'));
+        // isolasi cabang: jika bukan owner dan memiliki branch_id khusus, kunci ke cabang tersebut
+        if ($member && $member->role !== 'OWNER' && $member->branch_id) {
+            $branchId = $member->branch_id;
         }
 
-        if ($request->filled('category')) {
-            $query->where('category', $request->query('category'));
-        }
+        $sessionId = $request->query('pos_session_id');
 
-        if ($request->filled('funding_source')) {
-            $query->where('funding_source', $request->query('funding_source'));
-        }
-
-        if ($request->filled('pos_session_id')) {
-            $query->where('pos_session_id', $request->query('pos_session_id'));
-        }
-
-        $purchases = $query->orderByDesc('created_at')->get();
+        $purchases = $this->posService->getOutletPurchases(
+            workspaceId: $workspaceId,
+            branchId: $branchId ? (string) $branchId : null,
+            posSessionId: $sessionId ? (string) $sessionId : null,
+        );
 
         return new JsonResponse([
-            'message' => 'Daftar belanja outlet berhasil dimuat.',
-            'total_amount' => (float) $purchases->sum('total_price'),
-            'count' => $purchases->count(),
+            'message' => 'Daftar pengeluaran belanja outlet berhasil dimuat.',
             'data' => $purchases,
         ], Response::HTTP_OK);
     }
 
     /**
-     * simpan data pengeluaran belanja operasional outlet dari portal web
+     * catat belanja operasional baru dari web portal admin
      */
     public function store(CreateOutletPurchaseRequest $request): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
         $user = $request->user();
 
+        /** @var WorkspaceMember|null $member */
         $member = WorkspaceMember::where('workspace_id', $workspaceId)
-            ->where('user_id', $user->id)
+            ->where('user_id', $user?->id)
             ->first();
 
-        $isOwner = $user->is_superadmin || ($member && $member->role === 'OWNER');
-
         $branchId = $request->input('branch_id');
-        if (! $branchId) {
-            $branchId = $member?->branch_id;
+        if ($member && $member->role !== 'OWNER' && $member->branch_id) {
+            $branchId = $member->branch_id;
         }
 
         if (! $branchId) {
@@ -85,68 +78,60 @@ class OutletPurchaseController
             $branchId = $defaultBranch?->id;
         }
 
-        if (! $isOwner && $member && $member->branch_id && $branchId !== $member->branch_id) {
+        if (! $branchId) {
             return new JsonResponse([
-                'message' => 'Anda tidak memiliki hak akses untuk mencatat pengeluaran di cabang lain.',
-            ], Response::HTTP_FORBIDDEN);
+                'message' => 'Cabang outlet tidak ditemukan.',
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $quantity = (float) $request->input('quantity');
-        $unitPrice = (float) $request->input('unit_price');
-        $totalPrice = $request->filled('total_price')
-            ? (float) $request->input('total_price')
-            : round($quantity * $unitPrice, 2);
-
-        $purchase = OutletPurchase::create([
-            'workspace_id' => $workspaceId,
-            'branch_id' => $branchId,
-            'pos_session_id' => $request->input('pos_session_id'),
-            'item_name' => $request->input('item_name'),
-            'unit' => $request->input('unit', 'Pcs'),
-            'quantity' => $quantity,
-            'unit_price' => $unitPrice,
-            'total_price' => $totalPrice,
-            'category' => $request->input('category'),
-            'funding_source' => $request->input('funding_source'),
-            'receipt_photo_url' => $request->input('receipt_photo_url'),
-            'notes' => $request->input('notes'),
-            'recorded_by_user_id' => $user->id,
-        ]);
-
-        $purchase->load(['branch:id,name', 'recordedByUser:id,name']);
+        $purchase = $this->posService->createOutletPurchase(
+            workspaceId: $workspaceId,
+            branchId: (string) $branchId,
+            posSessionId: $request->validated('pos_session_id'),
+            recordedByUserId: (string) $user->id,
+            data: $request->validated(),
+        );
 
         return new JsonResponse([
             'message' => 'Belanja outlet berhasil dicatat.',
-            'data' => $purchase,
+            'data' => $purchase->load(['recordedByUser:id,name', 'branch:id,name']),
         ], Response::HTTP_CREATED);
     }
 
     /**
-     * ambil detail satu transaksi belanja outlet
+     * tampilkan detail catatan belanja outlet
      */
     public function show(Request $request, string $id): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
         $user = $request->user();
 
+        /** @var WorkspaceMember|null $member */
         $member = WorkspaceMember::where('workspace_id', $workspaceId)
-            ->where('user_id', $user->id)
+            ->where('user_id', $user?->id)
             ->first();
 
-        $isOwner = $user->is_superadmin || ($member && $member->role === 'OWNER');
-
+        /** @var OutletPurchase|null $purchase */
         $purchase = OutletPurchase::withoutGlobalScopes()
-            ->with(['branch:id,name', 'recordedByUser:id,name', 'session'])
+            ->with(['recordedByUser:id,name', 'branch:id,name', 'session'])
             ->where('workspace_id', $workspaceId)
-            ->findOrFail($id);
+            ->where('id', $id)
+            ->first();
 
-        if (! $isOwner && $member && $member->branch_id && $purchase->branch_id !== $member->branch_id) {
+        if (! $purchase) {
             return new JsonResponse([
-                'message' => 'Anda tidak memiliki hak akses untuk melihat data belanja cabang lain.',
+                'message' => 'Catatan belanja outlet tidak ditemukan.',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($member && $member->role !== 'OWNER' && $member->branch_id && $member->branch_id !== $purchase->branch_id) {
+            return new JsonResponse([
+                'message' => 'Anda tidak memiliki akses ke cabang outlet ini.',
             ], Response::HTTP_FORBIDDEN);
         }
 
         return new JsonResponse([
+            'message' => 'Detail belanja outlet berhasil dimuat.',
             'data' => $purchase,
         ], Response::HTTP_OK);
     }
@@ -159,19 +144,26 @@ class OutletPurchaseController
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
         $user = $request->user();
 
+        /** @var WorkspaceMember|null $member */
         $member = WorkspaceMember::where('workspace_id', $workspaceId)
-            ->where('user_id', $user->id)
+            ->where('user_id', $user?->id)
             ->first();
 
-        $isOwner = $user->is_superadmin || ($member && $member->role === 'OWNER');
-
+        /** @var OutletPurchase|null $purchase */
         $purchase = OutletPurchase::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
-            ->findOrFail($id);
+            ->where('id', $id)
+            ->first();
 
-        if (! $isOwner && $member && $member->branch_id && $purchase->branch_id !== $member->branch_id) {
+        if (! $purchase) {
             return new JsonResponse([
-                'message' => 'Anda tidak memiliki hak akses untuk menghapus data belanja cabang lain.',
+                'message' => 'Catatan belanja outlet tidak ditemukan.',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($member && $member->role !== 'OWNER' && $member->branch_id && $member->branch_id !== $purchase->branch_id) {
+            return new JsonResponse([
+                'message' => 'Anda tidak memiliki akses untuk menghapus data cabang lain.',
             ], Response::HTTP_FORBIDDEN);
         }
 
