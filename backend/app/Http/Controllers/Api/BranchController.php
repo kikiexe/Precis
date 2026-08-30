@@ -40,6 +40,11 @@ class BranchController
                     'late_penalty_per_minute' => $setting ? (float) $setting->late_penalty_per_minute : 1000.0,
                     'overtime_pay_per_hour' => $setting ? (float) $setting->overtime_pay_per_hour : 20000.0,
                     'min_overtime_threshold_minutes' => $setting ? (int) $setting->min_overtime_threshold_minutes : 30,
+                    'tax_enabled' => $setting ? (bool) $setting->tax_enabled : false,
+                    'tax_name' => $setting ? (string) $setting->tax_name : 'PB1',
+                    'tax_rate' => $setting ? (float) $setting->tax_rate : 10.0,
+                    'tax_type' => $setting ? (string) $setting->tax_type : 'INCLUSIVE',
+                    'show_tax_on_receipt' => $setting ? (bool) $setting->show_tax_on_receipt : true,
                     'terminals_count' => $b->posTerminals->count(),
                     'terminals' => $b->posTerminals->map(function (PosTerminal $t): array {
                         return [
@@ -90,6 +95,11 @@ class BranchController
             'late_penalty_per_minute' => 'sometimes|numeric|min:0',
             'overtime_pay_per_hour' => 'sometimes|numeric|min:0',
             'min_overtime_threshold_minutes' => 'sometimes|integer|min:0|max:180',
+            'tax_enabled' => 'sometimes|boolean',
+            'tax_name' => 'sometimes|string|max:100',
+            'tax_rate' => 'sometimes|numeric|min:0|max:100',
+            'tax_type' => 'sometimes|string|in:INCLUSIVE,EXCLUSIVE',
+            'show_tax_on_receipt' => 'sometimes|boolean',
         ]);
 
         if (isset($validated['name'])) {
@@ -118,6 +128,11 @@ class BranchController
                 'late_penalty_per_minute' => 1000.0,
                 'overtime_pay_per_hour' => 20000.0,
                 'min_overtime_threshold_minutes' => 30,
+                'tax_enabled' => false,
+                'tax_name' => 'PB1',
+                'tax_rate' => 10.00,
+                'tax_type' => 'INCLUSIVE',
+                'show_tax_on_receipt' => true,
             ]
         );
 
@@ -129,6 +144,21 @@ class BranchController
         }
         if (isset($validated['min_overtime_threshold_minutes'])) {
             $setting->min_overtime_threshold_minutes = $validated['min_overtime_threshold_minutes'];
+        }
+        if (isset($validated['tax_enabled'])) {
+            $setting->tax_enabled = (bool) $validated['tax_enabled'];
+        }
+        if (isset($validated['tax_name'])) {
+            $setting->tax_name = $validated['tax_name'];
+        }
+        if (isset($validated['tax_rate'])) {
+            $setting->tax_rate = $validated['tax_rate'];
+        }
+        if (isset($validated['tax_type'])) {
+            $setting->tax_type = $validated['tax_type'];
+        }
+        if (isset($validated['show_tax_on_receipt'])) {
+            $setting->show_tax_on_receipt = (bool) $validated['show_tax_on_receipt'];
         }
         $setting->save();
 
@@ -144,6 +174,11 @@ class BranchController
                 'late_penalty_per_minute' => (float) $setting->late_penalty_per_minute,
                 'overtime_pay_per_hour' => (float) $setting->overtime_pay_per_hour,
                 'min_overtime_threshold_minutes' => (int) $setting->min_overtime_threshold_minutes,
+                'tax_enabled' => (bool) $setting->tax_enabled,
+                'tax_name' => (string) $setting->tax_name,
+                'tax_rate' => (float) $setting->tax_rate,
+                'tax_type' => (string) $setting->tax_type,
+                'show_tax_on_receipt' => (bool) $setting->show_tax_on_receipt,
             ],
         ], Response::HTTP_OK);
     }

@@ -80,7 +80,14 @@ export function generateReceiptText(
   if (order.discount_amount > 0) {
     text += row('Diskon:', `-${formatCurrency(order.discount_amount)}`) + '\n';
   }
+  if (order.tax_type === 'EXCLUSIVE' && (order.tax_amount ?? 0) > 0) {
+    const taxLabel = `${order.tax_name || 'PB1'} (${order.tax_rate ?? 0}%):`;
+    text += row(taxLabel, formatCurrency(order.tax_amount || 0)) + '\n';
+  }
   text += row('TOTAL:', formatCurrency(order.final_amount)) + '\n';
+  if (order.tax_type === 'INCLUSIVE' && (order.tax_amount ?? 0) > 0) {
+    text += row(`*Inc. ${order.tax_name || 'PB1'} (${order.tax_rate ?? 0}%):`, formatCurrency(order.tax_amount || 0)) + '\n';
+  }
   if (order.cash_tendered) {
     text += row('Bayar Tunai:', formatCurrency(order.cash_tendered)) + '\n';
     text += row('Kembalian:', formatCurrency(order.change_amount || 0)) + '\n';

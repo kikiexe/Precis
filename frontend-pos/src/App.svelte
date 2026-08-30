@@ -5,6 +5,7 @@
   import { posService } from './lib/services/pos-service';
   import { syncEngine } from './lib/services/sync-engine';
   import { preloadAndCacheImage } from './lib/services/image-cache';
+  import { calculateCartTotals } from './lib/services/pos-calculations';
   import type {
     Product,
     Category,
@@ -94,16 +95,18 @@
   // pesanan terakhir untuk cetak struk
   let lastCompletedOrder = $state<OfflineOrder | null>(null);
 
-  // perhitungan total belanja
-  let subtotalAmount = $derived(
-    cartItems.reduce((sum, item) => sum + item.unit_price * item.quantity, 0)
+  // perhitungan total belanja dan pajak dinamis
+  let cartCalc = $derived(
+    calculateCartTotals(cartItems, discountPercent, discountNominal, terminalInfo?.tax_settings)
   );
 
-  let calculatedDiscountAmount = $derived(
-    discountPercent > 0 ? Math.round((subtotalAmount * discountPercent) / 100) : discountNominal
-  );
-
-  let finalPayableAmount = $derived(Math.max(0, subtotalAmount - calculatedDiscountAmount));
+  let subtotalAmount = $derived(cartCalc.totalAmount);
+  let calculatedDiscountAmount = $derived(cartCalc.discountAmount);
+  let taxAmount = $derived(cartCalc.taxAmount);
+  let taxName = $derived(cartCalc.taxName);
+  let taxType = $derived(cartCalc.taxType);
+  let taxRate = $derived(cartCalc.taxRate);
+  let finalPayableAmount = $derived(cartCalc.finalAmount);
 
   onMount(() => {
     // daftarkan interceptor token tidak sah untuk membuka modal pairing
@@ -528,6 +531,7 @@
           {orderType}
           {customerName}
           openBillsCount={openBills.length}
+          taxSettings={terminalInfo?.tax_settings}
           onSelectCategory={(id: string) => (selectedCategoryId = id)}
           onAddToCart={handleAddToCart}
           onUpdateQuantity={handleUpdateQuantity}
@@ -614,6 +618,10 @@
     totalAmount={subtotalAmount}
     discountAmount={calculatedDiscountAmount}
     finalAmount={finalPayableAmount}
+    {taxName}
+    {taxRate}
+    {taxType}
+    {taxAmount}
     items={cartItems}
     {activeCashier}
     branchId={terminalInfo?.branch_id || 'branch-sleman-01'}

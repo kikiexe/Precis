@@ -284,14 +284,24 @@ Route::prefix('v1')->group(function (): void {
                 ->values()
                 ->toArray();
 
+            $branch = $terminal->branch;
+            $setting = $branch?->setting;
+
             return response()->json([
                 'terminal_id' => $terminal->id,
                 'terminal_name' => $terminal->terminal_name,
                 'workspace_id' => $terminal->workspace_id,
                 'branch_id' => $terminal->branch_id,
-                'branch_name' => $terminal->branch?->name,
-                'qris_image_url' => $terminal->branch?->qris_image_url,
+                'branch_name' => $branch?->name,
+                'qris_image_url' => $branch?->qris_image_url,
                 'cashiers' => $cashiers,
+                'tax_settings' => [
+                    'tax_enabled' => (bool) ($setting?->tax_enabled ?? false),
+                    'tax_name' => (string) ($setting?->tax_name ?? 'PB1'),
+                    'tax_rate' => (float) ($setting?->tax_rate ?? 10.0),
+                    'tax_type' => (string) ($setting?->tax_type ?? 'INCLUSIVE'),
+                    'show_tax_on_receipt' => (bool) ($setting?->show_tax_on_receipt ?? true),
+                ],
             ]);
         });
 

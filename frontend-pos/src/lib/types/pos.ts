@@ -1,3 +1,11 @@
+export interface TaxSettings {
+  tax_enabled: boolean;
+  tax_name: string;
+  tax_rate: number;
+  tax_type: 'INCLUSIVE' | 'EXCLUSIVE';
+  show_tax_on_receipt: boolean;
+}
+
 export interface PosTerminalInfo {
   terminal_id: string;
   terminal_name: string;
@@ -6,6 +14,7 @@ export interface PosTerminalInfo {
   branch_name?: string;
   qris_image_url?: string | null;
   cashiers?: CashierUser[];
+  tax_settings?: TaxSettings;
 }
 
 export interface Addon {
@@ -146,6 +155,10 @@ export interface OfflineOrder {
   total_amount: number;
   discount_amount: number;
   final_amount: number;
+  tax_name?: string;
+  tax_rate?: number;
+  tax_type?: 'INCLUSIVE' | 'EXCLUSIVE';
+  tax_amount?: number;
   payment_method: PaymentMethod;
   payment_status?: 'PAID' | 'CANCELLED' | 'VOIDED' | 'REFUNDED' | 'PARTIALLY_REFUNDED';
   void_reason?: string | null;
@@ -262,6 +275,7 @@ export interface OutletPurchase {
   };
   created_at: string;
 }
+
 export type StockWasteReason =
   | 'EXPIRED'
   | 'SPOILED'

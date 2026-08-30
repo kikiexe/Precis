@@ -37,6 +37,11 @@ class InventoryService {
         | 'late_penalty_per_minute'
         | 'overtime_pay_per_hour'
         | 'min_overtime_threshold_minutes'
+        | 'tax_enabled'
+        | 'tax_name'
+        | 'tax_rate'
+        | 'tax_type'
+        | 'show_tax_on_receipt'
       >
     >
   ): Promise<BranchItem> {

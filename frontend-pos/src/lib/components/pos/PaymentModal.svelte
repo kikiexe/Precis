@@ -9,6 +9,10 @@
     totalAmount: number;
     discountAmount: number;
     finalAmount: number;
+    taxName?: string;
+    taxRate?: number;
+    taxType?: 'INCLUSIVE' | 'EXCLUSIVE';
+    taxAmount?: number;
     items: CartItem[];
     activeCashier?: CashierUser | null;
     branchId: string;
@@ -24,6 +28,10 @@
     totalAmount = 0,
     discountAmount = 0,
     finalAmount = 0,
+    taxName,
+    taxRate,
+    taxType,
+    taxAmount = 0,
     items = [],
     activeCashier = null,
     branchId = 'branch-sleman-01',
@@ -91,6 +99,10 @@
       total_amount: totalAmount,
       discount_amount: discountAmount,
       final_amount: finalAmount,
+      tax_name: taxName,
+      tax_rate: taxRate,
+      tax_type: taxType,
+      tax_amount: taxAmount,
       payment_method: selectedMethod,
       cash_tendered: selectedMethod === 'CASH' ? cashTendered : undefined,
       change_amount: selectedMethod === 'CASH' ? changeAmount : undefined,

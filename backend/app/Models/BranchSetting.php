@@ -24,6 +24,11 @@ class BranchSetting extends Model
         'late_penalty_per_minute',
         'overtime_pay_per_hour',
         'min_overtime_threshold_minutes',
+        'tax_enabled',
+        'tax_name',
+        'tax_rate',
+        'tax_type',
+        'show_tax_on_receipt',
     ];
 
     protected function casts(): array
@@ -32,6 +37,9 @@ class BranchSetting extends Model
             'late_penalty_per_minute' => 'decimal:2',
             'overtime_pay_per_hour' => 'decimal:2',
             'min_overtime_threshold_minutes' => 'integer',
+            'tax_enabled' => 'boolean',
+            'tax_rate' => 'decimal:2',
+            'show_tax_on_receipt' => 'boolean',
         ];
     }
 

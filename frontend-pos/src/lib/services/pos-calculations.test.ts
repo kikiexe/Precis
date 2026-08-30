@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { calculateCartTotals, calculateCashChange, calculateStockUsed } from './pos-calculations';
-import type { CartItem } from '../types/pos';
+import type { CartItem, TaxSettings } from '../types/pos';
 
 const mockItems: CartItem[] = [
   {
@@ -26,6 +26,21 @@ const mockItems: CartItem[] = [
     quantity: 1,
     unit_price: 35000,
     notes: 'Less sweet',
+  },
+];
+
+const mockSingle100kItem: CartItem[] = [
+  {
+    product: {
+      id: 'p-cake',
+      name: 'Whole Cheesecake',
+      base_price: 100000,
+      category_id: 'c-pastry',
+      is_active: true,
+    },
+    quantity: 1,
+    unit_price: 100000,
+    notes: '',
   },
 ];
 
@@ -71,6 +86,55 @@ describe('calculateCartTotals', () => {
     expect(result.totalAmount).toBe(0);
     expect(result.discountAmount).toBe(0);
     expect(result.finalAmount).toBe(0);
+  });
+
+  it('calculates dynamic tax inclusive accurately (e.g. 14% on 100.000)', () => {
+    const taxSettings: TaxSettings = {
+      tax_enabled: true,
+      tax_name: 'PB1 Restoran (14%)',
+      tax_rate: 14.0,
+      tax_type: 'INCLUSIVE',
+      show_tax_on_receipt: true,
+    };
+
+    const result = calculateCartTotals(mockSingle100kItem, 0, 0, taxSettings);
+    expect(result.totalAmount).toBe(100000);
+    expect(result.finalAmount).toBe(100000); // Nilai tagihan tidak bertambah
+    expect(result.taxAmount).toBe(12281); // 100.000 - (100.000 / 1.14) = 12.280,70 -> 12281
+    expect(result.taxName).toBe('PB1 Restoran (14%)');
+    expect(result.taxType).toBe('INCLUSIVE');
+  });
+
+  it('calculates dynamic tax exclusive accurately (e.g. 12% on 100.000)', () => {
+    const taxSettings: TaxSettings = {
+      tax_enabled: true,
+      tax_name: 'PPN 12%',
+      tax_rate: 12.0,
+      tax_type: 'EXCLUSIVE',
+      show_tax_on_receipt: true,
+    };
+
+    const result = calculateCartTotals(mockSingle100kItem, 0, 0, taxSettings);
+    expect(result.totalAmount).toBe(100000);
+    expect(result.taxAmount).toBe(12000); // 100.000 x 12% = 12.000
+    expect(result.finalAmount).toBe(112000); // Subtotal + Tax = 112.000
+    expect(result.taxName).toBe('PPN 12%');
+    expect(result.taxType).toBe('EXCLUSIVE');
+  });
+
+  it('ignores tax if tax_enabled is false', () => {
+    const taxSettings: TaxSettings = {
+      tax_enabled: false,
+      tax_name: 'PB1',
+      tax_rate: 10.0,
+      tax_type: 'EXCLUSIVE',
+      show_tax_on_receipt: true,
+    };
+
+    const result = calculateCartTotals(mockSingle100kItem, 0, 0, taxSettings);
+    expect(result.totalAmount).toBe(100000);
+    expect(result.taxAmount).toBe(0);
+    expect(result.finalAmount).toBe(100000);
   });
 });
 
