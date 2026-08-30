@@ -38,12 +38,14 @@ class Order extends Model
         'payment_method',
         'payment_status',
         'void_reason',
-        'voided_at',
         'voided_by_user_id',
+        'voided_at',
         'refund_amount',
         'refund_reason',
-        'refunded_at',
+        'refund_method',
+        'refunded_in_session_id',
         'refunded_by_user_id',
+        'refunded_at',
     ];
 
     protected function casts(): array
@@ -75,6 +77,11 @@ class Order extends Model
         return $this->belongsTo(PosSession::class, 'pos_session_id');
     }
 
+    public function refundedInSession(): BelongsTo
+    {
+        return $this->belongsTo(PosSession::class, 'refunded_in_session_id');
+    }
+
     public function terminal(): BelongsTo
     {
         return $this->belongsTo(PosTerminal::class, 'pos_terminal_id');
@@ -83,6 +90,16 @@ class Order extends Model
     public function cashier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'cashier_user_id');
+    }
+
+    public function voidedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'voided_by_user_id');
+    }
+
+    public function refundedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'refunded_by_user_id');
     }
 
     public function items(): HasMany

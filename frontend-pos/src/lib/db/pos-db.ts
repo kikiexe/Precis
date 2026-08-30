@@ -16,7 +16,7 @@ export class PrecisPosDatabase extends Dexie {
   orders!: Table<OfflineOrder, string>;
   sessions!: Table<PosSession, string>;
   cashiers!: Table<CashierUser, string>;
-  addons!: Table<AddonCategory, string>;
+  addonCategories!: Table<AddonCategory, string>;
   purchases!: Table<OutletPurchase, string>;
   stockWastes!: Table<StockWaste, string>;
 
@@ -29,15 +29,12 @@ export class PrecisPosDatabase extends Dexie {
       sessions: 'id, workspace_id, branch_id, status, opened_at',
       cashiers: 'id, name, pin',
     });
-
     this.version(2).stores({
-      addons: 'id, workspace_id, name',
+      addonCategories: 'id, name, selection_type, is_required',
     });
-
     this.version(3).stores({
-      purchases: 'id, workspace_id, branch_id, category, funding_source, created_at',
+      purchases: 'id, workspace_id, branch_id, pos_session_id, funding_source, created_at',
     });
-
     this.version(4).stores({
       stockWastes: 'id, workspace_id, branch_id, reason, created_at',
     });

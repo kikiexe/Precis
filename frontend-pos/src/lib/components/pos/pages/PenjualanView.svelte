@@ -27,6 +27,7 @@
     onSaveOpenBill?: () => void;
     onOpenBillsModal?: () => void;
     onOpenPaymentModal: () => void;
+    onEditItemModifiers?: (item: CartItem) => void;
   }
 
   let {
@@ -53,6 +54,7 @@
     onSaveOpenBill,
     onOpenBillsModal,
     onOpenPaymentModal,
+    onEditItemModifiers,
   }: Props = $props();
 </script>
 
@@ -80,5 +82,6 @@
     {onSaveOpenBill}
     {onOpenBillsModal}
     {onOpenPaymentModal}
+    {onEditItemModifiers}
   />
 </div>

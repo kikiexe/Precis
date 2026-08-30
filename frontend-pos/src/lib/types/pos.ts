@@ -17,6 +17,32 @@ export interface PosTerminalInfo {
   tax_settings?: TaxSettings;
 }
 
+export interface Addon {
+  id: string;
+  addon_category_id: string;
+  name: string;
+  price: number;
+  is_active: boolean;
+}
+
+export interface AddonCategory {
+  id: string;
+  name: string;
+  selection_type: 'SINGLE' | 'MULTIPLE';
+  is_required: boolean;
+  min_selection: number;
+  max_selection: number;
+  product_ids?: string[];
+  addons: Addon[];
+}
+
+export interface SelectedModifier {
+  addon_id: string;
+  addon_category_id?: string;
+  name: string;
+  price: number;
+}
+
 export interface Product {
   id: string;
   category_id: string;
@@ -26,6 +52,8 @@ export interface Product {
   description?: string;
   is_active: boolean;
   stock?: number;
+  addon_category_ids?: string[];
+  addon_categories?: AddonCategory[];
 }
 
 export interface Category {
@@ -43,6 +71,7 @@ export interface CatalogCategoryItem {
     name: string;
     base_price: number;
     is_active: boolean;
+    addon_category_ids?: string[];
   }>;
 }
 
@@ -51,6 +80,7 @@ export interface CartItem {
   quantity: number;
   unit_price: number;
   notes: string;
+  modifiers?: SelectedModifier[];
 }
 
 export type PosPage =
@@ -111,6 +141,7 @@ export interface MasterUnlockResult {
 }
 
 export interface OfflineOrder {
+  id?: string;
   client_order_id: string; // UUIDv4
   order_number: string;
   workspace_id: string;
@@ -129,6 +160,16 @@ export interface OfflineOrder {
   tax_type?: 'INCLUSIVE' | 'EXCLUSIVE';
   tax_amount?: number;
   payment_method: PaymentMethod;
+  payment_status?: 'PAID' | 'CANCELLED' | 'VOIDED' | 'REFUNDED' | 'PARTIALLY_REFUNDED';
+  void_reason?: string | null;
+  voided_at?: string | null;
+  voided_by_user_id?: string | null;
+  refund_amount?: number;
+  refund_reason?: string | null;
+  refund_method?: string | null;
+  refunded_in_session_id?: string | null;
+  refunded_by_user_id?: string | null;
+  refunded_at?: string | null;
   cash_tendered?: number;
   change_amount?: number;
   items: Array<{
@@ -138,6 +179,7 @@ export interface OfflineOrder {
     unit_price: number;
     subtotal: number;
     notes?: string;
+    modifiers?: SelectedModifier[];
   }>;
   created_at: string;
   sync_status: 'PENDING' | 'SYNCED' | 'FAILED';
@@ -203,6 +245,37 @@ export interface StockAdjustmentLog {
   created_at: string;
 }
 
+export type PurchaseCategory =
+  | 'BAHAN_BAKU_DARURAT'
+  | 'OPERASIONAL_TOKO'
+  | 'KEBERSIHAN'
+  | 'UTILITAS'
+  | 'LAINNYA';
+
+export type FundingSource = 'CASH_DRAWER' | 'EXTERNAL_REIMBURSE';
+
+export interface OutletPurchase {
+  id: string;
+  workspace_id: string;
+  branch_id: string;
+  pos_session_id?: string | null;
+  item_name: string;
+  unit: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  category: PurchaseCategory;
+  funding_source: FundingSource;
+  receipt_photo_url?: string | null;
+  notes?: string | null;
+  recorded_by_user_id: string;
+  recorded_by_user?: {
+    id: string;
+    name: string;
+  };
+  created_at: string;
+}
+
 export type StockWasteReason =
   | 'EXPIRED'
   | 'SPOILED'
@@ -216,6 +289,10 @@ export interface StockWaste {
   workspace_id: string;
   branch_id: string;
   product_id?: string | null;
+  product?: {
+    id: string;
+    name: string;
+  };
   item_name: string;
   quantity: number;
   unit: string;
@@ -224,45 +301,10 @@ export interface StockWaste {
   reason: StockWasteReason;
   photo_url?: string | null;
   notes?: string | null;
-  recorded_by_user_id?: string;
+  recorded_by_user_id: string;
+  recorded_by_user?: {
+    id: string;
+    name: string;
+  };
   created_at: string;
 }
-
-export type OutletPurchaseFundingSource = 'CASH_DRAWER' | 'PETTY_CASH' | 'OWNER_DIRECT';
-
-export interface OutletPurchase {
-  id: string;
-  workspace_id: string;
-  branch_id: string;
-  pos_session_id?: string | null;
-  item_name: string;
-  unit: string;
-  quantity: number;
-  unit_price: number;
-  total_price: number;
-  category: string;
-  funding_source: OutletPurchaseFundingSource;
-  receipt_photo_url?: string | null;
-  notes?: string | null;
-  recorded_by_user_id?: string;
-  created_at: string;
-}
-
-export interface AddonOption {
-  id: string;
-  addon_category_id: string;
-  name: string;
-  price: number;
-  is_active: boolean;
-}
-
-export interface AddonCategory {
-  id: string;
-  workspace_id: string;
-  name: string;
-  min_selection: number;
-  max_selection: number;
-  is_required: boolean;
-  options: AddonOption[];
-}
-

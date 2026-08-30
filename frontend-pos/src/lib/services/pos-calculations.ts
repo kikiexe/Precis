@@ -79,3 +79,24 @@ export function calculateCashChange(cashTendered: number, finalAmount: number): 
 export function calculateStockUsed(stockPreviousDay: number, currentStock: number): number {
   return Math.max(0, stockPreviousDay - currentStock);
 }
+
+/**
+ * Calculates expected closing cash considering opening cash, cash sales, cash purchases (petty cash), and cash refunds
+ */
+export function calculateExpectedCash(
+  openingCash: number,
+  cashSales: number,
+  cashPurchases = 0,
+  cashRefunds = 0
+): number {
+  return Math.max(0, openingCash + cashSales - cashPurchases - cashRefunds);
+}
+
+/**
+ * Calculates unit price with attached modifiers
+ */
+export function calculateItemUnitPrice(basePrice: number, modifiers?: Array<{ price: number }>): number {
+  if (!modifiers || modifiers.length === 0) return basePrice;
+  const modifierSum = modifiers.reduce((sum, mod) => sum + (mod.price || 0), 0);
+  return basePrice + modifierSum;
+}

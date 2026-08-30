@@ -19,6 +19,9 @@
     OpenBill,
     PosPage,
     StockWaste,
+    AddonCategory,
+    SelectedModifier,
+    OutletPurchase,
   } from './lib/types/pos';
   import PosSidebar from './lib/components/pos/PosSidebar.svelte';
   import PenjualanView from './lib/components/pos/pages/PenjualanView.svelte';
@@ -34,6 +37,8 @@
   import MasterLockModal from './lib/components/pos/MasterLockModal.svelte';
   import DevicePairingModal from './lib/components/pos/DevicePairingModal.svelte';
   import OpenBillsModal from './lib/components/pos/OpenBillsModal.svelte';
+  import ModifierModal from './lib/components/pos/ModifierModal.svelte';
+  import OutletPurchaseModal from './lib/components/pos/OutletPurchaseModal.svelte';
 
   // state navigasi halaman
   let activePage = $state<PosPage>('penjualan');
@@ -43,10 +48,18 @@
   let terminalInfo = $state<PosTerminalInfo | null>(null);
   let categories = $state<Category[]>([]);
   let products = $state<Product[]>([]);
+  let addonCategories = $state<AddonCategory[]>([]);
+  let purchases = $state<OutletPurchase[]>([]);
   let cashiers = $state<CashierUser[]>([]);
   let allOrders = $state<OfflineOrder[]>([]);
   let closedSessions = $state<PosSession[]>([]);
   let stockWastes = $state<StockWaste[]>([]);
+
+  // state modal modifier / add-on & belanja
+  let isModifierModalOpen = $state(false);
+  let modifierProduct = $state<Product | null>(null);
+  let editingCartItem = $state<CartItem | null>(null);
+  let isPurchaseModalOpen = $state(false);
 
   // state staf / shift operator bersama
   let activeCashier = $state<CashierUser>({
@@ -177,14 +190,11 @@
       }
       // sinkronkan katalog terbaru ke IndexedDB secara background
       await posService.syncCatalogToLocalDb();
-      // sinkronkan add-on dan modifier ke IndexedDB
       await posService.syncAddonsToLocalDb();
+      await posService.syncPurchasesToLocalDb();
+      await posService.syncStockWastesToLocalDb();
       // sinkronkan riwayat transaksi server ke IndexedDB
       await posService.syncRecentOrdersToLocalDb();
-      // sinkronkan pengeluaran belanja outlet ke IndexedDB
-      await posService.syncPurchasesToLocalDb();
-      // sinkronkan riwayat stock waste ke IndexedDB
-      await posService.syncStockWastesToLocalDb();
       await loadDbData();
     } catch {
       // Jika request server gagal (offline), jangan lempar modal pairing jika snapshot lokal ada
@@ -198,6 +208,8 @@
     try {
       products = await db.products.toArray();
       categories = await db.categories.toArray();
+      addonCategories = await db.addonCategories.toArray();
+      purchases = await db.purchases.reverse().toArray();
       cashiers = await db.cashiers.toArray();
       if (cashiers.length > 0 && (!activeCashier.id || activeCashier.id === 'team-outlet')) {
         activeCashier = cashiers[0];
@@ -230,25 +242,80 @@
       }
     }
     await posService.syncCatalogToLocalDb();
+    await posService.syncAddonsToLocalDb();
+    await posService.syncPurchasesToLocalDb();
     await posService.syncRecentOrdersToLocalDb();
     await loadDbData();
   }
 
+  function handlePurchaseCreated(newPurchase: OutletPurchase) {
+    purchases = [newPurchase, ...purchases];
+    loadDbData();
+  }
+
   // fungsi keranjang belanja
   function handleAddToCart(product: Product) {
-    const existingIndex = cartItems.findIndex((i) => i.product.id === product.id);
-    if (existingIndex > -1) {
-      cartItems[existingIndex].quantity += 1;
+    const hasModifiers =
+      (product.addon_category_ids && product.addon_category_ids.length > 0) ||
+      addonCategories.some((cat) => cat.product_ids && cat.product_ids.includes(product.id));
+
+    if (hasModifiers) {
+      modifierProduct = product;
+      editingCartItem = null;
+      isModifierModalOpen = true;
+    } else {
+      const existingIndex = cartItems.findIndex(
+        (i) => i.product.id === product.id && (!i.modifiers || i.modifiers.length === 0)
+      );
+      if (existingIndex > -1) {
+        cartItems[existingIndex].quantity += 1;
+      } else {
+        cartItems.push({
+          product,
+          quantity: 1,
+          unit_price: product.base_price,
+          notes: '',
+          modifiers: [],
+        });
+      }
+    }
+  }
+
+  function handleSaveModifierItem(saved: {
+    product: Product;
+    quantity: number;
+    unit_price: number;
+    notes: string;
+    modifiers: SelectedModifier[];
+  }) {
+    if (editingCartItem) {
+      const idx = cartItems.findIndex((i) => i === editingCartItem);
+      if (idx > -1) {
+        cartItems[idx] = {
+          product: saved.product,
+          quantity: saved.quantity,
+          unit_price: saved.unit_price,
+          notes: saved.notes,
+          modifiers: saved.modifiers,
+        };
+      }
+      editingCartItem = null;
     } else {
       cartItems.push({
-        product,
-        quantity: 1,
-        unit_price: product.base_price,
-        notes: '',
+        product: saved.product,
+        quantity: saved.quantity,
+        unit_price: saved.unit_price,
+        notes: saved.notes,
+        modifiers: saved.modifiers,
       });
     }
   }
 
+  function handleEditItemModifiers(item: CartItem) {
+    modifierProduct = item.product;
+    editingCartItem = item;
+    isModifierModalOpen = true;
+  }
   function handleUpdateQuantity(productId: string, delta: number) {
     const index = cartItems.findIndex((i) => i.product.id === productId);
     if (index > -1) {
@@ -484,14 +551,23 @@
           onSaveOpenBill={handleSaveOpenBill}
           onOpenBillsModal={() => (isOpenBillsModalOpen = true)}
           onOpenPaymentModal={() => (isPaymentModalOpen = true)}
+          onEditItemModifiers={handleEditItemModifiers}
         />
       {:else if activePage === 'transaksi'}
-        <TransaksiView orders={allOrders} onPrintOrder={handlePrintOrderDirect} />
+        <TransaksiView
+          orders={allOrders}
+          {cashiers}
+          {activeSession}
+          onPrintOrder={handlePrintOrderDirect}
+          onOrderUpdated={loadDbData}
+        />
       {:else if activePage === 'shift'}
         <ShiftView
           {activeSession}
           {activeCashier}
+          {purchases}
           onOpenSessionModal={() => (isSessionModalOpen = true)}
+          onOpenPurchaseModal={() => (isPurchaseModalOpen = true)}
           onGoToSettlement={() => (activePage = 'settlement')}
         />
       {:else if activePage === 'settlement'}
@@ -557,6 +633,36 @@
   />
 {/if}
 
+<!-- modal modifier / add-on menu -->
+{#if isModifierModalOpen && modifierProduct}
+  <ModifierModal
+    isOpen={isModifierModalOpen}
+    product={modifierProduct}
+    {addonCategories}
+    initialModifiers={editingCartItem?.modifiers || []}
+    initialNotes={editingCartItem?.notes || ''}
+    initialQuantity={editingCartItem?.quantity || 1}
+    onClose={() => {
+      isModifierModalOpen = false;
+      modifierProduct = null;
+      editingCartItem = null;
+    }}
+    onAddToCart={handleSaveModifierItem}
+  />
+{/if}
+
+<!-- modal belanja outlet petty cash -->
+{#if isPurchaseModalOpen}
+  <OutletPurchaseModal
+    isOpen={isPurchaseModalOpen}
+    {activeSession}
+    {activeCashier}
+    {cashiers}
+    onClose={() => (isPurchaseModalOpen = false)}
+    onPurchaseCreated={handlePurchaseCreated}
+  />
+{/if}
+
 <!-- modal struk cetak -->
 <ReceiptModal
   isOpen={isReceiptModalOpen}
@@ -571,6 +677,7 @@
   cashierUserId={activeCashier?.id}
   {cashiers}
   {activeCashier}
+  {purchases}
   onClose={() => (isSessionModalOpen = false)}
   onSessionOpened={handleSessionOpened}
   onSessionClosed={handleSessionClosed}
