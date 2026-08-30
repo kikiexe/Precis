@@ -17,7 +17,7 @@ class RoleController
     ) {}
 
     /**
-     * Mendapatkan daftar peran (roles) di workspace aktif
+     * mendapatkan daftar peran (roles) di workspace aktif
      */
     public function index(Request $request): JsonResponse
     {
@@ -40,7 +40,7 @@ class RoleController
     }
 
     /**
-     * Mengambil katalog modul hak akses & template preset
+     * mengambil katalog modul hak akses dan template preset
      */
     public function catalog(): JsonResponse
     {
@@ -50,7 +50,7 @@ class RoleController
     }
 
     /**
-     * Membuat custom role baru
+     * membuat custom role baru
      */
     public function store(Request $request): JsonResponse
     {
@@ -86,7 +86,7 @@ class RoleController
     }
 
     /**
-     * Mengambil detail satu role
+     * mengambil detail satu role
      */
     public function show(Request $request, string $id): JsonResponse
     {
@@ -107,7 +107,7 @@ class RoleController
     }
 
     /**
-     * Memperbarui peran dan checklist izin
+     * memperbarui peran dan checklist izin
      */
     public function update(Request $request, string $id): JsonResponse
     {
@@ -138,7 +138,7 @@ class RoleController
     }
 
     /**
-     * Menghapus peran kustom
+     * menghapus peran kustom
      */
     public function destroy(Request $request, string $id): JsonResponse
     {

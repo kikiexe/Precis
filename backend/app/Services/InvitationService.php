@@ -49,12 +49,18 @@ class InvitationService
         // validasi branch_id jika ada
         $branchId = null;
         if (! empty($data['branch_id'])) {
-            $branchExists = Branch::where('id', $data['branch_id'])
+            $branchExists = Branch::withoutGlobalScopes()
+                ->where('id', $data['branch_id'])
                 ->where('workspace_id', $workspaceId)
                 ->exists();
-            if ($branchExists) {
-                $branchId = $data['branch_id'];
+
+            if (! $branchExists) {
+                throw ValidationException::withMessages([
+                    'branch_id' => ['Cabang tidak ditemukan pada workspace ini.'],
+                ]);
             }
+
+            $branchId = (string) $data['branch_id'];
         }
 
         $roleId = $data['role_id'] ?? null;
@@ -70,6 +76,12 @@ class InvitationService
             } else {
                 $roleId = null;
             }
+        }
+
+        if (strtoupper(trim((string) $roleName)) === 'OWNER') {
+            throw ValidationException::withMessages([
+                'role' => ['Role OWNER tidak dapat ditetapkan secara manual. Kepemilikan workspace ditetapkan secara otomatis saat registrasi.'],
+            ]);
         }
 
         return DB::transaction(function () use ($inviter, $workspace, $workspaceId, $email, $data, $branchId, $roleId, $roleName): WorkspaceInvitation {
@@ -257,6 +269,8 @@ class InvitationService
             }
 
             // buat atau perbarui keanggotaan workspace
+            $acceptedRole = strtoupper(trim((string) $invitation->role)) === 'OWNER' ? 'STAFF' : $invitation->role;
+
             /** @var WorkspaceMember $member */
             $member = WorkspaceMember::withoutGlobalScopes()->updateOrCreate(
                 [
@@ -267,7 +281,7 @@ class InvitationService
                     'branch_id' => $invitation->branch_id,
                     'role_id' => $invitation->role_id,
                     'job_title' => $invitation->job_title,
-                    'role' => $invitation->role,
+                    'role' => $acceptedRole,
                     'base_salary' => $invitation->base_salary,
                     'is_active' => true,
                 ]

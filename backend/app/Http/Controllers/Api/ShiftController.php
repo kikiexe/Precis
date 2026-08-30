@@ -25,9 +25,21 @@ class ShiftController
     public function roster(Request $request): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var \App\Models\WorkspaceMember|null $actorMember */
+        $actorMember = $request->attributes->get('current_member');
         $branchId = $request->query('branch_id');
         $startDate = $request->query('start_date');
         $endDate = $request->query('end_date');
+
+        if ($actorMember && $actorMember->role !== 'OWNER' && $actorMember->branch_id !== null) {
+            if ($branchId && $branchId !== $actorMember->branch_id) {
+                return new JsonResponse([
+                    'message' => 'Kalender roster shift berhasil dimuat.',
+                    'data' => [],
+                ], Response::HTTP_OK);
+            }
+            $branchId = $actorMember->branch_id;
+        }
 
         $roster = $this->shiftService->getRoster(
             workspaceId: $workspaceId,
@@ -43,7 +55,7 @@ class ShiftController
     }
 
     /**
-     *  tetapkan jadwal shift staf oleh Admin/Owner
+     * tetapkan jadwal shift staf (khusus OWNER dan ADMIN)
      */
     public function assign(AssignShiftRequest $request): JsonResponse
     {
@@ -73,15 +85,18 @@ class ShiftController
     }
 
     /**
-     * Hapus / batalkan penugasan shift (menjadikan libur / off)
+     * hapus atau batalkan penugasan shift (menjadikan libur / off)
      */
     public function deleteAssignment(Request $request, string $id): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var User $user */
+        $user = $request->user();
 
         $this->shiftService->deleteAssignment(
             workspaceId: $workspaceId,
             assignmentId: $id,
+            actor: $user,
         );
 
         return new JsonResponse([
@@ -123,7 +138,19 @@ class ShiftController
     public function pendingSwapRequests(Request $request): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var \App\Models\WorkspaceMember|null $actorMember */
+        $actorMember = $request->attributes->get('current_member');
         $branchId = $request->query('branch_id');
+
+        if ($actorMember && $actorMember->role !== 'OWNER' && $actorMember->branch_id !== null) {
+            if ($branchId && $branchId !== $actorMember->branch_id) {
+                return new JsonResponse([
+                    'message' => 'Daftar permohonan tukar shift berhasil dimuat.',
+                    'data' => [],
+                ], Response::HTTP_OK);
+            }
+            $branchId = $actorMember->branch_id;
+        }
 
         $requests = $this->shiftService->getPendingSwapRequests(
             workspaceId: $workspaceId,

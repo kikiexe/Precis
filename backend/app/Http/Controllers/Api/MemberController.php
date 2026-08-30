@@ -22,10 +22,27 @@ class MemberController
     public function index(Request $request): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var WorkspaceMember|null $actorMember */
+        $actorMember = $request->attributes->get('current_member');
+        $requestedBranchId = $request->query('branch_id');
 
-        $members = WorkspaceMember::withoutGlobalScopes()
+        $query = WorkspaceMember::withoutGlobalScopes()
             ->with(['user', 'branch', 'customRole.permissions'])
-            ->where('workspace_id', $workspaceId)
+            ->where('workspace_id', $workspaceId);
+
+        if ($actorMember && $actorMember->role !== 'OWNER' && $actorMember->branch_id !== null) {
+            if ($requestedBranchId && $requestedBranchId !== $actorMember->branch_id) {
+                return new JsonResponse([
+                    'message' => 'Daftar anggota tim berhasil dimuat.',
+                    'data' => [],
+                ], Response::HTTP_OK);
+            }
+            $query->where('branch_id', $actorMember->branch_id);
+        } elseif ($requestedBranchId) {
+            $query->where('branch_id', $requestedBranchId);
+        }
+
+        $members = $query
             ->orderByRaw("CASE WHEN role = 'OWNER' THEN 1 ELSE 2 END")
             ->orderBy('created_at', 'desc')
             ->get()
@@ -63,16 +80,43 @@ class MemberController
     public function store(Request $request): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var WorkspaceMember|null $actorMember */
+        $actorMember = $request->attributes->get('current_member');
 
         $rawBranchId = $request->input('branch_id');
         $branchId = null;
-        if ($rawBranchId && Str::isUuid((string) $rawBranchId)) {
+        if (! empty($rawBranchId)) {
+            if (! Str::isUuid((string) $rawBranchId)) {
+                return new JsonResponse([
+                    'message' => 'Format branch_id tidak valid.',
+                    'errors' => [
+                        'branch_id' => ['Format branch_id tidak valid.'],
+                    ],
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
             $branchExists = DB::table('branches')
                 ->where('id', $rawBranchId)
                 ->where('workspace_id', $workspaceId)
                 ->exists();
-            if ($branchExists) {
-                $branchId = $rawBranchId;
+
+            if (! $branchExists) {
+                return new JsonResponse([
+                    'message' => 'Cabang tidak ditemukan pada workspace ini.',
+                    'errors' => [
+                        'branch_id' => ['Cabang tidak ditemukan pada workspace ini.'],
+                    ],
+                ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
+            $branchId = (string) $rawBranchId;
+        }
+
+        if ($actorMember && $actorMember->role !== 'OWNER' && $actorMember->branch_id !== null) {
+            if (! $branchId || $branchId !== $actorMember->branch_id) {
+                return new JsonResponse([
+                    'message' => 'Akses ditolak. Anda hanya berwenang mengelola staf pada cabang penugasan Anda.',
+                ], Response::HTTP_FORBIDDEN);
             }
         }
 
@@ -85,8 +129,40 @@ class MemberController
             'base_salary' => ['required', 'numeric', 'min:0'],
         ]);
 
-        return DB::transaction(function () use ($validated, $workspaceId, $branchId): JsonResponse {
-            // Cari atau buat User
+        if ($request->has('role') && strtoupper(trim((string) $request->input('role'))) === 'OWNER') {
+            return new JsonResponse([
+                'message' => 'Role OWNER tidak dapat ditetapkan secara manual. Kepemilikan workspace ditetapkan secara otomatis saat registrasi.',
+                'errors' => [
+                    'role' => ['Role OWNER tidak dapat ditetapkan secara manual. Kepemilikan workspace ditetapkan secara otomatis saat registrasi.'],
+                ],
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $roleId = $validated['role_id'] ?? null;
+        $roleName = $validated['role'] ?? 'STAFF';
+
+        if ($roleId) {
+            $roleModel = WorkspaceRole::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->find($roleId);
+            if ($roleModel) {
+                $roleName = $roleModel->name;
+            } else {
+                $roleId = null;
+            }
+        }
+
+        if (strtoupper(trim((string) $roleName)) === 'OWNER') {
+            return new JsonResponse([
+                'message' => 'Role OWNER tidak dapat ditetapkan secara manual. Kepemilikan workspace ditetapkan secara otomatis saat registrasi.',
+                'errors' => [
+                    'role' => ['Role OWNER tidak dapat ditetapkan secara manual. Kepemilikan workspace ditetapkan secara otomatis saat registrasi.'],
+                ],
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return DB::transaction(function () use ($validated, $workspaceId, $branchId, $roleId, $roleName): JsonResponse {
+            // cari atau buat user
             $user = User::where('email', strtolower($validated['email']))->first();
 
             if (! $user) {
@@ -99,7 +175,7 @@ class MemberController
                 ]);
             }
 
-            // Periksa apakah sudah menjadi anggota
+            // periksa apakah sudah menjadi anggota
             $existing = WorkspaceMember::withoutGlobalScopes()
                 ->where('workspace_id', $workspaceId)
                 ->where('user_id', $user->id)
@@ -109,20 +185,6 @@ class MemberController
                 return new JsonResponse([
                     'message' => 'Karyawan dengan email ini sudah terdaftar sebagai anggota di workspace ini.',
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
-            }
-
-            $roleId = $validated['role_id'] ?? null;
-            $roleName = $validated['role'] ?? 'STAFF';
-
-            if ($roleId) {
-                $roleModel = WorkspaceRole::withoutGlobalScopes()
-                    ->where('workspace_id', $workspaceId)
-                    ->find($roleId);
-                if ($roleModel) {
-                    $roleName = $roleModel->name;
-                } else {
-                    $roleId = null;
-                }
             }
 
             $member = WorkspaceMember::withoutGlobalScopes()->create([
@@ -165,6 +227,8 @@ class MemberController
     public function update(Request $request, string $id): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var WorkspaceMember|null $actorMember */
+        $actorMember = $request->attributes->get('current_member');
 
         $validated = $request->validate([
             'job_title' => ['sometimes', 'string', 'max:100'],
@@ -179,6 +243,23 @@ class MemberController
             ->where('workspace_id', $workspaceId)
             ->findOrFail($id);
 
+        if ($actorMember && $actorMember->role !== 'OWNER' && $actorMember->branch_id !== null) {
+            if ($member->branch_id !== $actorMember->branch_id) {
+                return new JsonResponse([
+                    'message' => 'Akses ditolak. Anda hanya berwenang mengelola staf pada cabang penugasan Anda.',
+                ], Response::HTTP_FORBIDDEN);
+            }
+        }
+
+        if ($request->has('role') && strtoupper(trim((string) $request->input('role'))) === 'OWNER') {
+            return new JsonResponse([
+                'message' => 'Role OWNER tidak dapat ditetapkan secara manual. Kepemilikan workspace ditetapkan secara otomatis saat registrasi.',
+                'errors' => [
+                    'role' => ['Role OWNER tidak dapat ditetapkan secara manual. Kepemilikan workspace ditetapkan secara otomatis saat registrasi.'],
+                ],
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
         if (isset($validated['job_title'])) {
             $member->job_title = $validated['job_title'];
         }
@@ -191,6 +272,14 @@ class MemberController
                         ->where('workspace_id', $workspaceId)
                         ->find($roleId);
                     if ($roleModel) {
+                        if (strtoupper(trim((string) $roleModel->name)) === 'OWNER') {
+                            return new JsonResponse([
+                                'message' => 'Role OWNER tidak dapat ditetapkan secara manual. Kepemilikan workspace ditetapkan secara otomatis saat registrasi.',
+                                'errors' => [
+                                    'role' => ['Role OWNER tidak dapat ditetapkan secara manual. Kepemilikan workspace ditetapkan secara otomatis saat registrasi.'],
+                                ],
+                            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+                        }
                         $member->role_id = $roleModel->id;
                         $member->role = $roleModel->name;
                     }
@@ -204,12 +293,39 @@ class MemberController
 
         if ($request->has('branch_id')) {
             $rawBranchId = $request->input('branch_id');
-            if ($rawBranchId && Str::isUuid((string) $rawBranchId)) {
+            if ($actorMember && $actorMember->role !== 'OWNER' && $actorMember->branch_id !== null) {
+                if ($rawBranchId !== $actorMember->branch_id) {
+                    return new JsonResponse([
+                        'message' => 'Akses ditolak. Anda hanya berwenang mengelola staf pada cabang penugasan Anda.',
+                    ], Response::HTTP_FORBIDDEN);
+                }
+            }
+
+            if (! empty($rawBranchId)) {
+                if (! Str::isUuid((string) $rawBranchId)) {
+                    return new JsonResponse([
+                        'message' => 'Format branch_id tidak valid.',
+                        'errors' => [
+                            'branch_id' => ['Format branch_id tidak valid.'],
+                        ],
+                    ], Response::HTTP_UNPROCESSABLE_ENTITY);
+                }
+
                 $branchExists = DB::table('branches')
                     ->where('id', $rawBranchId)
                     ->where('workspace_id', $workspaceId)
                     ->exists();
-                $member->branch_id = $branchExists ? $rawBranchId : null;
+
+                if (! $branchExists) {
+                    return new JsonResponse([
+                        'message' => 'Cabang tidak ditemukan pada workspace ini.',
+                        'errors' => [
+                            'branch_id' => ['Cabang tidak ditemukan pada workspace ini.'],
+                        ],
+                    ], Response::HTTP_UNPROCESSABLE_ENTITY);
+                }
+
+                $member->branch_id = (string) $rawBranchId;
             } else {
                 $member->branch_id = null;
             }
@@ -252,6 +368,8 @@ class MemberController
     public function destroy(Request $request, string $id): JsonResponse
     {
         $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        /** @var WorkspaceMember|null $actorMember */
+        $actorMember = $request->attributes->get('current_member');
 
         /** @var WorkspaceMember $member */
         $member = WorkspaceMember::withoutGlobalScopes()
@@ -262,6 +380,14 @@ class MemberController
             return new JsonResponse([
                 'message' => 'Pemilik bisnis (OWNER) tidak dapat dihapus dari workspace.',
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        if ($actorMember && $actorMember->role !== 'OWNER' && $actorMember->branch_id !== null) {
+            if ($member->branch_id !== $actorMember->branch_id) {
+                return new JsonResponse([
+                    'message' => 'Akses ditolak. Anda hanya berwenang mengelola staf pada cabang penugasan Anda.',
+                ], Response::HTTP_FORBIDDEN);
+            }
         }
 
         $memberName = $member->user?->name ?? 'Karyawan';
