@@ -38,6 +38,21 @@ class PosController
     }
 
     /**
+     * ambil master add-on / modifier dan opsi item aktif untuk sinkronisasi POS offline
+     */
+    public function addons(Request $request): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+
+        $addons = $this->posService->getAddons($workspaceId);
+
+        return new JsonResponse([
+            'message' => 'Data modifier add-on POS berhasil dimuat.',
+            'data' => $addons,
+        ], Response::HTTP_OK);
+    }
+
+    /**
      * buka sesi kasir baru dengan input modal awal laci kasir
      */
     public function openSession(OpenPosSessionRequest $request): JsonResponse
@@ -236,6 +251,7 @@ class PosController
                         'unit_price' => (float) $i->unit_price,
                         'subtotal' => (float) $i->subtotal,
                         'notes' => $i->notes,
+                        'modifiers' => $i->modifiers,
                     ])->toArray(),
                     'created_at' => $o->created_at?->toIso8601String() ?? now()->toIso8601String(),
                     'sync_status' => 'SYNCED',

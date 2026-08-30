@@ -17,6 +17,8 @@
     CloseSessionResponse,
     OpenBill,
     PosPage,
+    AddonCategory,
+    SelectedModifier,
   } from './lib/types/pos';
   import PosSidebar from './lib/components/pos/PosSidebar.svelte';
   import PenjualanView from './lib/components/pos/pages/PenjualanView.svelte';
@@ -32,6 +34,7 @@
   import MasterLockModal from './lib/components/pos/MasterLockModal.svelte';
   import DevicePairingModal from './lib/components/pos/DevicePairingModal.svelte';
   import OpenBillsModal from './lib/components/pos/OpenBillsModal.svelte';
+  import ModifierModal from './lib/components/pos/ModifierModal.svelte';
 
   // state navigasi halaman
   let activePage = $state<PosPage>('penjualan');
@@ -41,9 +44,15 @@
   let terminalInfo = $state<PosTerminalInfo | null>(null);
   let categories = $state<Category[]>([]);
   let products = $state<Product[]>([]);
+  let addonCategories = $state<AddonCategory[]>([]);
   let cashiers = $state<CashierUser[]>([]);
   let allOrders = $state<OfflineOrder[]>([]);
   let closedSessions = $state<PosSession[]>([]);
+
+  // state modal modifier / add-on
+  let isModifierModalOpen = $state(false);
+  let modifierProduct = $state<Product | null>(null);
+  let editingCartItem = $state<CartItem | null>(null);
 
   // state staf / shift operator bersama
   let activeCashier = $state<CashierUser>({
@@ -172,6 +181,7 @@
       }
       // sinkronkan katalog terbaru ke IndexedDB secara background
       await posService.syncCatalogToLocalDb();
+      await posService.syncAddonsToLocalDb();
       // sinkronkan riwayat transaksi server ke IndexedDB
       await posService.syncRecentOrdersToLocalDb();
       await loadDbData();
@@ -187,6 +197,7 @@
     try {
       products = await db.products.toArray();
       categories = await db.categories.toArray();
+      addonCategories = await db.addonCategories.toArray();
       cashiers = await db.cashiers.toArray();
       if (cashiers.length > 0 && (!activeCashier.id || activeCashier.id === 'team-outlet')) {
         activeCashier = cashiers[0];
@@ -218,23 +229,73 @@
       }
     }
     await posService.syncCatalogToLocalDb();
+    await posService.syncAddonsToLocalDb();
     await posService.syncRecentOrdersToLocalDb();
     await loadDbData();
   }
 
   // fungsi keranjang belanja
   function handleAddToCart(product: Product) {
-    const existingIndex = cartItems.findIndex((i) => i.product.id === product.id);
-    if (existingIndex > -1) {
-      cartItems[existingIndex].quantity += 1;
+    const hasModifiers =
+      (product.addon_category_ids && product.addon_category_ids.length > 0) ||
+      addonCategories.some((cat) => cat.product_ids && cat.product_ids.includes(product.id));
+
+    if (hasModifiers) {
+      modifierProduct = product;
+      editingCartItem = null;
+      isModifierModalOpen = true;
+    } else {
+      const existingIndex = cartItems.findIndex(
+        (i) => i.product.id === product.id && (!i.modifiers || i.modifiers.length === 0)
+      );
+      if (existingIndex > -1) {
+        cartItems[existingIndex].quantity += 1;
+      } else {
+        cartItems.push({
+          product,
+          quantity: 1,
+          unit_price: product.base_price,
+          notes: '',
+          modifiers: [],
+        });
+      }
+    }
+  }
+
+  function handleSaveModifierItem(saved: {
+    product: Product;
+    quantity: number;
+    unit_price: number;
+    notes: string;
+    modifiers: SelectedModifier[];
+  }) {
+    if (editingCartItem) {
+      const idx = cartItems.findIndex((i) => i === editingCartItem);
+      if (idx > -1) {
+        cartItems[idx] = {
+          product: saved.product,
+          quantity: saved.quantity,
+          unit_price: saved.unit_price,
+          notes: saved.notes,
+          modifiers: saved.modifiers,
+        };
+      }
+      editingCartItem = null;
     } else {
       cartItems.push({
-        product,
-        quantity: 1,
-        unit_price: product.base_price,
-        notes: '',
+        product: saved.product,
+        quantity: saved.quantity,
+        unit_price: saved.unit_price,
+        notes: saved.notes,
+        modifiers: saved.modifiers,
       });
     }
+  }
+
+  function handleEditItemModifiers(item: CartItem) {
+    modifierProduct = item.product;
+    editingCartItem = item;
+    isModifierModalOpen = true;
   }
 
   function handleUpdateQuantity(productId: string, delta: number) {
@@ -471,6 +532,7 @@
           onSaveOpenBill={handleSaveOpenBill}
           onOpenBillsModal={() => (isOpenBillsModalOpen = true)}
           onOpenPaymentModal={() => (isPaymentModalOpen = true)}
+          onEditItemModifiers={handleEditItemModifiers}
         />
       {:else if activePage === 'transaksi'}
         <TransaksiView
@@ -535,6 +597,24 @@
     qrisImageUrl={terminalInfo?.qris_image_url}
     onClose={() => (isPaymentModalOpen = false)}
     onCompleteOrder={handleCompleteOrder}
+  />
+{/if}
+
+<!-- modal modifier / add-on menu -->
+{#if isModifierModalOpen && modifierProduct}
+  <ModifierModal
+    isOpen={isModifierModalOpen}
+    product={modifierProduct}
+    {addonCategories}
+    initialModifiers={editingCartItem?.modifiers || []}
+    initialNotes={editingCartItem?.notes || ''}
+    initialQuantity={editingCartItem?.quantity || 1}
+    onClose={() => {
+      isModifierModalOpen = false;
+      modifierProduct = null;
+      editingCartItem = null;
+    }}
+    onAddToCart={handleSaveModifierItem}
   />
 {/if}
 

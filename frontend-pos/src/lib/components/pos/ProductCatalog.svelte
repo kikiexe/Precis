@@ -155,7 +155,11 @@
                   {product.name}
                 </div>
 
-                {#if product.description}
+                {#if product.addon_category_ids && product.addon_category_ids.length > 0}
+                  <span class="inline-block rounded bg-zinc-100 px-1.5 py-0.5 text-[9px] font-bold text-zinc-600">
+                    +Custom / Add-on
+                  </span>
+                {:else if product.description}
                   <div class="line-clamp-1 text-[10.5px] leading-tight font-normal text-zinc-500">
                     {product.description}
                   </div>
