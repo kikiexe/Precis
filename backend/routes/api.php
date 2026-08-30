@@ -282,5 +282,7 @@ Route::prefix('v1')->group(function (): void {
         Route::middleware('throttle:pos-session-open')->post('/sessions/open', [PosController::class, 'openSession']);
         Route::post('/sessions/close', [PosController::class, 'closeSession']);
         Route::post('/orders/sync-batch', [PosController::class, 'syncBatch']);
+        Route::post('/orders/{id}/void', [PosController::class, 'voidOrder']);
+        Route::post('/orders/{id}/refund', [PosController::class, 'refundOrder']);
     });
 });

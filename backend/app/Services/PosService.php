@@ -177,8 +177,16 @@ class PosService
             ->where('payment_status', 'PAID')
             ->sum('final_amount');
 
+        // kalkulasi total pengembalian kas tunai selama sesi ini
+        $cashRefunds = (float) Order::withoutGlobalScopes()
+            ->where('workspace_id', $workspaceId)
+            ->where('branch_id', $branchId)
+            ->where('refunded_in_session_id', $session->id)
+            ->where('refund_method', 'CASH_DRAWER')
+            ->sum('refund_amount');
+
         $openingCash = (float) $session->opening_cash;
-        $closingCashExpected = $openingCash + $cashSales;
+        $closingCashExpected = $openingCash + $cashSales - $cashRefunds;
         $discrepancyAmount = $closingCashActual - $closingCashExpected;
 
         $session->update([
@@ -192,6 +200,231 @@ class PosService
         ]);
 
         return $session;
+    }
+
+    /**
+     * batalkan pesanan pada sesi kasir yang sedang aktif (void) dengan otorisasi PIN approver
+     */
+    public function voidOrder(
+        string $workspaceId,
+        string $branchId,
+        string $orderId,
+        string $approverUserId,
+        string $pin,
+        string $reason
+    ): Order {
+        return DB::transaction(function () use (
+            $workspaceId,
+            $branchId,
+            $orderId,
+            $approverUserId,
+            $pin,
+            $reason
+        ): Order {
+            $order = Order::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->where('id', $orderId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $order) {
+                throw ValidationException::withMessages([
+                    'order_id' => ['Transaksi pesanan tidak ditemukan pada cabang ini.'],
+                ]);
+            }
+
+            if ($order->payment_status !== 'PAID') {
+                throw ValidationException::withMessages([
+                    'status' => ["Pesanan dengan status {$order->payment_status} tidak dapat dibatalkan (void)."],
+                ]);
+            }
+
+            // void hanya dapat dilakukan pada sesi kasir aktif yang sama
+            $activeSession = PosSession::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->where('status', 'OPEN')
+                ->first();
+
+            if (! $activeSession || $order->pos_session_id !== $activeSession->id) {
+                throw ValidationException::withMessages([
+                    'status' => ['Pembatalan (void) hanya dapat dilakukan pada transaksi di sesi kasir yang sedang aktif. Gunakan fitur refund untuk transaksi lintas sesi.'],
+                ]);
+            }
+
+            /** @var WorkspaceMember|null $approverMember */
+            $approverMember = WorkspaceMember::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('user_id', $approverUserId)
+                ->where('is_active', true)
+                ->first();
+
+            if (! $approverMember) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun penyetujui (approver) bukan anggota aktif di workspace ini.'],
+                ]);
+            }
+
+            if ($approverMember->branch_id && $approverMember->branch_id !== $branchId) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun approver tidak ditugaskan pada cabang ini.'],
+                ]);
+            }
+
+            $hasPermission = in_array($approverMember->role, ['OWNER', 'ADMIN', 'MANAGER'], true)
+                || $approverMember->hasPermission('pos.void_order');
+
+            if (! $hasPermission) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun approver tidak memiliki wewenang untuk otorisasi void transaksi.'],
+                ]);
+            }
+
+            if (empty($approverMember->pin) || ! Hash::check($pin, (string) $approverMember->pin)) {
+                throw ValidationException::withMessages([
+                    'pin' => ['PIN otorisasi approver tidak valid.'],
+                ]);
+            }
+
+            $order->update([
+                'payment_status' => 'VOIDED',
+                'void_reason' => $reason,
+                'voided_by_user_id' => $approverUserId,
+                'voided_at' => Carbon::now(),
+            ]);
+
+            return $order;
+        });
+    }
+
+    /**
+     * proses pengembalian dana pesanan (refund) sebagian atau penuh dengan otorisasi PIN approver
+     */
+    public function refundOrder(
+        string $workspaceId,
+        string $branchId,
+        string $orderId,
+        string $approverUserId,
+        string $pin,
+        string $reason,
+        ?float $refundAmount,
+        string $refundMethod
+    ): Order {
+        return DB::transaction(function () use (
+            $workspaceId,
+            $branchId,
+            $orderId,
+            $approverUserId,
+            $pin,
+            $reason,
+            $refundAmount,
+            $refundMethod
+        ): Order {
+            $order = Order::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->where('id', $orderId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $order) {
+                throw ValidationException::withMessages([
+                    'order_id' => ['Transaksi pesanan tidak ditemukan pada cabang ini.'],
+                ]);
+            }
+
+            if (! in_array($order->payment_status, ['PAID', 'PARTIALLY_REFUNDED'], true)) {
+                throw ValidationException::withMessages([
+                    'status' => ["Pesanan dengan status {$order->payment_status} tidak dapat diproses refund."],
+                ]);
+            }
+
+            $currentRefunded = (float) $order->refund_amount;
+            $finalAmount = (float) $order->final_amount;
+            $remainingRefundable = max(0.0, $finalAmount - $currentRefunded);
+
+            if ($remainingRefundable <= 0) {
+                throw ValidationException::withMessages([
+                    'refund_amount' => ['Seluruh nilai pesanan ini telah selesai di-refund sebelumnya.'],
+                ]);
+            }
+
+            $amountToRefund = $refundAmount ?? $remainingRefundable;
+
+            if ($amountToRefund <= 0 || $amountToRefund > $remainingRefundable) {
+                throw ValidationException::withMessages([
+                    'refund_amount' => ['Nominal refund tidak boleh melebihi sisa dana yang dapat dikembalikan (Rp ' . number_format($remainingRefundable, 0, ',', '.') . ').'],
+                ]);
+            }
+
+            /** @var WorkspaceMember|null $approverMember */
+            $approverMember = WorkspaceMember::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('user_id', $approverUserId)
+                ->where('is_active', true)
+                ->first();
+
+            if (! $approverMember) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun penyetujui (approver) bukan anggota aktif di workspace ini.'],
+                ]);
+            }
+
+            if ($approverMember->branch_id && $approverMember->branch_id !== $branchId) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun approver tidak ditugaskan pada cabang ini.'],
+                ]);
+            }
+
+            $hasPermission = in_array($approverMember->role, ['OWNER', 'ADMIN', 'MANAGER'], true)
+                || $approverMember->hasPermission('pos.refund_order')
+                || $approverMember->hasPermission('pos.void_order');
+
+            if (! $hasPermission) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun approver tidak memiliki wewenang untuk otorisasi refund transaksi.'],
+                ]);
+            }
+
+            if (empty($approverMember->pin) || ! Hash::check($pin, (string) $approverMember->pin)) {
+                throw ValidationException::withMessages([
+                    'pin' => ['PIN otorisasi approver tidak valid.'],
+                ]);
+            }
+
+            $refundedInSessionId = null;
+            if ($refundMethod === 'CASH_DRAWER') {
+                $activeSession = PosSession::withoutGlobalScopes()
+                    ->where('workspace_id', $workspaceId)
+                    ->where('branch_id', $branchId)
+                    ->where('status', 'OPEN')
+                    ->first();
+
+                if (! $activeSession) {
+                    throw ValidationException::withMessages([
+                        'refund_method' => ['Pengembalian dana via kas laci (CASH_DRAWER) memerlukan sesi kasir yang sedang aktif terbuka.'],
+                    ]);
+                }
+
+                $refundedInSessionId = $activeSession->id;
+            }
+
+            $newTotalRefunded = $currentRefunded + $amountToRefund;
+            $newPaymentStatus = ($newTotalRefunded >= $finalAmount) ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
+
+            $order->update([
+                'payment_status' => $newPaymentStatus,
+                'refund_amount' => $newTotalRefunded,
+                'refund_reason' => $reason,
+                'refund_method' => $refundMethod,
+                'refunded_in_session_id' => $refundedInSessionId,
+                'refunded_by_user_id' => $approverUserId,
+                'refunded_at' => Carbon::now(),
+            ]);
+
+            return $order;
+        });
     }
 
     /**

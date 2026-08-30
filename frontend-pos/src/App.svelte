@@ -473,7 +473,13 @@
           onOpenPaymentModal={() => (isPaymentModalOpen = true)}
         />
       {:else if activePage === 'transaksi'}
-        <TransaksiView orders={allOrders} onPrintOrder={handlePrintOrderDirect} />
+        <TransaksiView
+          orders={allOrders}
+          {cashiers}
+          {activeSession}
+          onPrintOrder={handlePrintOrderDirect}
+          onOrderUpdated={loadDbData}
+        />
       {:else if activePage === 'shift'}
         <ShiftView
           {activeSession}

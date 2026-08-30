@@ -2,7 +2,7 @@
   import {
     Search,
     Printer,
-    Send,
+    ShieldAlert,
     RotateCcw,
     CreditCard,
     QrCode,
@@ -10,19 +10,32 @@
     Clock,
     Receipt,
   } from 'lucide-svelte';
-  import type { OfflineOrder } from '../../../types/pos';
+  import type { OfflineOrder, CashierUser, PosSession } from '../../../types/pos';
   import { formatCurrency } from '../../../services/printer-service';
+  import VoidRefundModal from '../VoidRefundModal.svelte';
 
   interface Props {
     orders: OfflineOrder[];
+    cashiers?: CashierUser[];
+    activeSession?: PosSession | null;
     onPrintOrder: (order: OfflineOrder) => void;
+    onOrderUpdated?: () => void;
   }
 
-  let { orders = [], onPrintOrder }: Props = $props();
+  let {
+    orders = [],
+    cashiers = [],
+    activeSession = null,
+    onPrintOrder,
+    onOrderUpdated,
+  }: Props = $props();
 
   let searchQuery = $state('');
   let selectedOrderId = $state<string | null>(null);
   let timeframeFilter = $state<'TODAY' | 'THIS_MONTH' | 'THIS_YEAR' | 'CUSTOM'>('TODAY');
+
+  let isVoidRefundModalOpen = $state(false);
+  let voidRefundMode = $state<'VOID' | 'REFUND'>('VOID');
 
   const todayStr = new Date().toISOString().substring(0, 10);
 
@@ -114,6 +127,15 @@
     filteredOrders.find((o) => o.client_order_id === selectedOrderId) || filteredOrders[0] || null
   );
 
+  let isOrderFromActiveSession = $derived(
+    Boolean(
+      selectedOrder &&
+      activeSession &&
+      activeSession.status === 'OPEN' &&
+      selectedOrder.pos_session_id === activeSession.id
+    )
+  );
+
   function formatTime(iso: string): string {
     try {
       const date = new Date(iso);
@@ -142,6 +164,24 @@
     if (method === 'QRIS') return QrCode;
     if (method === 'CASH') return Banknote;
     return CreditCard;
+  }
+
+  function handleOpenVoidModal() {
+    if (!selectedOrder) return;
+    voidRefundMode = 'VOID';
+    isVoidRefundModalOpen = true;
+  }
+
+  function handleOpenRefundModal() {
+    if (!selectedOrder) return;
+    voidRefundMode = 'REFUND';
+    isVoidRefundModalOpen = true;
+  }
+
+  function handleSuccessVoidRefund() {
+    if (onOrderUpdated) {
+      onOrderUpdated();
+    }
   }
 </script>
 
@@ -282,7 +322,7 @@
             <Receipt class="mb-2 size-9 text-zinc-400 opacity-30" />
             <p class="text-sm font-semibold text-zinc-800">Tidak ada transaksi</p>
             <p class="mt-0.5 text-xs text-zinc-500">
-              Transaksi yang telah dibayar akan muncul di sini.
+              Transaksi yang telah diproses akan muncul di sini.
             </p>
           </div>
         {:else}
@@ -309,15 +349,36 @@
               <div class="min-w-0 flex-1">
                 <div class="flex items-center justify-between gap-1">
                   <span
-                    class={`font-mono text-xs font-bold sm:text-sm ${isSelected ? 'text-white' : 'text-zinc-900'}`}
+                    class={`font-mono text-xs font-bold sm:text-sm ${
+                      order.payment_status === 'VOIDED'
+                        ? 'line-through opacity-60'
+                        : isSelected
+                          ? 'text-white'
+                          : 'text-zinc-900'
+                    }`}
                   >
                     {formatCurrency(order.final_amount)}
                   </span>
-                  <span
-                    class={`font-mono text-[11px] ${isSelected ? 'text-zinc-400' : 'text-zinc-400'}`}
-                  >
-                    {formatTime(order.created_at)}
-                  </span>
+                  <div class="flex items-center gap-1.5">
+                    {#if order.payment_status === 'VOIDED'}
+                      <span class="rounded bg-red-100 px-1.5 py-0.5 text-[9px] font-bold text-red-700 uppercase">
+                        VOID
+                      </span>
+                    {:else if order.payment_status === 'REFUNDED'}
+                      <span class="rounded bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold text-amber-800 uppercase">
+                        REFUND
+                      </span>
+                    {:else if order.payment_status === 'PARTIALLY_REFUNDED'}
+                      <span class="rounded bg-purple-100 px-1.5 py-0.5 text-[9px] font-bold text-purple-700 uppercase">
+                        PARSIAL
+                      </span>
+                    {/if}
+                    <span
+                      class={`font-mono text-[11px] ${isSelected ? 'text-zinc-400' : 'text-zinc-400'}`}
+                    >
+                      {formatTime(order.created_at)}
+                    </span>
+                  </div>
                 </div>
 
                 <div
@@ -336,7 +397,7 @@
     <div class="flex-1 overflow-y-auto bg-[#f4f6f9] p-6">
       {#if selectedOrder}
         <div class="mx-auto max-w-2xl space-y-6">
-          <!-- Top Action Buttons (Kirim Struk | Cetak Ulang | Pilih Refund) -->
+          <!-- Top Action Buttons (Cetak Struk | Void Pesanan | Pilih Refund) -->
           <div class="grid grid-cols-3 gap-3">
             <button
               type="button"
@@ -349,20 +410,63 @@
 
             <button
               type="button"
-              class="active:scale-0.99 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50"
+              onclick={handleOpenVoidModal}
+              disabled={selectedOrder.payment_status !== 'PAID' || !isOrderFromActiveSession}
+              class="active:scale-0.99 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <Send class="size-4 text-zinc-600" />
-              <span>Kirim Struk</span>
+              <ShieldAlert class="size-4 text-[#b30000]" />
+              <span>Void Pesanan</span>
             </button>
 
             <button
               type="button"
-              class="active:scale-0.99 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50"
+              onclick={handleOpenRefundModal}
+              disabled={selectedOrder.payment_status === 'VOIDED' || selectedOrder.payment_status === 'CANCELLED' || selectedOrder.payment_status === 'REFUNDED'}
+              class="active:scale-0.99 flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 py-3 text-xs font-semibold text-zinc-800 shadow-2xs transition-all hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <RotateCcw class="size-4 text-zinc-600" />
+              <RotateCcw class="size-4 text-[#1863dc]" />
               <span>Pilih Refund</span>
             </button>
           </div>
+
+          <!-- Voided / Refunded Banner Alert -->
+          {#if selectedOrder.payment_status === 'VOIDED'}
+            <div class="rounded-2xl border border-red-200 bg-red-50/70 p-4 text-xs text-red-900">
+              <div class="flex items-center gap-2 font-bold text-red-800">
+                <ShieldAlert class="size-4" />
+                <span>Transaksi Dibatalkan (VOID)</span>
+              </div>
+              <p class="mt-1 text-red-700">
+                Alasan: <span class="font-semibold">{selectedOrder.void_reason || 'Tidak ada alasan dicatat'}</span>
+              </p>
+              {#if selectedOrder.voided_at}
+                <p class="mt-0.5 text-[11px] text-red-600">
+                  Dibatalkan pada {formatFullDate(selectedOrder.voided_at)}
+                </p>
+              {/if}
+            </div>
+          {:else if selectedOrder.payment_status === 'REFUNDED' || selectedOrder.payment_status === 'PARTIALLY_REFUNDED'}
+            <div class="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 text-xs text-amber-900">
+              <div class="flex items-center gap-2 font-bold text-amber-800">
+                <RotateCcw class="size-4" />
+                <span>
+                  {selectedOrder.payment_status === 'REFUNDED' ? 'Pengembalian Dana Penuh (REFUND)' : 'Pengembalian Dana Sebagian (PARSIAL)'}
+                </span>
+              </div>
+              <p class="mt-1 text-amber-800">
+                Dana dikembalikan: <span class="font-mono font-bold">{formatCurrency(selectedOrder.refund_amount || 0)}</span>
+                ({selectedOrder.refund_method || 'CASH_DRAWER'})
+              </p>
+              <p class="mt-0.5 text-amber-700">
+                Alasan: <span class="font-semibold">{selectedOrder.refund_reason || 'Tidak ada alasan dicatat'}</span>
+              </p>
+              {#if selectedOrder.refunded_at}
+                <p class="mt-0.5 text-[11px] text-amber-600">
+                  Diproses pada {formatFullDate(selectedOrder.refunded_at)}
+                </p>
+              {/if}
+            </div>
+          {/if}
 
           <!-- Section: Detail Transaksi -->
           <div class="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
@@ -373,6 +477,30 @@
             </div>
 
             <div class="space-y-3 text-xs">
+              <div class="flex items-center justify-between">
+                <span class="flex items-center gap-2 text-zinc-500">
+                  <CreditCard class="size-4 text-zinc-400" />
+                  <span>Status Transaksi</span>
+                </span>
+                {#if selectedOrder.payment_status === 'VOIDED'}
+                  <span class="rounded-md border border-red-200 bg-red-50 px-2.5 py-1 font-bold text-red-700">
+                    VOIDED
+                  </span>
+                {:else if selectedOrder.payment_status === 'REFUNDED'}
+                  <span class="rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 font-bold text-amber-800">
+                    REFUNDED
+                  </span>
+                {:else if selectedOrder.payment_status === 'PARTIALLY_REFUNDED'}
+                  <span class="rounded-md border border-purple-200 bg-purple-50 px-2.5 py-1 font-bold text-purple-700">
+                    PARTIALLY REFUNDED
+                  </span>
+                {:else}
+                  <span class="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 font-bold text-emerald-800">
+                    PAID / LUNAS
+                  </span>
+                {/if}
+              </div>
+
               <div class="flex items-center justify-between">
                 <span class="flex items-center gap-2 text-zinc-500">
                   <CreditCard class="size-4 text-zinc-400" />
@@ -488,3 +616,14 @@
     </div>
   </div>
 </div>
+
+{#if isVoidRefundModalOpen}
+  <VoidRefundModal
+    isOpen={isVoidRefundModalOpen}
+    mode={voidRefundMode}
+    order={selectedOrder}
+    {cashiers}
+    onClose={() => (isVoidRefundModalOpen = false)}
+    onSuccess={handleSuccessVoidRefund}
+  />
+{/if}

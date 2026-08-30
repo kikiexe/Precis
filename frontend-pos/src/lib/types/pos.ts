@@ -102,6 +102,7 @@ export interface MasterUnlockResult {
 }
 
 export interface OfflineOrder {
+  id?: string;
   client_order_id: string; // UUIDv4
   order_number: string;
   workspace_id: string;
@@ -116,6 +117,16 @@ export interface OfflineOrder {
   discount_amount: number;
   final_amount: number;
   payment_method: PaymentMethod;
+  payment_status?: 'PAID' | 'CANCELLED' | 'VOIDED' | 'REFUNDED' | 'PARTIALLY_REFUNDED';
+  void_reason?: string | null;
+  voided_at?: string | null;
+  voided_by_user_id?: string | null;
+  refund_amount?: number;
+  refund_reason?: string | null;
+  refund_method?: string | null;
+  refunded_in_session_id?: string | null;
+  refunded_by_user_id?: string | null;
+  refunded_at?: string | null;
   cash_tendered?: number;
   change_amount?: number;
   items: Array<{
