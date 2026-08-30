@@ -146,12 +146,20 @@ Route::prefix('v1')->group(function (): void {
         // katalog produk & kategori web portal
         Route::get('/products', [\App\Http\Controllers\Api\ProductCatalogController::class, 'products']);
         Route::get('/categories', [\App\Http\Controllers\Api\ProductCatalogController::class, 'categories']);
+        Route::get('/addon-categories', [\App\Http\Controllers\Api\AddonController::class, 'index']);
+        Route::get('/addon-categories/{id}', [\App\Http\Controllers\Api\AddonController::class, 'show']);
         Route::middleware('permission:catalog.manage')->group(function (): void {
             Route::post('/products', [\App\Http\Controllers\Api\ProductCatalogController::class, 'storeProduct']);
             Route::put('/products/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'updateProduct']);
             Route::delete('/products/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'deleteProduct']);
             Route::post('/categories', [\App\Http\Controllers\Api\ProductCatalogController::class, 'storeCategory']);
             Route::delete('/categories/{id}', [\App\Http\Controllers\Api\ProductCatalogController::class, 'deleteCategory']);
+            Route::post('/addon-categories', [\App\Http\Controllers\Api\AddonController::class, 'store']);
+            Route::put('/addon-categories/{id}', [\App\Http\Controllers\Api\AddonController::class, 'update']);
+            Route::delete('/addon-categories/{id}', [\App\Http\Controllers\Api\AddonController::class, 'destroy']);
+            Route::post('/addons', [\App\Http\Controllers\Api\AddonController::class, 'storeAddon']);
+            Route::put('/addons/{id}', [\App\Http\Controllers\Api\AddonController::class, 'updateAddon']);
+            Route::delete('/addons/{id}', [\App\Http\Controllers\Api\AddonController::class, 'destroyAddon']);
         });
 
         // presensi mobile PWA
@@ -278,9 +286,12 @@ Route::prefix('v1')->group(function (): void {
 
         // katalog produk offline & manajemen sesi kasir
         Route::get('/products', [PosController::class, 'products']);
+        Route::get('/addons', [PosController::class, 'addons']);
         Route::get('/orders', [PosController::class, 'orders']);
         Route::middleware('throttle:pos-session-open')->post('/sessions/open', [PosController::class, 'openSession']);
         Route::post('/sessions/close', [PosController::class, 'closeSession']);
         Route::post('/orders/sync-batch', [PosController::class, 'syncBatch']);
+        Route::post('/orders/{id}/void', [PosController::class, 'voidOrder']);
+        Route::post('/orders/{id}/refund', [PosController::class, 'refundOrder']);
     });
 });

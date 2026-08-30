@@ -10,6 +10,7 @@ import type {
   CloseSessionResponse,
   MasterUnlockResult,
   OfflineOrder,
+  AddonCategory,
 } from '../types/pos';
 
 export class PosService {
@@ -48,6 +49,7 @@ export class PosService {
             name: prod.name,
             base_price: Number(prod.base_price),
             is_active: prod.is_active,
+            addon_category_ids: prod.addon_category_ids || [],
           });
         });
       }
@@ -65,6 +67,22 @@ export class PosService {
       categoriesCount: categories.length,
       productsCount: products.length,
     };
+  }
+
+  public async syncAddonsToLocalDb(): Promise<{ addonCategoriesCount: number }> {
+    try {
+      const response = await posApiClient.get<AddonCategory[]>('/pos/addons');
+      if (response.data && Array.isArray(response.data)) {
+        await db.addonCategories.bulkPut(response.data);
+        return { addonCategoriesCount: response.data.length };
+      }
+    } catch (err: unknown) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        return { addonCategoriesCount: 0 };
+      }
+      console.warn('[POS Sync] Gagal menyinkronkan data add-on ke IndexedDB:', err);
+    }
+    return { addonCategoriesCount: 0 };
   }
 
   public async syncRecentOrdersToLocalDb(): Promise<{ ordersCount: number }> {

@@ -12,28 +12,29 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ScopedBy([WorkspaceScope::class])]
-class Product extends Model
+class AddonCategory extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes;
+    use HasFactory, HasUuids;
 
-    protected $table = 'products';
+    protected $table = 'addon_categories';
 
     protected $fillable = [
         'workspace_id',
-        'category_id',
         'name',
-        'base_price',
-        'is_active',
+        'selection_type',
+        'is_required',
+        'min_selection',
+        'max_selection',
     ];
 
     protected function casts(): array
     {
         return [
-            'base_price' => 'decimal:2',
-            'is_active' => 'boolean',
+            'is_required' => 'boolean',
+            'min_selection' => 'integer',
+            'max_selection' => 'integer',
         ];
     }
 
@@ -42,18 +43,13 @@ class Product extends Model
         return $this->belongsTo(Workspace::class, 'workspace_id');
     }
 
-    public function category(): BelongsTo
+    public function addons(): HasMany
     {
-        return $this->belongsTo(Category::class, 'category_id');
+        return $this->hasMany(Addon::class, 'addon_category_id');
     }
 
-    public function orderItems(): HasMany
+    public function products(): BelongsToMany
     {
-        return $this->hasMany(OrderItem::class, 'product_id');
-    }
-
-    public function addonCategories(): BelongsToMany
-    {
-        return $this->belongsToMany(AddonCategory::class, 'product_addon_categories', 'product_id', 'addon_category_id');
+        return $this->belongsToMany(Product::class, 'product_addon_categories', 'addon_category_id', 'product_id');
     }
 }

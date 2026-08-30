@@ -47,3 +47,12 @@ export function calculateCashChange(cashTendered: number, finalAmount: number): 
 export function calculateStockUsed(stockPreviousDay: number, currentStock: number): number {
   return Math.max(0, stockPreviousDay - currentStock);
 }
+
+/**
+ * Calculates unit price with attached modifiers
+ */
+export function calculateItemUnitPrice(basePrice: number, modifiers?: Array<{ price: number }>): number {
+  if (!modifiers || modifiers.length === 0) return basePrice;
+  const modifierSum = modifiers.reduce((sum, mod) => sum + (mod.price || 0), 0);
+  return basePrice + modifierSum;
+}

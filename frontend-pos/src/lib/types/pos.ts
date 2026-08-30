@@ -17,6 +17,33 @@ export interface Product {
   description?: string;
   is_active: boolean;
   stock?: number;
+  addon_category_ids?: string[];
+}
+
+export interface Addon {
+  id: string;
+  addon_category_id: string;
+  name: string;
+  price: number;
+  is_active: boolean;
+}
+
+export interface AddonCategory {
+  id: string;
+  name: string;
+  selection_type: 'SINGLE' | 'MULTIPLE';
+  is_required: boolean;
+  min_selection: number;
+  max_selection: number;
+  product_ids?: string[];
+  addons: Addon[];
+}
+
+export interface SelectedModifier {
+  addon_id: string;
+  addon_category_id?: string;
+  name: string;
+  price: number;
 }
 
 export interface Category {
@@ -34,6 +61,7 @@ export interface CatalogCategoryItem {
     name: string;
     base_price: number;
     is_active: boolean;
+    addon_category_ids?: string[];
   }>;
 }
 
@@ -42,6 +70,7 @@ export interface CartItem {
   quantity: number;
   unit_price: number;
   notes: string;
+  modifiers?: SelectedModifier[];
 }
 
 export type PosPage =
@@ -125,6 +154,7 @@ export interface OfflineOrder {
     unit_price: number;
     subtotal: number;
     notes?: string;
+    modifiers?: SelectedModifier[];
   }>;
   created_at: string;
   sync_status: 'PENDING' | 'SYNCED' | 'FAILED';

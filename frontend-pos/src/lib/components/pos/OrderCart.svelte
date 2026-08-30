@@ -36,6 +36,7 @@
     onSaveOpenBill?: () => void;
     onOpenBillsModal?: () => void;
     onOpenPaymentModal: () => void;
+    onEditItemModifiers?: (item: CartItem) => void;
   }
 
   let {
@@ -56,6 +57,7 @@
     onSaveOpenBill,
     onOpenBillsModal,
     onOpenPaymentModal,
+    onEditItemModifiers,
   }: Props = $props();
 
   // Order type dropdown state
@@ -364,9 +366,26 @@
             >
               <div class="flex items-start justify-between gap-2">
                 <div class="min-w-0 flex-1">
-                  <div class="line-clamp-2 text-xs leading-snug font-medium text-zinc-900">
-                    {item.product.name}
-                  </div>
+                  <button
+                    type="button"
+                    onclick={() => onEditItemModifiers?.(item)}
+                    class="cursor-pointer text-left hover:underline"
+                  >
+                    <div class="line-clamp-2 text-xs leading-snug font-semibold text-zinc-900">
+                      {item.product.name}
+                    </div>
+                  </button>
+
+                  {#if item.modifiers && item.modifiers.length > 0}
+                    <div class="mt-1 flex flex-wrap gap-1">
+                      {#each item.modifiers as mod}
+                        <span class="inline-flex items-center rounded bg-zinc-100 px-1.5 py-0.5 text-[9.5px] font-medium text-zinc-700">
+                          +{mod.name}
+                        </span>
+                      {/each}
+                    </div>
+                  {/if}
+
                   <div class="mt-0.5 font-mono text-[11px] text-zinc-500">
                     {formatCurrency(item.unit_price)}
                   </div>

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Addon;
+use App\Models\AddonCategory;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -26,7 +28,7 @@ class PosService
     {
         return Category::withoutGlobalScopes()
             ->with(['products' => function ($q): void {
-                $q->where('is_active', true)->orderBy('name');
+                $q->where('is_active', true)->with('addonCategories')->orderBy('name');
             }])
             ->where('workspace_id', $workspaceId)
             ->orderBy('name')
@@ -42,6 +44,47 @@ class PosService
                             'name' => $product->name,
                             'base_price' => (float) $product->base_price,
                             'is_active' => $product->is_active,
+                            'addon_category_ids' => $product->addonCategories->pluck('id')->toArray(),
+                        ];
+                    })->toArray(),
+                ];
+            })
+            ->toArray();
+    }
+
+    /**
+     * ambil daftar kategori add-on / modifier dan opsi item aktif untuk sinkronisasi POS offline
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getAddons(string $workspaceId): array
+    {
+        return AddonCategory::withoutGlobalScopes()
+            ->with([
+                'addons' => function ($q): void {
+                    $q->where('is_active', true)->orderBy('name');
+                },
+                'products',
+            ])
+            ->where('workspace_id', $workspaceId)
+            ->orderBy('name')
+            ->get()
+            ->map(function (AddonCategory $cat): array {
+                return [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                    'selection_type' => $cat->selection_type,
+                    'is_required' => (bool) $cat->is_required,
+                    'min_selection' => (int) $cat->min_selection,
+                    'max_selection' => (int) $cat->max_selection,
+                    'product_ids' => $cat->products->pluck('id')->toArray(),
+                    'addons' => $cat->addons->map(function (Addon $addon): array {
+                        return [
+                            'id' => $addon->id,
+                            'addon_category_id' => $addon->addon_category_id,
+                            'name' => $addon->name,
+                            'price' => (float) $addon->price,
+                            'is_active' => (bool) $addon->is_active,
                         ];
                     })->toArray(),
                 ];
@@ -209,13 +252,22 @@ class PosService
         return DB::transaction(function () use ($workspaceId, $branchId, $posTerminalId, $ordersPayload): array {
             $syncedIds = [];
 
-            // kumpulkan seluruh product_id dari payload untuk prefetch harga dari database
+            // kumpulkan seluruh product_id dan addon_id dari payload untuk prefetch harga resmi dari database
             $productIds = [];
+            $addonIds = [];
             foreach ($ordersPayload as $orderData) {
                 if (! empty($orderData['items']) && is_array($orderData['items'])) {
                     foreach ($orderData['items'] as $item) {
                         if (! empty($item['product_id'])) {
                             $productIds[] = (string) $item['product_id'];
+                        }
+                        if (! empty($item['modifiers']) && is_array($item['modifiers'])) {
+                            foreach ($item['modifiers'] as $mod) {
+                                $aid = isset($mod['addon_id']) ? (string) $mod['addon_id'] : (isset($mod['id']) ? (string) $mod['id'] : null);
+                                if ($aid) {
+                                    $addonIds[] = $aid;
+                                }
+                            }
                         }
                     }
                 }
@@ -225,6 +277,13 @@ class PosService
             $products = Product::withoutGlobalScopes()
                 ->where('workspace_id', $workspaceId)
                 ->whereIn('id', array_unique($productIds))
+                ->get()
+                ->keyBy('id');
+
+            /** @var \Illuminate\Support\Collection<string, Addon> $addons */
+            $addons = Addon::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->whereIn('id', array_unique($addonIds))
                 ->get()
                 ->keyBy('id');
 
@@ -242,7 +301,7 @@ class PosService
                     continue;
                 }
 
-                // kalkulasi ulang subtotal dan total harga di sisi server
+                // kalkulasi ulang subtotal dan total harga di sisi server (anti-tampering)
                 $calculatedTotalAmount = 0.0;
                 $processedItems = [];
 
@@ -252,9 +311,32 @@ class PosService
                         $quantity = max(1, (int) ($item['quantity'] ?? 1));
                         /** @var Product|null $product */
                         $product = $productId ? $products->get($productId) : null;
+                        $baseProductPrice = $product ? (float) $product->base_price : (float) ($item['unit_price'] ?? 0.0);
 
-                        // gunakan harga resmi database jika produk terdaftar, fallback ke unit_price client
-                        $unitPrice = $product ? (float) $product->base_price : (float) ($item['unit_price'] ?? 0.0);
+                        $modifierTotal = 0.0;
+                        $verifiedModifiers = [];
+                        if (! empty($item['modifiers']) && is_array($item['modifiers'])) {
+                            foreach ($item['modifiers'] as $mod) {
+                                $aid = isset($mod['addon_id']) ? (string) $mod['addon_id'] : (isset($mod['id']) ? (string) $mod['id'] : null);
+                                /** @var Addon|null $addon */
+                                $addon = $aid ? $addons->get($aid) : null;
+                                $addonPrice = $addon ? (float) $addon->price : (float) ($mod['price'] ?? $mod['unit_price'] ?? 0.0);
+                                $addonName = $addon ? $addon->name : (string) ($mod['name'] ?? $mod['addon_name'] ?? 'Addon');
+                                $modifierTotal += $addonPrice;
+
+                                $verifiedModifiers[] = [
+                                    'addon_id' => $aid,
+                                    'addon_category_id' => $addon?->addon_category_id,
+                                    'name' => $addonName,
+                                    'addon_name' => $addonName,
+                                    'price' => $addonPrice,
+                                    'unit_price' => $addonPrice,
+                                ];
+                            }
+                        }
+
+                        // harga satuan = harga dasar produk + total harga add-on resmi server
+                        $unitPrice = $baseProductPrice + $modifierTotal;
                         $productName = $product ? $product->name : (string) ($item['product_name'] ?? 'Item');
                         $subtotal = $unitPrice * $quantity;
                         $calculatedTotalAmount += $subtotal;
@@ -266,6 +348,7 @@ class PosService
                             'quantity' => $quantity,
                             'subtotal' => $subtotal,
                             'notes' => $item['notes'] ?? null,
+                            'modifiers' => count($verifiedModifiers) > 0 ? $verifiedModifiers : null,
                         ];
                     }
                 }
@@ -327,6 +410,7 @@ class PosService
                         'quantity' => $item['quantity'],
                         'subtotal' => $item['subtotal'],
                         'notes' => $item['notes'],
+                        'modifiers' => $item['modifiers'],
                     ]);
                 }
 

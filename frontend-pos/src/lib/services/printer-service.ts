@@ -61,6 +61,10 @@ export function generateReceiptText(
 
   order.items.forEach((item) => {
     text += `${item.product_name}\n`;
+    if (item.modifiers && item.modifiers.length > 0) {
+      const modNames = item.modifiers.map((m) => `+${m.name}`).join(', ');
+      text += `  (${modNames})\n`;
+    }
     text +=
       row(
         `  ${item.quantity} x ${formatCurrency(item.unit_price)}`,
