@@ -101,6 +101,7 @@
         unit_price: i.unit_price,
         subtotal: i.unit_price * i.quantity,
         notes: i.notes || undefined,
+        modifiers: i.modifiers && i.modifiers.length > 0 ? i.modifiers : undefined,
       })),
       created_at: new Date().toISOString(),
       sync_status: 'PENDING',

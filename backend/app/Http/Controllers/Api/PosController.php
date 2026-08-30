@@ -6,7 +6,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\Pos\ClosePosSessionRequest;
 use App\Http\Requests\Pos\OpenPosSessionRequest;
+use App\Http\Requests\Pos\RefundOrderRequest;
 use App\Http\Requests\Pos\SyncOrderBatchRequest;
+use App\Http\Requests\Pos\VoidOrderRequest;
 use App\Models\PosTerminal;
 use App\Services\PosService;
 use Illuminate\Http\JsonResponse;
@@ -32,6 +34,21 @@ class PosController
         return new JsonResponse([
             'message' => 'Katalog produk POS berhasil dimuat.',
             'data' => $catalog,
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * ambil master add-on / modifier dan opsi item aktif untuk sinkronisasi POS offline
+     */
+    public function addons(Request $request): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+
+        $addons = $this->posService->getAddons($workspaceId);
+
+        return new JsonResponse([
+            'message' => 'Data modifier add-on POS berhasil dimuat.',
+            'data' => $addons,
         ], Response::HTTP_OK);
     }
 
@@ -97,6 +114,75 @@ class PosController
     }
 
     /**
+     * batalkan pesanan pada sesi kasir aktif (void) dengan otorisasi PIN approver
+     */
+    public function voidOrder(VoidOrderRequest $request, string $id): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        $branchId = (string) $request->attributes->get('current_branch_id');
+
+        $order = $this->posService->voidOrder(
+            workspaceId: $workspaceId,
+            branchId: $branchId,
+            orderId: $id,
+            approverUserId: (string) $request->validated('approver_user_id'),
+            pin: (string) $request->validated('pin'),
+            reason: (string) $request->validated('reason'),
+        );
+
+        return new JsonResponse([
+            'message' => 'Transaksi pesanan berhasil dibatalkan (void).',
+            'data' => [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'payment_status' => $order->payment_status,
+                'void_reason' => $order->void_reason,
+                'voided_by_user_id' => $order->voided_by_user_id,
+                'voided_at' => $order->voided_at?->toIso8601String(),
+            ],
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * proses pengembalian dana pesanan (refund) dengan otorisasi PIN approver
+     */
+    public function refundOrder(RefundOrderRequest $request, string $id): JsonResponse
+    {
+        $workspaceId = (string) $request->attributes->get('current_workspace_id');
+        $branchId = (string) $request->attributes->get('current_branch_id');
+
+        $refundAmount = $request->validated('refund_amount') !== null
+            ? (float) $request->validated('refund_amount')
+            : null;
+
+        $order = $this->posService->refundOrder(
+            workspaceId: $workspaceId,
+            branchId: $branchId,
+            orderId: $id,
+            approverUserId: (string) $request->validated('approver_user_id'),
+            pin: (string) $request->validated('pin'),
+            reason: (string) $request->validated('reason'),
+            refundAmount: $refundAmount,
+            refundMethod: (string) $request->validated('refund_method'),
+        );
+
+        return new JsonResponse([
+            'message' => 'Pengembalian dana (refund) transaksi berhasil diproses.',
+            'data' => [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'payment_status' => $order->payment_status,
+                'refund_amount' => (float) $order->refund_amount,
+                'refund_reason' => $order->refund_reason,
+                'refund_method' => $order->refund_method,
+                'refunded_in_session_id' => $order->refunded_in_session_id,
+                'refunded_by_user_id' => $order->refunded_by_user_id,
+                'refunded_at' => $order->refunded_at?->toIso8601String(),
+            ],
+        ], Response::HTTP_OK);
+    }
+
+    /**
      * sinkronisasi batch transaksi pesanan offline secara idempoten
      */
     public function syncBatch(SyncOrderBatchRequest $request): JsonResponse
@@ -136,6 +222,7 @@ class PosController
             ->get()
             ->map(function (\App\Models\Order $o): array {
                 return [
+                    'id' => (string) $o->id,
                     'client_order_id' => $o->client_order_id ?? (string) $o->id,
                     'order_number' => $o->order_number,
                     'workspace_id' => $o->workspace_id,
@@ -148,6 +235,13 @@ class PosController
                     'discount_amount' => (float) $o->discount_amount,
                     'final_amount' => (float) $o->final_amount,
                     'payment_method' => $o->payment_method,
+                    'payment_status' => $o->payment_status ?? 'PAID',
+                    'void_reason' => $o->void_reason,
+                    'voided_at' => $o->voided_at?->toIso8601String(),
+                    'refund_amount' => (float) ($o->refund_amount ?? 0),
+                    'refund_reason' => $o->refund_reason,
+                    'refund_method' => $o->refund_method,
+                    'refunded_at' => $o->refunded_at?->toIso8601String(),
                     'cash_tendered' => $o->cash_tendered ? (float) $o->cash_tendered : null,
                     'change_amount' => $o->change_amount ? (float) $o->change_amount : null,
                     'items' => $o->items->map(fn ($i) => [
@@ -157,6 +251,7 @@ class PosController
                         'unit_price' => (float) $i->unit_price,
                         'subtotal' => (float) $i->subtotal,
                         'notes' => $i->notes,
+                        'modifiers' => $i->modifiers,
                     ])->toArray(),
                     'created_at' => $o->created_at?->toIso8601String() ?? now()->toIso8601String(),
                     'sync_status' => 'SYNCED',

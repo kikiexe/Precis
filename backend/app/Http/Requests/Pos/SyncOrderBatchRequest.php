@@ -33,6 +33,7 @@ class SyncOrderBatchRequest extends FormRequest
             'orders.*.items.*.quantity' => ['required', 'integer', 'min:1'],
             'orders.*.items.*.subtotal' => ['required', 'numeric', 'min:0'],
             'orders.*.items.*.notes' => ['nullable', 'string', 'max:255'],
+            'orders.*.items.*.modifiers' => ['nullable', 'array'],
         ];
     }
 

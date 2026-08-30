@@ -52,7 +52,7 @@
   let allOrders = $state<OfflineOrder[]>([]);
   let closedSessions = $state<PosSession[]>([]);
 
-  // state modal modifier & belanja
+  // state modal modifier / add-on & belanja
   let isModifierModalOpen = $state(false);
   let modifierProduct = $state<Product | null>(null);
   let editingCartItem = $state<CartItem | null>(null);
@@ -248,61 +248,67 @@
 
   // fungsi keranjang belanja
   function handleAddToCart(product: Product) {
-    if (product.addon_category_ids && product.addon_category_ids.length > 0) {
-      handleOpenModifierModal(product);
-      return;
-    }
+    const hasModifiers =
+      (product.addon_category_ids && product.addon_category_ids.length > 0) ||
+      addonCategories.some((cat) => cat.product_ids && cat.product_ids.includes(product.id));
 
-    const existingIndex = cartItems.findIndex(
-      (i) => i.product.id === product.id && (!i.modifiers || i.modifiers.length === 0)
-    );
-    if (existingIndex > -1) {
-      cartItems[existingIndex].quantity += 1;
+    if (hasModifiers) {
+      modifierProduct = product;
+      editingCartItem = null;
+      isModifierModalOpen = true;
+    } else {
+      const existingIndex = cartItems.findIndex(
+        (i) => i.product.id === product.id && (!i.modifiers || i.modifiers.length === 0)
+      );
+      if (existingIndex > -1) {
+        cartItems[existingIndex].quantity += 1;
+      } else {
+        cartItems.push({
+          product,
+          quantity: 1,
+          unit_price: product.base_price,
+          notes: '',
+          modifiers: [],
+        });
+      }
+    }
+  }
+
+  function handleSaveModifierItem(saved: {
+    product: Product;
+    quantity: number;
+    unit_price: number;
+    notes: string;
+    modifiers: SelectedModifier[];
+  }) {
+    if (editingCartItem) {
+      const idx = cartItems.findIndex((i) => i === editingCartItem);
+      if (idx > -1) {
+        cartItems[idx] = {
+          product: saved.product,
+          quantity: saved.quantity,
+          unit_price: saved.unit_price,
+          notes: saved.notes,
+          modifiers: saved.modifiers,
+        };
+      }
+      editingCartItem = null;
     } else {
       cartItems.push({
-        product,
-        quantity: 1,
-        unit_price: product.base_price,
-        notes: '',
-        modifiers: [],
+        product: saved.product,
+        quantity: saved.quantity,
+        unit_price: saved.unit_price,
+        notes: saved.notes,
+        modifiers: saved.modifiers,
       });
     }
   }
 
-  function handleOpenModifierModal(product: Product, existingCartItem?: CartItem) {
-    modifierProduct = product;
-    editingCartItem = existingCartItem || null;
+  function handleEditItemModifiers(item: CartItem) {
+    modifierProduct = item.product;
+    editingCartItem = item;
     isModifierModalOpen = true;
   }
-
-  function handleConfirmModifiers(data: {
-    modifiers: SelectedModifier[];
-    notes: string;
-    unit_price: number;
-  }) {
-    if (!modifierProduct) return;
-
-    if (editingCartItem) {
-      editingCartItem.modifiers = data.modifiers;
-      editingCartItem.notes = data.notes;
-      editingCartItem.unit_price = data.unit_price;
-      cartItems = [...cartItems];
-    } else {
-      cartItems.push({
-        product: modifierProduct,
-        quantity: 1,
-        unit_price: data.unit_price,
-        notes: data.notes,
-        modifiers: data.modifiers,
-      });
-      cartItems = [...cartItems];
-    }
-
-    isModifierModalOpen = false;
-    modifierProduct = null;
-    editingCartItem = null;
-  }
-
   function handleUpdateQuantity(productId: string, delta: number) {
     const index = cartItems.findIndex((i) => i.product.id === productId);
     if (index > -1) {
@@ -537,9 +543,16 @@
           onSaveOpenBill={handleSaveOpenBill}
           onOpenBillsModal={() => (isOpenBillsModalOpen = true)}
           onOpenPaymentModal={() => (isPaymentModalOpen = true)}
+          onEditItemModifiers={handleEditItemModifiers}
         />
       {:else if activePage === 'transaksi'}
-        <TransaksiView orders={allOrders} onPrintOrder={handlePrintOrderDirect} />
+        <TransaksiView
+          orders={allOrders}
+          {cashiers}
+          {activeSession}
+          onPrintOrder={handlePrintOrderDirect}
+          onOrderUpdated={loadDbData}
+        />
       {:else if activePage === 'shift'}
         <ShiftView
           {activeSession}
@@ -600,20 +613,21 @@
   />
 {/if}
 
-<!-- modal modifier & add-on produk -->
+<!-- modal modifier / add-on menu -->
 {#if isModifierModalOpen && modifierProduct}
   <ModifierModal
     isOpen={isModifierModalOpen}
     product={modifierProduct}
     {addonCategories}
-    initialModifiers={editingCartItem?.modifiers}
-    initialNotes={editingCartItem?.notes}
+    initialModifiers={editingCartItem?.modifiers || []}
+    initialNotes={editingCartItem?.notes || ''}
+    initialQuantity={editingCartItem?.quantity || 1}
     onClose={() => {
       isModifierModalOpen = false;
       modifierProduct = null;
       editingCartItem = null;
     }}
-    onConfirm={handleConfirmModifiers}
+    onAddToCart={handleSaveModifierItem}
   />
 {/if}
 

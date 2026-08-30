@@ -59,3 +59,12 @@ export function calculateExpectedCash(
 ): number {
   return Math.max(0, openingCash + cashSales - cashPurchases - cashRefunds);
 }
+
+/**
+ * Calculates unit price with attached modifiers
+ */
+export function calculateItemUnitPrice(basePrice: number, modifiers?: Array<{ price: number }>): number {
+  if (!modifiers || modifiers.length === 0) return basePrice;
+  const modifierSum = modifiers.reduce((sum, mod) => sum + (mod.price || 0), 0);
+  return basePrice + modifierSum;
+}

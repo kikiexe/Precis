@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\Addon;
+use App\Models\AddonCategory;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -27,7 +29,7 @@ class PosService
     {
         return Category::withoutGlobalScopes()
             ->with(['products' => function ($q): void {
-                $q->where('is_active', true)->orderBy('name');
+                $q->where('is_active', true)->with('addonCategories')->orderBy('name');
             }])
             ->where('workspace_id', $workspaceId)
             ->orderBy('name')
@@ -43,6 +45,47 @@ class PosService
                             'name' => $product->name,
                             'base_price' => (float) $product->base_price,
                             'is_active' => $product->is_active,
+                            'addon_category_ids' => $product->addonCategories->pluck('id')->toArray(),
+                        ];
+                    })->toArray(),
+                ];
+            })
+            ->toArray();
+    }
+
+    /**
+     * ambil daftar kategori add-on / modifier dan opsi item aktif untuk sinkronisasi POS offline
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getAddons(string $workspaceId): array
+    {
+        return AddonCategory::withoutGlobalScopes()
+            ->with([
+                'addons' => function ($q): void {
+                    $q->where('is_active', true)->orderBy('name');
+                },
+                'products',
+            ])
+            ->where('workspace_id', $workspaceId)
+            ->orderBy('name')
+            ->get()
+            ->map(function (AddonCategory $cat): array {
+                return [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                    'selection_type' => $cat->selection_type,
+                    'is_required' => (bool) $cat->is_required,
+                    'min_selection' => (int) $cat->min_selection,
+                    'max_selection' => (int) $cat->max_selection,
+                    'product_ids' => $cat->products->pluck('id')->toArray(),
+                    'addons' => $cat->addons->map(function (Addon $addon): array {
+                        return [
+                            'id' => $addon->id,
+                            'addon_category_id' => $addon->addon_category_id,
+                            'name' => $addon->name,
+                            'price' => (float) $addon->price,
+                            'is_active' => (bool) $addon->is_active,
                         ];
                     })->toArray(),
                 ];
@@ -186,7 +229,7 @@ class PosService
             ->where('funding_source', 'CASH_DRAWER')
             ->sum('total_price');
 
-        // kalkulasi total pengembalian uang tunai (refund kas laci) selama sesi ini
+        // kalkulasi total pengembalian kas tunai selama sesi ini
         $cashRefunds = (float) Order::withoutGlobalScopes()
             ->where('workspace_id', $workspaceId)
             ->where('branch_id', $branchId)
@@ -212,6 +255,231 @@ class PosService
     }
 
     /**
+     * batalkan pesanan pada sesi kasir yang sedang aktif (void) dengan otorisasi PIN approver
+     */
+    public function voidOrder(
+        string $workspaceId,
+        string $branchId,
+        string $orderId,
+        string $approverUserId,
+        string $pin,
+        string $reason
+    ): Order {
+        return DB::transaction(function () use (
+            $workspaceId,
+            $branchId,
+            $orderId,
+            $approverUserId,
+            $pin,
+            $reason
+        ): Order {
+            $order = Order::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->where('id', $orderId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $order) {
+                throw ValidationException::withMessages([
+                    'order_id' => ['Transaksi pesanan tidak ditemukan pada cabang ini.'],
+                ]);
+            }
+
+            if ($order->payment_status !== 'PAID') {
+                throw ValidationException::withMessages([
+                    'status' => ["Pesanan dengan status {$order->payment_status} tidak dapat dibatalkan (void)."],
+                ]);
+            }
+
+            // void hanya dapat dilakukan pada sesi kasir aktif yang sama
+            $activeSession = PosSession::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->where('status', 'OPEN')
+                ->first();
+
+            if (! $activeSession || $order->pos_session_id !== $activeSession->id) {
+                throw ValidationException::withMessages([
+                    'status' => ['Pembatalan (void) hanya dapat dilakukan pada transaksi di sesi kasir yang sedang aktif. Gunakan fitur refund untuk transaksi lintas sesi.'],
+                ]);
+            }
+
+            /** @var WorkspaceMember|null $approverMember */
+            $approverMember = WorkspaceMember::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('user_id', $approverUserId)
+                ->where('is_active', true)
+                ->first();
+
+            if (! $approverMember) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun penyetujui (approver) bukan anggota aktif di workspace ini.'],
+                ]);
+            }
+
+            if ($approverMember->branch_id && $approverMember->branch_id !== $branchId) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun approver tidak ditugaskan pada cabang ini.'],
+                ]);
+            }
+
+            $hasPermission = in_array($approverMember->role, ['OWNER', 'ADMIN', 'MANAGER'], true)
+                || $approverMember->hasPermission('pos.void_order');
+
+            if (! $hasPermission) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun approver tidak memiliki wewenang untuk otorisasi void transaksi.'],
+                ]);
+            }
+
+            if (empty($approverMember->pin) || ! Hash::check($pin, (string) $approverMember->pin)) {
+                throw ValidationException::withMessages([
+                    'pin' => ['PIN otorisasi approver tidak valid.'],
+                ]);
+            }
+
+            $order->update([
+                'payment_status' => 'VOIDED',
+                'void_reason' => $reason,
+                'voided_by_user_id' => $approverUserId,
+                'voided_at' => Carbon::now(),
+            ]);
+
+            return $order;
+        });
+    }
+
+    /**
+     * proses pengembalian dana pesanan (refund) sebagian atau penuh dengan otorisasi PIN approver
+     */
+    public function refundOrder(
+        string $workspaceId,
+        string $branchId,
+        string $orderId,
+        string $approverUserId,
+        string $pin,
+        string $reason,
+        ?float $refundAmount,
+        string $refundMethod
+    ): Order {
+        return DB::transaction(function () use (
+            $workspaceId,
+            $branchId,
+            $orderId,
+            $approverUserId,
+            $pin,
+            $reason,
+            $refundAmount,
+            $refundMethod
+        ): Order {
+            $order = Order::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->where('id', $orderId)
+                ->lockForUpdate()
+                ->first();
+
+            if (! $order) {
+                throw ValidationException::withMessages([
+                    'order_id' => ['Transaksi pesanan tidak ditemukan pada cabang ini.'],
+                ]);
+            }
+
+            if (! in_array($order->payment_status, ['PAID', 'PARTIALLY_REFUNDED'], true)) {
+                throw ValidationException::withMessages([
+                    'status' => ["Pesanan dengan status {$order->payment_status} tidak dapat diproses refund."],
+                ]);
+            }
+
+            $currentRefunded = (float) $order->refund_amount;
+            $finalAmount = (float) $order->final_amount;
+            $remainingRefundable = max(0.0, $finalAmount - $currentRefunded);
+
+            if ($remainingRefundable <= 0) {
+                throw ValidationException::withMessages([
+                    'refund_amount' => ['Seluruh nilai pesanan ini telah selesai di-refund sebelumnya.'],
+                ]);
+            }
+
+            $amountToRefund = $refundAmount ?? $remainingRefundable;
+
+            if ($amountToRefund <= 0 || $amountToRefund > $remainingRefundable) {
+                throw ValidationException::withMessages([
+                    'refund_amount' => ['Nominal refund tidak boleh melebihi sisa dana yang dapat dikembalikan (Rp ' . number_format($remainingRefundable, 0, ',', '.') . ').'],
+                ]);
+            }
+
+            /** @var WorkspaceMember|null $approverMember */
+            $approverMember = WorkspaceMember::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('user_id', $approverUserId)
+                ->where('is_active', true)
+                ->first();
+
+            if (! $approverMember) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun penyetujui (approver) bukan anggota aktif di workspace ini.'],
+                ]);
+            }
+
+            if ($approverMember->branch_id && $approverMember->branch_id !== $branchId) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun approver tidak ditugaskan pada cabang ini.'],
+                ]);
+            }
+
+            $hasPermission = in_array($approverMember->role, ['OWNER', 'ADMIN', 'MANAGER'], true)
+                || $approverMember->hasPermission('pos.refund_order')
+                || $approverMember->hasPermission('pos.void_order');
+
+            if (! $hasPermission) {
+                throw ValidationException::withMessages([
+                    'approver_user_id' => ['Akun approver tidak memiliki wewenang untuk otorisasi refund transaksi.'],
+                ]);
+            }
+
+            if (empty($approverMember->pin) || ! Hash::check($pin, (string) $approverMember->pin)) {
+                throw ValidationException::withMessages([
+                    'pin' => ['PIN otorisasi approver tidak valid.'],
+                ]);
+            }
+
+            $refundedInSessionId = null;
+            if ($refundMethod === 'CASH_DRAWER') {
+                $activeSession = PosSession::withoutGlobalScopes()
+                    ->where('workspace_id', $workspaceId)
+                    ->where('branch_id', $branchId)
+                    ->where('status', 'OPEN')
+                    ->first();
+
+                if (! $activeSession) {
+                    throw ValidationException::withMessages([
+                        'refund_method' => ['Pengembalian dana via kas laci (CASH_DRAWER) memerlukan sesi kasir yang sedang aktif terbuka.'],
+                    ]);
+                }
+
+                $refundedInSessionId = $activeSession->id;
+            }
+
+            $newTotalRefunded = $currentRefunded + $amountToRefund;
+            $newPaymentStatus = ($newTotalRefunded >= $finalAmount) ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
+
+            $order->update([
+                'payment_status' => $newPaymentStatus,
+                'refund_amount' => $newTotalRefunded,
+                'refund_reason' => $reason,
+                'refund_method' => $refundMethod,
+                'refunded_in_session_id' => $refundedInSessionId,
+                'refunded_by_user_id' => $approverUserId,
+                'refunded_at' => Carbon::now(),
+            ]);
+
+            return $order;
+        });
+    }
+
+    /**
      * sinkronisasi batch transaksi penjualan offline dengan jaminan idempoten dan verifikasi harga server-side
      *
      * @param  array<int, array<string, mixed>>  $ordersPayload
@@ -226,13 +494,22 @@ class PosService
         return DB::transaction(function () use ($workspaceId, $branchId, $posTerminalId, $ordersPayload): array {
             $syncedIds = [];
 
-            // kumpulkan seluruh product_id dari payload untuk prefetch harga dari database
+            // kumpulkan seluruh product_id dan addon_id dari payload untuk prefetch harga resmi dari database
             $productIds = [];
+            $addonIds = [];
             foreach ($ordersPayload as $orderData) {
                 if (! empty($orderData['items']) && is_array($orderData['items'])) {
                     foreach ($orderData['items'] as $item) {
                         if (! empty($item['product_id'])) {
                             $productIds[] = (string) $item['product_id'];
+                        }
+                        if (! empty($item['modifiers']) && is_array($item['modifiers'])) {
+                            foreach ($item['modifiers'] as $mod) {
+                                $aid = isset($mod['addon_id']) ? (string) $mod['addon_id'] : (isset($mod['id']) ? (string) $mod['id'] : null);
+                                if ($aid) {
+                                    $addonIds[] = $aid;
+                                }
+                            }
                         }
                     }
                 }
@@ -242,6 +519,13 @@ class PosService
             $products = Product::withoutGlobalScopes()
                 ->where('workspace_id', $workspaceId)
                 ->whereIn('id', array_unique($productIds))
+                ->get()
+                ->keyBy('id');
+
+            /** @var \Illuminate\Support\Collection<string, Addon> $addons */
+            $addons = Addon::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->whereIn('id', array_unique($addonIds))
                 ->get()
                 ->keyBy('id');
 
@@ -259,7 +543,7 @@ class PosService
                     continue;
                 }
 
-                // kalkulasi ulang subtotal dan total harga di sisi server
+                // kalkulasi ulang subtotal dan total harga di sisi server (anti-tampering)
                 $calculatedTotalAmount = 0.0;
                 $processedItems = [];
 
@@ -269,9 +553,32 @@ class PosService
                         $quantity = max(1, (int) ($item['quantity'] ?? 1));
                         /** @var Product|null $product */
                         $product = $productId ? $products->get($productId) : null;
+                        $baseProductPrice = $product ? (float) $product->base_price : (float) ($item['unit_price'] ?? 0.0);
 
-                        // gunakan harga resmi database jika produk terdaftar, fallback ke unit_price client
-                        $unitPrice = $product ? (float) $product->base_price : (float) ($item['unit_price'] ?? 0.0);
+                        $modifierTotal = 0.0;
+                        $verifiedModifiers = [];
+                        if (! empty($item['modifiers']) && is_array($item['modifiers'])) {
+                            foreach ($item['modifiers'] as $mod) {
+                                $aid = isset($mod['addon_id']) ? (string) $mod['addon_id'] : (isset($mod['id']) ? (string) $mod['id'] : null);
+                                /** @var Addon|null $addon */
+                                $addon = $aid ? $addons->get($aid) : null;
+                                $addonPrice = $addon ? (float) $addon->price : (float) ($mod['price'] ?? $mod['unit_price'] ?? 0.0);
+                                $addonName = $addon ? $addon->name : (string) ($mod['name'] ?? $mod['addon_name'] ?? 'Addon');
+                                $modifierTotal += $addonPrice;
+
+                                $verifiedModifiers[] = [
+                                    'addon_id' => $aid,
+                                    'addon_category_id' => $addon?->addon_category_id,
+                                    'name' => $addonName,
+                                    'addon_name' => $addonName,
+                                    'price' => $addonPrice,
+                                    'unit_price' => $addonPrice,
+                                ];
+                            }
+                        }
+
+                        // harga satuan = harga dasar produk + total harga add-on resmi server
+                        $unitPrice = $baseProductPrice + $modifierTotal;
                         $productName = $product ? $product->name : (string) ($item['product_name'] ?? 'Item');
                         $subtotal = $unitPrice * $quantity;
                         $calculatedTotalAmount += $subtotal;
@@ -283,6 +590,7 @@ class PosService
                             'quantity' => $quantity,
                             'subtotal' => $subtotal,
                             'notes' => $item['notes'] ?? null,
+                            'modifiers' => count($verifiedModifiers) > 0 ? $verifiedModifiers : null,
                         ];
                     }
                 }
@@ -344,6 +652,7 @@ class PosService
                         'quantity' => $item['quantity'],
                         'subtotal' => $item['subtotal'],
                         'notes' => $item['notes'],
+                        'modifiers' => $item['modifiers'],
                     ]);
                 }
 

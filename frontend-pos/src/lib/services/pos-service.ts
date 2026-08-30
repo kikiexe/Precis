@@ -50,6 +50,7 @@ export class PosService {
             name: prod.name,
             base_price: Number(prod.base_price),
             is_active: prod.is_active,
+            addon_category_ids: prod.addon_category_ids || [],
           });
         });
       }
@@ -80,7 +81,7 @@ export class PosService {
       if (typeof navigator !== 'undefined' && !navigator.onLine) {
         return { addonCategoriesCount: 0 };
       }
-      console.warn('[POS Sync] Gagal menyinkronkan data modifier/addon ke IndexedDB:', err);
+      console.warn('[POS Sync] Gagal menyinkronkan data add-on ke IndexedDB:', err);
     }
     return { addonCategoriesCount: 0 };
   }
@@ -243,6 +244,109 @@ export class PosService {
       return response.data;
     }
     throw new Error(response.message || 'Gagal mencatat belanja outlet.');
+  }
+
+  public async voidOrder(
+    orderId: string,
+    approverUserId: string,
+    pin: string,
+    reason: string
+  ): Promise<{
+    id: string;
+    order_number: string;
+    payment_status: string;
+    void_reason: string;
+    voided_by_user_id: string;
+    voided_at: string;
+  }> {
+    const payload = {
+      approver_user_id: approverUserId,
+      pin,
+      reason,
+    };
+
+    const response = await posApiClient.post<{
+      id: string;
+      order_number: string;
+      payment_status: string;
+      void_reason: string;
+      voided_by_user_id: string;
+      voided_at: string;
+    }>(`/pos/orders/${orderId}/void`, payload);
+
+    if (response.data) {
+      try {
+        await db.orders.where('client_order_id').equals(orderId).or('id').equals(orderId).modify({
+          payment_status: 'VOIDED',
+          void_reason: reason,
+          voided_by_user_id: approverUserId,
+          voided_at: response.data.voided_at,
+        });
+      } catch {
+        // abaikan jika index lokal belum sinkron
+      }
+      return response.data;
+    }
+
+    throw new Error(response.message || 'Gagal membatalkan (void) pesanan.');
+  }
+
+  public async refundOrder(
+    orderId: string,
+    approverUserId: string,
+    pin: string,
+    reason: string,
+    refundAmount?: number,
+    refundMethod: string = 'CASH_DRAWER'
+  ): Promise<{
+    id: string;
+    order_number: string;
+    payment_status: string;
+    refund_amount: number;
+    refund_reason: string;
+    refund_method: string;
+    refunded_in_session_id?: string;
+    refunded_by_user_id: string;
+    refunded_at: string;
+  }> {
+    const payload = {
+      approver_user_id: approverUserId,
+      pin,
+      reason,
+      refund_amount: refundAmount !== undefined ? refundAmount : undefined,
+      refund_method: refundMethod,
+    };
+
+    const response = await posApiClient.post<{
+      id: string;
+      order_number: string;
+      payment_status: string;
+      refund_amount: number;
+      refund_reason: string;
+      refund_method: string;
+      refunded_in_session_id?: string;
+      refunded_by_user_id: string;
+      refunded_at: string;
+    }>(`/pos/orders/${orderId}/refund`, payload);
+
+    if (response.data) {
+      try {
+        await db.orders.where('client_order_id').equals(orderId).or('id').equals(orderId).modify({
+          payment_status: response.data.payment_status as OfflineOrder['payment_status'],
+          refund_amount: response.data.refund_amount,
+          refund_reason: response.data.refund_reason,
+          refund_method: response.data.refund_method,
+          refunded_in_session_id: response.data.refunded_in_session_id,
+          refunded_by_user_id: response.data.refunded_by_user_id,
+          refunded_at: response.data.refunded_at,
+        });
+      } catch {
+        // abaikan jika index lokal belum sinkron
+      }
+      return response.data;
+    }
+
+    throw new Error(response.message || 'Gagal memproses refund pesanan.');
   }
 }
 
