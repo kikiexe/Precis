@@ -10,6 +10,8 @@ import type {
   CloseSessionResponse,
   MasterUnlockResult,
   OfflineOrder,
+  AddonCategory,
+  OutletPurchase,
 } from '../types/pos';
 
 export class PosService {
@@ -65,6 +67,22 @@ export class PosService {
       categoriesCount: categories.length,
       productsCount: products.length,
     };
+  }
+
+  public async syncAddonsToLocalDb(): Promise<{ addonCategoriesCount: number }> {
+    try {
+      const response = await posApiClient.get<AddonCategory[]>('/pos/addons');
+      if (response.data && Array.isArray(response.data)) {
+        await db.addonCategories.bulkPut(response.data);
+        return { addonCategoriesCount: response.data.length };
+      }
+    } catch (err: unknown) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        return { addonCategoriesCount: 0 };
+      }
+      console.warn('[POS Sync] Gagal menyinkronkan data modifier/addon ke IndexedDB:', err);
+    }
+    return { addonCategoriesCount: 0 };
   }
 
   public async syncRecentOrdersToLocalDb(): Promise<{ ordersCount: number }> {
@@ -168,6 +186,63 @@ export class PosService {
   public async pairDevice(deviceToken: string): Promise<PosTerminalInfo> {
     posApiClient.setDeviceToken(deviceToken);
     return await this.getTerminalInfo();
+  }
+
+  public async syncPurchasesToLocalDb(): Promise<{ purchasesCount: number }> {
+    try {
+      const response = await posApiClient.get<OutletPurchase[]>('/pos/purchases');
+      if (response.data && Array.isArray(response.data)) {
+        await db.purchases.bulkPut(response.data);
+        return { purchasesCount: response.data.length };
+      }
+    } catch (err: unknown) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        return { purchasesCount: 0 };
+      }
+      console.warn('[POS Sync] Gagal menyinkronkan data belanja ke IndexedDB:', err);
+    }
+    return { purchasesCount: 0 };
+  }
+
+  public async getOutletPurchases(sessionId?: string): Promise<OutletPurchase[]> {
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+      try {
+        const url = sessionId ? `/pos/purchases?pos_session_id=${sessionId}` : '/pos/purchases';
+        const response = await posApiClient.get<OutletPurchase[]>(url);
+        if (response.data && Array.isArray(response.data)) {
+          await db.purchases.bulkPut(response.data);
+          return response.data;
+        }
+      } catch {
+        // fallback ke IndexedDB lokal
+      }
+    }
+
+    if (sessionId) {
+      return await db.purchases.where('pos_session_id').equals(sessionId).reverse().toArray();
+    }
+    return await db.purchases.reverse().toArray();
+  }
+
+  public async createOutletPurchase(data: {
+    item_name: string;
+    unit: string;
+    quantity: number;
+    unit_price: number;
+    total_price: number;
+    category: string;
+    funding_source: string;
+    pos_session_id?: string | null;
+    cashier_user_id?: string;
+    pin?: string;
+    notes?: string;
+  }): Promise<OutletPurchase> {
+    const response = await posApiClient.post<OutletPurchase>('/pos/purchases', data);
+    if (response.data) {
+      await db.purchases.put(response.data);
+      return response.data;
+    }
+    throw new Error(response.message || 'Gagal mencatat belanja outlet.');
   }
 }
 

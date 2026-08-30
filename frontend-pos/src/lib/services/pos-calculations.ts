@@ -47,3 +47,15 @@ export function calculateCashChange(cashTendered: number, finalAmount: number): 
 export function calculateStockUsed(stockPreviousDay: number, currentStock: number): number {
   return Math.max(0, stockPreviousDay - currentStock);
 }
+
+/**
+ * Calculates expected closing cash considering opening cash, cash sales, cash purchases (petty cash), and cash refunds
+ */
+export function calculateExpectedCash(
+  openingCash: number,
+  cashSales: number,
+  cashPurchases = 0,
+  cashRefunds = 0
+): number {
+  return Math.max(0, openingCash + cashSales - cashPurchases - cashRefunds);
+}

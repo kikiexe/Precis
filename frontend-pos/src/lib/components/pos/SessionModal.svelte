@@ -1,6 +1,6 @@
 <script lang="ts">
   import { DollarSign, X, Check, AlertCircle, ChevronDown } from 'lucide-svelte';
-  import type { PosSession, CloseSessionResponse, CashierUser } from '../../types/pos';
+  import type { PosSession, CloseSessionResponse, CashierUser, OutletPurchase } from '../../types/pos';
   import { formatCurrency } from '../../services/printer-service';
   import { posService } from '../../services/pos-service';
 
@@ -10,6 +10,7 @@
     cashierUserId?: string;
     cashiers?: CashierUser[];
     activeCashier?: CashierUser | null;
+    purchases?: OutletPurchase[];
     onClose: () => void;
     onSessionOpened: (session: PosSession) => void;
     onSessionClosed: (closedData: CloseSessionResponse) => void;
@@ -21,6 +22,7 @@
     cashierUserId,
     cashiers = [],
     activeCashier = null,
+    purchases = [],
     onClose,
     onSessionOpened,
     onSessionClosed,
@@ -34,6 +36,22 @@
   let isLoading = $state(false);
   let errorMessage = $state<string | null>(null);
 
+  let sessionCashPurchases = $derived(
+    activeSession && purchases
+      ? purchases
+          .filter((p) => p.pos_session_id === activeSession?.id && p.funding_source === 'CASH_DRAWER')
+          .reduce((sum, p) => sum + Number(p.total_price), 0)
+      : 0
+  );
+
+  let expectedCash = $derived(
+    activeSession
+      ? (activeSession.opening_cash || 0) + (activeSession.total_cash_sales || 0) - sessionCashPurchases
+      : 0
+  );
+
+  let discrepancy = $derived(activeSession ? closingCashInput - expectedCash : 0);
+
   $effect(() => {
     if (isOpen) {
       errorMessage = null;
@@ -46,17 +64,10 @@
             : cashiers[0]?.id || '';
 
       if (activeSession && activeSession.status === 'OPEN') {
-        closingCashInput =
-          (activeSession.opening_cash || 0) + (activeSession.total_cash_sales || 0);
+        closingCashInput = expectedCash;
       }
     }
   });
-
-  let expectedCash = $derived(
-    activeSession ? (activeSession.opening_cash || 0) + (activeSession.total_cash_sales || 0) : 0
-  );
-
-  let discrepancy = $derived(activeSession ? closingCashInput - expectedCash : 0);
 
   async function handleStartSession() {
     if (!selectedCashierId) {
@@ -280,6 +291,14 @@
                 >+{formatCurrency(activeSession.total_cash_sales)}</span
               >
             </div>
+            {#if sessionCashPurchases > 0}
+              <div class="flex justify-between">
+                <span class="text-[#616161]">Belanja Kas Laci (Petty Cash):</span>
+                <span class="font-mono font-medium text-[#b30000]"
+                  >-{formatCurrency(sessionCashPurchases)}</span
+                >
+              </div>
+            {/if}
             <div class="flex justify-between">
               <span class="text-[#616161]">Penjualan Non-Tunai (QRIS / EDC):</span>
               <span class="font-mono font-medium text-[#1863dc]"
