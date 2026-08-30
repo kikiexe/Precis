@@ -10,6 +10,10 @@ import type {
   CloseSessionResponse,
   MasterUnlockResult,
   OfflineOrder,
+  AddonCategory,
+  OutletPurchase,
+  StockWaste,
+  StockWasteReason,
 } from '../types/pos';
 
 export class PosService {
@@ -67,6 +71,95 @@ export class PosService {
     };
   }
 
+  public async syncAddonsToLocalDb(): Promise<{ count: number }> {
+    try {
+      const response = await posApiClient.get<AddonCategory[]>('/pos/addons');
+      if (response.data && Array.isArray(response.data)) {
+        await db.addons.clear();
+        await db.addons.bulkPut(response.data);
+        return { count: response.data.length };
+      }
+    } catch {
+      // Offline fallback silent
+    }
+    return { count: 0 };
+  }
+
+  public async syncPurchasesToLocalDb(): Promise<{ count: number }> {
+    try {
+      const response = await posApiClient.get<OutletPurchase[]>('/pos/purchases');
+      if (response.data && Array.isArray(response.data)) {
+        await db.purchases.bulkPut(response.data);
+        return { count: response.data.length };
+      }
+    } catch {
+      // Offline fallback
+    }
+    return { count: 0 };
+  }
+
+  public async syncStockWastesToLocalDb(): Promise<{ count: number }> {
+    try {
+      const response = await posApiClient.get<StockWaste[]>('/pos/inventory/waste');
+      if (response.data && Array.isArray(response.data)) {
+        await db.stockWastes.bulkPut(response.data);
+        return { count: response.data.length };
+      }
+    } catch {
+      // Offline fallback
+    }
+    return { count: 0 };
+  }
+
+  public async getStockWastes(): Promise<StockWaste[]> {
+    return await db.stockWastes.reverse().toArray();
+  }
+
+  public async createStockWaste(payload: {
+    product_id?: string | null;
+    item_name: string;
+    quantity: number;
+    unit?: string;
+    cost_per_unit: number;
+    reason: StockWasteReason;
+    photo_url?: string | null;
+    notes?: string | null;
+    cashier_user_id: string;
+    pin: string;
+  }): Promise<StockWaste> {
+    const totalLoss = Math.round(payload.quantity * payload.cost_per_unit);
+
+    const localWaste: StockWaste = {
+      id: crypto.randomUUID(),
+      workspace_id: '',
+      branch_id: '',
+      product_id: payload.product_id || null,
+      item_name: payload.item_name,
+      quantity: payload.quantity,
+      unit: payload.unit || 'Pcs',
+      cost_per_unit: payload.cost_per_unit,
+      total_loss_cost: totalLoss,
+      reason: payload.reason,
+      photo_url: payload.photo_url || null,
+      notes: payload.notes || null,
+      recorded_by_user_id: payload.cashier_user_id,
+      created_at: new Date().toISOString(),
+    };
+
+    try {
+      const response = await posApiClient.post<StockWaste>('/pos/inventory/waste', payload);
+      if (response.data) {
+        await db.stockWastes.put(response.data);
+        return response.data;
+      }
+    } catch (err: unknown) {
+      console.warn('[Stock Waste] Offline fallback, menyimpan ke IndexedDB:', err);
+    }
+
+    await db.stockWastes.put(localWaste);
+    return localWaste;
+  }
+
   public async syncRecentOrdersToLocalDb(): Promise<{ ordersCount: number }> {
     try {
       const response = await posApiClient.get<OfflineOrder[]>('/pos/orders');
@@ -76,7 +169,6 @@ export class PosService {
       }
     } catch (err: unknown) {
       if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        // mode offline normal: kasir beroperasi tanpa koneksi internet
         return { ordersCount: 0 };
       }
       console.warn('[POS Sync] Gagal menyinkronkan riwayat transaksi server ke IndexedDB:', err);

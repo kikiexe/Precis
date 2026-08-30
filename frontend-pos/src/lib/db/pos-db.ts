@@ -1,5 +1,14 @@
 import Dexie, { type Table } from 'dexie';
-import type { Product, Category, OfflineOrder, PosSession, CashierUser } from '../types/pos';
+import type {
+  Product,
+  Category,
+  OfflineOrder,
+  PosSession,
+  CashierUser,
+  AddonCategory,
+  OutletPurchase,
+  StockWaste,
+} from '../types/pos';
 
 export class PrecisPosDatabase extends Dexie {
   products!: Table<Product, string>;
@@ -7,6 +16,9 @@ export class PrecisPosDatabase extends Dexie {
   orders!: Table<OfflineOrder, string>;
   sessions!: Table<PosSession, string>;
   cashiers!: Table<CashierUser, string>;
+  addons!: Table<AddonCategory, string>;
+  purchases!: Table<OutletPurchase, string>;
+  stockWastes!: Table<StockWaste, string>;
 
   constructor() {
     super('PrecisPosDb');
@@ -16,6 +28,18 @@ export class PrecisPosDatabase extends Dexie {
       orders: 'client_order_id, workspace_id, branch_id, pos_session_id, sync_status, created_at',
       sessions: 'id, workspace_id, branch_id, status, opened_at',
       cashiers: 'id, name, pin',
+    });
+
+    this.version(2).stores({
+      addons: 'id, workspace_id, name',
+    });
+
+    this.version(3).stores({
+      purchases: 'id, workspace_id, branch_id, category, funding_source, created_at',
+    });
+
+    this.version(4).stores({
+      stockWastes: 'id, workspace_id, branch_id, reason, created_at',
     });
   }
 }

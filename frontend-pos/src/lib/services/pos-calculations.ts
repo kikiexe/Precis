@@ -1,18 +1,24 @@
-import type { CartItem } from '../types/pos';
+import type { CartItem, TaxSettings } from '../types/pos';
 
 export interface CartCalculationResult {
   totalAmount: number;
   discountAmount: number;
+  netAmount: number;
+  taxName?: string;
+  taxRate?: number;
+  taxType?: 'INCLUSIVE' | 'EXCLUSIVE';
+  taxAmount: number;
   finalAmount: number;
 }
 
 /**
- * Calculates cart subtotal, discount, and final amount
+ * kalkulasi subtotal keranjang, diskon, dan pajak dinamis (inclusive vs exclusive)
  */
 export function calculateCartTotals(
   items: CartItem[],
   discountPercent = 0,
-  discountNominal = 0
+  discountNominal = 0,
+  taxSettings?: TaxSettings | null
 ): CartCalculationResult {
   const totalAmount = items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
 
@@ -24,17 +30,43 @@ export function calculateCartTotals(
     discountAmount = Math.min(totalAmount, Math.max(0, discountNominal));
   }
 
-  const finalAmount = Math.max(0, totalAmount - discountAmount);
+  const netAmount = Math.max(0, totalAmount - discountAmount);
+
+  let taxAmount = 0;
+  let taxName: string | undefined;
+  let taxRate: number | undefined;
+  let taxType: 'INCLUSIVE' | 'EXCLUSIVE' | undefined;
+  let finalAmount = netAmount;
+
+  if (taxSettings && taxSettings.tax_enabled && taxSettings.tax_rate > 0) {
+    taxRate = taxSettings.tax_rate;
+    taxType = taxSettings.tax_type ?? 'INCLUSIVE';
+    taxName = taxSettings.tax_name ?? 'PB1';
+
+    if (taxType === 'EXCLUSIVE') {
+      taxAmount = Math.round(netAmount * (taxRate / 100));
+      finalAmount = netAmount + taxAmount;
+    } else {
+      // INCLUSIVE (Pajak sudah terkandung di dalam netAmount)
+      taxAmount = Math.round(netAmount - netAmount / (1 + taxRate / 100));
+      finalAmount = netAmount;
+    }
+  }
 
   return {
     totalAmount,
     discountAmount,
+    netAmount,
+    taxName,
+    taxRate,
+    taxType,
+    taxAmount,
     finalAmount,
   };
 }
 
 /**
- * Calculates cash change amount
+ * kalkulasi uang kembalian pembayaran tunai
  */
 export function calculateCashChange(cashTendered: number, finalAmount: number): number {
   if (cashTendered < finalAmount) return 0;
@@ -42,7 +74,7 @@ export function calculateCashChange(cashTendered: number, finalAmount: number): 
 }
 
 /**
- * Calculates inventory stock usage given start stock and updated current stock
+ * kalkulasi penggunaan stok bahan baku
  */
 export function calculateStockUsed(stockPreviousDay: number, currentStock: number): number {
   return Math.max(0, stockPreviousDay - currentStock);

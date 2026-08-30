@@ -31,8 +31,19 @@ class Order extends Model
         'total_amount',
         'discount_amount',
         'final_amount',
+        'tax_name',
+        'tax_rate',
+        'tax_type',
+        'tax_amount',
         'payment_method',
         'payment_status',
+        'void_reason',
+        'voided_at',
+        'voided_by_user_id',
+        'refund_amount',
+        'refund_reason',
+        'refunded_at',
+        'refunded_by_user_id',
     ];
 
     protected function casts(): array
@@ -41,6 +52,11 @@ class Order extends Model
             'total_amount' => 'decimal:2',
             'discount_amount' => 'decimal:2',
             'final_amount' => 'decimal:2',
+            'tax_rate' => 'decimal:2',
+            'tax_amount' => 'decimal:2',
+            'refund_amount' => 'decimal:2',
+            'voided_at' => 'datetime',
+            'refunded_at' => 'datetime',
         ];
     }
 

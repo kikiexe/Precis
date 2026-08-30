@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Product, Category, CartItem, OrderType } from '../../../types/pos';
+  import type { Product, Category, CartItem, OrderType, TaxSettings } from '../../../types/pos';
   import ProductCatalog from '../ProductCatalog.svelte';
   import OrderCart from '../OrderCart.svelte';
 
@@ -13,6 +13,7 @@
     orderType?: OrderType;
     customerName?: string;
     openBillsCount?: number;
+    taxSettings?: TaxSettings | null;
     onSelectCategory: (id: string) => void;
     onAddToCart: (product: Product) => void;
     onUpdateQuantity: (productId: string, delta: number) => void;
@@ -38,6 +39,7 @@
     orderType = 'DINE_IN',
     customerName = '',
     openBillsCount = 0,
+    taxSettings = null,
     onSelectCategory,
     onAddToCart,
     onUpdateQuantity,
@@ -66,6 +68,7 @@
     {orderType}
     {customerName}
     {openBillsCount}
+    {taxSettings}
     {onUpdateQuantity}
     {onUpdateNotes}
     {onRemoveItem}

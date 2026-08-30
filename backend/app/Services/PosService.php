@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\BranchSetting;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -228,6 +229,17 @@ class PosService
                 ->get()
                 ->keyBy('id');
 
+            // ambil pengaturan pajak cabang untuk kalkulasi akurat di server
+            $branchSetting = BranchSetting::withoutGlobalScopes()
+                ->where('workspace_id', $workspaceId)
+                ->where('branch_id', $branchId)
+                ->first();
+
+            $isTaxEnabled = $branchSetting ? (bool) $branchSetting->tax_enabled : false;
+            $taxRate = $branchSetting ? (float) $branchSetting->tax_rate : 0.0;
+            $taxType = $branchSetting ? (string) $branchSetting->tax_type : 'INCLUSIVE';
+            $taxName = $branchSetting ? (string) $branchSetting->tax_name : 'PB1';
+
             foreach ($ordersPayload as $orderData) {
                 $clientOrderId = (string) $orderData['client_order_id'];
 
@@ -272,7 +284,27 @@ class PosService
 
                 $totalAmount = count($processedItems) > 0 ? $calculatedTotalAmount : (float) $orderData['total_amount'];
                 $discountAmount = max(0.0, min($totalAmount, (float) ($orderData['discount_amount'] ?? 0.00)));
-                $finalAmount = max(0.0, $totalAmount - $discountAmount);
+                $netBase = max(0.0, $totalAmount - $discountAmount);
+
+                if ($isTaxEnabled && $taxRate > 0) {
+                    if ($taxType === 'EXCLUSIVE') {
+                        $taxAmount = round($netBase * ($taxRate / 100), 2);
+                        $finalAmount = round($netBase + $taxAmount, 2);
+                    } else {
+                        // tax inclusive: pajak sudah terkandung di dalam harga akhir
+                        $taxAmount = round($netBase - ($netBase / (1 + ($taxRate / 100))), 2);
+                        $finalAmount = $netBase;
+                    }
+                    $orderTaxName = $taxName;
+                    $orderTaxRate = $taxRate;
+                    $orderTaxType = $taxType;
+                } else {
+                    $taxAmount = 0.00;
+                    $orderTaxName = null;
+                    $orderTaxRate = 0.00;
+                    $orderTaxType = 'INCLUSIVE';
+                    $finalAmount = $netBase;
+                }
 
                 // validasi kasir di dalam workspace
                 $cashierUserId = isset($orderData['cashier_user_id']) ? (string) $orderData['cashier_user_id'] : null;
@@ -314,6 +346,10 @@ class PosService
                     'total_amount' => $totalAmount,
                     'discount_amount' => $discountAmount,
                     'final_amount' => $finalAmount,
+                    'tax_name' => $orderTaxName,
+                    'tax_rate' => $orderTaxRate,
+                    'tax_type' => $orderTaxType,
+                    'tax_amount' => $taxAmount,
                     'payment_method' => (string) $orderData['payment_method'],
                     'payment_status' => (string) ($orderData['payment_status'] ?? 'PAID'),
                 ]);

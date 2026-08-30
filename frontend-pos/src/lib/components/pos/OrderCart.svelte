@@ -15,8 +15,9 @@
     Bookmark,
     Printer,
   } from 'lucide-svelte';
-  import type { CartItem, OrderType } from '../../types/pos';
+  import type { CartItem, OrderType, TaxSettings } from '../../types/pos';
   import { formatCurrency } from '../../services/printer-service';
+  import { calculateCartTotals } from '../../services/pos-calculations';
 
   interface Props {
     items: CartItem[];
@@ -25,6 +26,7 @@
     orderType?: OrderType;
     customerName?: string;
     openBillsCount?: number;
+    taxSettings?: TaxSettings | null;
     onUpdateQuantity: (productId: string, delta: number) => void;
     onUpdateNotes: (productId: string, notes: string) => void;
     onRemoveItem: (productId: string) => void;
@@ -45,6 +47,7 @@
     orderType = 'DINE_IN',
     customerName = '',
     openBillsCount = 0,
+    taxSettings = null,
     onUpdateQuantity,
     onUpdateNotes,
     onRemoveItem,
@@ -88,13 +91,16 @@
     }
   });
 
-  let subtotal = $derived(items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0));
-
-  let calculatedDiscount = $derived(
-    discountPercent > 0 ? Math.round((subtotal * discountPercent) / 100) : discountNominal
+  let cartCalc = $derived(
+    calculateCartTotals(items, discountPercent, discountNominal, taxSettings)
   );
 
-  let finalTotal = $derived(Math.max(0, subtotal - calculatedDiscount));
+  let subtotal = $derived(cartCalc.totalAmount);
+  let calculatedDiscount = $derived(cartCalc.discountAmount);
+  let taxAmount = $derived(cartCalc.taxAmount);
+  let taxName = $derived(cartCalc.taxName);
+  let taxType = $derived(cartCalc.taxType);
+  let finalTotal = $derived(cartCalc.finalAmount);
 
   let totalItemCount = $derived(items.reduce((sum, item) => sum + item.quantity, 0));
 
@@ -504,6 +510,19 @@
         <div class="flex justify-between text-red-600">
           <span>Diskon ({discountMode === 'PERCENT' ? `${discountPercent}%` : 'Nominal'})</span>
           <span class="font-mono">-{formatCurrency(calculatedDiscount)}</span>
+        </div>
+      {/if}
+      {#if taxAmount > 0}
+        <div class="flex justify-between text-zinc-600">
+          <span>
+            {taxName} ({taxSettings?.tax_rate}%)
+            {#if taxType === 'INCLUSIVE'}
+              <span class="text-[10px] font-normal text-zinc-400">(Termasuk)</span>
+            {/if}
+          </span>
+          <span class="font-mono">
+            {taxType === 'EXCLUSIVE' ? '+' : ''}{formatCurrency(taxAmount)}
+          </span>
         </div>
       {/if}
       <div

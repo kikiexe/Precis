@@ -508,6 +508,11 @@ export interface BranchItem {
   late_penalty_per_minute: number;
   overtime_pay_per_hour: number;
   min_overtime_threshold_minutes: number;
+  tax_enabled?: boolean;
+  tax_name?: string;
+  tax_rate?: number;
+  tax_type?: 'INCLUSIVE' | 'EXCLUSIVE';
+  show_tax_on_receipt?: boolean;
   terminals_count?: number;
   terminals?: PosTerminalItem[];
   created_at?: string;

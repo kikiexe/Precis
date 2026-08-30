@@ -1,3 +1,11 @@
+export interface TaxSettings {
+  tax_enabled: boolean;
+  tax_name: string;
+  tax_rate: number;
+  tax_type: 'INCLUSIVE' | 'EXCLUSIVE';
+  show_tax_on_receipt: boolean;
+}
+
 export interface PosTerminalInfo {
   terminal_id: string;
   terminal_name: string;
@@ -6,6 +14,7 @@ export interface PosTerminalInfo {
   branch_name?: string;
   qris_image_url?: string | null;
   cashiers?: CashierUser[];
+  tax_settings?: TaxSettings;
 }
 
 export interface Product {
@@ -115,6 +124,10 @@ export interface OfflineOrder {
   total_amount: number;
   discount_amount: number;
   final_amount: number;
+  tax_name?: string;
+  tax_rate?: number;
+  tax_type?: 'INCLUSIVE' | 'EXCLUSIVE';
+  tax_amount?: number;
   payment_method: PaymentMethod;
   cash_tendered?: number;
   change_amount?: number;
@@ -189,3 +202,67 @@ export interface StockAdjustmentLog {
   adjusted_by: string;
   created_at: string;
 }
+
+export type StockWasteReason =
+  | 'EXPIRED'
+  | 'SPOILED'
+  | 'ACCIDENT_SPILL'
+  | 'BARISTA_MISTAKE'
+  | 'QC_REJECT'
+  | 'OTHER';
+
+export interface StockWaste {
+  id: string;
+  workspace_id: string;
+  branch_id: string;
+  product_id?: string | null;
+  item_name: string;
+  quantity: number;
+  unit: string;
+  cost_per_unit: number;
+  total_loss_cost: number;
+  reason: StockWasteReason;
+  photo_url?: string | null;
+  notes?: string | null;
+  recorded_by_user_id?: string;
+  created_at: string;
+}
+
+export type OutletPurchaseFundingSource = 'CASH_DRAWER' | 'PETTY_CASH' | 'OWNER_DIRECT';
+
+export interface OutletPurchase {
+  id: string;
+  workspace_id: string;
+  branch_id: string;
+  pos_session_id?: string | null;
+  item_name: string;
+  unit: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  category: string;
+  funding_source: OutletPurchaseFundingSource;
+  receipt_photo_url?: string | null;
+  notes?: string | null;
+  recorded_by_user_id?: string;
+  created_at: string;
+}
+
+export interface AddonOption {
+  id: string;
+  addon_category_id: string;
+  name: string;
+  price: number;
+  is_active: boolean;
+}
+
+export interface AddonCategory {
+  id: string;
+  workspace_id: string;
+  name: string;
+  min_selection: number;
+  max_selection: number;
+  is_required: boolean;
+  options: AddonOption[];
+}
+

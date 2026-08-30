@@ -14,6 +14,7 @@
     Trash2,
     QrCode,
     Upload,
+    Receipt,
   } from 'lucide-svelte';
   import type { BranchItem } from '../../../types/app';
   import { inventoryService } from '../../../services/inventory-service';
@@ -44,6 +45,13 @@
   let overtimeHourlyRate = $state(DEFAULT_OVERTIME_PAY_PER_HOUR_IDR);
   let minOvertimeThreshold = $state(DEFAULT_MIN_OVERTIME_THRESHOLD_MINUTES);
   let branchQrisUrl = $state<string | null>(null);
+
+  // State Konfigurasi Pajak Restoran & Biaya Layanan
+  let isTaxEnabled = $state(false);
+  let taxName = $state('PB1');
+  let taxRate = $state(10.0);
+  let taxType = $state<'INCLUSIVE' | 'EXCLUSIVE'>('INCLUSIVE');
+  let showTaxOnReceipt = $state(true);
 
   let isDetectingGps = $state(false);
   let isSavingBranch = $state(false);
@@ -78,6 +86,11 @@
         minOvertimeThreshold =
           active.min_overtime_threshold_minutes ?? DEFAULT_MIN_OVERTIME_THRESHOLD_MINUTES;
         branchQrisUrl = active.qris_image_url || null;
+        isTaxEnabled = Boolean(active.tax_enabled);
+        taxName = active.tax_name || 'PB1';
+        taxRate = typeof active.tax_rate === 'number' ? active.tax_rate : 10.0;
+        taxType = (active.tax_type as 'INCLUSIVE' | 'EXCLUSIVE') || 'INCLUSIVE';
+        showTaxOnReceipt = active.show_tax_on_receipt !== false;
       }
     }
   });
@@ -197,6 +210,11 @@
         late_penalty_per_minute: Number(latePenaltyRate) || 0,
         overtime_pay_per_hour: Number(overtimeHourlyRate) || 0,
         min_overtime_threshold_minutes: Number(minOvertimeThreshold) || 0,
+        tax_enabled: isTaxEnabled,
+        tax_name: taxName.trim() || 'PB1',
+        tax_rate: Number(taxRate) || 0,
+        tax_type: taxType,
+        show_tax_on_receipt: showTaxOnReceipt,
       });
 
       if (res) {
@@ -581,6 +599,140 @@
         />
       </div>
     </div>
+  </div>
+
+  <!-- Card Konfigurasi Pajak Restoran & Biaya Layanan (Dynamic Tax System) -->
+  <div class="space-y-3.5 rounded-2xl border border-[#e5e5ea] bg-[#fafafc] p-4 shadow-2xs">
+    <div class="flex flex-col justify-between gap-1 sm:flex-row sm:items-center">
+      <div class="flex items-center gap-2">
+        <Receipt class="size-4 text-[#17171c]" />
+        <h4 class="text-xs font-bold text-[#17171c]">Pengaturan Pajak (PB1 / PPN) & Biaya Layanan</h4>
+      </div>
+      <span class="text-[11px] text-[#8e8e93]">
+        Perhitungan dinamis di kasir POS tablet dan cetak struk
+      </span>
+    </div>
+
+    <!-- Toggle Aktifkan Pajak -->
+    <div class="flex items-center justify-between rounded-xl border border-[#e5e5ea] bg-white p-3 shadow-2xs">
+      <div class="space-y-0.5">
+        <span class="text-xs font-semibold text-[#17171c]">Aktifkan Perhitungan Pajak</span>
+        <p class="text-[11px] text-[#686873]">
+          Otomatis hitung pajak saat transaksi POS berlangsung
+        </p>
+      </div>
+      <label class="relative inline-flex cursor-pointer items-center">
+        <input
+          type="checkbox"
+          bind:checked={isTaxEnabled}
+          class="peer sr-only"
+        />
+        <div
+          class="peer h-5 w-9 rounded-full bg-[#e5e5ea] peer-checked:bg-[#17171c] peer-focus:outline-hidden after:absolute after:top-[2px] after:left-[2px] after:size-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full"
+        ></div>
+      </label>
+    </div>
+
+    {#if isTaxEnabled}
+      <div class="space-y-3.5 pt-1">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div class="space-y-0.5">
+            <label for="setting-tax-name" class="block text-[10.5px] font-medium text-[#686873]">
+              Nama Pajak / Label di Struk
+            </label>
+            <input
+              id="setting-tax-name"
+              type="text"
+              bind:value={taxName}
+              placeholder="Contoh: PB1, PPN, Pajak Resto"
+              class="w-full rounded-lg border border-[#e5e5ea] bg-white px-3 py-1.5 text-xs font-semibold text-[#17171c] shadow-2xs focus:border-[#17171c] focus:outline-hidden"
+            />
+          </div>
+
+          <div class="space-y-0.5">
+            <label for="setting-tax-rate" class="block text-[10.5px] font-medium text-[#686873]">
+              Tarif Pajak (%)
+            </label>
+            <div class="relative">
+              <input
+                id="setting-tax-rate"
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                bind:value={taxRate}
+                class="w-full rounded-lg border border-[#e5e5ea] bg-white py-1.5 pr-7 pl-3 font-mono text-xs font-semibold text-[#17171c] shadow-2xs focus:border-[#17171c] focus:outline-hidden"
+              />
+              <span class="absolute top-1/2 right-2.5 -translate-y-1/2 font-mono text-[10px] text-[#8e8e93]">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tipe Perhitungan Pajak (Inclusive vs Exclusive) -->
+        <div class="space-y-1.5">
+          <span class="block text-[10.5px] font-medium text-[#686873]">
+            Metode Perhitungan Pajak
+          </span>
+          <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            <!-- Inclusive -->
+            <label
+              class={`flex cursor-pointer flex-col gap-1 rounded-xl border p-3 transition-all ${
+                taxType === 'INCLUSIVE'
+                  ? 'border-[#17171c] bg-white ring-1 ring-[#17171c]'
+                  : 'border-[#e5e5ea] bg-white hover:border-[#8e8e93]'
+              }`}
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-[#17171c]">Tax Inclusive (Nett)</span>
+                <input
+                  type="radio"
+                  name="taxType"
+                  value="INCLUSIVE"
+                  bind:group={taxType}
+                  class="size-3.5 text-[#17171c] focus:ring-0"
+                />
+              </div>
+              <p class="text-[10.5px] leading-relaxed text-[#686873]">
+                Harga menu sudah termasuk pajak. Total tagihan pelanggan tidak bertambah, pajak dipisahkan di belakang layar.
+              </p>
+            </label>
+
+            <!-- Exclusive -->
+            <label
+              class={`flex cursor-pointer flex-col gap-1 rounded-xl border p-3 transition-all ${
+                taxType === 'EXCLUSIVE'
+                  ? 'border-[#17171c] bg-white ring-1 ring-[#17171c]'
+                  : 'border-[#e5e5ea] bg-white hover:border-[#8e8e93]'
+              }`}
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-[#17171c]">Tax Exclusive (Plus-Plus)</span>
+                <input
+                  type="radio"
+                  name="taxType"
+                  value="EXCLUSIVE"
+                  bind:group={taxType}
+                  class="size-3.5 text-[#17171c] focus:ring-0"
+                />
+              </div>
+              <p class="text-[10.5px] leading-relaxed text-[#686873]">
+                Pajak ditambahkan di akhir transaksi. Total tagihan pelanggan bertambah sebesar persentase pajak.
+              </p>
+            </label>
+          </div>
+        </div>
+
+        <!-- Checkbox Cetak di Struk -->
+        <label class="flex cursor-pointer items-center gap-2 pt-1 text-xs text-[#17171c]">
+          <input
+            type="checkbox"
+            bind:checked={showTaxOnReceipt}
+            class="rounded border-[#e5e5ea] text-[#17171c] focus:ring-0"
+          />
+          <span>Cetak rincian nilai pajak di struk thermal POS</span>
+        </label>
+      </div>
+    {/if}
   </div>
 
   <!-- Card Barcode QRIS Statis Toko (Pembayaran POS) -->
