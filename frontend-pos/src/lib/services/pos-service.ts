@@ -86,11 +86,13 @@ export class PosService {
 
   public async openSession(
     cashierUserId: string,
+    pin: string,
     openingCash: number,
     notes?: string
   ): Promise<PosSession> {
     const payload = {
       cashier_user_id: cashierUserId,
+      pin,
       opening_cash: openingCash,
       notes: notes || undefined,
     };

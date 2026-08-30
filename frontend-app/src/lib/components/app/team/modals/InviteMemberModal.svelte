@@ -27,13 +27,17 @@
     branch_id: null as string | null,
   });
 
+  let assignableRoles = $derived(
+    roles.filter((r) => r.name.toUpperCase().trim() !== 'OWNER')
+  );
+
   $effect(() => {
     if (isOpen) {
       const defaultRole =
-        roles.find(
+        assignableRoles.find(
           (r) =>
             r.name.toLowerCase().includes('barista') || r.name.toLowerCase().includes('karyawan')
-        ) || roles[0];
+        ) || assignableRoles[0];
       form = {
         email: '',
         job_title: 'Barista',
@@ -48,7 +52,7 @@
   });
 
   function handleRoleChange(selectedId: string) {
-    const r = roles.find((item) => item.id === selectedId);
+    const r = assignableRoles.find((item) => item.id === selectedId);
     if (r) {
       form.role_id = r.id;
       form.role = r.name;
@@ -176,9 +180,8 @@
             class="flex items-center justify-between font-bold text-[#17171c]"
           >
             <span>Role (Hak Akses)</span>
-            {#if roles.length > 0}
-              <span class="text-[11px] font-normal text-[#8e8e93]">{roles.length} pilihan role</span
-              >
+            {#if assignableRoles.length > 0}
+              <span class="text-[11px] font-normal text-[#8e8e93]">{assignableRoles.length} pilihan role</span>
             {/if}
           </label>
           <div class="relative">
@@ -188,8 +191,8 @@
               onchange={(e) => handleRoleChange((e.target as HTMLSelectElement).value)}
               class="w-full cursor-pointer appearance-none rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 pr-10 text-xs text-[#17171c] shadow-2xs transition-all hover:border-[#d1d1d6] hover:bg-white focus:border-[#17171c] focus:outline-hidden"
             >
-              {#if roles.length > 0}
-                {#each roles as role}
+              {#if assignableRoles.length > 0}
+                {#each assignableRoles as role}
                   <option value={role.id}>
                     {role.name} ({role.permissions.length} izin)
                   </option>

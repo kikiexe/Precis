@@ -27,6 +27,7 @@
   }: Props = $props();
 
   let selectedCashierId = $state<string>('');
+  let cashierPin = $state('');
   let openingCashInput = $state(200000);
   let closingCashInput = $state(0);
   let sessionNotes = $state('');
@@ -36,6 +37,7 @@
   $effect(() => {
     if (isOpen) {
       errorMessage = null;
+      cashierPin = '';
       selectedCashierId =
         cashierUserId && cashierUserId !== 'team-outlet' && cashierUserId !== 'usr-active-01'
           ? cashierUserId
@@ -62,12 +64,18 @@
       return;
     }
 
+    if (!cashierPin || cashierPin.length !== 6) {
+      errorMessage = 'Masukkan 6 digit PIN kasir yang valid.';
+      return;
+    }
+
     isLoading = true;
     errorMessage = null;
 
     try {
       const session = await posService.openSession(
         selectedCashierId,
+        cashierPin,
         openingCashInput,
         sessionNotes
       );
@@ -175,6 +183,22 @@
               </div>
             </div>
           {/if}
+
+          <div>
+            <label for="cashier-pin" class="mb-1.5 block text-xs font-medium text-[#616161]">
+              PIN Kasir (6 Digit):
+            </label>
+            <input
+              id="cashier-pin"
+              type="password"
+              maxlength="6"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              placeholder="••••••"
+              bind:value={cashierPin}
+              class="w-full rounded-xl border border-[#d9d9dd] bg-[#eeece7]/40 px-4 py-2.5 text-center font-mono text-base font-medium tracking-widest text-[#212121] focus:border-[#17171c] focus:ring-2 focus:ring-[#4c6ee6]/20 focus:outline-hidden"
+            />
+          </div>
 
           <div>
             <label for="opening-cash" class="mb-1.5 block text-xs font-medium text-[#616161]">
