@@ -168,6 +168,11 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/outlet-purchases', [\App\Http\Controllers\Api\OutletPurchaseController::class, 'store']);
         Route::delete('/outlet-purchases/{id}', [\App\Http\Controllers\Api\OutletPurchaseController::class, 'destroy']);
 
+        // pencatatan barang rusak terbuang (stock waste)
+        Route::get('/stock-wastes', [\App\Http\Controllers\Api\StockWasteController::class, 'index']);
+        Route::get('/stock-wastes/{id}', [\App\Http\Controllers\Api\StockWasteController::class, 'show']);
+        Route::post('/stock-wastes', [\App\Http\Controllers\Api\StockWasteController::class, 'store']);
+        Route::delete('/stock-wastes/{id}', [\App\Http\Controllers\Api\StockWasteController::class, 'destroy']);
         // presensi mobile PWA
         Route::prefix('attendances')->group(function (): void {
             Route::post('/clock-in', [AttendanceController::class, 'clockIn']);
@@ -301,5 +306,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/orders/{id}/refund', [PosController::class, 'refundOrder']);
         Route::get('/purchases', [PosController::class, 'purchases']);
         Route::post('/purchases', [PosController::class, 'storePurchase']);
+        Route::get('/inventory/waste', [PosController::class, 'wastes']);
+        Route::post('/inventory/waste', [PosController::class, 'storeWaste']);
     });
 });

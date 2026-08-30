@@ -7,6 +7,7 @@ import type {
   CashierUser,
   AddonCategory,
   OutletPurchase,
+  StockWaste,
 } from '../types/pos';
 
 export class PrecisPosDatabase extends Dexie {
@@ -17,6 +18,7 @@ export class PrecisPosDatabase extends Dexie {
   cashiers!: Table<CashierUser, string>;
   addonCategories!: Table<AddonCategory, string>;
   purchases!: Table<OutletPurchase, string>;
+  stockWastes!: Table<StockWaste, string>;
 
   constructor() {
     super('PrecisPosDb');
@@ -32,6 +34,9 @@ export class PrecisPosDatabase extends Dexie {
     });
     this.version(3).stores({
       purchases: 'id, workspace_id, branch_id, pos_session_id, funding_source, created_at',
+    });
+    this.version(4).stores({
+      stockWastes: 'id, workspace_id, branch_id, reason, created_at',
     });
   }
 }

@@ -12,6 +12,7 @@ import type {
   OfflineOrder,
   AddonCategory,
   OutletPurchase,
+  StockWaste,
 } from '../types/pos';
 
 export class PosService {
@@ -244,6 +245,58 @@ export class PosService {
       return response.data;
     }
     throw new Error(response.message || 'Gagal mencatat belanja outlet.');
+  }
+
+  public async syncStockWastesToLocalDb(): Promise<{ count: number }> {
+    try {
+      const response = await posApiClient.get<StockWaste[]>('/pos/inventory/waste');
+      if (response.data && Array.isArray(response.data)) {
+        await db.stockWastes.bulkPut(response.data);
+        return { count: response.data.length };
+      }
+    } catch (err: unknown) {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        return { count: 0 };
+      }
+      console.warn('[POS Sync] Gagal menyinkronkan data stock waste ke IndexedDB:', err);
+    }
+    return { count: 0 };
+  }
+
+  public async getStockWastes(): Promise<StockWaste[]> {
+    if (typeof navigator !== 'undefined' && navigator.onLine) {
+      try {
+        const response = await posApiClient.get<StockWaste[]>('/pos/inventory/waste');
+        if (response.data && Array.isArray(response.data)) {
+          await db.stockWastes.bulkPut(response.data);
+          return response.data;
+        }
+      } catch {
+        // fallback ke IndexedDB lokal
+      }
+    }
+    return await db.stockWastes.reverse().toArray();
+  }
+
+  public async createStockWaste(data: {
+    item_name: string;
+    quantity: number;
+    unit: string;
+    cost_per_unit: number;
+    total_loss_cost?: number;
+    reason: string;
+    product_id?: string | null;
+    photo_url?: string;
+    notes?: string;
+    cashier_user_id?: string;
+    pin?: string;
+  }): Promise<StockWaste> {
+    const response = await posApiClient.post<StockWaste>('/pos/inventory/waste', data);
+    if (response.data) {
+      await db.stockWastes.put(response.data);
+      return response.data;
+    }
+    throw new Error(response.message || 'Gagal mencatat stock waste.');
   }
 
   public async voidOrder(

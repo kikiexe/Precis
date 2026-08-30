@@ -262,3 +262,35 @@ export interface OutletPurchase {
   };
   created_at: string;
 }
+export type StockWasteReason =
+  | 'EXPIRED'
+  | 'SPOILED'
+  | 'ACCIDENT_SPILL'
+  | 'BARISTA_MISTAKE'
+  | 'QC_REJECT'
+  | 'OTHER';
+
+export interface StockWaste {
+  id: string;
+  workspace_id: string;
+  branch_id: string;
+  product_id?: string | null;
+  product?: {
+    id: string;
+    name: string;
+  };
+  item_name: string;
+  quantity: number;
+  unit: string;
+  cost_per_unit: number;
+  total_loss_cost: number;
+  reason: StockWasteReason;
+  photo_url?: string | null;
+  notes?: string | null;
+  recorded_by_user_id: string;
+  recorded_by_user?: {
+    id: string;
+    name: string;
+  };
+  created_at: string;
+}

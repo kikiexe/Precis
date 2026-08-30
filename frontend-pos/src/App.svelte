@@ -17,6 +17,7 @@
     CloseSessionResponse,
     OpenBill,
     PosPage,
+    StockWaste,
     AddonCategory,
     SelectedModifier,
     OutletPurchase,
@@ -51,6 +52,7 @@
   let cashiers = $state<CashierUser[]>([]);
   let allOrders = $state<OfflineOrder[]>([]);
   let closedSessions = $state<PosSession[]>([]);
+  let stockWastes = $state<StockWaste[]>([]);
 
   // state modal modifier / add-on & belanja
   let isModifierModalOpen = $state(false);
@@ -187,6 +189,7 @@
       await posService.syncCatalogToLocalDb();
       await posService.syncAddonsToLocalDb();
       await posService.syncPurchasesToLocalDb();
+      await posService.syncStockWastesToLocalDb();
       // sinkronkan riwayat transaksi server ke IndexedDB
       await posService.syncRecentOrdersToLocalDb();
       await loadDbData();
@@ -209,6 +212,7 @@
         activeCashier = cashiers[0];
       }
       allOrders = await db.orders.reverse().toArray();
+      stockWastes = await posService.getStockWastes();
 
       const openSess = await db.sessions.where('status').equals('OPEN').first();
       activeSession = openSess || null;
@@ -580,7 +584,15 @@
           onUpdateCategories={handleUpdateCategories}
         />
       {:else if activePage === 'inventori'}
-        <InventoriView />
+        <InventoriView
+          {products}
+          {cashiers}
+          {activeCashier}
+          {stockWastes}
+          onRecordWaste={(w) => {
+            stockWastes = [w, ...stockWastes];
+          }}
+        />
       {:else if activePage === 'profil'}
         <ProfilView
           {activeCashier}
