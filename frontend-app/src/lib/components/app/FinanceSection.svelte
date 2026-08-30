@@ -21,6 +21,7 @@
     TimeframeMetricData,
   } from '../../types/app';
   import { inventoryService } from '../../services/inventory-service';
+  import { apiClient } from '../../services/api-client';
   import { formatRupiah } from '@precis/shared-utils';
   import AdminPayrollView from './finance/AdminPayrollView.svelte';
   import StaffPayrollSlipView from './finance/StaffPayrollSlipView.svelte';
@@ -77,6 +78,9 @@
   let successNotification = $state<string | null>(null);
   let errorNotification = $state<string | null>(null);
 
+  let wasteTotalCost = $state(0);
+  let wasteIncidentCount = $state(0);
+
   $effect(() => {
     if (activeSubTab === 'laporan') {
       const period = selectedAnalyticsTimeframe;
@@ -90,6 +94,19 @@
         })
         .catch(() => {
           isAnalyticsLoading = false;
+        });
+
+      apiClient
+        .get<{ total_loss_cost: number; count: number }>('/stock-wastes', {
+          ...(branch && branch !== 'ALL' ? { branch_id: branch } : {}),
+        })
+        .then((res) => {
+          wasteTotalCost = res.data?.total_loss_cost || 0;
+          wasteIncidentCount = res.data?.count || 0;
+        })
+        .catch(() => {
+          wasteTotalCost = 0;
+          wasteIncidentCount = 0;
         });
     }
   });
@@ -237,14 +254,9 @@
         }}
       />
     {:else if activeSubTab === 'laporan'}
-      {@const adjustmentLogs = inventoryService.getAdjustmentLogs()}
-      {@const damagedLogs = adjustmentLogs.filter(
-        (l) => l.reason === 'DAMAGED' || l.reason === 'EXPIRED' || l.reason === 'WASTE'
-      )}
-      {@const totalWasteCost = damagedLogs.reduce(
-        (sum, l) => sum + Math.abs(l.adjusted_amount * 20000),
-        0
-      )}
+      {@const totalWasteCost = wasteTotalCost}
+      {@const damagedLogsCount = wasteIncidentCount}
+      {@const adjustmentLogs = [] as import('../../types/app').StockAdjustmentLog[]}
       {@const paymentMethods = liveAnalytics?.payment_methods || []}
       {@const totalRevenue = liveAnalytics?.total_revenue || 0}
       {@const totalOrders = liveAnalytics?.total_orders || 0}
@@ -452,7 +464,7 @@
               <span
                 class="rounded-full bg-[#f4f4f6] px-2.5 py-0.5 font-mono text-[10.5px] font-semibold text-[#17171c]"
               >
-                {damagedLogs.length} Insiden Waste
+                {damagedLogsCount} Insiden Waste
               </span>
             </div>
 
@@ -470,7 +482,7 @@
               <span
                 class="rounded-full border border-[#fecaca] bg-[#fef2f2] px-3 py-1 font-mono text-[11px] font-semibold text-[#e5484d]"
               >
-                {damagedLogs.length} Insiden
+                {damagedLogsCount} Insiden
               </span>
             </div>
 

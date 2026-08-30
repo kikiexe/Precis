@@ -253,6 +253,8 @@ class SalesHistorySeeder extends Seeder
                             $discountAmount = 0.00;
                             $totalAmount = $subtotal;
                             $finalAmount = $totalAmount - $discountAmount;
+                            $taxRate = 10.00;
+                            $taxAmount = round($finalAmount - ($finalAmount / (1 + ($taxRate / 100))), 2);
 
                             $orderRows[] = [
                                 'id' => $orderId,
@@ -266,6 +268,10 @@ class SalesHistorySeeder extends Seeder
                                 'total_amount' => $totalAmount,
                                 'discount_amount' => $discountAmount,
                                 'final_amount' => $finalAmount,
+                                'tax_name' => 'PB1',
+                                'tax_rate' => $taxRate,
+                                'tax_type' => 'INCLUSIVE',
+                                'tax_amount' => $taxAmount,
                                 'payment_method' => $paymentMethod,
                                 'payment_status' => 'PAID',
                                 'created_at' => $orderTime->toDateTimeString(),

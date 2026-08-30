@@ -13,6 +13,8 @@ import type {
   AddonCategory,
   OutletPurchase,
   StockWaste,
+  RawMaterial,
+  StockAdjustmentLog,
 } from '../types/pos';
 
 export class PosService {
@@ -400,6 +402,39 @@ export class PosService {
     }
 
     throw new Error(response.message || 'Gagal memproses refund pesanan.');
+  }
+
+  public async getRawMaterials(): Promise<RawMaterial[]> {
+    try {
+      const response = await posApiClient.get<RawMaterial[]>('/pos/inventory/raw-materials');
+      return response.data || [];
+    } catch {
+      return [];
+    }
+  }
+
+  public async getInventoryCategories(): Promise<Array<{ id: string; name: string }>> {
+    try {
+      const response = await posApiClient.get<Array<{ id: string; name: string }>>('/pos/inventory/categories');
+      return response.data || [
+        { id: 'cat-bar', name: 'Bar' },
+        { id: 'cat-kitchen', name: 'Kitchen' },
+      ];
+    } catch {
+      return [
+        { id: 'cat-bar', name: 'Bar' },
+        { id: 'cat-kitchen', name: 'Kitchen' },
+      ];
+    }
+  }
+
+  public async getStockLogs(): Promise<StockAdjustmentLog[]> {
+    try {
+      const response = await posApiClient.get<StockAdjustmentLog[]>('/pos/inventory/stock-logs');
+      return response.data || [];
+    } catch {
+      return [];
+    }
   }
 }
 

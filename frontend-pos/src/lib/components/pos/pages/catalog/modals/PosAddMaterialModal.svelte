@@ -20,7 +20,7 @@
   let { isOpen, editingMaterial, rawMaterialCategories = [], onClose, onSave }: Props = $props();
 
   let name = $state('');
-  let category_id = $state('cat-dairy');
+  let category_id = $state('');
   let current_stock = $state(10);
   let min_stock_alert = $state(5);
   let unit = $state('liter');
@@ -35,7 +35,7 @@
         unit = editingMaterial.unit;
       } else {
         name = '';
-        category_id = 'cat-dairy';
+        category_id = rawMaterialCategories[0]?.id || '';
         current_stock = 10;
         min_stock_alert = 5;
         unit = 'liter';

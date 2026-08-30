@@ -2,6 +2,7 @@
   import { Sparkles, CheckCircle2, Upload, X } from 'lucide-svelte';
   import type { SubscriptionInvoice, SubscriptionPlanItem } from '../../../types/app';
   import { formatRupiah } from '../../../utils/formatters';
+  import { billingService } from '../../../services/billing-service';
 
   interface Props {
     subscriptionInvoices: SubscriptionInvoice[];
@@ -26,15 +27,30 @@
   let selectedInvoiceId = $state<string | null>(null);
   let proofBankName = $state('');
   let proofAmount = $state(299000);
-  let proofUrl = $state('https://r2.precis.id/proofs/bukti_transfer_sample.webp');
+  let proofUrl = $state('');
+  let proofFile = $state<File | null>(null);
   let isUploadingProof = $state(false);
+
+  function handleFileSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.files && target.files.length > 0) {
+      proofFile = target.files[0];
+    }
+  }
 
   async function handleSendProof() {
     if (!selectedInvoiceId || !proofBankName.trim()) return;
+    if (!proofFile && !proofUrl) return;
+
     isUploadingProof = true;
     try {
-      await onSubmitPaymentProof(selectedInvoiceId, proofBankName.trim(), proofAmount, proofUrl);
+      let finalUrl = proofUrl;
+      if (proofFile) {
+        finalUrl = await billingService.uploadProofImage(proofFile);
+      }
+      await onSubmitPaymentProof(selectedInvoiceId, proofBankName.trim(), proofAmount, finalUrl);
       isProofModalOpen = false;
+      proofFile = null;
     } finally {
       isUploadingProof = false;
     }
@@ -232,6 +248,22 @@
             class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2.5 font-mono text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
           />
         </div>
+
+        <div class="space-y-1.5">
+          <label for="proof-file" class="block font-bold text-[#17171c]"
+            >Berkas Foto Bukti Transfer</label
+          >
+          <input
+            id="proof-file"
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            onchange={handleFileSelected}
+            class="w-full rounded-xl border border-[#e5e5ea] bg-[#f8f8fa] px-4 py-2 text-xs text-[#17171c] shadow-2xs transition-all hover:bg-white focus:border-[#17171c] focus:outline-hidden"
+          />
+          {#if proofFile}
+            <p class="text-[11px] font-medium text-[#059669]">Terpilih: {proofFile.name}</p>
+          {/if}
+        </div>
       </div>
 
       <div class="flex items-center gap-3 pt-2">
@@ -244,7 +276,7 @@
         </button>
         <button
           type="button"
-          disabled={isUploadingProof || !proofBankName.trim()}
+          disabled={isUploadingProof || !proofBankName.trim() || (!proofFile && !proofUrl)}
           onclick={handleSendProof}
           class="flex-1 cursor-pointer rounded-full bg-[#17171c] py-3 text-xs font-semibold text-white shadow-xs transition-all hover:bg-black disabled:opacity-50"
         >

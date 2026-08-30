@@ -9,6 +9,7 @@
     ShieldCheck,
   } from 'lucide-svelte';
   import type { CashierUser } from '../../../types/pos';
+  import { syncEngine } from '../../../services/sync-engine';
 
   interface Props {
     activeCashier?: CashierUser | null;
@@ -42,8 +43,8 @@
   let enableCashPayment = $state(true);
   let enableQrisPayment = $state(true);
   let enableTransferPayment = $state(true);
-  let bankAccountNumber = $state('BCA 8901238910 - PT PRECIS KREATIF');
-  let qrisMerchantName = $state('PRECIS COFFEE OUTLET SETURAN');
+  let bankAccountNumber = $state('');
+  let qrisMerchantName = $state('');
   let paymentSaveMsg = $state<string | null>(null);
 
   // Sub-Tab 3: Sync & Storage State
@@ -55,14 +56,19 @@
     setTimeout(() => (paymentSaveMsg = null), 3000);
   }
 
-  function handleTriggerSync() {
+  async function handleTriggerSync() {
     isSyncingNow = true;
     syncSuccessMsg = null;
-    setTimeout(() => {
-      isSyncingNow = false;
+    try {
+      await syncEngine.syncPendingOrders();
       syncSuccessMsg = 'Semua data transaksi kasir berhasil disinkronkan ke server cloud.';
       setTimeout(() => (syncSuccessMsg = null), 4000);
-    }, 1200);
+    } catch {
+      syncSuccessMsg = 'Gagal menyinkronkan data. Periksa koneksi internet.';
+      setTimeout(() => (syncSuccessMsg = null), 4000);
+    } finally {
+      isSyncingNow = false;
+    }
   }
 </script>
 
