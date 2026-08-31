@@ -55,9 +55,9 @@
     isLoading = true;
     try {
       const [cats, prods, raws] = await Promise.all([
-        inventoryService.fetchLiveCategories(),
-        inventoryService.fetchLiveProducts(),
-        inventoryService.getRawMaterials(),
+        inventoryService.fetchLiveCategories().catch(() => []),
+        inventoryService.fetchLiveProducts().catch(() => []),
+        inventoryService.getRawMaterials().catch(() => []),
       ]);
       categories = cats;
       menuItems = prods;

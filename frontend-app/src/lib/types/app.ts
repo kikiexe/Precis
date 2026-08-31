@@ -492,7 +492,8 @@ export interface WorkspaceInvitationItem {
 export interface PosTerminalItem {
   id: string;
   terminal_name: string;
-  device_token: string;
+  device_token?: string;
+  device_token_preview?: string;
   is_active: boolean;
   created_at?: string;
 }

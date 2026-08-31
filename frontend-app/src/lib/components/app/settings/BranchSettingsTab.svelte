@@ -331,16 +331,20 @@
   }
 
   let customDeviceToken = $state('');
+  let freshTokens = $state<Record<string, string>>({});
 
   async function handleCreateTerminal() {
     if (!activeBranch) return;
     isCreatingTerminal = true;
     try {
-      await inventoryService.createTerminal(
+      const res = await inventoryService.createTerminal(
         activeBranch.id,
         newTerminalName || undefined,
         customDeviceToken.trim() || undefined
       );
+      if (res && res.id && res.device_token) {
+        freshTokens[res.id] = res.device_token;
+      }
       newTerminalName = '';
       customDeviceToken = '';
       isShowAddTerminalModal = false;
@@ -364,7 +368,10 @@
     )
       return;
     try {
-      await inventoryService.regenerateTerminalToken(activeBranch.id, terminalId);
+      const res = await inventoryService.regenerateTerminalToken(activeBranch.id, terminalId);
+      if (res && res.device_token) {
+        freshTokens[terminalId] = res.device_token;
+      }
       terminalActionMsg = 'Device token baru berhasil diterbitkan.';
       setTimeout(() => (terminalActionMsg = null), 4000);
       onBranchUpdated?.();
@@ -956,11 +963,15 @@
                 <code
                   class="flex-1 truncate font-mono text-xs font-bold tracking-wide text-[#17171c] select-all"
                 >
-                  {terminal.device_token}
+                  {freshTokens[terminal.id] || terminal.device_token || terminal.device_token_preview || '-'}
                 </code>
                 <button
                   type="button"
-                  onclick={() => handleCopyToken(terminal.id, terminal.device_token)}
+                  onclick={() =>
+                    handleCopyToken(
+                      terminal.id,
+                      freshTokens[terminal.id] || terminal.device_token || terminal.device_token_preview || ''
+                    )}
                   class={`flex cursor-pointer items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold transition-all ${
                     copiedTokenId === terminal.id
                       ? 'bg-[#059669] text-white shadow-2xs'

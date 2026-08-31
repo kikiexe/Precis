@@ -230,35 +230,6 @@ class AnalyticsService
                     'average_ticket' => $count > 0 ? (int) round($rev / $count) : 0,
                 ];
             }
-        } elseif ($period === 'week') {
-            $days = [
-                ['d' => 1, 'l' => 'Senin'],
-                ['d' => 2, 'l' => 'Selasa'],
-                ['d' => 3, 'l' => 'Rabu'],
-                ['d' => 4, 'l' => 'Kamis'],
-                ['d' => 5, 'l' => 'Jumat'],
-                ['d' => 6, 'l' => 'Sabtu'],
-                ['d' => 7, 'l' => 'Minggu'],
-            ];
-            foreach ($hours as $slot) {
-                $h = $slot['h'];
-                $matching = $mappedOrders->filter(function ($o) use ($h) {
-                    $orderHour = (int) $o['timestamp']->format('G');
-                    return $orderHour >= $h && $orderHour < $h + 2;
-                });
-
-                $count = $matching->count();
-                $rev = (float) $matching->sum('amount');
-
-                $breakdown[] = [
-                    'id' => 'slot-' . $h,
-                    'label' => $slot['l'],
-                    'subLabel' => $slot['sub'],
-                    'revenue' => (int) $rev,
-                    'orders_count' => $count,
-                    'average_ticket' => $count > 0 ? (int) round($rev / $count) : 0,
-                ];
-            }
         } elseif ($period === 'week' || $period === 'month') {
             $cursor = $start->copy()->startOfDay();
             while ($cursor->lte($end)) {

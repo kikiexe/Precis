@@ -236,5 +236,27 @@ class BranchSeeder extends Seeder
                 );
             }
         }
+        $rawMaterialsSample = [
+            ['name' => 'Fresh Milk Diamond 1L', 'current_stock' => 18, 'min_stock_alert' => 10, 'unit' => 'liter'],
+            ['name' => 'Oatside Barista Oat Milk 1L', 'current_stock' => 12, 'min_stock_alert' => 5, 'unit' => 'liter'],
+            ['name' => 'Biji Kopi Arabica House Blend 1kg', 'current_stock' => 15, 'min_stock_alert' => 5, 'unit' => 'kg'],
+            ['name' => 'Sirup Monin Vanilla 700ml', 'current_stock' => 4, 'min_stock_alert' => 2, 'unit' => 'botol'],
+            ['name' => 'Paper Cup 8oz Cold / Hot', 'current_stock' => 250, 'min_stock_alert' => 50, 'unit' => 'pcs'],
+        ];
+
+        foreach ($rawMaterialsSample as $mat) {
+            \App\Models\RawMaterial::withoutGlobalScopes()->firstOrCreate(
+                [
+                    'workspace_id' => $branchSeturan->workspace_id,
+                    'name' => $mat['name'],
+                ],
+                [
+                    'current_stock' => $mat['current_stock'],
+                    'min_stock_alert' => $mat['min_stock_alert'],
+                    'unit' => $mat['unit'],
+                    'last_adjusted_at' => $now,
+                ]
+            );
+        }
     }
 }
